@@ -1,0 +1,71 @@
+package cav
+
+import (
+	"resty.dev/v3"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/auth"
+	subclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/subClient"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
+)
+
+// settings hold the values of all client options.
+type settings struct {
+	// Organization is the name of the organization to which the client belongs.
+	Organization string
+	// Console contains all properties related to the console of the client.
+	Console consoles.Console
+	// SubClients contains the sub-clients for the client.
+	SubClients map[subclient.Name]subclient.Client
+	// Credential is the authentication credential for the client.
+	// TODO Remove
+	// Credential auth.Auth
+
+	httpClient *resty.Client
+}
+
+func newSettings(organization string) *settings {
+	return &settings{
+		Organization: organization,
+		SubClients:   make(map[subclient.Name]subclient.Client),
+	}
+}
+
+// ClientOption  is a function which applies options to a settings object.
+type ClientOption func(*settings) error
+
+// * Internal options
+
+// withConsole sets the console for the client.
+func withConsole() ClientOption {
+	return func(s *settings) error {
+		c, err := consoles.FindByOrganizationName(s.Organization)
+		if err != nil {
+			return err
+		}
+		s.Console = c
+		return nil
+	}
+}
+
+// * Exporter options
+
+// WithCloudAvenueCredential sets the credential for the client.
+func WithCloudAvenueCredential(username, password string) ClientOption {
+	return func(s *settings) error {
+		for _, client := range []subclient.Name{subclient.Cerberus, subclient.Vmware} {
+			if s.SubClients[client] == nil {
+				s.SubClients[client] = subclient.Clients[client]
+			}
+
+			s.SubClients[client].SetConsole(s.Console)
+
+			cred, err := auth.NewCloudavenueCredential(s.httpClient, s.Console, s.Organization, username, password)
+			if err != nil {
+				return err
+			}
+			s.SubClients[client].SetCredential(cred)
+		}
+
+		return nil
+	}
+}

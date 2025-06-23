@@ -1,0 +1,45 @@
+package errors
+
+import (
+	"testing"
+	"time"
+)
+
+func TestClientError_Error(t *testing.T) {
+	err := &ClientError{Message: "client error"}
+	if got := err.Error(); got != "client error" {
+		t.Errorf("ClientError.Error() = %q, want %q", got, "client error")
+	}
+	var nilErr *ClientError
+	if got := nilErr.Error(); got != "nil ClientError" {
+		t.Errorf("ClientError.Error() nil = %q, want %q", got, "nil ClientError")
+	}
+}
+
+func TestAPIError_Error(t *testing.T) {
+	apiErr := &APIError{
+		StatusCode: 500,
+		Message:    "internal error",
+		Duration:   2 * time.Second,
+		Endpoint:   "/test",
+	}
+	want := "request API error: internal error (status code: 500, duration: 2s, endpoint: /test)"
+	if got := apiErr.Error(); got != want {
+		t.Errorf("APIError.Error() = %q, want %q", got, want)
+	}
+	var nilErr *APIError
+	if got := nilErr.Error(); got != "nil APIError" {
+		t.Errorf("APIError.Error() nil = %q, want %q", got, "nil APIError")
+	}
+}
+
+func TestAPIError_IsNotFound(t *testing.T) {
+	apiErr := &APIError{StatusCode: 404}
+	if !apiErr.IsNotFound() {
+		t.Error("APIError.IsNotFound() = false, want true")
+	}
+	apiErr.StatusCode = 500
+	if apiErr.IsNotFound() {
+		t.Error("APIError.IsNotFound() = true, want false")
+	}
+}
