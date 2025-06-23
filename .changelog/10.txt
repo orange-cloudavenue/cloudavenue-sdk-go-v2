@@ -1,0 +1,3 @@
+```release-note:feature
+initial implementation of the CloudAvenue SDK V2, a Go client library for interacting with the Orange CloudAvenue APIs. The changes include core client functionality, authentication mechanisms, and supporting documentation.
+```
