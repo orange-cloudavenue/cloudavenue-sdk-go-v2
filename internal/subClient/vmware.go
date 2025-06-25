@@ -44,7 +44,7 @@ func (v *vmware) NewHTTPClient(ctx context.Context) (*resty.Client, error) {
 	}
 
 	v.httpClient = httpclient.NewHTTPClient().
-		SetBaseURL(v.console.GetAPIVmwareEndpoint()).
+		SetBaseURL(v.console.GetAPIVCDEndpoint()).
 		SetHeaders(v.credential.Headers()).
 		SetHeader("Accept", "application/json;version="+auth.VDCVersion).
 		SetError(vmwareError{})

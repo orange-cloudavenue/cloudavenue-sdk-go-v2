@@ -14,8 +14,9 @@ import (
 	"errors"
 	"log"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 	"resty.dev/v3"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )
 
 var _ Auth = (*CloudavenueCredential)(nil)
@@ -86,7 +87,7 @@ func (c *CloudavenueCredential) Refresh(ctx context.Context) error {
 		r.SetBasicAuth(c.username+"@"+c.organization, c.password)
 	}
 
-	resp, err := r.Post(c.console.GetAPIVmwareEndpoint() + "/1.0.0/sessions")
+	resp, err := r.Post(c.console.GetAPIVCDEndpoint() + "/1.0.0/sessions")
 
 	if err != nil {
 		c.bearer = ""

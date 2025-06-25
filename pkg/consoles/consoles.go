@@ -11,8 +11,6 @@ package consoles
 
 import (
 	"regexp"
-
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go/pkg/errors"
 )
 
 type (
@@ -29,7 +27,7 @@ type (
 	}
 
 	Services struct {
-		APIVmware   Service
+		APIVCD      Service
 		APICerberus Service
 		S3          Service
 		VCDA        Service
@@ -64,7 +62,7 @@ var consoles = map[Console]console{
 		URL:                 "https://console1.cloudavenue.orange-business.com",
 		OrganizationPattern: regexp.MustCompile(`^cav01ev01ocb\d{7}$`),
 		Services: Services{
-			APIVmware: Service{
+			APIVCD: Service{
 				Enabled:  true,
 				Endpoint: "https://console1.cloudavenue.orange-business.com/cloudapi",
 			},
@@ -89,7 +87,7 @@ var consoles = map[Console]console{
 		URL:                 "https://console2.cloudavenue.orange-business.com",
 		OrganizationPattern: regexp.MustCompile(`^cav01iv02ocb\d{7}$`),
 		Services: Services{
-			APIVmware: Service{
+			APIVCD: Service{
 				Enabled:  true,
 				Endpoint: "https://console2.cloudavenue.orange-business.com/cloudapi",
 			},
@@ -115,7 +113,7 @@ var consoles = map[Console]console{
 		URL:                 "https://console4.cloudavenue.orange-business.com",
 		OrganizationPattern: regexp.MustCompile(`^cav02ev04ocb\d{7}$`),
 		Services: Services{
-			APIVmware: Service{
+			APIVCD: Service{
 				Enabled:  true,
 				Endpoint: "https://console4.cloudavenue.orange-business.com/cloudapi",
 			},
@@ -136,7 +134,7 @@ var consoles = map[Console]console{
 		URL:                 "https://console5.cloudavenue-cha.itn.intraorange",
 		OrganizationPattern: regexp.MustCompile(`^cav02iv05ocb\d{7}$`),
 		Services: Services{
-			APIVmware: Service{
+			APIVCD: Service{
 				Enabled:  true,
 				Endpoint: "https://console5.cloudavenue-cha.itn.intraorange/cloudapi",
 			},
@@ -158,7 +156,7 @@ var consoles = map[Console]console{
 		URL:                 "https://console7.cloudavenue-vdr.itn.intraorange",
 		OrganizationPattern: regexp.MustCompile(`^cav01iv07ocb\d{7}$`),
 		Services: Services{
-			APIVmware: Service{
+			APIVCD: Service{
 				Enabled:  true,
 				Endpoint: "https://console7.cloudavenue-vdr.itn.intraorange/cloudapi",
 			},
@@ -175,7 +173,7 @@ var consoles = map[Console]console{
 		URL:                 "https://console8.cloudavenue-vdr.itn.intraorange",
 		OrganizationPattern: regexp.MustCompile(`^cav01iv08ocb\d{7}$`),
 		Services: Services{
-			APIVmware: Service{
+			APIVCD: Service{
 				Enabled:  true,
 				Endpoint: "https://console8.cloudavenue-vdr.itn.intraorange/cloudapi",
 			},
@@ -193,7 +191,7 @@ var consoles = map[Console]console{
 		URL:                 "https://console9.cloudavenue.orange-business.com",
 		OrganizationPattern: regexp.MustCompile(`^cav0[0-2]{1}vv09ocb\d{7}$`),
 		Services: Services{
-			APIVmware: Service{
+			APIVCD: Service{
 				Enabled:  true,
 				Endpoint: "https://console9.cloudavenue.orange-business.com/cloudapi",
 			},
@@ -211,7 +209,7 @@ var consoles = map[Console]console{
 		URL:                 "http://mock.api",
 		OrganizationPattern: regexp.MustCompile(`^mockorg\d+$`),
 		Services: Services{
-			APIVmware: Service{
+			APIVCD: Service{
 				Enabled:  true,
 				Endpoint: "http://mock.api/cloudapi",
 			},
@@ -254,14 +252,14 @@ func FindByURL(url string) (Console, bool) {
 }
 
 // FindByOrganizationName - Returns the console by its organization name.
-func FindByOrganizationName(organizationName string) (Console, error) {
+func FindByOrganizationName(organizationName string) (Console, bool) {
 	for c, console := range consoles {
 		if console.OrganizationPattern.MatchString(organizationName) {
-			return c, nil
+			return c, true
 		}
 	}
 
-	return "", errors.ErrOrganizationFormatIsInvalid
+	return "", false
 }
 
 // CheckOrganizationName - Returns true if the organization name is valid.
@@ -310,9 +308,9 @@ func (c Console) GetURL() string {
 	return consoles[c].URL
 }
 
-// GetAPIVmwareEndpoint - Returns the VMware API endpoint.
-func (c Console) GetAPIVmwareEndpoint() string {
-	return consoles[c].Services.APIVmware.GetEndpoint()
+// GetAPIVCDEndpoint - Returns the VMware API endpoint.
+func (c Console) GetAPIVCDEndpoint() string {
+	return consoles[c].Services.APIVCD.GetEndpoint()
 }
 
 // GetAPICerberusEndpoint - Returns the Cerberus API endpoint.

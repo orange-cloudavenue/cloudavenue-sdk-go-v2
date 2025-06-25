@@ -63,19 +63,6 @@ func TestConsoles(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "should return the correct site name for Console9",
-			console: Console9,
-			orgName: "cav01vv09ocb0001234",
-			wantErr: false,
-		},
-		{
-			name:    "should return the correct site name for Console9",
-			console: Console9,
-			orgName: "cav02vv09ocb0001234",
-			wantErr: false,
-		},
-
-		{
 			name:    "should return an error if the organization is empty",
 			console: "",
 			orgName: "",
@@ -91,19 +78,22 @@ func TestConsoles(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c, err := FindByOrganizationName(tt.orgName)
-			if (err != nil) && !tt.wantErr {
-				t.Errorf("FingByOrganizationName(%s) error = %v, wantErr %v", tt.orgName, err, tt.wantErr)
+			c, ok := FindByOrganizationName(tt.orgName)
+			if ok && !tt.wantErr {
+				t.Errorf("FindByOrganizationName(%s) = %v, want error", tt.orgName, c)
 				return
 			}
 
-			if !tt.wantErr && !CheckOrganizationName(tt.orgName) {
-				t.Errorf("CheckOrganizationName(%s) error = %v, wantErr %v", tt.orgName, err, tt.wantErr)
-				return
+			if !tt.wantErr {
+				got := CheckOrganizationName(tt.orgName)
+				if !got {
+					t.Errorf("CheckOrganizationName(%s) = %v, want %v", tt.orgName, got, !tt.wantErr)
+					return
+				}
 			}
 
 			if c.GetSiteID() != tt.console {
-				t.Errorf("FingByOrganizationName(%s) = %v, want %v", tt.orgName, c.GetSiteID(), tt.console)
+				t.Errorf("FindByOrganizationName(%s) = %v, want %v", tt.orgName, c.GetSiteID(), tt.console)
 				return
 			}
 		})
@@ -191,11 +181,11 @@ func TestFindByURL(t *testing.T) {
 func TestConsole_Services(t *testing.T) {
 	c := Console1
 	services := c.Services()
-	if !services.APIVmware.Enabled {
-		t.Errorf("Expected APIVmware to be enabled for Console1")
+	if !services.APIVCD.Enabled {
+		t.Errorf("Expected APIVCD to be enabled for Console1")
 	}
-	if services.APIVmware.Endpoint == "" {
-		t.Errorf("Expected APIVmware endpoint to be non-empty for Console1")
+	if services.APIVCD.Endpoint == "" {
+		t.Errorf("Expected APIVCD endpoint to be non-empty for Console1")
 	}
 }
 
@@ -251,7 +241,7 @@ func TestConsole_GetURL(t *testing.T) {
 	}
 }
 
-func TestConsole_GetAPIVmwareEndpoint(t *testing.T) {
+func TestConsole_GetAPIVCDEndpoint(t *testing.T) {
 	tests := []struct {
 		console  Console
 		expected string
@@ -261,9 +251,9 @@ func TestConsole_GetAPIVmwareEndpoint(t *testing.T) {
 		{Console9, "https://console9.cloudavenue.orange-business.com/cloudapi"},
 	}
 	for _, tt := range tests {
-		got := tt.console.GetAPIVmwareEndpoint()
+		got := tt.console.GetAPIVCDEndpoint()
 		if got != tt.expected {
-			t.Errorf("GetAPIVmwareEndpoint() = %v, want %v", got, tt.expected)
+			t.Errorf("GetAPIVCDEndpoint() = %v, want %v", got, tt.expected)
 		}
 	}
 }

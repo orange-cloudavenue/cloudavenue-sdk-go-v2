@@ -7,7 +7,7 @@
  * or see the "LICENSE" file for more details.
  */
 
-// Package errors provides functions to manipulate errors in CloudAvenue SDK.
+// Package errors provides functions to manipulate errors in CloudAvenue SDK V2.
 //
 // It includes error handling, error wrapping, and custom error types
 // to facilitate error management across the SDK.

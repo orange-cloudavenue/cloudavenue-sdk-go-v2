@@ -83,5 +83,5 @@ func TestWithConsole_SetsConsole(t *testing.T) {
 
 	assert.Equal(t, s.Console.GetSiteName(), "Console Mock")
 	assert.Equal(t, s.Console.GetSiteID(), consoles.Console("mock"))
-	assert.Equal(t, s.Console.GetAPIVmwareEndpoint(), "http://mock.api/cloudapi")
+	assert.Equal(t, s.Console.GetAPIVCDEndpoint(), "http://mock.api/cloudapi")
 }

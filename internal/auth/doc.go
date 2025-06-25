@@ -7,5 +7,5 @@
  * or see the "LICENSE" file for more details.
  */
 
-// Package auth provides authentication utilities for the CloudAvenue SDK.
+// Package auth provides authentication utilities for the CloudAvenue SDK V2.
 package auth

@@ -10,6 +10,8 @@
 package cav
 
 import (
+	"errors"
+
 	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/auth"
@@ -25,9 +27,6 @@ type settings struct {
 	Console consoles.Console
 	// SubClients contains the sub-clients for the client.
 	SubClients map[subclient.Name]subclient.Client
-	// Credential is the authentication credential for the client.
-	// TODO Remove
-	// Credential auth.Auth
 
 	httpClient *resty.Client
 }
@@ -47,9 +46,9 @@ type ClientOption func(*settings) error
 // withConsole sets the console for the client.
 func withConsole() ClientOption {
 	return func(s *settings) error {
-		c, err := consoles.FindByOrganizationName(s.Organization)
-		if err != nil {
-			return err
+		c, ok := consoles.FindByOrganizationName(s.Organization)
+		if !ok {
+			return errors.New("console not found")
 		}
 		s.Console = c
 		return nil
