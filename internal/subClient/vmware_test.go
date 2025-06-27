@@ -106,9 +106,10 @@ func TestVmware_ParseAPIError_ErrorResponse(t *testing.T) {
 		Body: http.NoBody,
 		Request: &resty.Request{
 			URL: "http://mock.api/vmware",
-			Error: &vmwareError{
-				Message:        "Bad Request",
-				MinorErrorCode: "1234",
+			Error: &VmwareError{
+				Message:       "Bad Request",
+				StatusCode:    400,
+				StatusMessage: "1234",
 			},
 		},
 	}

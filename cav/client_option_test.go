@@ -12,9 +12,8 @@ package cav
 import (
 	"testing"
 
-	"resty.dev/v3"
-
 	"github.com/stretchr/testify/assert"
+	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/auth"
 	subclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/subClient"
@@ -33,7 +32,7 @@ var getMockConsole = func() consoles.Console {
 func TestWithCloudAvenueCredential_SetsCredentials(t *testing.T) {
 	// Mock the NewCloudavenueCredential function to return a mock auth
 	origNewCloudavenueCredential := auth.NewCloudavenueCredential
-	auth.NewCloudavenueCredential = func(_ *resty.Client, _ consoles.Console, _ string, _ string, _ string) (auth.Auth, error) {
+	auth.NewCloudavenueCredential = func(_ *resty.Client, _ consoles.Console, _, _, _ string) (auth.Auth, error) {
 		return getMockAuth, nil
 	}
 	defer func() { auth.NewCloudavenueCredential = origNewCloudavenueCredential }()

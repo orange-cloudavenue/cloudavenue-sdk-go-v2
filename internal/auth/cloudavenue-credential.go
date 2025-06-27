@@ -88,7 +88,6 @@ func (c *CloudavenueCredential) Refresh(ctx context.Context) error {
 	}
 
 	resp, err := r.Post(c.console.GetAPIVCDEndpoint() + "/1.0.0/sessions")
-
 	if err != nil {
 		c.bearer = ""
 		return err

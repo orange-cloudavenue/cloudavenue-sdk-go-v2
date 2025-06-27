@@ -29,6 +29,7 @@ func Test_NewRequest_WithoutAuth(t *testing.T) {
 		t.Fatalf("Expected error message 'invalid client mock', got '%v'", err.Error())
 	}
 }
+
 func Test_NewRequest(t *testing.T) {
 	client, err := NewClient("mockorg001", WithMock())
 	if err != nil {
@@ -40,6 +41,7 @@ func Test_NewRequest(t *testing.T) {
 		t.Fatalf("Error creating request with mock: %v", err)
 	}
 }
+
 func Test_NewRequest_RequestOptionsError(t *testing.T) {
 	client, err := NewClient("mockorg001", WithMock())
 	if err != nil {
