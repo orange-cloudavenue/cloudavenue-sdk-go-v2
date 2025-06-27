@@ -63,7 +63,7 @@ func (c *client) NewRequest(ctx context.Context, client subclient.Name, reqOpt .
 
 		// Create a new HTTP client specifically for job requests.
 		// This is necessary because the initial client (hc) have a specific middleware defined below.
-		// If the hc client has used in NewJobMiddleware, it will create a infinite loop.
+		// If the hc client has used in NewJobMiddleware, it will create an infinite loop.
 		// So we create a new client for job requests.
 		hCForJob, err := sc.NewHTTPClient(ctxv)
 		if err != nil {
