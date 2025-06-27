@@ -16,10 +16,29 @@ import (
 
 type (
 	APIError struct {
+		// StatusCode is the HTTP status code returned by the API.
+		// It is used to determine the type of error that occurred.
 		StatusCode int
-		Message    string
-		Duration   time.Duration
-		Endpoint   string
+
+		// StatusMessage is the HTTP status message returned by the API.
+		// It provides additional context about the error.
+		StatusMessage string
+
+		// Operation is a short description of the operation that caused the error.
+		// It helps identify which API operation failed.
+		Operation string
+
+		// Message is the error message returned by the API.
+		// It contains the specific error details provided by the API.
+		Message string
+
+		// Duration is the time taken for the API request to complete.
+		Duration time.Duration
+
+		// Endpoint is the API endpoint that was called when the error occurred.
+		// It helps identify which specific API endpoint was involved in the error.
+		// This is useful for debugging and logging purposes.
+		Endpoint string
 	}
 )
 
@@ -33,7 +52,8 @@ func (e *APIError) Error() string {
 	if e == nil {
 		return "nil APIError"
 	}
-	return fmt.Sprintf("request API error: %s (status code: %d, duration: %s, endpoint: %s)",
-		e.Message, e.StatusCode, e.Duration, e.Endpoint,
+
+	return fmt.Sprintf("request API error: [%s] %s (status code: %d, duration: %s, endpoint: %s)",
+		e.Operation, e.Message, e.StatusCode, e.Duration, e.Endpoint,
 	)
 }

@@ -1,6 +1,8 @@
 package errors
 
-import "errors"
+import (
+	"errors"
+)
 
 func parseErrorType[errType any](err error) bool {
 	if err == nil {
