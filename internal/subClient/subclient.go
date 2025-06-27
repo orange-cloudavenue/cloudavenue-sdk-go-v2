@@ -24,6 +24,8 @@ var Clients = map[Name]Client{
 	Cerberus: NewCerberusClient(),
 	// Mock client for testing purposes
 	mock: NewMockClient(),
+	// Mock job client for testing purposes
+	mockJob: NewMockJobClient(),
 }
 
 type Name string
@@ -32,7 +34,8 @@ const (
 	Vmware    Name = "vmware"
 	Cerberus  Name = "cerberus"
 	Netbackup Name = "netbackup"
-	mock      Name = "mock" // For testing purposes
+	mock      Name = "mock"     // For testing purposes
+	mockJob   Name = "mock-job" // For testing purposes with jobs
 )
 
 type client struct {
@@ -45,5 +48,9 @@ type Client interface {
 	SetCredential(auth.Auth)
 	SetConsole(consoles.Console)
 	NewHTTPClient(context.Context) (*resty.Client, error)
+
+	// TODO(azrod): Add field operation to ParseAPIError to force user to set the name of the operation
+	// E.g. ParseAPIError(*resty.Response, "CreateVM") *errors.APIError
+
 	ParseAPIError(*resty.Response) *errors.APIError
 }

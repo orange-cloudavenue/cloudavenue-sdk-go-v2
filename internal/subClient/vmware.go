@@ -20,16 +20,9 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
-var _ Client = &vmware{}
-
-type vmware struct {
-	client
-}
-
-type vmwareError struct {
-	Message        string `json:"message"`
-	MinorErrorCode string `json:"minorErrorCode"`
-}
+var (
+	_ Client = &vmware{}
+)
 
 var NewVmwareClient = func() Client {
 	return &vmware{}
@@ -37,19 +30,19 @@ var NewVmwareClient = func() Client {
 
 // NewClient creates a new request for the VMware subclient.
 func (v *vmware) NewHTTPClient(ctx context.Context) (*resty.Client, error) {
+	// If the credential is not initialized, refresh it.
+	// This is necessary to ensure that the client has the latest authentication token.
 	if !v.credential.IsInitialized() {
 		if err := v.credential.Refresh(ctx); err != nil {
 			return nil, err
 		}
 	}
 
-	v.httpClient = httpclient.NewHTTPClient().
+	// Create a new HTTP client with the base URL and headers.
+	return httpclient.NewHTTPClient().
 		SetBaseURL(v.console.GetAPIVCDEndpoint()).
 		SetHeaders(v.credential.Headers()).
-		SetHeader("Accept", "application/json;version="+auth.VDCVersion).
-		SetError(vmwareError{})
-
-	return v.httpClient, nil
+		SetHeader("Accept", "application/json;version="+auth.VDCVersion), nil
 }
 
 // SetCredential sets the authentication credential for the VMware client.
@@ -68,14 +61,18 @@ func (v *vmware) ParseAPIError(resp *resty.Response) *errors.APIError {
 		return nil
 	}
 
+	// Documentation for the VCD API error response:
+	// https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/types/ErrorType.html
+
 	// If resp.Error() is not nil, it means an error occurred.
 	// Parse the error response body.
-	if err, ok := resp.Error().(*vmwareError); ok {
+	if vmwErr, ok := resp.Error().(*VmwareError); ok {
 		return &errors.APIError{
-			StatusCode: resp.StatusCode(),
-			Message:    err.Message,
-			Duration:   resp.Duration(),
-			Endpoint:   resp.Request.URL,
+			StatusCode:    resp.StatusCode(),
+			StatusMessage: vmwErr.StatusMessage,
+			Message:       vmwErr.Message,
+			Duration:      resp.Duration(),
+			Endpoint:      resp.Request.URL,
 		}
 	}
 

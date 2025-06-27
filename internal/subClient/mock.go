@@ -18,13 +18,17 @@ import (
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/auth"
 	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/httpClient"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/jobs"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
-var _ Client = &mockClient{}
+// MockClient and MockJobClientWithJob are mock implementations of the Client interface
+// There are used for testing purposes, allowing you to simulate API responses
 
-type mockClient struct {
+var _ Client = &MockClient{}
+
+type MockClient struct {
 	client
 }
 
@@ -33,10 +37,10 @@ type MockError struct {
 }
 
 var NewMockClient = func() Client {
-	return &mockClient{}
+	return &MockClient{}
 }
 
-func (m *mockClient) NewHTTPClient(_ context.Context) (*resty.Client, error) {
+func (m *MockClient) NewHTTPClient(_ context.Context) (*resty.Client, error) {
 	if m.httpClient == nil {
 		m.httpClient = httpclient.NewMockHTTPClient().
 			SetBaseURL("https://mock-api.cloudavenue.com").
@@ -47,15 +51,15 @@ func (m *mockClient) NewHTTPClient(_ context.Context) (*resty.Client, error) {
 	return m.httpClient, nil
 }
 
-func (m *mockClient) SetCredential(a auth.Auth) {
+func (m *MockClient) SetCredential(a auth.Auth) {
 	m.credential = a
 }
 
-func (m *mockClient) SetConsole(c consoles.Console) {
+func (m *MockClient) SetConsole(c consoles.Console) {
 	m.console = c
 }
 
-func (m *mockClient) ParseAPIError(resp *resty.Response) *errors.APIError {
+func (m *MockClient) ParseAPIError(resp *resty.Response) *errors.APIError {
 	if resp == nil || !resp.IsError() {
 		return nil
 	}
@@ -71,4 +75,55 @@ func (m *mockClient) ParseAPIError(resp *resty.Response) *errors.APIError {
 	}
 
 	return nil
+}
+
+// * WithJob interface
+
+var _ jobs.Client = &MockJobClientWithJob{}
+
+type MockJobClientWithJob struct {
+	// Set the desired job status for the mock client
+	JobStatus jobs.Status
+	Client
+}
+
+var NewMockJobClient = func() Client {
+	return &MockJobClientWithJob{
+		JobStatus: jobs.Queued,
+		Client:    NewMockClient(),
+	}
+}
+
+func (m *MockJobClientWithJob) SetCredential(a auth.Auth) {
+	m.Client.SetCredential(a)
+}
+
+func (m *MockJobClientWithJob) SetConsole(c consoles.Console) {
+	m.Client.SetConsole(c)
+}
+
+func (m *MockJobClientWithJob) NewHTTPClient(ctx context.Context) (*resty.Client, error) {
+	return m.Client.NewHTTPClient(ctx)
+}
+
+func (m *MockJobClientWithJob) ParseAPIError(resp *resty.Response) *errors.APIError {
+	return m.Client.ParseAPIError(resp)
+}
+
+func (m *MockJobClientWithJob) JobRefresh(_ *resty.Request, resp *resty.Response) (*jobs.Job, error) {
+	return m.JobParser(resp)
+}
+
+func (m *MockJobClientWithJob) JobParser(_ *resty.Response) (*jobs.Job, error) {
+	status, _ := m.JobStatusParser("")
+
+	// Mock job parsing logic
+	return &jobs.Job{
+		ID:     "mock-job-id",
+		Status: status,
+	}, nil
+}
+
+func (m *MockJobClientWithJob) JobStatusParser(_ string) (jobs.Status, error) {
+	return m.JobStatus, nil
 }
