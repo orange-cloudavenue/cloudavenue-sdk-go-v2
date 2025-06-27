@@ -58,29 +58,3 @@ func Test_NewClient_WithInvalidMock(t *testing.T) {
 		t.Fatalf("Expected error message 'invalid client mock', got '%v'", err.Error())
 	}
 }
-
-func Test_NewRequest_WithoutAuth(t *testing.T) {
-	client, err := NewClient("mockorg001")
-	if err != nil {
-		t.Fatalf("Error creating client: %v", err)
-	}
-
-	_, err = client.NewRequest(t.Context(), mock)
-	if err == nil {
-		t.Fatal("Expected error for request without authentication, got nil")
-	}
-	if err.Error() != "invalid client mock" {
-		t.Fatalf("Expected error message 'invalid client mock', got '%v'", err.Error())
-	}
-}
-func Test_NewRequest(t *testing.T) {
-	client, err := NewClient("mockorg001", WithMock())
-	if err != nil {
-		t.Fatalf("Error creating client with mock: %v", err)
-	}
-
-	_, err = client.NewRequest(t.Context(), mock)
-	if err != nil {
-		t.Fatalf("Error creating request with mock: %v", err)
-	}
-}

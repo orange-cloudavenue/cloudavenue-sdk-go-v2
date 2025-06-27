@@ -31,11 +31,12 @@ const (
 	Vmware    = subclient.Vmware
 	Cerberus  = subclient.Cerberus
 	Netbackup = subclient.Netbackup
-	mock      = subclient.Name("mock") // For testing purposes
+	mock      = subclient.Name("mock")     // For testing purposes
+	mockJob   = subclient.Name("mock-job") // For testing purposes with jobs
 )
 
 type Client interface {
-	NewRequest(ctx context.Context, client subclient.Name) (req *resty.Request, err error)
+	NewRequest(ctx context.Context, client subclient.Name, reqOpt ...RequestOption) (req *resty.Request, err error)
 	ParseAPIError(resp *resty.Response) *errors.APIError
 }
 
@@ -67,22 +68,6 @@ func NewClient(organization string, opts ...ClientOption) (Client, error) {
 		console:            settings.Console,
 		clientsInitialized: settings.SubClients,
 	}, nil
-}
-
-// NewRequest creates a new request using the resty client.
-func (c *client) NewRequest(ctx context.Context, client subclient.Name) (req *resty.Request, err error) {
-	sc, err := c.identifyClient(ctx, client)
-	if err != nil {
-		return nil, err
-	}
-
-	ctxv := context.WithValue(ctx, subclient.ContextKeyClientName, client)
-
-	hC, err := sc.NewHTTPClient(ctxv)
-	if err != nil {
-		return nil, err
-	}
-	return hC.NewRequest().SetContext(ctxv), nil
 }
 
 // ParseAPIError parses the API error response from the subclient.
