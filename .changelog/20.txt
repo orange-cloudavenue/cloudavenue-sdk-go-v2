@@ -1,0 +1,19 @@
+```release-note:feature
+`Job Management Enhancements` - This release introduces a new jobs package for handling asynchronous jobs, including job middleware, options, and utilities.
+```
+
+```release-note:feature
+`Job Management Enhancements` - Added support for job-related request options, including custom timeout and polling intervals, via the WithJob and SetExtractorFunc functions.
+```
+
+```release-note:note
+`Job Management Enhancements` - Created tests for job-related request options and middleware to ensure proper functionality.
+```
+
+```release-note:feature
+`Request Handling Improvements` - The NewRequest method has been refactored to support additional request options and job-related middleware, improving flexibility and modularity.
+```
+
+```release-note:note
+`Request Handling Improvements` - Added tests for the refactored NewRequest method, including scenarios with and without authentication, and with job options.
+```
