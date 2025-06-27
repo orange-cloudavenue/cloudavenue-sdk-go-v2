@@ -1,0 +1,11 @@
+```release-note:feature
+`subclient/vmware` - Implemented job parsing and status handling for the VMware subclient, enabling support for asynchronous VMware operations.
+```
+
+```release-note:feature
+`client` - Extended the `Client` interface and subclient registry to support job-related methods and mock job clients.
+```
+
+```release-note:note
+Enhanced documentation for VMware subclient job methods and error handling.
+```
