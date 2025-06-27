@@ -30,4 +30,9 @@ func IsClientError(err error) bool {
 	return parseErrorType[*ClientError](err)
 }
 
-var New = errors.New
+// Reimplement golang errors function to avoid package name conflict
+var (
+	New = errors.New
+	As  = errors.As
+	Is  = errors.Is
+)

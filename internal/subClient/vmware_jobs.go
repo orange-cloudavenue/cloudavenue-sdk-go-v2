@@ -51,7 +51,6 @@ func (v *vmware) JobRefresh(newReq *resty.Request, resp *resty.Response) (job *j
 		SetResult(VmwareJobAPIResponse{}).
 		SetError(VmwareError{}).
 		Get(job.HREF)
-
 	if err != nil {
 		return job, err
 	}

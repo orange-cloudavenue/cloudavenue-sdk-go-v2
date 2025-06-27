@@ -20,9 +20,7 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
-var (
-	_ Client = &vmware{}
-)
+var _ Client = &vmware{}
 
 var NewVmwareClient = func() Client {
 	return &vmware{}

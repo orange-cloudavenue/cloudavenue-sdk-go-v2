@@ -23,26 +23,7 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
-type mockVmware struct{}
-
-func (v *mockVmware) JobParser(resp *resty.Response) (*jobs.Job, error) {
-	if resp == nil {
-		return nil, errors.New("no response to parse")
-	}
-	// Simule un parsing simple pour les tests
-	if resp.Request != nil && resp.Request.URL == "error" {
-		return nil, errors.New("parse error")
-	}
-	return &jobs.Job{
-		HREF:   "http://mock.api/job/123",
-		Status: jobs.Queued,
-	}, nil
-}
-func (v *mockVmware) JobStatusParser(status string) (jobs.Status, error) {
-	return jobs.Queued, nil
-}
-
-// Test pour JobRefresh : succès complet
+// Test for JobRefresh: complete success
 func TestVmware_JobRefresh_ResponseNil(t *testing.T) {
 	vmw := NewVmwareClient()
 	vmw.SetConsole(getMockConsole())
@@ -58,14 +39,10 @@ func mustResponder(responder httpmock.Responder, _ error) httpmock.Responder {
 	return responder
 }
 
-// Test pour JobRefresh : tests table-driven
+// Test for JobRefresh: table-driven tests
 func TestVmware_JobRefresh_TableDriven(t *testing.T) {
 	type fields struct {
 		jobResponders []httpmock.Responder
-	}
-	type args struct {
-		req  *resty.Request
-		resp *resty.Response
 	}
 	tests := []struct {
 		name           string
@@ -183,7 +160,6 @@ func TestVmware_JobRefresh_TableDriven(t *testing.T) {
 			name: "status-preRunning",
 			fields: fields{
 				jobResponders: []httpmock.Responder{
-
 					mustResponder(httpmock.NewJsonResponder(200, VmwareJobAPIResponse{
 						ID:          "123",
 						Name:        "Test Job",
@@ -203,7 +179,6 @@ func TestVmware_JobRefresh_TableDriven(t *testing.T) {
 			name: "status-queued",
 			fields: fields{
 				jobResponders: []httpmock.Responder{
-
 					mustResponder(httpmock.NewJsonResponder(200, VmwareJobAPIResponse{
 						ID:          "123",
 						Name:        "Test Job",
@@ -277,7 +252,7 @@ func TestVmware_JobRefresh_TableDriven(t *testing.T) {
 				httpmock.RegisterResponder("GET", "http://mock.api/job/123", responder)
 			}
 
-			// Mock resty.Request et resty.Response
+			// Mock resty.Request and resty.Response
 			req := hC.R()
 			req.SetHeader("Accept", "application/json")
 			req.SetResult(VmwareJobAPIResponse{})
@@ -313,7 +288,8 @@ func TestVmware_JobRefresh_TableDriven(t *testing.T) {
 				if tt.wantErr {
 					assert.Error(t, err)
 					if tt.wantParseErr {
-						if apiErr, ok := err.(*errors.APIError); ok {
+						apiErr := &errors.APIError{}
+						if errors.As(err, &apiErr) {
 							assert.Equal(t, 500, apiErr.StatusCode)
 							assert.Equal(t, "Internal Server Error", apiErr.StatusMessage)
 							assert.Equal(t, "An error occurred", apiErr.Message)

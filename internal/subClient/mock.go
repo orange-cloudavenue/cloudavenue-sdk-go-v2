@@ -12,9 +12,8 @@ package subclient
 import (
 	"context"
 
-	"resty.dev/v3"
-
 	"github.com/jarcoal/httpmock"
+	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/auth"
 	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/httpClient"

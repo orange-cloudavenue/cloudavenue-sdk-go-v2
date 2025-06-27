@@ -15,9 +15,10 @@ import (
 	"testing"
 
 	"github.com/jarcoal/httpmock"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 	"github.com/stretchr/testify/assert"
 	"resty.dev/v3"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )
 
 var getMockConsole = func() consoles.Console {
@@ -193,6 +194,7 @@ func TestCloudavenueCredential_NewCloudavenueCredential_NilClient(t *testing.T) 
 	}
 	assert.Equal(t, "http client cannot be nil", err.Error())
 }
+
 func TestCloudavenueCredential_NewCloudavenueCredential_EmptyOrganization(t *testing.T) {
 	_, err := newCloudavenueCredential(getMockRestyClient(), getMockConsole(), "", "user", "pass")
 	if err == nil {
@@ -200,6 +202,7 @@ func TestCloudavenueCredential_NewCloudavenueCredential_EmptyOrganization(t *tes
 	}
 	assert.Equal(t, "organization cannot be empty", err.Error())
 }
+
 func TestCloudavenueCredential_NewCloudavenueCredential_EmptyUsername(t *testing.T) {
 	_, err := newCloudavenueCredential(getMockRestyClient(), getMockConsole(), "org", "", "pass")
 	if err == nil {
@@ -207,6 +210,7 @@ func TestCloudavenueCredential_NewCloudavenueCredential_EmptyUsername(t *testing
 	}
 	assert.Equal(t, "username cannot be empty", err.Error())
 }
+
 func TestCloudavenueCredential_NewCloudavenueCredential_EmptyPassword(t *testing.T) {
 	_, err := newCloudavenueCredential(getMockRestyClient(), getMockConsole(), "org", "user", "")
 	if err == nil {
