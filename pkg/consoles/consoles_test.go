@@ -79,7 +79,7 @@ func TestConsoles(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c, ok := FindByOrganizationName(tt.orgName)
-			if ok && !tt.wantErr {
+			if ok && tt.wantErr {
 				t.Errorf("FindByOrganizationName(%s) = %v, want error", tt.orgName, c)
 				return
 			}

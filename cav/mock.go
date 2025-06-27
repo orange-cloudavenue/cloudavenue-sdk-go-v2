@@ -30,3 +30,19 @@ func WithMock() ClientOption {
 		return nil
 	}
 }
+
+// WithMockJob sets the mock job client for testing purposes.
+func WithMockJob() ClientOption {
+	return func(s *settings) error {
+		if s.SubClients[mockJob] == nil {
+			s.SubClients[mockJob] = subclient.Clients[mockJob]
+		}
+
+		s.SubClients[mockJob].SetConsole(s.Console)
+		s.SubClients[mockJob].SetCredential(auth.NewMockAuth(map[string]string{
+			"X-Mock-Job": "mock-job",
+		}))
+
+		return nil
+	}
+}

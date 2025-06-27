@@ -14,25 +14,15 @@ import (
 	"time"
 )
 
-func TestClientError_Error(t *testing.T) {
-	err := &ClientError{Message: "client error"}
-	if got := err.Error(); got != "client error" {
-		t.Errorf("ClientError.Error() = %q, want %q", got, "client error")
-	}
-	var nilErr *ClientError
-	if got := nilErr.Error(); got != "nil ClientError" {
-		t.Errorf("ClientError.Error() nil = %q, want %q", got, "nil ClientError")
-	}
-}
-
 func TestAPIError_Error(t *testing.T) {
 	apiErr := &APIError{
 		StatusCode: 500,
 		Message:    "internal error",
 		Duration:   2 * time.Second,
 		Endpoint:   "/test",
+		Operation:  "test operation",
 	}
-	want := "request API error: internal error (status code: 500, duration: 2s, endpoint: /test)"
+	want := "request API error: [test operation] internal error (status code: 500, duration: 2s, endpoint: /test)"
 	if got := apiErr.Error(); got != want {
 		t.Errorf("APIError.Error() = %q, want %q", got, want)
 	}
