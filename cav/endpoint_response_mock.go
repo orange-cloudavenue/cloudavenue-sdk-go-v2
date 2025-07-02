@@ -72,5 +72,4 @@ func returnErrFromStatusCodeExpected(w http.ResponseWriter, statusCode *int) {
 
 	log.Default().Printf("Mock response error for status code %d", *statusCode)
 	http.Error(w, http.StatusText(*statusCode), *statusCode)
-	w.WriteHeader(*statusCode)
 }

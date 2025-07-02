@@ -13,6 +13,8 @@ import (
 	"regexp"
 )
 
+// TODO add mutex
+
 type (
 	Console      string
 	LocationCode string
