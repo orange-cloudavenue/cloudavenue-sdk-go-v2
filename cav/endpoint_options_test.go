@@ -24,7 +24,7 @@ type dummyBody struct {
 func TestSetBody_NilBody(t *testing.T) {
 	endpoint := &Endpoint{
 		Category: "cat", Version: "v1", Name: "name", Method: "POST",
-		BodyType: dummyBody{},
+		BodyRequestType: dummyBody{},
 	}
 	req := resty.New().R()
 	opt := SetBody(nil)
@@ -34,10 +34,10 @@ func TestSetBody_NilBody(t *testing.T) {
 	}
 }
 
-func TestSetBody_BodyTypeMismatch(t *testing.T) {
+func TestSetBody_BodyRequestTypeMismatch(t *testing.T) {
 	endpoint := &Endpoint{
 		Category: "cat", Version: "v1", Name: "name", Method: "POST",
-		BodyType: dummyBody{},
+		BodyRequestType: dummyBody{},
 	}
 	req := resty.New().R()
 	opt := SetBody("not a struct")
@@ -47,10 +47,10 @@ func TestSetBody_BodyTypeMismatch(t *testing.T) {
 	}
 }
 
-func TestSetBody_BodyTypeMatch(t *testing.T) {
+func TestSetBody_BodyRequestTypeMatch(t *testing.T) {
 	endpoint := &Endpoint{
 		Category: "cat", Version: "v1", Name: "name", Method: "POST",
-		BodyType: dummyBody{},
+		BodyRequestType: dummyBody{},
 	}
 	req := resty.New().R()
 	body := dummyBody{Foo: "bar"}
@@ -64,17 +64,17 @@ func TestSetBody_BodyTypeMatch(t *testing.T) {
 	}
 }
 
-func TestSetBody_NoBodyType(t *testing.T) {
+func TestSetBody_NoBodyRequestType(t *testing.T) {
 	endpoint := &Endpoint{
 		Category: "cat", Version: "v1", Name: "name", Method: "POST",
-		BodyType: nil,
+		BodyRequestType: nil,
 	}
 	req := resty.New().R()
 	body := dummyBody{Foo: "bar"}
 	opt := SetBody(body)
 	err := opt(endpoint, req)
 	if err != nil {
-		t.Errorf("expected no error when BodyType is nil, got: %v", err)
+		t.Errorf("expected no error when BodyRequestType is nil, got: %v", err)
 	}
 	if req.Body == nil {
 		t.Error("expected body to be set in request")

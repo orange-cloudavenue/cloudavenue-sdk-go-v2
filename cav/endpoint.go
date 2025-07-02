@@ -73,16 +73,15 @@ type (
 		// and body content.
 		RequestFunc func(ctx context.Context, client Client, endpoint *Endpoint, opts ...RequestOption) (*resty.Response, error)
 
-		// BodyType is the golang type of the request body.
+		// BodyRequestType is the golang type of the request body.
 		// It is used to validate the body areguments passed to the endpoint.
 		// BodyType is optional and can be used to specify the type of the request body
 		// for POST, PUT, or PATCH requests.
-		BodyType any `validate:"omitempty"`
+		BodyRequestType any `validate:"required_if=Method POST PUT PATCH"`
 
-		// body is the request body that can be used in the request.
-		// It is optional and can be used to send data in the request body for POST, PUT, or PATCH requests.
-		// Body is only accessible through the RequestOption function
-		body any
+		// BodyResponseType is the golang type of the response body.
+		// It is used to validate the response body returned by the endpoint.
+		BodyResponseType any `validate:"omitempty"`
 
 		// RequestInternalFunc is a function that takes a client and options and returns a resty.Response and an error.
 		// This function is used to make the actual HTTP request (from internal package) to the endpoint.
@@ -99,7 +98,7 @@ type (
 
 		// mockResponseStatusCode int
 		// mockResponseStatusCode is the HTTP status code to return for the mock response.
-		mockResponseStatusCode *int `validate:"omitempty,oneof=200 201 202 204 400 401 403 404 500"`
+		mockResponseStatusCode *int `validate:"omitempty"`
 	}
 
 	QueryParam struct {
@@ -171,57 +170,12 @@ func (e Endpoint) Register() {
 	}
 
 	// TODO
-	if e.BodyType != nil {
-		log.Default().Print("====>", reflect.TypeOf(e.BodyType).PkgPath())
+	if e.BodyRequestType != nil {
+		log.Default().Print("====>", reflect.TypeOf(e.BodyRequestType).PkgPath())
 	}
 
 	// Set the endpoint in the Endpoints map
 	endpoints[e.Category][e.Version][e.Name][e.Method] = &e
-}
-
-// GetMockResponse retrieves the mock response for the endpoint.
-func (e Endpoint) GetMockResponseFunc() func(w http.ResponseWriter, _ *http.Request) {
-	if e.mockResponseFunc != nil {
-		return e.mockResponseFunc
-	}
-
-	// Default mock response if not provided
-	return func(w http.ResponseWriter, _ *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "Mock response"}`))
-	}
-}
-
-// MockResponseIsDefined checks if a mock response is defined for the endpoint.
-func (e Endpoint) MockResponseFuncIsDefined() bool {
-	return e.mockResponseFunc != nil
-}
-
-// SetMockResponse sets the mock response for the endpoint.
-func (e *Endpoint) SetMockResponseFunc(mockResponse func(w http.ResponseWriter, _ *http.Request)) {
-	if mockResponse == nil {
-		log.Default().Println("Mock response is nil, not setting it for endpoint:", e.Name)
-		return
-	}
-	e.mockResponseFunc = mockResponse
-}
-
-// GetMockResponseData retrieves the mock response data for the endpoint.
-func (e Endpoint) GetMockResponse() (data any, statusCode *int) {
-	return e.mockResponseData, e.mockResponseStatusCode
-}
-
-// SetMockResponse sets the mock response data and status code for the endpoint.
-func (e *Endpoint) SetMockResponse(mockResponseData any, mockResponseStatusCode *int) {
-	e.mockResponseData = mockResponseData
-	e.mockResponseStatusCode = mockResponseStatusCode
-}
-
-// CleanMockResponse cleans the mock response for the endpoint.
-func (e *Endpoint) CleanMockResponse() {
-	e.mockResponseFunc = nil
-	e.mockResponseData = nil
-	e.mockResponseStatusCode = nil
 }
 
 // GetEndpoints retrieves all endpoints for a given category and version.
@@ -230,23 +184,6 @@ func GetEndpoints() map[Category]map[Version]map[string]map[Method]*Endpoint {
 	defer mu.RUnlock()
 
 	return endpoints
-
-	// // Create a copy of the endpoints map to avoid concurrent modification issues
-	// endpointsCopy := make(map[Category]map[Version]map[string]map[Method]*Endpoint)
-	// for category, versions := range endpoints {
-	// 	endpointsCopy[category] = make(map[Version]map[string]map[Method]Endpoint)
-	// 	for version, objects := range versions {
-	// 		endpointsCopy[category][version] = make(map[string]map[Method]Endpoint)
-	// 		for name, methods := range objects {
-	// 			endpointsCopy[category][version][name] = make(map[Method]Endpoint)
-	// 			for method, endpoint := range methods {
-	// 				endpointsCopy[category][version][name][method] = endpoint
-	// 			}
-	// 		}
-	// 	}
-	// }
-
-	// return endpointsCopy
 }
 
 // GetEndpointsUncategorized retrieves all endpoints without categorization.

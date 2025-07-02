@@ -27,6 +27,6 @@ var DefaultRequestFunc = func(ctx context.Context, client Client, endpoint *Endp
 		}
 	}
 	return req.
-		SetResult(endpoint.BodyType).
+		SetResult(endpoint.BodyResponseType).
 		Get(endpoint.PathTemplate)
 }

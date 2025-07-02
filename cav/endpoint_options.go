@@ -81,9 +81,9 @@ func SetBody(body any) RequestOption {
 			return errors.Newf("body cannot be nil for endpoint %s %s %s %s", endpoint.Category, endpoint.Version, endpoint.Name, endpoint.Method)
 		}
 
-		// Reflect BodyType and body to ensure they match
-		if endpoint.BodyType != nil {
-			reflectBodyType := reflect.TypeOf(endpoint.BodyType)
+		// Reflect BodyRequestType and body to ensure they match
+		if endpoint.BodyRequestType != nil {
+			reflectBodyType := reflect.TypeOf(endpoint.BodyRequestType)
 			reflectBody := reflect.TypeOf(body)
 			if reflectBody != reflectBodyType {
 				return errors.Newf("body must be of type %s for endpoint %s %s %s %s", reflectBodyType, endpoint.Category, endpoint.Version, endpoint.Name, endpoint.Method)

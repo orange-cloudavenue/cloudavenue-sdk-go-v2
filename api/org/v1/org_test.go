@@ -23,6 +23,9 @@ func TestDemoRequest(t *testing.T) {
 	mC, err := mock.NewClient()
 	assert.Nil(t, err, "Error creating mock client")
 
+	oC, err := New(mC)
+	assert.Nil(t, err, "Error creating org client")
+
 	ep, err := mock.GetEndpoint("demo", cav.VersionV1, "demo-api", cav.MethodGET)
 	if err != nil {
 		t.Fatalf("Error getting endpoint: %v", err)
@@ -82,7 +85,7 @@ func TestDemoRequest(t *testing.T) {
 				mock.SetMockResponse(ep, tt.expectedResp, &tt.expectedStatus)
 			}
 
-			resp, err := DemoRequest(t.Context(), mC, tt.orgID)
+			resp, err := oC.DemoRequest(t.Context(), tt.orgID)
 			if tt.expectedErr {
 				assert.NotNil(t, err, "Expected error for orgID %s", tt.orgID)
 				assert.Nil(t, resp, "Response should be nil for orgID %s", tt.orgID)

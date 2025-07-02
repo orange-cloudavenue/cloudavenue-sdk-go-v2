@@ -37,7 +37,7 @@ func init() {
 		},
 		QueryParams:      []cav.QueryParam{},
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/orgs/orgUrn/get/",
-		BodyType:         OrgResponse{},
+		BodyResponseType: OrgResponse{},
 	}.Register()
 }
 
@@ -62,7 +62,7 @@ type OrgResponse struct { //nolint:revive
 }
 
 // DemoRequest represents a request to the demo cav.
-func DemoRequest(ctx context.Context, client cav.Client, orgID string) (*OrgResponse, error) {
+func (o *Org) DemoRequest(ctx context.Context, orgID string) (*OrgResponse, error) {
 	demoEndpoint, err := cav.GetEndpoint("demo", cav.VersionV1, "demo-api", cav.MethodGET)
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func DemoRequest(ctx context.Context, client cav.Client, orgID string) (*OrgResp
 
 	resp, err := demoEndpoint.RequestFunc(
 		ctx,
-		client,
+		o.c,
 		demoEndpoint,
 		cav.WithPathParam(demoEndpoint.PathParams[0], orgID),
 	)
@@ -78,7 +78,7 @@ func DemoRequest(ctx context.Context, client cav.Client, orgID string) (*OrgResp
 		return nil, err
 	}
 
-	if err := client.ParseAPIError("Get organization detail", resp); err != nil {
+	if err := o.c.ParseAPIError("Get organization detail", resp); err != nil {
 		return nil, err
 	}
 

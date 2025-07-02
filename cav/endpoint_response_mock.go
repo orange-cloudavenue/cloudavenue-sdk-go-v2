@@ -28,9 +28,9 @@ var defaultMockResponseFunc = func(ep *Endpoint) func(w http.ResponseWriter, _ *
 			log.Default().Printf("Using mock response data for endpoint %s", ep.Name)
 			// If mock response data is defined, use it directly
 			body = ep.mockResponseData
-		} else if ep.BodyType != nil {
+		} else if ep.BodyResponseType != nil {
 			log.Default().Printf("Generating mock response data for endpoint %s", ep.Name)
-			body = ep.BodyType
+			body = ep.BodyResponseType
 			if err := faker.FakeData(&body); err != nil {
 				log.Default().Println("Error generating mock data for endpoint:", ep.Name, err)
 				w.WriteHeader(http.StatusInternalServerError)
@@ -72,4 +72,49 @@ func returnErrFromStatusCodeExpected(w http.ResponseWriter, statusCode *int) {
 
 	log.Default().Printf("Mock response error for status code %d", *statusCode)
 	http.Error(w, http.StatusText(*statusCode), *statusCode)
+}
+
+// GetMockResponse retrieves the mock response for the endpoint.
+func (e Endpoint) GetMockResponseFunc() func(w http.ResponseWriter, _ *http.Request) {
+	if e.mockResponseFunc != nil {
+		return e.mockResponseFunc
+	}
+
+	// Default mock response if not provided
+	return func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "Mock response"}`))
+	}
+}
+
+// MockResponseIsDefined checks if a mock response is defined for the endpoint.
+func (e Endpoint) MockResponseFuncIsDefined() bool {
+	return e.mockResponseFunc != nil
+}
+
+// SetMockResponse sets the mock response for the endpoint.
+func (e *Endpoint) SetMockResponseFunc(mockResponse func(w http.ResponseWriter, _ *http.Request)) {
+	if mockResponse == nil {
+		log.Default().Println("Mock response is nil, not setting it for endpoint:", e.Name)
+		return
+	}
+	e.mockResponseFunc = mockResponse
+}
+
+// GetMockResponseData retrieves the mock response data for the endpoint.
+func (e Endpoint) GetMockResponse() (data any, statusCode *int) {
+	return e.mockResponseData, e.mockResponseStatusCode
+}
+
+// SetMockResponse sets the mock response data and status code for the endpoint.
+func (e *Endpoint) SetMockResponse(mockResponseData any, mockResponseStatusCode *int) {
+	e.mockResponseData = mockResponseData
+	e.mockResponseStatusCode = mockResponseStatusCode
+}
+
+// CleanMockResponse cleans the mock response for the endpoint.
+func (e *Endpoint) CleanMockResponse() {
+	e.mockResponseFunc = nil
+	e.mockResponseData = nil
+	e.mockResponseStatusCode = nil
 }

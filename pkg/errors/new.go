@@ -10,6 +10,7 @@
 package errors
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -17,3 +18,5 @@ import (
 func Newf(format string, args ...interface{}) error {
 	return fmt.Errorf(format, args...)
 }
+
+var New = errors.New
