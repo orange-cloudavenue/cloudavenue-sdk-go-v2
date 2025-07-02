@@ -161,18 +161,15 @@ var endpoints = map[Category]map[Version]map[string]map[Method]*Endpoint{}
 // map[api]map[version]
 
 // Register registers an endpoint in the Endpoints map.
-func (e Endpoint) Register() error {
+func (e Endpoint) Register() {
 	mu.Lock()
 	defer mu.Unlock()
 
 	if err := validators.New().Struct(&e); err != nil {
-		// Handle validation errors
-		return err
+		panic(err)
 	}
 
 	initEndpoint(e)
-
-	log.Default().Printf("Registered endpoint: %s %s %s", e.Method, e.PathTemplate, e.Name)
 
 	if e.RequestFunc == nil {
 		// Default RequestFunc if not provided
@@ -186,8 +183,6 @@ func (e Endpoint) Register() error {
 
 	// Set the endpoint in the Endpoints map
 	endpoints[e.Category][e.Version][e.Name][e.Method] = &e
-
-	return nil
 }
 
 // GetMockResponse retrieves the mock response for the endpoint.

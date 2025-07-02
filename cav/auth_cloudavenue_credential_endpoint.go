@@ -16,7 +16,7 @@ import (
 )
 
 func init() {
-	err := Endpoint{
+	Endpoint{
 		Category:         CategoryAuthentication,
 		Version:          VersionV1,
 		Name:             "CreateSessionVmware",
@@ -41,7 +41,4 @@ func init() {
 			return r.Post(endpoint.PathTemplate)
 		},
 	}.Register()
-	if err != nil {
-		panic(err)
-	}
 }

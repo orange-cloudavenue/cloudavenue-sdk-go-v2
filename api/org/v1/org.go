@@ -18,7 +18,7 @@ import (
 )
 
 func init() {
-	err := cav.Endpoint{
+	cav.Endpoint{
 		Category:     "demo",
 		Version:      cav.VersionV1,
 		Name:         "demo-api",
@@ -39,10 +39,6 @@ func init() {
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/orgs/orgUrn/get/",
 		BodyType:         OrgResponse{},
 	}.Register()
-
-	if err != nil {
-		panic(err)
-	}
 }
 
 type OrgResponse struct { //nolint:revive

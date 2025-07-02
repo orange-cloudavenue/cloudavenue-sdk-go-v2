@@ -100,7 +100,7 @@ func SetBody(body any) RequestOption {
 }
 
 func SetCustomRestyOption(option func(*resty.Request)) RequestOption {
-	return func(endpoint *Endpoint, req *resty.Request) error {
+	return func(_ *Endpoint, req *resty.Request) error {
 		option(req)
 		return nil
 	}
