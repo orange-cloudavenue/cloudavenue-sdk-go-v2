@@ -27,12 +27,13 @@ func TestClientError_Error(t *testing.T) {
 
 func TestAPIError_Error(t *testing.T) {
 	apiErr := &APIError{
+		Action:     "Mock error",
 		StatusCode: 500,
 		Message:    "internal error",
 		Duration:   2 * time.Second,
 		Endpoint:   "/test",
 	}
-	want := "request API error: internal error (status code: 500, duration: 2s, endpoint: /test)"
+	want := "[Mock error] request API error: internal error (status code: 500, duration: 2s, endpoint: /test)"
 	if got := apiErr.Error(); got != want {
 		t.Errorf("APIError.Error() = %q, want %q", got, want)
 	}

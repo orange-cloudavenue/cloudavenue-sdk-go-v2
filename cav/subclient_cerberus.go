@@ -36,11 +36,13 @@ var newCerberusClient = func() SubClient {
 	return &cerberus{}
 }
 
+const cerberusVCDVersion = vmwareVCDVersion // Reusing the same version as VMware
+
 // NewClient creates a new request for the Cerberus subclient.
 func (v *cerberus) NewHTTPClient(ctx context.Context) (*resty.Client, error) {
 	v.httpClient = httpclient.NewHTTPClient().
 		SetBaseURL(v.console.GetAPICerberusEndpoint()).
-		SetHeader("Accept", "application/json;version="+VDCVersion).
+		SetHeader("Accept", "application/json;version="+cerberusVCDVersion).
 		SetError(cerberusError{})
 
 	if !v.credential.IsInitialized() {

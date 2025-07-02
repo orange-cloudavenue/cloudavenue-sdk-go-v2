@@ -23,10 +23,8 @@ import (
 
 var _ auth = (*cloudavenueCredential)(nil)
 
-// CloudavenueCredential is the pair of a username and password
-// used to authenticate with the CloudAvenue service.
-// This type is public because it's an internal package.
-// TODO(azrod): use validators
+// cloudavenueCredential implements the auth interface
+// for Cloudavenue authentication using a username and password.
 type cloudavenueCredential struct {
 	httpC        *resty.Client
 	username     string `validate:"required"`
@@ -36,10 +34,8 @@ type cloudavenueCredential struct {
 	console      consoles.Console
 }
 
-// XVmwareAccessToken is the header used to retrieve the Bearer token in the authentication process.
-const XVmwareAccessToken = "X-VMWARE-VCLOUD-ACCESS-TOKEN" // #nosec G101
-
-const VDCVersion = "38.1"
+// cloudavenueCredentialXVmwareAccessToken is the header used to retrieve the Bearer token in the authentication process.
+const cloudavenueCredentialXVmwareAccessToken = "X-VMWARE-VCLOUD-ACCESS-TOKEN" // #nosec G101
 
 // NewCloudavenueCredential creates a new CloudavenueCredential
 // with the given username and password.
@@ -117,7 +113,7 @@ func (c *cloudavenueCredential) Refresh(ctx context.Context) error {
 		return err
 	}
 
-	c.bearer = resp.Header().Get(XVmwareAccessToken)
+	c.bearer = resp.Header().Get(cloudavenueCredentialXVmwareAccessToken)
 
 	return nil
 }

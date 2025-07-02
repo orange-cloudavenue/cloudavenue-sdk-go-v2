@@ -30,7 +30,7 @@ func init() {
 		requestInternalFunc: func(ctx context.Context, client *resty.Client, endpoint *Endpoint, opts ...RequestOption) (*resty.Response, error) {
 			r := client.R().
 				SetContext(ctx).
-				SetHeader("Accept", "application/json;version="+VDCVersion)
+				SetHeader("Accept", "application/json;version="+vmwareVCDVersion)
 
 			for _, opt := range opts {
 				if err := opt(endpoint, r); err != nil {

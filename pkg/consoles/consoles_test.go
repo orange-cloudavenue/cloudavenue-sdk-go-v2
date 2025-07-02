@@ -79,7 +79,7 @@ func TestConsoles(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c, ok := FindByOrganizationName(tt.orgName)
-			if ok && !tt.wantErr {
+			if !ok && !tt.wantErr {
 				t.Errorf("FindByOrganizationName(%s) = %v, want error", tt.orgName, c)
 				return
 			}
@@ -95,45 +95,6 @@ func TestConsoles(t *testing.T) {
 			if c.GetSiteID() != tt.console {
 				t.Errorf("FindByOrganizationName(%s) = %v, want %v", tt.orgName, c.GetSiteID(), tt.console)
 				return
-			}
-		})
-	}
-}
-
-func TestFindBySiteID(t *testing.T) {
-	tests := []struct {
-		name     string
-		siteID   string
-		expected Console
-		found    bool
-	}{
-		{
-			name:     "valid siteID Console1",
-			siteID:   "console1",
-			expected: Console1,
-			found:    true,
-		},
-		{
-			name:     "valid siteID Console5",
-			siteID:   "console5",
-			expected: Console5,
-			found:    true,
-		},
-		{
-			name:     "invalid siteID",
-			siteID:   "invalid",
-			expected: "",
-			found:    false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c, ok := FindBySiteID(tt.siteID)
-			if ok != tt.found {
-				t.Errorf("FindBySiteID(%s) found = %v, want %v", tt.siteID, ok, tt.found)
-			}
-			if c != tt.expected {
-				t.Errorf("FindBySiteID(%s) = %v, want %v", tt.siteID, c, tt.expected)
 			}
 		})
 	}
@@ -305,4 +266,24 @@ func TestCheckOrganizationName(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestConsole_OverrideEndpoint(t *testing.T) {
+	original := Console1.Services()
+	newServices := original
+	newServices.APIVCD.Endpoint = "https://custom-endpoint.example.com/cloudapi"
+	newServices.APIVCD.Enabled = false
+
+	Console1.OverrideEndpoint(newServices)
+
+	got := Console1.Services()
+	if got.APIVCD.Endpoint != "https://custom-endpoint.example.com/cloudapi" {
+		t.Errorf("OverrideEndpoint did not update APIVCD endpoint, got %s", got.APIVCD.Endpoint)
+	}
+	if got.APIVCD.Enabled != false {
+		t.Errorf("OverrideEndpoint did not update APIVCD enabled flag, got %v", got.APIVCD.Enabled)
+	}
+
+	// Restore original state for other tests
+	Console1.OverrideEndpoint(original)
 }

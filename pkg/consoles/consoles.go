@@ -11,9 +11,10 @@ package consoles
 
 import (
 	"regexp"
+	"sync"
 )
 
-// TODO add mutex
+var mu = &sync.RWMutex{}
 
 type (
 	Console      string
@@ -226,19 +227,11 @@ var consoles = map[Console]console{
 	},
 }
 
-// FindBySiteID - Returns the console by its siteID.
-func FindBySiteID(siteID string) (Console, bool) {
-	for c, console := range consoles {
-		if console.SiteID == Console(siteID) {
-			return c, true
-		}
-	}
-
-	return "", false
-}
-
 // FindByOrganizationName - Returns the console by its organization name.
 func FindByOrganizationName(organizationName string) (Console, bool) {
+	mu.RLock()
+	defer mu.RUnlock()
+
 	for c, console := range consoles {
 		if console.OrganizationPattern.MatchString(organizationName) {
 			return c, true
@@ -250,6 +243,9 @@ func FindByOrganizationName(organizationName string) (Console, bool) {
 
 // CheckOrganizationName - Returns true if the organization name is valid.
 func CheckOrganizationName(organizationName string) bool {
+	mu.RLock()
+	defer mu.RUnlock()
+
 	for _, console := range consoles {
 		if console.OrganizationPattern.MatchString(organizationName) {
 			return true
@@ -261,6 +257,9 @@ func CheckOrganizationName(organizationName string) bool {
 
 // Services - Returns the Services.
 func (c Console) Services() Services {
+	mu.RLock()
+	defer mu.RUnlock()
+
 	return consoles[c].Services
 }
 
@@ -276,31 +275,48 @@ func (ss Service) GetEndpoint() string {
 
 // GetSiteName - Returns the site name.
 func (c Console) GetSiteName() string {
+	mu.RLock()
+	defer mu.RUnlock()
+
 	return consoles[c].SiteName
 }
 
 // GetLocationCode - Returns the location code.
 func (c Console) GetLocationCode() LocationCode {
+	mu.RLock()
+	defer mu.RUnlock()
+
 	return consoles[c].LocationCode
 }
 
 // GetSiteID - Returns the site ID.
 func (c Console) GetSiteID() Console {
+	mu.RLock()
+	defer mu.RUnlock()
+
 	return consoles[c].SiteID
 }
 
 // GetAPIVCDEndpoint - Returns the VMware API endpoint.
 func (c Console) GetAPIVCDEndpoint() string {
+	mu.RLock()
+	defer mu.RUnlock()
+
 	return consoles[c].Services.APIVCD.GetEndpoint()
 }
 
 // GetAPICerberusEndpoint - Returns the Cerberus API endpoint.
 func (c Console) GetAPICerberusEndpoint() string {
+	mu.RLock()
+	defer mu.RUnlock()
+
 	return consoles[c].Services.APICerberus.GetEndpoint()
 }
 
 // OverrideEndpoint - Overrides the endpoint for a specific service.
 func (c Console) OverrideEndpoint(svc Services) {
+	mu.Lock()
+	defer mu.Unlock()
 	x := consoles[c]
 	x.Services = svc
 

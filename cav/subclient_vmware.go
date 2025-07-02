@@ -21,14 +21,18 @@ import (
 
 var _ SubClient = &vmware{}
 
-type vmware struct {
-	subclient
-}
+type (
+	vmware struct {
+		subclient
+	}
 
-type vmwareError struct {
-	Message        string `json:"message"`
-	MinorErrorCode string `json:"minorErrorCode"`
-}
+	vmwareError struct {
+		Message        string `json:"message"`
+		MinorErrorCode string `json:"minorErrorCode"`
+	}
+)
+
+const vmwareVCDVersion = "38.1"
 
 var newVmwareClient = func() SubClient {
 	return &vmware{}
@@ -38,7 +42,7 @@ var newVmwareClient = func() SubClient {
 func (v *vmware) NewHTTPClient(ctx context.Context) (*resty.Client, error) {
 	v.httpClient = httpclient.NewHTTPClient().
 		SetBaseURL(v.console.GetAPIVCDEndpoint()).
-		SetHeader("Accept", "application/json;version="+VDCVersion).
+		SetHeader("Accept", "application/json;version="+vmwareVCDVersion).
 		SetError(vmwareError{})
 
 	if !v.credential.IsInitialized() {
