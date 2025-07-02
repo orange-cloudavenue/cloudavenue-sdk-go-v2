@@ -36,8 +36,6 @@ func WithPathParam(pp PathParam, value string) RequestOption {
 			}
 		}
 
-		pp.value = value
-		endpoint.PathParams = append(endpoint.PathParams, pp)
 		req.SetPathParam(pp.Name, value)
 		return nil
 	}
@@ -54,7 +52,7 @@ func WithQueryParam(qp QueryParam, value string) RequestOption {
 				if p.Required && value == "" {
 					return errors.Newf("query param %s is required for endpoint %s %s %s %s", qp.Name, endpoint.Category, endpoint.Version, endpoint.Name, endpoint.Method)
 				}
-				if p.ValidatorFunc != nil {
+				if p.ValidatorFunc != nil && value != "" {
 					if err := p.ValidatorFunc(value); err != nil {
 						return errors.Newf("query param %s validation failed for endpoint %s %s %s %s: %v", qp.Name, endpoint.Category, endpoint.Version, endpoint.Name, endpoint.Method, err)
 					}
@@ -62,8 +60,6 @@ func WithQueryParam(qp QueryParam, value string) RequestOption {
 			}
 		}
 
-		qp.value = value
-		endpoint.QueryParams = append(endpoint.QueryParams, qp)
 		req.SetQueryParam(qp.Name, value)
 		return nil
 	}

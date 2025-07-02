@@ -107,9 +107,6 @@ type (
 		Description   string `validate:"required"`
 		Required      bool
 		ValidatorFunc func(value string) error
-
-		// value is completed by the RequestOption
-		value string
 	}
 
 	PathParam struct {
@@ -117,9 +114,6 @@ type (
 		Description   string `validate:"required"`
 		Required      bool
 		ValidatorFunc func(value string) error
-
-		// value is completed by the RequestOption
-		value string
 	}
 
 	Method string
