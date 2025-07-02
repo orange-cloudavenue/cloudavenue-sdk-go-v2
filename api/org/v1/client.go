@@ -18,8 +18,6 @@ type (
 	Org struct {
 		c cav.Client
 	}
-
-	Client interface{}
 )
 
 // New creates a new organization client.
