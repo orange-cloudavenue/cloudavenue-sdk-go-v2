@@ -7,5 +7,10 @@
  * or see the "LICENSE" file for more details.
  */
 
-// Package auth provides authentication utilities for the CloudAvenue SDK V2.
-package auth
+package cav
+
+type contextKey string
+
+const (
+	contextKeyClientName contextKey = "subclient.clientName" // Context key for the client name
+)

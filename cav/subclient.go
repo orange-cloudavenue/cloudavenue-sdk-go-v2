@@ -7,43 +7,39 @@
  * or see the "LICENSE" file for more details.
  */
 
-package subclient
+package cav
 
 import (
 	"context"
 
 	"resty.dev/v3"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/auth"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
-var Clients = map[Name]Client{
-	Vmware:   NewVmwareClient(),
-	Cerberus: NewCerberusClient(),
-	// Mock client for testing purposes
-	mock: NewMockClient(),
+var subClients = map[SubClientName]SubClient{
+	ClientVmware:   newVmwareClient(),
+	ClientCerberus: newCerberusClient(),
 }
 
-type Name string
+type SubClientName string
 
 const (
-	Vmware    Name = "vmware"
-	Cerberus  Name = "cerberus"
-	Netbackup Name = "netbackup"
-	mock      Name = "mock" // For testing purposes
+	ClientVmware    SubClientName = "vmware"
+	ClientCerberus  SubClientName = "cerberus"
+	ClientNetbackup SubClientName = "netbackup"
 )
 
-type client struct {
+type subclient struct {
 	httpClient *resty.Client
-	credential auth.Auth
+	credential auth
 	console    consoles.Console
 }
 
-type Client interface {
-	SetCredential(auth.Auth)
+type SubClient interface {
+	SetCredential(auth)
 	SetConsole(consoles.Console)
 	NewHTTPClient(context.Context) (*resty.Client, error)
-	ParseAPIError(*resty.Response) *errors.APIError
+	ParseAPIError(action string, resp *resty.Response) *errors.APIError
 }

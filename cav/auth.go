@@ -7,14 +7,14 @@
  * or see the "LICENSE" file for more details.
  */
 
-package auth
+package cav
 
 import (
 	"context"
 )
 
 // Auth implements methods required for authentication.
-type Auth interface {
+type auth interface {
 	// Headers returns headers that must be included in the http request.
 	Headers() map[string]string
 

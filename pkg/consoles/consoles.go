@@ -21,12 +21,12 @@ type (
 		SiteName            string
 		LocationCode        LocationCode
 		SiteID              Console
-		URL                 string
 		Services            Services
 		OrganizationPattern *regexp.Regexp
 	}
 
 	Services struct {
+		IHM         Service
 		APIVCD      Service
 		APICerberus Service
 		S3          Service
@@ -59,9 +59,12 @@ var consoles = map[Console]console{
 		SiteName:            "Console Externe VDR",
 		LocationCode:        LocationVDR,
 		SiteID:              Console1,
-		URL:                 "https://console1.cloudavenue.orange-business.com",
 		OrganizationPattern: regexp.MustCompile(`^cav01ev01ocb\d{7}$`),
 		Services: Services{
+			IHM: Service{
+				Enabled:  true,
+				Endpoint: "https://console1.cloudavenue.orange-business.com",
+			},
 			APIVCD: Service{
 				Enabled:  true,
 				Endpoint: "https://console1.cloudavenue.orange-business.com/cloudapi",
@@ -84,9 +87,12 @@ var consoles = map[Console]console{
 		SiteName:            "Console Interne VDR",
 		LocationCode:        LocationVDR,
 		SiteID:              Console2,
-		URL:                 "https://console2.cloudavenue.orange-business.com",
 		OrganizationPattern: regexp.MustCompile(`^cav01iv02ocb\d{7}$`),
 		Services: Services{
+			IHM: Service{
+				Enabled:  true,
+				Endpoint: "https://console2.cloudavenue.orange-business.com",
+			},
 			APIVCD: Service{
 				Enabled:  true,
 				Endpoint: "https://console2.cloudavenue.orange-business.com/cloudapi",
@@ -110,9 +116,12 @@ var consoles = map[Console]console{
 		SiteName:            "Console Externe CHA",
 		LocationCode:        LocationCHR,
 		SiteID:              Console4,
-		URL:                 "https://console4.cloudavenue.orange-business.com",
 		OrganizationPattern: regexp.MustCompile(`^cav02ev04ocb\d{7}$`),
 		Services: Services{
+			IHM: Service{
+				Enabled:  true,
+				Endpoint: "https://console4.cloudavenue.orange-business.com",
+			},
 			APIVCD: Service{
 				Enabled:  true,
 				Endpoint: "https://console4.cloudavenue.orange-business.com/cloudapi",
@@ -131,9 +140,12 @@ var consoles = map[Console]console{
 		SiteName:            "Console Interne CHA",
 		LocationCode:        LocationCHR,
 		SiteID:              Console5,
-		URL:                 "https://console5.cloudavenue-cha.itn.intraorange",
 		OrganizationPattern: regexp.MustCompile(`^cav02iv05ocb\d{7}$`),
 		Services: Services{
+			IHM: Service{
+				Enabled:  true,
+				Endpoint: "https://console5.cloudavenue-cha.itn.intraorange",
+			},
 			APIVCD: Service{
 				Enabled:  true,
 				Endpoint: "https://console5.cloudavenue-cha.itn.intraorange/cloudapi",
@@ -153,9 +165,12 @@ var consoles = map[Console]console{
 		SiteName:            "Console specific VDR",
 		LocationCode:        LocationVDR,
 		SiteID:              Console7,
-		URL:                 "https://console7.cloudavenue-vdr.itn.intraorange",
 		OrganizationPattern: regexp.MustCompile(`^cav01iv07ocb\d{7}$`),
 		Services: Services{
+			IHM: Service{
+				Enabled:  true,
+				Endpoint: "https://console7.cloudavenue-vdr.itn.intraorange",
+			},
 			APIVCD: Service{
 				Enabled:  true,
 				Endpoint: "https://console7.cloudavenue-vdr.itn.intraorange/cloudapi",
@@ -170,9 +185,12 @@ var consoles = map[Console]console{
 		SiteName:            "Console specific VDR",
 		LocationCode:        LocationVDR,
 		SiteID:              Console8,
-		URL:                 "https://console8.cloudavenue-vdr.itn.intraorange",
 		OrganizationPattern: regexp.MustCompile(`^cav01iv08ocb\d{7}$`),
 		Services: Services{
+			IHM: Service{
+				Enabled:  true,
+				Endpoint: "https://console8.cloudavenue-vdr.itn.intraorange",
+			},
 			APIVCD: Service{
 				Enabled:  true,
 				Endpoint: "https://console8.cloudavenue-vdr.itn.intraorange/cloudapi",
@@ -188,9 +206,12 @@ var consoles = map[Console]console{
 		SiteName:            "Console VCOD",
 		LocationCode:        LocationVDRCHA,
 		SiteID:              Console9,
-		URL:                 "https://console9.cloudavenue.orange-business.com",
 		OrganizationPattern: regexp.MustCompile(`^cav0[0-2]{1}vv09ocb\d{7}$`),
 		Services: Services{
+			IHM: Service{
+				Enabled:  true,
+				Endpoint: "https://console9.cloudavenue.orange-business.com",
+			},
 			APIVCD: Service{
 				Enabled:  true,
 				Endpoint: "https://console9.cloudavenue.orange-business.com/cloudapi",
@@ -201,49 +222,12 @@ var consoles = map[Console]console{
 			},
 		},
 	},
-	// Mock Console for testing purposes
-	Console("mock"): {
-		SiteName:            "Console Mock",
-		LocationCode:        LocationCode("mock"),
-		SiteID:              Console("mock"),
-		URL:                 "http://mock.api",
-		OrganizationPattern: regexp.MustCompile(`^mockorg\d+$`),
-		Services: Services{
-			APIVCD: Service{
-				Enabled:  true,
-				Endpoint: "http://mock.api/cloudapi",
-			},
-			APICerberus: Service{
-				Enabled:  true,
-				Endpoint: "http://mock.api/api/customers",
-			},
-			S3: Service{
-				Enabled:  true,
-				Endpoint: "http://mock.api:9000",
-			},
-			Netbackup: Service{
-				Enabled:  true,
-				Endpoint: "http://mock.api:8080/NetBackupSelfService/Api",
-			},
-		},
-	},
 }
 
 // FindBySiteID - Returns the console by its siteID.
 func FindBySiteID(siteID string) (Console, bool) {
 	for c, console := range consoles {
 		if console.SiteID == Console(siteID) {
-			return c, true
-		}
-	}
-
-	return "", false
-}
-
-// FindByURL - Returns the console by its URL.
-func FindByURL(url string) (Console, bool) {
-	for c, console := range consoles {
-		if console.URL == url {
 			return c, true
 		}
 	}
@@ -303,11 +287,6 @@ func (c Console) GetSiteID() Console {
 	return consoles[c].SiteID
 }
 
-// GetURL - Returns the URL.
-func (c Console) GetURL() string {
-	return consoles[c].URL
-}
-
 // GetAPIVCDEndpoint - Returns the VMware API endpoint.
 func (c Console) GetAPIVCDEndpoint() string {
 	return consoles[c].Services.APIVCD.GetEndpoint()
@@ -316,4 +295,12 @@ func (c Console) GetAPIVCDEndpoint() string {
 // GetAPICerberusEndpoint - Returns the Cerberus API endpoint.
 func (c Console) GetAPICerberusEndpoint() string {
 	return consoles[c].Services.APICerberus.GetEndpoint()
+}
+
+// OverrideEndpoint - Overrides the endpoint for a specific service.
+func (c Console) OverrideEndpoint(svc Services) {
+	x := consoles[c]
+	x.Services = svc
+
+	consoles[c] = x
 }

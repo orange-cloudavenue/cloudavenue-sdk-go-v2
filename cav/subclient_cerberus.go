@@ -7,7 +7,7 @@
  * or see the "LICENSE" file for more details.
  */
 
-package subclient
+package cav
 
 import (
 	"context"
@@ -15,16 +15,15 @@ import (
 
 	"resty.dev/v3"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/auth"
 	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/httpClient"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
-var _ Client = &cerberus{}
+var _ SubClient = &cerberus{}
 
 type cerberus struct {
-	client
+	subclient
 }
 
 type cerberusError struct {
@@ -33,29 +32,31 @@ type cerberusError struct {
 	Message string `json:"message"`
 }
 
-var NewCerberusClient = func() Client {
+var newCerberusClient = func() SubClient {
 	return &cerberus{}
 }
 
 // NewClient creates a new request for the Cerberus subclient.
 func (v *cerberus) NewHTTPClient(ctx context.Context) (*resty.Client, error) {
+	v.httpClient = httpclient.NewHTTPClient().
+		SetBaseURL(v.console.GetAPICerberusEndpoint()).
+		SetHeader("Accept", "application/json;version="+VDCVersion).
+		SetError(cerberusError{})
+
 	if !v.credential.IsInitialized() {
 		if err := v.credential.Refresh(ctx); err != nil {
 			return nil, err
 		}
 	}
 
-	v.httpClient = httpclient.NewHTTPClient().
-		SetBaseURL(v.console.GetAPICerberusEndpoint()).
-		SetHeaders(v.credential.Headers()).
-		SetHeader("Accept", "application/json;version="+auth.VDCVersion).
-		SetError(cerberusError{})
+	v.httpClient.
+		SetHeaders(v.credential.Headers())
 
 	return v.httpClient, nil
 }
 
 // SetCredential sets the authentication credential for the Cerberus client.
-func (v *cerberus) SetCredential(a auth.Auth) {
+func (v *cerberus) SetCredential(a auth) {
 	v.credential = a
 }
 
@@ -65,21 +66,29 @@ func (v *cerberus) SetConsole(c consoles.Console) {
 }
 
 // ParseAPIError parses the API error response from the Cerberus client.
-func (v *cerberus) ParseAPIError(resp *resty.Response) *errors.APIError {
+func (v *cerberus) ParseAPIError(action string, resp *resty.Response) *errors.APIError {
 	if resp == nil || !resp.IsError() {
 		return nil
 	}
 
 	// If resp.Error() is not nil, it means an error occurred.
 	// Parse the error response body.
-	if v, ok := resp.Error().(*cerberusError); ok {
+	if err, ok := resp.Error().(*cerberusError); ok {
 		return &errors.APIError{
+			Action:     action,
 			StatusCode: resp.StatusCode(),
-			Message:    fmt.Sprintf("%s: %s", v.Reason, v.Message),
+			Message:    fmt.Sprintf("%s: %s", err.Reason, err.Message),
 			Duration:   resp.Duration(),
 			Endpoint:   resp.Request.URL,
 		}
 	}
 
-	return nil
+	// This is used to prevent nil pointer dereference if SetError() was not called or overrided by other object.
+	return &errors.APIError{
+		Action:     action,
+		StatusCode: resp.StatusCode(),
+		Message:    "Unknown error occurred",
+		Duration:   resp.Duration(),
+		Endpoint:   resp.Request.URL,
+	}
 }

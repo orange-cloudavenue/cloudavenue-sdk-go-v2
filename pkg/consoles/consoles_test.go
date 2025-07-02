@@ -139,45 +139,6 @@ func TestFindBySiteID(t *testing.T) {
 	}
 }
 
-func TestFindByURL(t *testing.T) {
-	tests := []struct {
-		name     string
-		url      string
-		expected Console
-		found    bool
-	}{
-		{
-			name:     "valid url Console1",
-			url:      "https://console1.cloudavenue.orange-business.com",
-			expected: Console1,
-			found:    true,
-		},
-		{
-			name:     "valid url Console5",
-			url:      "https://console5.cloudavenue-cha.itn.intraorange",
-			expected: Console5,
-			found:    true,
-		},
-		{
-			name:     "invalid url",
-			url:      "https://notfound.example.com",
-			expected: "",
-			found:    false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c, ok := FindByURL(tt.url)
-			if ok != tt.found {
-				t.Errorf("FindByURL(%s) found = %v, want %v", tt.url, ok, tt.found)
-			}
-			if c != tt.expected {
-				t.Errorf("FindByURL(%s) = %v, want %v", tt.url, c, tt.expected)
-			}
-		})
-	}
-}
-
 func TestConsole_Services(t *testing.T) {
 	c := Console1
 	services := c.Services()
@@ -221,23 +182,6 @@ func TestConsole_GetLocationCode(t *testing.T) {
 	expected := LocationCHR
 	if c.GetLocationCode() != expected {
 		t.Errorf("Expected location code %s, got %s", expected, c.GetLocationCode())
-	}
-}
-
-func TestConsole_GetURL(t *testing.T) {
-	tests := []struct {
-		console  Console
-		expected string
-	}{
-		{Console1, "https://console1.cloudavenue.orange-business.com"},
-		{Console5, "https://console5.cloudavenue-cha.itn.intraorange"},
-		{Console9, "https://console9.cloudavenue.orange-business.com"},
-	}
-	for _, tt := range tests {
-		got := tt.console.GetURL()
-		if got != tt.expected {
-			t.Errorf("GetURL() = %v, want %v", got, tt.expected)
-		}
 	}
 }
 
