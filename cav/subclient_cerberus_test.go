@@ -20,7 +20,7 @@ func Test_NewRequest_Cerberus(t *testing.T) {
 	client, err := newMockClient()
 	assert.Nil(t, err, "Error creating mock client")
 
-	endpointSessionCerberus, err := GetEndpoint(CategoryAuthentication, VersionV1, "CreateSessionVmware", MethodPOST)
+	endpointSessionCerberus, err := GetEndpoint("CreateSessionVmware", MethodPOST)
 	assert.Nil(t, err, "Error getting endpoint for CreateSessionVmware")
 	defer endpointSessionCerberus.CleanMockResponse()
 

@@ -26,7 +26,7 @@ func TestDemoRequest(t *testing.T) {
 	oC, err := New(mC)
 	assert.Nil(t, err, "Error creating org client")
 
-	ep, err := mock.GetEndpoint("demo", cav.VersionV1, "demo-api", cav.MethodGET)
+	ep, err := mock.GetEndpoint("GetOrganization", cav.MethodGET)
 	if err != nil {
 		t.Fatalf("Error getting endpoint: %v", err)
 	}

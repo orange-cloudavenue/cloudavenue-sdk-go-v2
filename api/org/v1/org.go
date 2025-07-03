@@ -19,9 +19,7 @@ import (
 
 func init() {
 	cav.Endpoint{
-		Category:     "demo",
-		Version:      cav.VersionV1,
-		Name:         "demo-api",
+		Name:         "GetOrganization",
 		Method:       cav.MethodGET,
 		SubClient:    cav.ClientVmware,
 		PathTemplate: "/1.0.0/orgs/{orgUrn}",
@@ -63,7 +61,7 @@ type OrgResponse struct { //nolint:revive
 
 // DemoRequest represents a request to the demo cav.
 func (o *Org) DemoRequest(ctx context.Context, orgID string) (*OrgResponse, error) {
-	demoEndpoint, err := cav.GetEndpoint("demo", cav.VersionV1, "demo-api", cav.MethodGET)
+	demoEndpoint, err := cav.GetEndpoint("GetOrganization", cav.MethodGET)
 	if err != nil {
 		return nil, err
 	}

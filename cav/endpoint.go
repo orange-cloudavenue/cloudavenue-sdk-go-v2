@@ -11,30 +11,22 @@ package cav
 
 import (
 	"context"
-	"log"
 	"net/http"
-	"reflect"
-
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
-
-	"sync"
 
 	"resty.dev/v3"
-
-	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 type (
-	Category string
-	Version  string
+	API     string
+	Version string
 
 	Endpoint struct {
-		// Category is the category of the endpoint, e.g., "vdc", "edgegateway", "vapp"
-		Category Category `validate:"required"`
+		// api is the api of the endpoint, e.g., "vdc", "edgegateway", "vapp"
+		api API `validate:"required"`
 
-		// Version is the API version, e.g., "v1", "v2, "v3", etc.
+		// version is the API version, e.g., "v1", "v2, "v3", etc.
 		// It is used to differentiate between different versions of the API.
-		Version Version `validate:"required"`
+		version Version `validate:"required"`
 
 		// Name is the name of the endpoint, e.g., "firewall", "loadBalancer", etc.
 		// It is used to group endpoints by their functionality.
@@ -119,174 +111,3 @@ type (
 
 	RequestOption func(*Endpoint, *resty.Request) error
 )
-
-const (
-	// * Categories
-	CategoryVDC            Category = "vdc"
-	CategoryEdgeGateway    Category = "edgegateway"
-	CategoryVApp           Category = "vapp"
-	CategoryAuthentication Category = "authentication"
-
-	// * Versions
-	VersionV1 Version = "v1"
-	VersionV2 Version = "v2"
-
-	// * Methods
-	MethodGET    Method = "GET"
-	MethodPOST   Method = "POST"
-	MethodPUT    Method = "PUT"
-	MethodDELETE Method = "DELETE"
-	MethodPATCH  Method = "PATCH"
-)
-
-var (
-	// mu is a mutex to protect the Endpoints map from concurrent access.
-	// It ensures that only one goroutine can modify the map at a time.
-	// This is important because the Endpoints map is shared across multiple goroutines,
-	// and concurrent modifications could lead to race conditions.
-	mu = &sync.RWMutex{}
-)
-
-// map[category]map[version]map[object]map[method]Endpoint
-// map[edgegateway]map[v1]map[firewall]map[GET|POST|PUT|DELETE]Endpoint
-var endpoints = map[Category]map[Version]map[string]map[Method]*Endpoint{}
-
-// map[api]map[version]
-
-// Register registers an endpoint in the Endpoints map.
-func (e Endpoint) Register() {
-	mu.Lock()
-	defer mu.Unlock()
-
-	if err := validators.New().Struct(&e); err != nil {
-		panic(err)
-	}
-
-	initEndpoint(e)
-
-	if e.RequestFunc == nil {
-		// Default RequestFunc if not provided
-		e.RequestFunc = DefaultRequestFunc
-	}
-
-	// pc, _, _, ok := runtime.Caller(1)
-	// if ok {
-	// 	funcName := runtime.FuncForPC(pc).Name()
-	// 	lastSlash := strings.LastIndexByte(funcName, '/')
-	// 	if lastSlash < 0 {
-	// 		lastSlash = 0
-	// 	}
-	// 	lastDot := strings.LastIndexByte(funcName[lastSlash:], '.') + lastSlash
-
-	// 	fmt.Printf("Package: %s\n", strings.TrimPrefix(funcName[:lastDot], "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/"))
-	// }
-	// TODO
-	if e.BodyRequestType != nil {
-		log.Default().Print("====>", reflect.TypeOf(e.BodyRequestType).PkgPath())
-	}
-
-	// Set the endpoint in the Endpoints map
-	endpoints[e.Category][e.Version][e.Name][e.Method] = &e
-}
-
-// GetEndpoints retrieves all endpoints for a given category and version.
-func GetEndpoints() map[Category]map[Version]map[string]map[Method]*Endpoint {
-	mu.RLock()
-	defer mu.RUnlock()
-
-	return endpoints
-}
-
-// GetEndpointsUncategorized retrieves all endpoints without categorization.
-func GetEndpointsUncategorized() []*Endpoint {
-	mu.RLock()
-	defer mu.RUnlock()
-
-	var endpointsList []*Endpoint
-
-	// Iterate through the endpoints map and collect all endpoints
-	for _, versions := range endpoints {
-		for _, objects := range versions {
-			for _, methods := range objects {
-				for _, endpoint := range methods {
-					endpointsList = append(endpointsList, endpoint)
-				}
-			}
-		}
-	}
-
-	return endpointsList
-}
-
-// GetEndpoint retrieves an endpoint from the Endpoints map based on the provided category, version, name, and method.
-func GetEndpoint(category Category, version Version, name string, method Method) (*Endpoint, error) {
-	mu.RLock()
-	defer mu.RUnlock()
-
-	// Check if the category exists
-	if _, ok := endpoints[category]; !ok {
-		return nil, errors.Newf("category %s not found", category)
-	}
-
-	// Check if the version exists in the category
-	if _, ok := endpoints[category][version]; !ok {
-		return nil, errors.Newf("version %s not found in category %s", version, category)
-	}
-
-	// Check if the name exists in the version
-	if _, ok := endpoints[category][version][name]; !ok {
-		return nil, errors.Newf("name %s not found in version %s of category %s", name, version, category)
-	}
-
-	// Check if the method exists in the name
-	if endpoint, ok := endpoints[category][version][name][method]; ok {
-		return endpoint, nil
-	}
-
-	return nil, errors.Newf("method %s not found for name %s in version %s of category %s", method, name, version, category)
-}
-
-// initCategory initializes the category in the Endpoints map if it does not exist.
-func initCategory(category Category) {
-	if _, ok := endpoints[category]; !ok {
-		endpoints[category] = make(map[Version]map[string]map[Method]*Endpoint)
-	}
-}
-
-// initVersion initializes the version in the category map if it does not exist.
-func initVersion(category Category, version Version) {
-	if _, ok := endpoints[category][version]; !ok {
-		endpoints[category][version] = make(map[string]map[Method]*Endpoint)
-	}
-}
-
-// initMethod initializes the method in the object map if it does not exist.
-func initMethod(category Category, version Version, name string, method Method) {
-	if _, ok := endpoints[category][version][name][method]; !ok {
-		endpoints[category][version][name][method] = &Endpoint{
-			Category:         category,
-			Version:          version,
-			Name:             name,
-			Method:           method,
-			PathTemplate:     "",
-			PathParams:       []PathParam{},
-			QueryParams:      []QueryParam{},
-			DocumentationURL: "",
-		}
-	}
-}
-
-// initName initializes the name in the object map if it does not exist.
-func initName(category Category, version Version, name string) {
-	if _, ok := endpoints[category][version][name]; !ok {
-		endpoints[category][version][name] = make(map[Method]*Endpoint)
-	}
-}
-
-// init Method initializes the method in the object map if it does not exist.
-func initEndpoint(endpoint Endpoint) {
-	initCategory(endpoint.Category)
-	initVersion(endpoint.Category, endpoint.Version)
-	initName(endpoint.Category, endpoint.Version, endpoint.Name)
-	initMethod(endpoint.Category, endpoint.Version, endpoint.Name, endpoint.Method)
-}

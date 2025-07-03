@@ -81,7 +81,7 @@ func (c *cloudavenueCredential) Headers() map[string]string {
 
 // Refresh is a placeholder method for refreshing the authentication token.
 func (c *cloudavenueCredential) Refresh(ctx context.Context) error {
-	ep, err := GetEndpoint(CategoryAuthentication, VersionV1, "CreateSessionVmware", MethodPOST)
+	ep, err := GetEndpoint("CreateSessionVmware", MethodPOST)
 	if err != nil {
 		return errors.New("failed to get endpoint for CreateSessionVmware: " + err.Error())
 	}

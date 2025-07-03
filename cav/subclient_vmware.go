@@ -32,7 +32,7 @@ type (
 	}
 )
 
-const vmwareVCDVersion = "38.1"
+const vmwareVCDversion = "38.1"
 
 var newVmwareClient = func() SubClient {
 	return &vmware{}
@@ -42,7 +42,7 @@ var newVmwareClient = func() SubClient {
 func (v *vmware) NewHTTPClient(ctx context.Context) (*resty.Client, error) {
 	v.httpClient = httpclient.NewHTTPClient().
 		SetBaseURL(v.console.GetAPIVCDEndpoint()).
-		SetHeader("Accept", "application/json;version="+vmwareVCDVersion).
+		SetHeader("Accept", "application/json;version="+vmwareVCDversion).
 		SetError(vmwareError{})
 
 	if !v.credential.IsInitialized() {
