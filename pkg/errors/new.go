@@ -7,10 +7,16 @@
  * or see the "LICENSE" file for more details.
  */
 
-package subclient
+package errors
 
-type contextKey string
-
-const (
-	ContextKeyClientName contextKey = "subclient.clientName" // Context key for the client name
+import (
+	"errors"
+	"fmt"
 )
+
+// Newf creates a new error with a formatted message.
+func Newf(format string, args ...interface{}) error {
+	return fmt.Errorf(format, args...)
+}
+
+var New = errors.New

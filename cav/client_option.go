@@ -11,11 +11,10 @@ package cav
 
 import (
 	"errors"
+	"log"
 
 	"resty.dev/v3"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/auth"
-	subclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/subClient"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )
 
@@ -26,7 +25,7 @@ type settings struct {
 	// Console contains all properties related to the console of the client.
 	Console consoles.Console
 	// SubClients contains the sub-clients for the client.
-	SubClients map[subclient.Name]subclient.Client
+	SubClients map[SubClientName]SubClient
 
 	httpClient *resty.Client
 }
@@ -34,7 +33,7 @@ type settings struct {
 func newSettings(organization string) *settings {
 	return &settings{
 		Organization: organization,
-		SubClients:   make(map[subclient.Name]subclient.Client),
+		SubClients:   make(map[SubClientName]SubClient),
 	}
 }
 
@@ -57,17 +56,26 @@ func withConsole() ClientOption {
 
 // * Exporter options
 
+// WithCustomEndpoints sets custom endpoints for the sub-clients.
+func WithCustomEndpoints(endpoints consoles.Services) ClientOption {
+	return func(s *settings) error {
+		s.Console.OverrideEndpoint(endpoints)
+		return nil
+	}
+}
+
 // WithCloudAvenueCredential sets the credential for the client.
 func WithCloudAvenueCredential(username, password string) ClientOption {
 	return func(s *settings) error {
-		for _, client := range []subclient.Name{subclient.Cerberus, subclient.Vmware} {
-			if s.SubClients[client] == nil {
-				s.SubClients[client] = subclient.Clients[client]
+		for _, client := range []SubClientName{ClientCerberus, ClientVmware} {
+			if _, ok := s.SubClients[client]; !ok {
+				s.SubClients[client] = subClients[client]
 			}
 
+			log.Default().Printf("Setting console %s for client %s", s.Console, client)
 			s.SubClients[client].SetConsole(s.Console)
 
-			cred, err := auth.NewCloudavenueCredential(s.httpClient, s.Console, s.Organization, username, password)
+			cred, err := NewCloudavenueCredential(s.Console, s.Organization, username, password)
 			if err != nil {
 				return err
 			}

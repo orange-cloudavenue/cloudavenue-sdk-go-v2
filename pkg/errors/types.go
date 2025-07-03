@@ -21,10 +21,11 @@ type (
 	}
 
 	APIError struct {
-		StatusCode int
+		Action     string // e.g., "Get Edge Gateway"
 		Message    string
-		Duration   time.Duration
+		StatusCode int
 		Endpoint   string
+		Duration   time.Duration
 	}
 )
 
@@ -46,7 +47,7 @@ func (e *APIError) Error() string {
 	if e == nil {
 		return "nil APIError"
 	}
-	return fmt.Sprintf("request API error: %s (status code: %d, duration: %s, endpoint: %s)",
-		e.Message, e.StatusCode, e.Duration, e.Endpoint,
+	return fmt.Sprintf("[%s] request API error: %s (status code: %d, duration: %s, endpoint: %s)",
+		e.Action, e.Message, e.StatusCode, e.Duration, e.Endpoint,
 	)
 }
