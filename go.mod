@@ -5,7 +5,6 @@ go 1.24.4
 require (
 	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-faker/faker/v4 v4.6.1
-	github.com/jarcoal/httpmock v1.4.0
 	github.com/orange-cloudavenue/common-go/validators v0.2.2
 	github.com/stretchr/testify v1.10.0
 	resty.dev/v3 v3.0.0-beta.3

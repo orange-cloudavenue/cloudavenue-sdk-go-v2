@@ -20,17 +20,17 @@ import (
 func WithPathParam(pp PathParam, value string) RequestOption {
 	return func(endpoint *Endpoint, req *resty.Request) error {
 		if endpoint.PathParams == nil {
-			return errors.Newf("endpoint %s %s %s %s has no path params", endpoint.Category, endpoint.Version, endpoint.Name, endpoint.Method)
+			return errors.Newf("endpoint %s %s %s %s has no path params", endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
 		}
 
 		for _, p := range endpoint.PathParams {
 			if p.Name == pp.Name {
 				if p.Required && value == "" {
-					return errors.Newf("path param %s is required for endpoint %s %s %s %s", pp.Name, endpoint.Category, endpoint.Version, endpoint.Name, endpoint.Method)
+					return errors.Newf("path param %s is required for endpoint %s %s %s %s", pp.Name, endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
 				}
 				if p.ValidatorFunc != nil && value != "" {
 					if err := p.ValidatorFunc(value); err != nil {
-						return errors.Newf("path param %s validation failed for endpoint %s %s %s %s: %v", pp.Name, endpoint.Category, endpoint.Version, endpoint.Name, endpoint.Method, err)
+						return errors.Newf("path param %s validation failed for endpoint %s %s %s %s: %v", pp.Name, endpoint.api, endpoint.version, endpoint.Name, endpoint.Method, err)
 					}
 				}
 			}
@@ -44,17 +44,17 @@ func WithPathParam(pp PathParam, value string) RequestOption {
 func WithQueryParam(qp QueryParam, value string) RequestOption {
 	return func(endpoint *Endpoint, req *resty.Request) error {
 		if endpoint.QueryParams == nil {
-			return errors.Newf("endpoint %s %s %s %s has no query params", endpoint.Category, endpoint.Version, endpoint.Name, endpoint.Method)
+			return errors.Newf("endpoint %s %s %s %s has no query params", endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
 		}
 
 		for _, p := range endpoint.QueryParams {
 			if p.Name == qp.Name {
 				if p.Required && value == "" {
-					return errors.Newf("query param %s is required for endpoint %s %s %s %s", qp.Name, endpoint.Category, endpoint.Version, endpoint.Name, endpoint.Method)
+					return errors.Newf("query param %s is required for endpoint %s %s %s %s", qp.Name, endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
 				}
 				if p.ValidatorFunc != nil && value != "" {
 					if err := p.ValidatorFunc(value); err != nil {
-						return errors.Newf("query param %s validation failed for endpoint %s %s %s %s: %v", qp.Name, endpoint.Category, endpoint.Version, endpoint.Name, endpoint.Method, err)
+						return errors.Newf("query param %s validation failed for endpoint %s %s %s %s: %v", qp.Name, endpoint.api, endpoint.version, endpoint.Name, endpoint.Method, err)
 					}
 				}
 			}
@@ -68,7 +68,7 @@ func WithQueryParam(qp QueryParam, value string) RequestOption {
 func OverrideSetResult(rt any) RequestOption {
 	return func(endpoint *Endpoint, req *resty.Request) error {
 		if rt == nil {
-			return errors.Newf("result type cannot be nil for endpoint %s %s %s %s", endpoint.Category, endpoint.Version, endpoint.Name, endpoint.Method)
+			return errors.Newf("result type cannot be nil for endpoint %s %s %s %s", endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
 		}
 		req.SetResult(rt)
 		return nil
@@ -78,7 +78,7 @@ func OverrideSetResult(rt any) RequestOption {
 func SetBody(body any) RequestOption {
 	return func(endpoint *Endpoint, req *resty.Request) error {
 		if body == nil {
-			return errors.Newf("body cannot be nil for endpoint %s %s %s %s", endpoint.Category, endpoint.Version, endpoint.Name, endpoint.Method)
+			return errors.Newf("body cannot be nil for endpoint %s %s %s %s", endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
 		}
 
 		// Reflect BodyRequestType and body to ensure they match
@@ -86,7 +86,7 @@ func SetBody(body any) RequestOption {
 			reflectBodyType := reflect.TypeOf(endpoint.BodyRequestType)
 			reflectBody := reflect.TypeOf(body)
 			if reflectBody != reflectBodyType {
-				return errors.Newf("body must be of type %s for endpoint %s %s %s %s", reflectBodyType, endpoint.Category, endpoint.Version, endpoint.Name, endpoint.Method)
+				return errors.Newf("body must be of type %s for endpoint %s %s %s %s", reflectBodyType, endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
 			}
 		}
 

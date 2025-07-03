@@ -15,8 +15,8 @@ import (
 
 func TestEndpoint_String(t *testing.T) {
 	e := Endpoint{
-		Category:     "cat",
-		Version:      "v1",
+		api:          "cat",
+		version:      "v1",
 		Name:         "endpointName",
 		Method:       "GET",
 		PathTemplate: "/path/{id}",

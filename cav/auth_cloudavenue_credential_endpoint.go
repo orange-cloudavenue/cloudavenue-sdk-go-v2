@@ -17,8 +17,6 @@ import (
 
 func init() {
 	Endpoint{
-		Category:         CategoryAuthentication,
-		Version:          VersionV1,
 		Name:             "CreateSessionVmware",
 		Method:           MethodPOST,
 		SubClient:        ClientVmware,
@@ -30,7 +28,7 @@ func init() {
 		requestInternalFunc: func(ctx context.Context, client *resty.Client, endpoint *Endpoint, opts ...RequestOption) (*resty.Response, error) {
 			r := client.R().
 				SetContext(ctx).
-				SetHeader("Accept", "application/json;version="+vmwareVCDVersion)
+				SetHeader("Accept", "application/json;version="+vmwareVCDversion)
 
 			for _, opt := range opts {
 				if err := opt(endpoint, r); err != nil {

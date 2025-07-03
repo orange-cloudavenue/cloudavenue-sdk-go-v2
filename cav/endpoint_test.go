@@ -20,8 +20,8 @@ func Test_Endpoint_Register(t *testing.T) {
 	}{
 		{
 			Endpoint: Endpoint{
-				Category:         Category("fake"),
-				Version:          VersionV1,
+				api:              API("fake"),
+				version:          VersionV1,
 				Name:             "fake",
 				Method:           MethodPOST,
 				SubClient:        ClientVmware,
@@ -35,7 +35,7 @@ func Test_Endpoint_Register(t *testing.T) {
 		},
 		{
 			Endpoint: Endpoint{
-				Category: "", // Invalid category
+				api: "", // Invalid api
 			},
 			expectedError: true,
 		},

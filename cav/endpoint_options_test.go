@@ -23,7 +23,7 @@ type dummyBody struct {
 
 func TestSetBody_NilBody(t *testing.T) {
 	endpoint := &Endpoint{
-		Category: "cat", Version: "v1", Name: "name", Method: "POST",
+		api: "cat", version: "v1", Name: "name", Method: "POST",
 		BodyRequestType: dummyBody{},
 	}
 	req := resty.New().R()
@@ -36,7 +36,7 @@ func TestSetBody_NilBody(t *testing.T) {
 
 func TestSetBody_BodyRequestTypeMismatch(t *testing.T) {
 	endpoint := &Endpoint{
-		Category: "cat", Version: "v1", Name: "name", Method: "POST",
+		api: "cat", version: "v1", Name: "name", Method: "POST",
 		BodyRequestType: dummyBody{},
 	}
 	req := resty.New().R()
@@ -49,7 +49,7 @@ func TestSetBody_BodyRequestTypeMismatch(t *testing.T) {
 
 func TestSetBody_BodyRequestTypeMatch(t *testing.T) {
 	endpoint := &Endpoint{
-		Category: "cat", Version: "v1", Name: "name", Method: "POST",
+		api: "cat", version: "v1", Name: "name", Method: "POST",
 		BodyRequestType: dummyBody{},
 	}
 	req := resty.New().R()
@@ -66,7 +66,7 @@ func TestSetBody_BodyRequestTypeMatch(t *testing.T) {
 
 func TestSetBody_NoBodyRequestType(t *testing.T) {
 	endpoint := &Endpoint{
-		Category: "cat", Version: "v1", Name: "name", Method: "POST",
+		api: "cat", version: "v1", Name: "name", Method: "POST",
 		BodyRequestType: nil,
 	}
 	req := resty.New().R()
@@ -83,7 +83,7 @@ func TestSetBody_NoBodyRequestType(t *testing.T) {
 
 func TestWithQueryParam_NoQueryParams(t *testing.T) {
 	endpoint := &Endpoint{
-		Category: "cat", Version: "v1", Name: "name", Method: "GET",
+		api: "cat", version: "v1", Name: "name", Method: "GET",
 		QueryParams: nil,
 	}
 	req := resty.New().R()
@@ -97,7 +97,7 @@ func TestWithQueryParam_NoQueryParams(t *testing.T) {
 
 func TestWithQueryParam_RequiredMissing(t *testing.T) {
 	endpoint := &Endpoint{
-		Category: "cat", Version: "v1", Name: "name", Method: "GET",
+		api: "cat", version: "v1", Name: "name", Method: "GET",
 		QueryParams: []QueryParam{{Name: "foo", Required: true}},
 	}
 	req := resty.New().R()
@@ -114,7 +114,7 @@ func TestWithQueryParam_ValidatorFails(t *testing.T) {
 		return errors.Newf("invalid value")
 	}
 	endpoint := &Endpoint{
-		Category: "cat", Version: "v1", Name: "name", Method: "GET",
+		api: "cat", version: "v1", Name: "name", Method: "GET",
 		QueryParams: []QueryParam{{Name: "foo", ValidatorFunc: validator}},
 	}
 	req := resty.New().R()
@@ -128,7 +128,7 @@ func TestWithQueryParam_ValidatorFails(t *testing.T) {
 
 func TestWithQueryParam_Success(t *testing.T) {
 	endpoint := &Endpoint{
-		Category: "cat", Version: "v1", Name: "name", Method: "GET",
+		api: "cat", version: "v1", Name: "name", Method: "GET",
 		QueryParams: []QueryParam{{Name: "foo"}},
 	}
 	req := resty.New().R()
@@ -145,7 +145,7 @@ func TestWithQueryParam_Success(t *testing.T) {
 
 func TestOverrideSetResult_NilResult(t *testing.T) {
 	endpoint := &Endpoint{
-		Category: "cat", Version: "v1", Name: "name", Method: "GET",
+		api: "cat", version: "v1", Name: "name", Method: "GET",
 	}
 	req := resty.New().R()
 	opt := OverrideSetResult(nil)
@@ -157,7 +157,7 @@ func TestOverrideSetResult_NilResult(t *testing.T) {
 
 func TestOverrideSetResult_Success(t *testing.T) {
 	endpoint := &Endpoint{
-		Category: "cat", Version: "v1", Name: "name", Method: "GET",
+		api: "cat", version: "v1", Name: "name", Method: "GET",
 	}
 	req := resty.New().R()
 	result := struct{ Foo string }{}
@@ -171,7 +171,7 @@ func TestOverrideSetResult_Success(t *testing.T) {
 
 func TestWithPathParam_NoPathParams(t *testing.T) {
 	endpoint := &Endpoint{
-		Category: "cat", Version: "v1", Name: "name", Method: "GET",
+		api: "cat", version: "v1", Name: "name", Method: "GET",
 		PathParams: nil,
 	}
 	req := resty.New().R()
@@ -185,7 +185,7 @@ func TestWithPathParam_NoPathParams(t *testing.T) {
 
 func TestWithPathParam_RequiredMissing(t *testing.T) {
 	endpoint := &Endpoint{
-		Category: "cat", Version: "v1", Name: "name", Method: "GET",
+		api: "cat", version: "v1", Name: "name", Method: "GET",
 		PathParams: []PathParam{{Name: "foo", Required: true}},
 	}
 	req := resty.New().R()
@@ -202,7 +202,7 @@ func TestWithPathParam_ValidatorFails(t *testing.T) {
 		return errors.Newf("invalid value")
 	}
 	endpoint := &Endpoint{
-		Category: "cat", Version: "v1", Name: "name", Method: "GET",
+		api: "cat", version: "v1", Name: "name", Method: "GET",
 		PathParams: []PathParam{{Name: "foo", ValidatorFunc: validator}},
 	}
 	req := resty.New().R()
@@ -216,7 +216,7 @@ func TestWithPathParam_ValidatorFails(t *testing.T) {
 
 func TestWithPathParam_Success(t *testing.T) {
 	endpoint := &Endpoint{
-		Category: "cat", Version: "v1", Name: "name", Method: "GET",
+		api: "cat", version: "v1", Name: "name", Method: "GET",
 		PathParams: []PathParam{{Name: "foo"}},
 	}
 	req := resty.New().R()

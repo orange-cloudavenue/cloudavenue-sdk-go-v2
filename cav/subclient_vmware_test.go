@@ -20,7 +20,7 @@ func Test_NewRequest_Vmware(t *testing.T) {
 	client, err := newMockClient()
 	assert.Nil(t, err, "Error creating mock client")
 
-	endpointSessionVmware, err := GetEndpoint(CategoryAuthentication, VersionV1, "CreateSessionVmware", MethodPOST)
+	endpointSessionVmware, err := GetEndpoint("CreateSessionVmware", MethodPOST)
 	assert.Nil(t, err, "Error getting endpoint for CreateSessionVmware")
 	defer endpointSessionVmware.CleanMockResponse()
 
