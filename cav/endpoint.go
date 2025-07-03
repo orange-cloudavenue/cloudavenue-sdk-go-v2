@@ -74,7 +74,7 @@ type (
 		RequestFunc func(ctx context.Context, client Client, endpoint *Endpoint, opts ...RequestOption) (*resty.Response, error)
 
 		// BodyRequestType is the golang type of the request body.
-		// It is used to validate the body areguments passed to the endpoint.
+		// It is used to validate the body arguments passed to the endpoint.
 		// BodyType is optional and can be used to specify the type of the request body
 		// for POST, PUT, or PATCH requests.
 		BodyRequestType any `validate:"required_if=Method POST PUT PATCH"`
@@ -169,6 +169,17 @@ func (e Endpoint) Register() {
 		e.RequestFunc = DefaultRequestFunc
 	}
 
+	// pc, _, _, ok := runtime.Caller(1)
+	// if ok {
+	// 	funcName := runtime.FuncForPC(pc).Name()
+	// 	lastSlash := strings.LastIndexByte(funcName, '/')
+	// 	if lastSlash < 0 {
+	// 		lastSlash = 0
+	// 	}
+	// 	lastDot := strings.LastIndexByte(funcName[lastSlash:], '.') + lastSlash
+
+	// 	fmt.Printf("Package: %s\n", strings.TrimPrefix(funcName[:lastDot], "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/"))
+	// }
 	// TODO
 	if e.BodyRequestType != nil {
 		log.Default().Print("====>", reflect.TypeOf(e.BodyRequestType).PkgPath())
