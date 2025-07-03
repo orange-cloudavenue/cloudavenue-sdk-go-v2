@@ -22,6 +22,9 @@ import (
 )
 
 const (
+	// API is the type for API names. (Type available in endpoint.go)
+	// Version is the type for API versions. (Type available in endpoint.go)
+
 	// * Exported api
 	// APIVDC         API = "vdc"
 	// APIEdgeGateway API = "edgegateway"
