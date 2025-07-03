@@ -49,8 +49,9 @@ func Test_NewRequest_Vmware(t *testing.T) {
 			name:        "not found",
 			expectedErr: true,
 			expectedResp: vmwareError{
-				Message:        "Resource not found",
-				MinorErrorCode: "RESOURCE_NOT_FOUND",
+				Message:       "Resource not found",
+				StatusCode:    404,
+				StatusMessage: "RESOURCE_NOT_FOUND",
 			},
 			expectedStatus: http.StatusNotFound,
 		},
@@ -59,8 +60,9 @@ func Test_NewRequest_Vmware(t *testing.T) {
 			expectedErr:    true,
 			expectedStatus: http.StatusUnauthorized,
 			expectedResp: vmwareError{
-				Message:        "Unauthorized access",
-				MinorErrorCode: "UNAUTHORIZED",
+				Message:       "Unauthorized access",
+				StatusCode:    401,
+				StatusMessage: "UNAUTHORIZED",
 			},
 		},
 		{

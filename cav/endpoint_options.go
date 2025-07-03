@@ -17,7 +17,7 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
-func WithPathParam(pp PathParam, value string) RequestOption {
+func WithPathParam(pp PathParam, value string) EndpointRequestOption {
 	return func(endpoint *Endpoint, req *resty.Request) error {
 		if endpoint.PathParams == nil {
 			return errors.Newf("endpoint %s %s %s %s has no path params", endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
@@ -41,7 +41,7 @@ func WithPathParam(pp PathParam, value string) RequestOption {
 	}
 }
 
-func WithQueryParam(qp QueryParam, value string) RequestOption {
+func WithQueryParam(qp QueryParam, value string) EndpointRequestOption {
 	return func(endpoint *Endpoint, req *resty.Request) error {
 		if endpoint.QueryParams == nil {
 			return errors.Newf("endpoint %s %s %s %s has no query params", endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
@@ -65,7 +65,7 @@ func WithQueryParam(qp QueryParam, value string) RequestOption {
 	}
 }
 
-func OverrideSetResult(rt any) RequestOption {
+func OverrideSetResult(rt any) EndpointRequestOption {
 	return func(endpoint *Endpoint, req *resty.Request) error {
 		if rt == nil {
 			return errors.Newf("result type cannot be nil for endpoint %s %s %s %s", endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
@@ -75,7 +75,7 @@ func OverrideSetResult(rt any) RequestOption {
 	}
 }
 
-func SetBody(body any) RequestOption {
+func SetBody(body any) EndpointRequestOption {
 	return func(endpoint *Endpoint, req *resty.Request) error {
 		if body == nil {
 			return errors.Newf("body cannot be nil for endpoint %s %s %s %s", endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
@@ -95,7 +95,7 @@ func SetBody(body any) RequestOption {
 	}
 }
 
-func SetCustomRestyOption(option func(*resty.Request)) RequestOption {
+func SetCustomRestyOption(option func(*resty.Request)) EndpointRequestOption {
 	return func(_ *Endpoint, req *resty.Request) error {
 		option(req)
 		return nil

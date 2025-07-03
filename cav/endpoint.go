@@ -63,7 +63,7 @@ type (
 		// This function is used to make the actual HTTP request to the endpoint.
 		// It allows for customization of the request, such as setting headers, query parameters,
 		// and body content.
-		RequestFunc func(ctx context.Context, client Client, endpoint *Endpoint, opts ...RequestOption) (*resty.Response, error)
+		RequestFunc func(ctx context.Context, client Client, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error)
 
 		// BodyRequestType is the golang type of the request body.
 		// It is used to validate the body arguments passed to the endpoint.
@@ -79,7 +79,7 @@ type (
 		// This function is used to make the actual HTTP request (from internal package) to the endpoint.
 		// It allows for customization of the request, such as setting headers, query parameters,
 		// and body content.
-		requestInternalFunc func(ctx context.Context, client *resty.Client, endpoint *Endpoint, opts ...RequestOption) (*resty.Response, error)
+		requestInternalFunc func(ctx context.Context, client *resty.Client, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error)
 
 		// mockResponse is the mock response that can be used for testing purposes.
 		// It is optional and can be used to simulate a response from the endpoint without making an actual HTTP request.
@@ -109,5 +109,5 @@ type (
 
 	Method string
 
-	RequestOption func(*Endpoint, *resty.Request) error
+	EndpointRequestOption func(*Endpoint, *resty.Request) error
 )

@@ -15,7 +15,7 @@ import (
 	"resty.dev/v3"
 )
 
-var DefaultRequestFunc = func(ctx context.Context, client Client, endpoint *Endpoint, opts ...RequestOption) (*resty.Response, error) {
+var DefaultRequestFunc = func(ctx context.Context, client Client, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error) {
 	req, err := client.NewRequest(ctx, endpoint.SubClient)
 	if err != nil {
 		return nil, err

@@ -25,10 +25,10 @@ func init() {
 		QueryParams:      []QueryParam{},
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/sessions/post/",
 		RequestFunc:      nil,
-		requestInternalFunc: func(ctx context.Context, client *resty.Client, endpoint *Endpoint, opts ...RequestOption) (*resty.Response, error) {
+		requestInternalFunc: func(ctx context.Context, client *resty.Client, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error) {
 			r := client.R().
 				SetContext(ctx).
-				SetHeader("Accept", "application/json;version="+vmwareVCDversion)
+				SetHeader("Accept", "application/json;version="+vmwareVCDVersion)
 
 			for _, opt := range opts {
 				if err := opt(endpoint, r); err != nil {

@@ -86,7 +86,7 @@ func (c *cloudavenueCredential) Refresh(ctx context.Context) error {
 		return errors.New("failed to get endpoint for CreateSessionVmware: " + err.Error())
 	}
 
-	opts := []RequestOption{}
+	opts := []EndpointRequestOption{}
 	if c.bearer != "" {
 		opts = append(opts, SetCustomRestyOption(func(r *resty.Request) {
 			r.SetAuthToken(c.bearer)
