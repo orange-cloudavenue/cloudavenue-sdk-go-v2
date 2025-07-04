@@ -1,12 +1,3 @@
-/*
- * SPDX-FileCopyrightText: Copyright (c) 2025 Orange
- * SPDX-License-Identifier: Mozilla Public License 2.0
- *
- * This software is distributed under the MPL-2.0 license.
- * the text of which is available at https://www.mozilla.org/en-US/MPL/2.0/
- * or see the "LICENSE" file for more details.
- */
-
 package cav
 
 import (
@@ -15,6 +6,12 @@ import (
 	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
+)
+
+type (
+	// EndpointRequestOption is a function that modifies the request for an endpoint.
+	// It takes an Endpoint and a resty.Request as parameters and returns an error.
+	EndpointRequestOption func(*Endpoint, *resty.Request) error
 )
 
 func WithPathParam(pp PathParam, value string) EndpointRequestOption {
@@ -84,9 +81,16 @@ func SetBody(body any) EndpointRequestOption {
 		// Reflect BodyRequestType and body to ensure they match
 		if endpoint.BodyRequestType != nil {
 			reflectBodyType := reflect.TypeOf(endpoint.BodyRequestType)
+			if reflectBodyType.Kind() == reflect.Ptr {
+				reflectBodyType = reflectBodyType.Elem()
+			}
+
 			reflectBody := reflect.TypeOf(body)
+			if reflectBody.Kind() == reflect.Ptr {
+				reflectBody = reflectBody.Elem()
+			}
 			if reflectBody != reflectBodyType {
-				return errors.Newf("body must be of type %s for endpoint %s %s %s %s", reflectBodyType, endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
+				return errors.Newf("body must be of type %s (not %s) for endpoint %s %s %s %s", reflectBodyType, reflectBody, endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
 			}
 		}
 

@@ -32,19 +32,19 @@ func newRequestOptions(opts ...RequestOption) (*requestOption, error) {
 	return ro, nil
 }
 
-// * Job
+// // * Job
 
-// WithJob is a request option to parse the Job Response.
-func WithJob(opts ...JobOption) RequestOption {
-	return func(ro *requestOption) error {
-		// This option is used to parse the job response.
-		// It can be used to set the job settings or any other job-related options.
-		jobOpts, err := NewJobOptions(opts...)
-		if err != nil {
-			return err
-		}
-		ro.JobOpts = jobOpts
+// // WithJob is a request option to parse the Job Response.
+// func WithJob(opts ...JobOption) RequestOption {
+// 	return func(ro *requestOption) error {
+// 		// This option is used to parse the job response.
+// 		// It can be used to set the job settings or any other job-related options.
+// 		jobOpts, err := NewJobOptions(opts...)
+// 		if err != nil {
+// 			return err
+// 		}
+// 		ro.JobOpts = jobOpts
 
-		return nil
-	}
-}
+// 		return nil
+// 	}
+// }

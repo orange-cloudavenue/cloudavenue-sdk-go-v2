@@ -20,7 +20,7 @@ type (
 	jobsInterface interface {
 		// JobRefresh refreshes the job status.
 		// Error return a custom error if the job fails. errors.JobError
-		JobRefresh(newReq *resty.Request, resp *resty.Response) (job *Job, err error)
+		JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts []EndpointRequestOption) (job *Job, err error)
 
 		// JobParser parses the job response.
 		// This method is used to parse the job response and extract the job information.
@@ -49,23 +49,25 @@ func newJobMiddleware(httpC *resty.Client, c jobsInterface, jobOpts *JobOptions)
 		// Create a new request for job status checking.
 		// This request will be used to poll the job status until it is terminated.
 		// The request will be configured with retry conditions and timeout settings.
-		newRequestJob := httpC.NewRequest().
+		reqOpts := []EndpointRequestOption{}
+		reqOpts = append(reqOpts,
 			// Set the context from the original response request.
-			SetContext(resp.Request.Context()).
+			SetCustomRestyOption(func(r *resty.Request) { r.SetContext(resp.Request.Context()) }),
 			// Set retry conditions for the job status check.
 			// This will retry the request based on the job status and error conditions.
-			SetRetryConditions(jobRetryCondition(c)).
-			SetRetryWaitTime(jobOpts.PollInterval).
-			SetRetryMaxWaitTime(jobOpts.Timeout).
+			SetCustomRestyOption(func(r *resty.Request) { r.SetRetryConditions(jobRetryCondition(c)) }),
+			SetCustomRestyOption(func(r *resty.Request) { r.SetRetryWaitTime(jobOpts.PollInterval) }),
+			SetCustomRestyOption(func(r *resty.Request) { r.SetRetryMaxWaitTime(jobOpts.Timeout) }),
 			// Set the maximum number of retries based on the timeout and poll interval. E.g. if timeout is 5 minutes and poll interval is 15 seconds,
 			// the maximum number of retries will be 20 (5 minutes / 15 seconds = 20).
 			// This ensures that the job status is checked periodically until it is completed.
-			SetRetryCount(int(jobOpts.Timeout / jobOpts.PollInterval)).
-			SetTimeout(jobOpts.Timeout)
+			SetCustomRestyOption(func(r *resty.Request) { r.SetRetryCount(int(jobOpts.Timeout / jobOpts.PollInterval)) }),
+			SetCustomRestyOption(func(r *resty.Request) { r.SetTimeout(jobOpts.Timeout) }),
+		)
 
 		// Use the subclient's JobRefresh method to refresh the job status.
 		// This method will handle the job response and return the updated job status.
-		job, err := c.JobRefresh(newRequestJob, resp)
+		job, err := c.JobRefresh(httpC, resp, reqOpts)
 
 		if job != nil {
 			// TODO(azrod) Replace log.Default with a proper logger
@@ -94,6 +96,11 @@ var jobRetryCondition = func(c jobsInterface) resty.RetryConditionFunc {
 		if err != nil {
 			log.Default().Printf("Failed to parse job response: %v", err)
 			return false // Stop retrying if parsing fails
+		}
+
+		if job == nil {
+			log.Default().Println("Job response is nil, stopping retries")
+			return false // Stop retrying if the job response is nil
 		}
 
 		log.Default().Printf("Job response status: %s", job.Status)

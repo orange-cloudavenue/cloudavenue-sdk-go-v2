@@ -27,7 +27,7 @@ type client struct {
 }
 
 type Client interface {
-	NewRequest(ctx context.Context, client SubClientName, opts ...RequestOption) (req *resty.Request, err error)
+	NewRequest(ctx context.Context, endpoint *Endpoint, opts ...RequestOption) (req *resty.Request, err error)
 	ParseAPIError(action string, resp *resty.Response) *errors.APIError
 }
 

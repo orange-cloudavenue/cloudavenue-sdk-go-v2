@@ -8,22 +8,24 @@ import (
 )
 
 // NewRequest creates a new request using the resty client.
-func (c *client) NewRequest(ctx context.Context, client SubClientName, opts ...RequestOption) (req *resty.Request, err error) {
+func (c *client) NewRequest(ctx context.Context, endpoint *Endpoint, _ ...RequestOption) (req *resty.Request, err error) {
 	// Retrieve the subclient based on the provided client name.
 	// This method identifies the subclient and returns it.
-	sc, err := c.identifyClient(ctx, client)
+	sc, err := c.identifyClient(ctx, endpoint.SubClient)
 	if err != nil {
 		return nil, err
 	}
 
 	// Inject the client name into the context for retrieval in the other methods.
-	ctxv := context.WithValue(ctx, contextKeyClientName, client)
+	ctxv := context.WithValue(ctx, contextKeyClientName, endpoint.SubClient)
 
 	// Create and populate the request options.
-	reqOpts, err := newRequestOptions(opts...)
-	if err != nil {
-		return nil, err
-	}
+	// TODO: actually the request options are not used in the current implementation.
+	// They are intended to be used for setting custom options on the request.
+	// reqOpts, err := newRequestOptions(opts...)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// TODO(azrod) thinking about removing the error from the new HTTPClient because
 	// it is not really useful, we can just return the request with the context. No error
@@ -38,7 +40,7 @@ func (c *client) NewRequest(ctx context.Context, client SubClientName, opts ...R
 
 	// If JobOpts are provided, we need to create a request with job middleware.
 	// This is used to handle job responses and status checks.
-	if reqOpts.JobOpts != nil {
+	if endpoint.JobOptions != nil {
 		sCJob, ok := sc.(jobsInterface)
 		if !ok {
 			// If the subclient does not implement the jobs.Client interface,
@@ -46,7 +48,7 @@ func (c *client) NewRequest(ctx context.Context, client SubClientName, opts ...R
 			// Return an error indicating that the client does not support job options.
 			// This is a design choice to ensure that only clients that support jobs can use this feature.
 			// If you need to handle jobs, ensure that the client implements the jobs.Client interface.
-			return nil, fmt.Errorf("client %s does not support job options", client)
+			return nil, fmt.Errorf("client %s does not support job options", endpoint.SubClient)
 		}
 
 		// Create a new HTTP client specifically for job requests.
@@ -61,7 +63,7 @@ func (c *client) NewRequest(ctx context.Context, client SubClientName, opts ...R
 		// If the request is for a job, set the job middleware.
 		hC.SetResponseMiddlewares(
 			resty.AutoParseResponseMiddleware,
-			newJobMiddleware(hCForJob, sCJob, reqOpts.JobOpts),
+			newJobMiddleware(hCForJob, sCJob, endpoint.JobOptions),
 		)
 	}
 

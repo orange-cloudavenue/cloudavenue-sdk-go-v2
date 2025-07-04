@@ -22,7 +22,7 @@ func init() {
 		Name:         "GetOrganization",
 		Method:       cav.MethodGET,
 		SubClient:    cav.ClientVmware,
-		PathTemplate: "/1.0.0/orgs/{orgUrn}",
+		PathTemplate: "/cloudapi/1.0.0/orgs/{orgUrn}",
 		PathParams: []cav.PathParam{
 			{
 				Name:        "orgUrn",

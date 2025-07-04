@@ -17,10 +17,10 @@ import (
 
 func init() {
 	Endpoint{
-		Name:             "CreateSessionVmware",
+		Name:             "SessionVmware",
 		Method:           MethodPOST,
 		SubClient:        ClientVmware,
-		PathTemplate:     "/1.0.0/sessions",
+		PathTemplate:     "/cloudapi/1.0.0/sessions",
 		PathParams:       []PathParam{},
 		QueryParams:      []QueryParam{},
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/sessions/post/",
