@@ -34,12 +34,12 @@ func TestIsType(urnType URN) resource.CheckResourceAttrWithFunc {
 // FindURNTypeFromString returns the URN type from a string.
 func FindURNTypeFromString(value string) (URN, error) {
 	if value == "" {
-		return "", errors.New("value doesn't contains an URN type provided")
+		return "", errors.New("value does not contain an URN type provided")
 	}
 
 	if u, ok := URNByNames[value]; ok {
 		return u, nil
 	}
 
-	return "", fmt.Errorf("URN type %s doesn't exist by package urn", value)
+	return "", fmt.Errorf("URN type %s does not exist in package urn", value)
 }

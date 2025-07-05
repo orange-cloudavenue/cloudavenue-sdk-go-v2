@@ -100,6 +100,8 @@ type (
 	URN string
 )
 
+var uuidRegex = regexp.MustCompile(`^([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})$`)
+
 // String returns the string representation of the URN.
 func (urn URN) String() string {
 	return string(urn)
@@ -120,7 +122,7 @@ func (urn URN) isEmpty() bool {
 }
 
 func isUUIDV4(urn string) bool {
-	return regexp.MustCompile(`^([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})$`).MatchString(urn)
+	return uuidRegex.MatchString(urn)
 }
 
 func IsUUIDV4(urn string) bool {

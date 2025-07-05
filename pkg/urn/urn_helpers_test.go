@@ -32,7 +32,7 @@ func TestFindURNTypeFromString(t *testing.T) {
 			input:     "",
 			want:      "",
 			wantErr:   true,
-			errString: "value doesn't contains an URN type provided",
+			errString: "value does not contain an URN type provided",
 		},
 		{
 			name:    "existing type",
@@ -45,7 +45,7 @@ func TestFindURNTypeFromString(t *testing.T) {
 			input:     "not-exist",
 			want:      "",
 			wantErr:   true,
-			errString: "URN type not-exist doesn't exist by package urn",
+			errString: "URN type not-exist does not exist in package urn",
 		},
 	}
 
