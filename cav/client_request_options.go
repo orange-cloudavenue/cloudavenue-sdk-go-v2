@@ -11,26 +11,25 @@ package cav
 
 type (
 	// requestOption is a function that modifies the request.
-	requestOption struct {
-		// Job indicates if the request is for a job.
-		JobOpts *JobOptions
-	}
+	requestOption struct{}
 
 	RequestOption func(*requestOption) error
 )
 
+// * Not used yet
+
 // Create a request option struct to hold the request options.
 // This struct will be populated with the options provided in reqOpt.
-func newRequestOptions(opts ...RequestOption) (*requestOption, error) {
-	// Create a new request option struct to hold the options.
-	ro := &requestOption{}
-	for _, opt := range opts {
-		if err := opt(ro); err != nil {
-			return nil, err
-		}
-	}
-	return ro, nil
-}
+// func newRequestOptions(opts ...RequestOption) (*requestOption, error) {
+// 	// Create a new request option struct to hold the options.
+// 	ro := &requestOption{}
+// 	for _, opt := range opts {
+// 		if err := opt(ro); err != nil {
+// 			return nil, err
+// 		}
+// 	}
+// 	return ro, nil
+// }
 
 // // * Job
 

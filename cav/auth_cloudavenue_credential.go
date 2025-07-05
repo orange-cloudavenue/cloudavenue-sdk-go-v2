@@ -13,9 +13,8 @@ import (
 	"context"
 	"errors"
 
-	"resty.dev/v3"
-
 	"github.com/orange-cloudavenue/common-go/validators"
+	"resty.dev/v3"
 
 	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/httpClient"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"

@@ -13,12 +13,11 @@ import (
 	"context"
 	"strings"
 
+	"github.com/orange-cloudavenue/common-go/validators"
 	"resty.dev/v3"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go/pkg/urn"
-	"github.com/orange-cloudavenue/common-go/validators"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go/pkg/urn"
 )
 
 func init() {

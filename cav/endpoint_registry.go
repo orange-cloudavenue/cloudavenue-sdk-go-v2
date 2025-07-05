@@ -31,10 +31,6 @@ const (
 	// APIVApp        API = "vapp"
 	APIOrg API = "org"
 
-	// * Unexported api
-	// These are endpoints that are not meant to be used directly by the user.
-	apiCore API = "cav"
-
 	// * versions
 	VersionV1 Version = "v1"
 	VersionV2 Version = "v2"
@@ -137,7 +133,7 @@ func GetEndpoint(name string, method Method, opts ...EndpointRegistryOptions) (*
 	endpoints.mu.RLock()
 	defer endpoints.mu.RUnlock()
 
-	var extraData = endpointRegistryOptions{}
+	extraData := endpointRegistryOptions{}
 
 	for _, opt := range opts {
 		opt(&extraData)

@@ -19,7 +19,6 @@ import (
 
 var defaultMockResponseFunc = func(ep *Endpoint) func(w http.ResponseWriter, _ *http.Request) {
 	return func(w http.ResponseWriter, _ *http.Request) {
-
 		returnErrFromStatusCodeExpected(w, ep.mockResponseStatusCode)
 
 		var body any
@@ -58,7 +57,7 @@ var defaultMockResponseFunc = func(ep *Endpoint) func(w http.ResponseWriter, _ *
 			w.WriteHeader(http.StatusOK)
 		}
 
-		w.Write(bodyEncoded)
+		w.Write(bodyEncoded) //nolint:errcheck
 	}
 }
 
@@ -91,7 +90,7 @@ func (e Endpoint) GetMockResponseFunc() func(w http.ResponseWriter, _ *http.Requ
 	// Default mock response if not provided
 	return func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "Mock response"}`))
+		w.Write([]byte(`{"message": "Mock response"}`)) //nolint:errcheck
 	}
 }
 

@@ -29,7 +29,6 @@ var (
 		}
 
 		return req.SetResult(endpoint.BodyResponseType).Execute(endpoint.Method.String(), endpoint.PathTemplate)
-
 	}
 
 	defaultRequestFuncWithJob = func(ctx context.Context, client Client, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error) {

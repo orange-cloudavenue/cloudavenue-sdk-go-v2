@@ -21,15 +21,13 @@ const (
 	mockOrg = "cav01ev01ocb0001234"
 )
 
-var (
-	pathPrefix = map[SubClientName]string{
-		ClientVmware:         "/cloudapi",
-		ClientCerberus:       "/api/customers",
-		ClientNetbackup:      "/netbackup",
-		SubClientName("ihm"): "/ihm",
-		SubClientName("s3"):  "/s3",
-	}
-)
+var pathPrefix = map[SubClientName]string{
+	ClientVmware:         "/cloudapi",
+	ClientCerberus:       "/api/customers",
+	ClientNetbackup:      "/netbackup",
+	SubClientName("ihm"): "/ihm",
+	SubClientName("s3"):  "/s3",
+}
 
 func newMockClient() (Client, error) {
 	// Mock implementation for testing purposes
@@ -109,22 +107,24 @@ func buildPath(subClient SubClientName, path string) string {
 	return path
 }
 
-func setMockResponse(ep *Endpoint, mockResponseData any, mockResponseStatusCode *int) {
-	if ep.MockResponseFuncIsDefined() {
-		log.Default().Println("Mock response already defined for endpoint", ep.Name)
-		return
-	}
+// * Not used for the moment, but can be used to set mock responses for endpoints.
 
-	ep.SetMockResponse(mockResponseData, mockResponseStatusCode)
-	log.Default().Printf("Mock response set for endpoint %s with status code %d", ep.Name, mockResponseStatusCode)
-}
+// func setMockResponse(ep *Endpoint, mockResponseData any, mockResponseStatusCode *int) {
+// 	if ep.MockResponseFuncIsDefined() {
+// 		log.Default().Println("Mock response already defined for endpoint", ep.Name)
+// 		return
+// 	}
 
-func cleanMockResponses() {
-	endpoints := GetEndpointsUncategorized()
-	for _, ep := range endpoints {
-		if ep.MockResponseFuncIsDefined() {
-			ep.CleanMockResponse()
-			log.Default().Printf("Mock response cleaned for endpoint %s", ep.Name)
-		}
-	}
-}
+// 	ep.SetMockResponse(mockResponseData, mockResponseStatusCode)
+// 	log.Default().Printf("Mock response set for endpoint %s with status code %d", ep.Name, mockResponseStatusCode)
+// }
+
+// func cleanMockResponses() {
+// 	endpoints := GetEndpointsUncategorized()
+// 	for _, ep := range endpoints {
+// 		if ep.MockResponseFuncIsDefined() {
+// 			ep.CleanMockResponse()
+// 			log.Default().Printf("Mock response cleaned for endpoint %s", ep.Name)
+// 		}
+// 	}
+// }

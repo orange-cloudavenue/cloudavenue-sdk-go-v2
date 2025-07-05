@@ -26,15 +26,13 @@ const (
 	mockOrg = "cav01ev01ocb0001234"
 )
 
-var (
-	pathPrefix = map[cav.SubClientName]string{
-		cav.ClientVmware:         "",
-		cav.ClientCerberus:       "/api/customers",
-		cav.ClientNetbackup:      "/netbackup",
-		cav.SubClientName("ihm"): "/ihm",
-		cav.SubClientName("s3"):  "/s3",
-	}
-)
+var pathPrefix = map[cav.SubClientName]string{
+	cav.ClientVmware:         "",
+	cav.ClientCerberus:       "/api/customers",
+	cav.ClientNetbackup:      "/netbackup",
+	cav.SubClientName("ihm"): "/ihm",
+	cav.SubClientName("s3"):  "/s3",
+}
 
 func NewClient() (cav.Client, error) {
 	// Mock implementation for testing purposes
