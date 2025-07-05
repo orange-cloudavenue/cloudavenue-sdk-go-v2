@@ -60,11 +60,12 @@ jobs:
     with:
       ref: ${{ github.ref }}
       repository: ${{ github.repository }}
+
   tests:
     if: event.type != 'edited' && github.event.pull_request.draft == false
     name: "Unit Tests"
     uses: orange-cloudavenue/workflows/.github/workflows/go_unit-test.yml@main
     with:
       ref: ${{ github.ref }}
-      repository: ${{ github.repository }}    with:
+      repository: ${{ github.repository }}    
       send-coverage: true
