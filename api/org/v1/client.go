@@ -10,13 +10,16 @@
 package org
 
 import (
+	"log/slog"
+
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
 type (
 	Org struct {
-		c cav.Client
+		c      cav.Client
+		logger *slog.Logger
 	}
 )
 
@@ -26,7 +29,12 @@ func New(c cav.Client) (*Org, error) {
 		return nil, errors.ErrClientNotInitialized
 	}
 
+	orgLogger := c.Logger().WithGroup("org")
+
+	orgLogger.Debug("Successfully creating new client")
+
 	return &Org{
-		c: c,
+		c:      c,
+		logger: orgLogger,
 	}, nil
 }
