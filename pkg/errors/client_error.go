@@ -7,10 +7,19 @@
  * or see the "LICENSE" file for more details.
  */
 
-package httpclient
+package errors
 
-import "resty.dev/v3"
+type (
+	ClientError struct {
+		Message string
+		APIErr  APIError
+	}
+)
 
-func NewHTTPClient() *resty.Client {
-	return resty.New().SetHeader("User-Agent", "GoCloudAvenueSDK/2.0")
+// Error returns the error message for ClientError.
+func (e *ClientError) Error() string {
+	if e == nil {
+		return "nil ClientError"
+	}
+	return e.Message
 }

@@ -13,9 +13,8 @@ import (
 	"context"
 	"errors"
 
-	"resty.dev/v3"
-
 	"github.com/orange-cloudavenue/common-go/validators"
+	"resty.dev/v3"
 
 	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/httpClient"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
@@ -81,12 +80,12 @@ func (c *cloudavenueCredential) Headers() map[string]string {
 
 // Refresh is a placeholder method for refreshing the authentication token.
 func (c *cloudavenueCredential) Refresh(ctx context.Context) error {
-	ep, err := GetEndpoint("CreateSessionVmware", MethodPOST)
+	ep, err := GetEndpoint("SessionVmware", MethodPOST)
 	if err != nil {
 		return errors.New("failed to get endpoint for CreateSessionVmware: " + err.Error())
 	}
 
-	opts := []RequestOption{}
+	opts := []EndpointRequestOption{}
 	if c.bearer != "" {
 		opts = append(opts, SetCustomRestyOption(func(r *resty.Request) {
 			r.SetAuthToken(c.bearer)
@@ -108,7 +107,7 @@ func (c *cloudavenueCredential) Refresh(ctx context.Context) error {
 		return err
 	}
 
-	if err := (&vmware{}).ParseAPIError("CreateSessionVmware", resp); err != nil {
+	if err := (&vmware{}).ParseAPIError("SessionVmware", resp); err != nil {
 		c.bearer = ""
 		return err
 	}

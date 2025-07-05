@@ -13,6 +13,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -25,15 +26,13 @@ const (
 	mockOrg = "cav01ev01ocb0001234"
 )
 
-var (
-	pathPrefix = map[cav.SubClientName]string{
-		cav.ClientVmware:         "/cloudapi",
-		cav.ClientCerberus:       "/api/customers",
-		cav.ClientNetbackup:      "/netbackup",
-		cav.SubClientName("ihm"): "/ihm",
-		cav.SubClientName("s3"):  "/s3",
-	}
-)
+var pathPrefix = map[cav.SubClientName]string{
+	cav.ClientVmware:         "",
+	cav.ClientCerberus:       "/api/customers",
+	cav.ClientNetbackup:      "/netbackup",
+	cav.SubClientName("ihm"): "/ihm",
+	cav.SubClientName("s3"):  "/s3",
+}
 
 func NewClient() (cav.Client, error) {
 	// Mock implementation for testing purposes
@@ -48,21 +47,37 @@ func NewClient() (cav.Client, error) {
 	mux := chi.NewRouter()
 
 	for _, ep := range endpoints {
-		switch ep.Method {
-		case cav.MethodGET:
-			if ep.MockResponseFuncIsDefined() {
-				mux.Get(buildPath(ep.SubClient, ep.PathTemplate), ep.GetMockResponseFunc())
-				continue
+		if ep.MockResponseFuncIsDefined() {
+			log.Default().Printf("Registering mock responseFunc for endpoint %s with method %s", ep.Name, ep.Method)
+			mux.MethodFunc(ep.Method.String(), buildPath(ep.SubClient, ep.PathTemplate), ep.GetMockResponseFunc())
+			continue
+		}
+
+		if ep.Method == cav.MethodGET {
+			mux.MethodFunc(ep.Method.String(), buildPath(ep.SubClient, ep.PathTemplate), cav.GetDefaultMockResponseFunc(ep))
+			continue
+		}
+
+		// Methods POST/PUT/PATCH/DELETE require a body
+		if ep.BodyResponseType != nil {
+			// If the request body type is defined, we need to check if it is a pointer
+			// and dereference it to get the actual type
+			reflectBodyType := reflect.TypeOf(ep.BodyResponseType)
+			if reflectBodyType.Kind() == reflect.Ptr {
+				// If the request body type is a pointer, we need to dereference it
+				reflectBodyType = reflectBodyType.Elem()
 			}
 
-			mux.Get(buildPath(ep.SubClient, ep.PathTemplate), cav.GetDefaultMockResponseFunc(ep))
-		case cav.MethodPOST:
-			mux.Post(buildPath(ep.SubClient, ep.PathTemplate), func(w http.ResponseWriter, _ *http.Request) {
-				// Return a mock response
-				w.WriteHeader(http.StatusOK)
-				w.Write([]byte("Mock response"))
-			})
+			if reflectBodyType == reflect.TypeOf(cav.Job{}) {
+				statusAccepted := http.StatusAccepted
+				ep.SetMockResponseFunc(func(w http.ResponseWriter, _ *http.Request) {
+					w.Header().Add("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
+					w.WriteHeader(statusAccepted)
+				})
+			}
 		}
+
+		mux.MethodFunc(ep.Method.String(), buildPath(ep.SubClient, ep.PathTemplate), cav.GetDefaultMockResponseFunc(ep))
 	}
 
 	hts := httptest.NewServer(mux)
@@ -78,7 +93,7 @@ func NewClient() (cav.Client, error) {
 			},
 			APIVCD: consoles.Service{
 				Enabled:  true,
-				Endpoint: hts.URL + "/cloudapi",
+				Endpoint: hts.URL,
 			},
 			APICerberus: consoles.Service{
 				Enabled:  true,

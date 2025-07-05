@@ -17,7 +17,13 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
-func WithPathParam(pp PathParam, value string) RequestOption {
+type (
+	// EndpointRequestOption is a function that modifies the request for an endpoint.
+	// It takes an Endpoint and a resty.Request as parameters and returns an error.
+	EndpointRequestOption func(*Endpoint, *resty.Request) error
+)
+
+func WithPathParam(pp PathParam, value string) EndpointRequestOption {
 	return func(endpoint *Endpoint, req *resty.Request) error {
 		if endpoint.PathParams == nil {
 			return errors.Newf("endpoint %s %s %s %s has no path params", endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
@@ -41,7 +47,7 @@ func WithPathParam(pp PathParam, value string) RequestOption {
 	}
 }
 
-func WithQueryParam(qp QueryParam, value string) RequestOption {
+func WithQueryParam(qp QueryParam, value string) EndpointRequestOption {
 	return func(endpoint *Endpoint, req *resty.Request) error {
 		if endpoint.QueryParams == nil {
 			return errors.Newf("endpoint %s %s %s %s has no query params", endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
@@ -65,7 +71,7 @@ func WithQueryParam(qp QueryParam, value string) RequestOption {
 	}
 }
 
-func OverrideSetResult(rt any) RequestOption {
+func OverrideSetResult(rt any) EndpointRequestOption {
 	return func(endpoint *Endpoint, req *resty.Request) error {
 		if rt == nil {
 			return errors.Newf("result type cannot be nil for endpoint %s %s %s %s", endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
@@ -75,7 +81,7 @@ func OverrideSetResult(rt any) RequestOption {
 	}
 }
 
-func SetBody(body any) RequestOption {
+func SetBody(body any) EndpointRequestOption {
 	return func(endpoint *Endpoint, req *resty.Request) error {
 		if body == nil {
 			return errors.Newf("body cannot be nil for endpoint %s %s %s %s", endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
@@ -84,9 +90,16 @@ func SetBody(body any) RequestOption {
 		// Reflect BodyRequestType and body to ensure they match
 		if endpoint.BodyRequestType != nil {
 			reflectBodyType := reflect.TypeOf(endpoint.BodyRequestType)
+			if reflectBodyType.Kind() == reflect.Ptr {
+				reflectBodyType = reflectBodyType.Elem()
+			}
+
 			reflectBody := reflect.TypeOf(body)
+			if reflectBody.Kind() == reflect.Ptr {
+				reflectBody = reflectBody.Elem()
+			}
 			if reflectBody != reflectBodyType {
-				return errors.Newf("body must be of type %s for endpoint %s %s %s %s", reflectBodyType, endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
+				return errors.Newf("body must be of type %s (not %s) for endpoint %s %s %s %s", reflectBodyType, reflectBody, endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
 			}
 		}
 
@@ -95,7 +108,7 @@ func SetBody(body any) RequestOption {
 	}
 }
 
-func SetCustomRestyOption(option func(*resty.Request)) RequestOption {
+func SetCustomRestyOption(option func(*resty.Request)) EndpointRequestOption {
 	return func(_ *Endpoint, req *resty.Request) error {
 		option(req)
 		return nil

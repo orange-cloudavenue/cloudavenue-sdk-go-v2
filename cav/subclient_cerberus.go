@@ -36,13 +36,13 @@ var newCerberusClient = func() SubClient {
 	return &cerberus{}
 }
 
-const cerberusVCDversion = vmwareVCDversion // Reusing the same version as VMware
+const cerberusVCDVersion = vmwareVCDVersion // Reusing the same version as VMware
 
 // NewClient creates a new request for the Cerberus subclient.
 func (v *cerberus) NewHTTPClient(ctx context.Context) (*resty.Client, error) {
 	v.httpClient = httpclient.NewHTTPClient().
 		SetBaseURL(v.console.GetAPICerberusEndpoint()).
-		SetHeader("Accept", "application/json;version="+cerberusVCDversion).
+		SetHeader("Accept", "application/json;version="+cerberusVCDVersion).
 		SetError(cerberusError{})
 
 	if !v.credential.IsInitialized() {
@@ -68,7 +68,7 @@ func (v *cerberus) SetConsole(c consoles.Console) {
 }
 
 // ParseAPIError parses the API error response from the Cerberus client.
-func (v *cerberus) ParseAPIError(action string, resp *resty.Response) *errors.APIError {
+func (v *cerberus) ParseAPIError(operation string, resp *resty.Response) *errors.APIError {
 	if resp == nil || !resp.IsError() {
 		return nil
 	}
@@ -77,7 +77,7 @@ func (v *cerberus) ParseAPIError(action string, resp *resty.Response) *errors.AP
 	// Parse the error response body.
 	if err, ok := resp.Error().(*cerberusError); ok {
 		return &errors.APIError{
-			Action:     action,
+			Operation:  operation,
 			StatusCode: resp.StatusCode(),
 			Message:    fmt.Sprintf("%s: %s", err.Reason, err.Message),
 			Duration:   resp.Duration(),
@@ -87,7 +87,7 @@ func (v *cerberus) ParseAPIError(action string, resp *resty.Response) *errors.AP
 
 	// This is used to prevent nil pointer dereference if SetError() was not called or overrided by other object.
 	return &errors.APIError{
-		Action:     action,
+		Operation:  operation,
 		StatusCode: resp.StatusCode(),
 		Message:    "Unknown error occurred",
 		Duration:   resp.Duration(),

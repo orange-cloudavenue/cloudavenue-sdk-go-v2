@@ -19,7 +19,6 @@ import (
 
 var defaultMockResponseFunc = func(ep *Endpoint) func(w http.ResponseWriter, _ *http.Request) {
 	return func(w http.ResponseWriter, _ *http.Request) {
-
 		returnErrFromStatusCodeExpected(w, ep.mockResponseStatusCode)
 
 		var body any
@@ -29,7 +28,7 @@ var defaultMockResponseFunc = func(ep *Endpoint) func(w http.ResponseWriter, _ *
 			// If mock response data is defined, use it directly
 			body = ep.mockResponseData
 		} else if ep.BodyResponseType != nil {
-			log.Default().Printf("Generating mock response data for endpoint %s", ep.Name)
+			log.Default().Printf("Generating mock response data for endpoint %s %s", ep.Name, ep.PathTemplate)
 			body = ep.BodyResponseType
 			if err := faker.FakeData(&body); err != nil {
 				log.Default().Println("Error generating mock data for endpoint:", ep.Name, err)
@@ -45,12 +44,20 @@ var defaultMockResponseFunc = func(ep *Endpoint) func(w http.ResponseWriter, _ *
 			return
 		}
 
-		log.Default().Printf("Mock response for endpoint %s: %s", ep.PathTemplate, string(bodyEncoded))
-
 		// Return a mock response
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write(bodyEncoded)
+
+		// Case used to set custom status code beetween 200 and 299
+		// If mockResponseStatusCode is defined, use it, otherwise default to 200
+		if ep.mockResponseStatusCode != nil {
+			log.Default().Printf("Setting mock response status code for endpoint %s: %d", ep.Name, *ep.mockResponseStatusCode)
+			w.WriteHeader(*ep.mockResponseStatusCode)
+		} else {
+			log.Default().Printf("No mock response status code defined for endpoint %s, using 200 OK", ep.Name)
+			w.WriteHeader(http.StatusOK)
+		}
+
+		w.Write(bodyEncoded) //nolint:errcheck
 	}
 }
 
@@ -83,7 +90,7 @@ func (e Endpoint) GetMockResponseFunc() func(w http.ResponseWriter, _ *http.Requ
 	// Default mock response if not provided
 	return func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "Mock response"}`))
+		w.Write([]byte(`{"message": "Mock response"}`)) //nolint:errcheck
 	}
 }
 

@@ -7,10 +7,11 @@
  * or see the "LICENSE" file for more details.
  */
 
-package httpclient
+package cav
 
-import "resty.dev/v3"
-
-func NewHTTPClient() *resty.Client {
-	return resty.New().SetHeader("User-Agent", "GoCloudAvenueSDK/2.0")
+func (e *Endpoint) SetJobExtractorFunc(extractorFunc ExtractorFunc) {
+	if e.JobOptions == nil {
+		e.JobOptions = &JobOptions{}
+	}
+	e.JobOptions.extractorFunc = extractorFunc
 }

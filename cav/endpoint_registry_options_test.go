@@ -13,9 +13,6 @@ import (
 	"testing"
 )
 
-type mockAPI struct{}
-type mockVersion struct{}
-
 func TestWithExtraProperties(t *testing.T) {
 	var (
 		api  = API("mock")

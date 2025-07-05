@@ -21,18 +21,7 @@ import (
 
 var _ SubClient = &vmware{}
 
-type (
-	vmware struct {
-		subclient
-	}
-
-	vmwareError struct {
-		Message        string `json:"message"`
-		MinorErrorCode string `json:"minorErrorCode"`
-	}
-)
-
-const vmwareVCDversion = "38.1"
+const vmwareVCDVersion = "38.1"
 
 var newVmwareClient = func() SubClient {
 	return &vmware{}
@@ -40,11 +29,14 @@ var newVmwareClient = func() SubClient {
 
 // NewClient creates a new request for the VMware subclient.
 func (v *vmware) NewHTTPClient(ctx context.Context) (*resty.Client, error) {
+	// Create a new HTTP client with the base URL and headers.
 	v.httpClient = httpclient.NewHTTPClient().
 		SetBaseURL(v.console.GetAPIVCDEndpoint()).
-		SetHeader("Accept", "application/json;version="+vmwareVCDversion).
+		SetHeader("Accept", "application/json;version="+vmwareVCDVersion).
 		SetError(vmwareError{})
 
+	// If the credential is not initialized, refresh it.
+	// This is necessary to ensure that the client has the latest authentication token.
 	if !v.credential.IsInitialized() {
 		if err := v.credential.Refresh(ctx); err != nil {
 			return nil, err
@@ -68,7 +60,7 @@ func (v *vmware) SetConsole(c consoles.Console) {
 }
 
 // ParseAPIError parses the API error response from the VMware client.
-func (v *vmware) ParseAPIError(action string, resp *resty.Response) *errors.APIError {
+func (v *vmware) ParseAPIError(operation string, resp *resty.Response) *errors.APIError {
 	if resp == nil || !resp.IsError() {
 		return nil
 	}
@@ -77,7 +69,7 @@ func (v *vmware) ParseAPIError(action string, resp *resty.Response) *errors.APIE
 	// Parse the error response body.
 	if err, ok := resp.Error().(*vmwareError); ok {
 		return &errors.APIError{
-			Action:     action,
+			Operation:  operation,
 			StatusCode: resp.StatusCode(),
 			Message:    err.Message,
 			Duration:   resp.Duration(),
@@ -87,7 +79,7 @@ func (v *vmware) ParseAPIError(action string, resp *resty.Response) *errors.APIE
 
 	// This is used to prevent nil pointer dereference if SetError() was not called or overrided by other object.
 	return &errors.APIError{
-		Action:     action,
+		Operation:  operation,
 		StatusCode: resp.StatusCode(),
 		Message:    "Unknown error occurred",
 		Duration:   resp.Duration(),

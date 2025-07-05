@@ -19,6 +19,7 @@ import (
 type (
 	API     string
 	Version string
+	Method  string
 
 	Endpoint struct {
 		// api is the api of the endpoint, e.g., "vdc", "edgegateway", "vapp"
@@ -59,12 +60,6 @@ type (
 		// DocumentationURL is the URL to the documentation for this endpoint.
 		DocumentationURL string `validate:"required,url"` // e.g., "https://docs.xx.com/api/v1/xx"
 
-		// RequestFunc is a function that takes a client and options and returns a resty.Response and an error.
-		// This function is used to make the actual HTTP request to the endpoint.
-		// It allows for customization of the request, such as setting headers, query parameters,
-		// and body content.
-		RequestFunc func(ctx context.Context, client Client, endpoint *Endpoint, opts ...RequestOption) (*resty.Response, error)
-
 		// BodyRequestType is the golang type of the request body.
 		// It is used to validate the body arguments passed to the endpoint.
 		// BodyType is optional and can be used to specify the type of the request body
@@ -73,13 +68,26 @@ type (
 
 		// BodyResponseType is the golang type of the response body.
 		// It is used to validate the response body returned by the endpoint.
+		//
+		// If your set `cav.Job{}` as BodyResponseType, the system will automatically
+		// handle the job response and retrieve the job status until it is completed (success or error).
 		BodyResponseType any `validate:"omitempty"`
+
+		// * Request
+
+		// RequestFunc is a function that takes a client and options and returns a resty.Response and an error.
+		// This function is used to make the actual HTTP request to the endpoint.
+		// It allows for customization of the request, such as setting headers, query parameters,
+		// and body content.
+		RequestFunc func(ctx context.Context, client Client, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error)
 
 		// RequestInternalFunc is a function that takes a client and options and returns a resty.Response and an error.
 		// This function is used to make the actual HTTP request (from internal package) to the endpoint.
 		// It allows for customization of the request, such as setting headers, query parameters,
 		// and body content.
-		requestInternalFunc func(ctx context.Context, client *resty.Client, endpoint *Endpoint, opts ...RequestOption) (*resty.Response, error)
+		requestInternalFunc func(ctx context.Context, client *resty.Client, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error)
+
+		// * Mock
 
 		// mockResponse is the mock response that can be used for testing purposes.
 		// It is optional and can be used to simulate a response from the endpoint without making an actual HTTP request.
@@ -91,6 +99,12 @@ type (
 		// mockResponseStatusCode int
 		// mockResponseStatusCode is the HTTP status code to return for the mock response.
 		mockResponseStatusCode *int `validate:"omitempty"`
+
+		// * Job
+
+		// jobOptions is the options for the job.
+		// It is used to specify the options for the job, such as the Timeout, PollingInterval, and ExtractorFunc
+		JobOptions *JobOptions
 	}
 
 	QueryParam struct {
@@ -106,8 +120,4 @@ type (
 		Required      bool
 		ValidatorFunc func(value string) error
 	}
-
-	Method string
-
-	RequestOption func(*Endpoint, *resty.Request) error
 )

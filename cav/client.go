@@ -27,7 +27,7 @@ type client struct {
 }
 
 type Client interface {
-	NewRequest(ctx context.Context, client SubClientName) (req *resty.Request, err error)
+	NewRequest(ctx context.Context, endpoint *Endpoint, opts ...RequestOption) (req *resty.Request, err error)
 	ParseAPIError(action string, resp *resty.Response) *errors.APIError
 }
 
@@ -62,22 +62,6 @@ func NewClient(organization string, opts ...ClientOption) (Client, error) {
 	client.clientsInitialized = settings.SubClients
 
 	return client, nil
-}
-
-// NewRequest creates a new request using the resty client.
-func (c *client) NewRequest(ctx context.Context, client SubClientName) (req *resty.Request, err error) {
-	sc, err := c.identifyClient(ctx, client)
-	if err != nil {
-		return nil, err
-	}
-
-	ctxv := context.WithValue(ctx, contextKeyClientName, client)
-
-	hC, err := sc.NewHTTPClient(ctxv)
-	if err != nil {
-		return nil, err
-	}
-	return hC.NewRequest().SetContext(ctxv), nil
 }
 
 // ParseAPIError parses the API error response from the subclient.

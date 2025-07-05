@@ -20,8 +20,8 @@ func Test_NewRequest_Vmware(t *testing.T) {
 	client, err := newMockClient()
 	assert.Nil(t, err, "Error creating mock client")
 
-	endpointSessionVmware, err := GetEndpoint("CreateSessionVmware", MethodPOST)
-	assert.Nil(t, err, "Error getting endpoint for CreateSessionVmware")
+	endpointSessionVmware, err := GetEndpoint("SessionVmware", MethodPOST)
+	assert.Nil(t, err, "Error getting endpoint for SessionVmware")
 	defer endpointSessionVmware.CleanMockResponse()
 
 	tests := []struct {
@@ -49,8 +49,9 @@ func Test_NewRequest_Vmware(t *testing.T) {
 			name:        "not found",
 			expectedErr: true,
 			expectedResp: vmwareError{
-				Message:        "Resource not found",
-				MinorErrorCode: "RESOURCE_NOT_FOUND",
+				Message:       "Resource not found",
+				StatusCode:    404,
+				StatusMessage: "RESOURCE_NOT_FOUND",
 			},
 			expectedStatus: http.StatusNotFound,
 		},
@@ -59,8 +60,9 @@ func Test_NewRequest_Vmware(t *testing.T) {
 			expectedErr:    true,
 			expectedStatus: http.StatusUnauthorized,
 			expectedResp: vmwareError{
-				Message:        "Unauthorized access",
-				MinorErrorCode: "UNAUTHORIZED",
+				Message:       "Unauthorized access",
+				StatusCode:    401,
+				StatusMessage: "UNAUTHORIZED",
 			},
 		},
 		{
@@ -81,7 +83,9 @@ func Test_NewRequest_Vmware(t *testing.T) {
 
 			endpointSessionVmware.SetMockResponse(tt.expectedResp, &tt.expectedStatus)
 
-			req, err := client.NewRequest(t.Context(), ClientVmware)
+			req, err := client.NewRequest(t.Context(), &Endpoint{
+				SubClient: ClientVmware,
+			})
 			if tt.expectedErr {
 				assert.NotNil(t, err, "Expected error but got none")
 				return

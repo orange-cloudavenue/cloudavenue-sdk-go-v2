@@ -20,8 +20,8 @@ func Test_NewRequest_Cerberus(t *testing.T) {
 	client, err := newMockClient()
 	assert.Nil(t, err, "Error creating mock client")
 
-	endpointSessionCerberus, err := GetEndpoint("CreateSessionVmware", MethodPOST)
-	assert.Nil(t, err, "Error getting endpoint for CreateSessionVmware")
+	endpointSessionCerberus, err := GetEndpoint("SessionVmware", MethodPOST)
+	assert.Nil(t, err, "Error getting endpoint for SessionVmware")
 	defer endpointSessionCerberus.CleanMockResponse()
 
 	tests := []struct {
@@ -83,7 +83,9 @@ func Test_NewRequest_Cerberus(t *testing.T) {
 
 			endpointSessionCerberus.SetMockResponse(tt.expectedResp, &tt.expectedStatus)
 
-			req, err := client.NewRequest(t.Context(), ClientCerberus)
+			req, err := client.NewRequest(t.Context(), &Endpoint{
+				SubClient: ClientCerberus,
+			})
 			if tt.expectedErr {
 				assert.NotNil(t, err, "Expected error but got none")
 				return

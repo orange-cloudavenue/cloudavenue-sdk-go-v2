@@ -31,10 +31,6 @@ const (
 	// APIVApp        API = "vapp"
 	APIOrg API = "org"
 
-	// * Unexported api
-	// These are endpoints that are not meant to be used directly by the user.
-	apiCore API = "cav"
-
 	// * versions
 	VersionV1 Version = "v1"
 	VersionV2 Version = "v2"
@@ -49,8 +45,12 @@ const (
 
 type (
 	endpointsMap struct {
+		// mu is a mutex to protect the endpoints map from concurrent access.
 		mu sync.RWMutex
-		// Map is a nested map structure to hold endpoints. String keys is a sha256 encoded string of the API/Version/Name/Method.
+
+		// Map is a nested map structure to hold endpoints.
+		// String keys is a sha256 encoded string of the API/Version/Name/Method.
+		// Map is capitalized to avoid confusion with the map golang.
 		Map map[string]*Endpoint
 	}
 )
@@ -83,18 +83,22 @@ func (e *endpointsMap) register(endpoint *Endpoint) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
-	if err := validators.New().Struct(endpoint); err != nil {
-		panic(err)
-	}
-
+	// RequestFunc is a function that will be used to make the request.
+	// If it is not set, we will use the default request function.
 	if endpoint.RequestFunc == nil {
-		// Default RequestFunc if not provided
-		endpoint.RequestFunc = DefaultRequestFunc
+		switch endpoint.BodyResponseType.(type) {
+		case Job, *Job: // If the endpoint is a job, we use the job middleware.
+			endpoint.RequestFunc = defaultRequestFuncWithJob
+		default:
+			// Default RequestFunc
+			endpoint.RequestFunc = defaultRequestFunc
+		}
 	}
 
 	// Encode the endpoint to create a unique key
 	encodedKey := encodeEndpoint(endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
 
+	// Store the endpoint in the map using the encoded key
 	e.Map[encodedKey] = endpoint
 }
 
@@ -129,7 +133,7 @@ func GetEndpoint(name string, method Method, opts ...EndpointRegistryOptions) (*
 	endpoints.mu.RLock()
 	defer endpoints.mu.RUnlock()
 
-	var extraData = endpointRegistryOptions{}
+	extraData := endpointRegistryOptions{}
 
 	for _, opt := range opts {
 		opt(&extraData)
@@ -141,7 +145,7 @@ func GetEndpoint(name string, method Method, opts ...EndpointRegistryOptions) (*
 			extraData.api, extraData.version = decodeCallerPackageName(runtime.FuncForPC(pc).Name())
 		}
 		if extraData.api == "" || extraData.version == "" {
-			return nil, errors.New("unable to determine API and version from caller context. Use WithExtraProperties() to specify them explicitly.")
+			return nil, errors.New("unable to determine API and version from caller context, use WithExtraProperties() to specify them explicitly")
 		}
 	}
 

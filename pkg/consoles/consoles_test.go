@@ -151,9 +151,9 @@ func TestConsole_GetAPIVCDEndpoint(t *testing.T) {
 		console  Console
 		expected string
 	}{
-		{Console1, "https://console1.cloudavenue.orange-business.com/cloudapi"},
-		{Console5, "https://console5.cloudavenue-cha.itn.intraorange/cloudapi"},
-		{Console9, "https://console9.cloudavenue.orange-business.com/cloudapi"},
+		{Console1, "https://console1.cloudavenue.orange-business.com"},
+		{Console5, "https://console5.cloudavenue-cha.itn.intraorange"},
+		{Console9, "https://console9.cloudavenue.orange-business.com"},
 	}
 	for _, tt := range tests {
 		got := tt.console.GetAPIVCDEndpoint()

@@ -70,7 +70,7 @@ var consoles = map[Console]console{
 			},
 			APIVCD: Service{
 				Enabled:  true,
-				Endpoint: "https://console1.cloudavenue.orange-business.com/cloudapi",
+				Endpoint: "https://console1.cloudavenue.orange-business.com",
 			},
 			APICerberus: Service{
 				Enabled:  true,
@@ -98,7 +98,7 @@ var consoles = map[Console]console{
 			},
 			APIVCD: Service{
 				Enabled:  true,
-				Endpoint: "https://console2.cloudavenue.orange-business.com/cloudapi",
+				Endpoint: "https://console2.cloudavenue.orange-business.com",
 			},
 			APICerberus: Service{
 				Enabled:  true,
@@ -127,7 +127,7 @@ var consoles = map[Console]console{
 			},
 			APIVCD: Service{
 				Enabled:  true,
-				Endpoint: "https://console4.cloudavenue.orange-business.com/cloudapi",
+				Endpoint: "https://console4.cloudavenue.orange-business.com",
 			},
 			APICerberus: Service{
 				Enabled:  true,
@@ -151,7 +151,7 @@ var consoles = map[Console]console{
 			},
 			APIVCD: Service{
 				Enabled:  true,
-				Endpoint: "https://console5.cloudavenue-cha.itn.intraorange/cloudapi",
+				Endpoint: "https://console5.cloudavenue-cha.itn.intraorange",
 			},
 			APICerberus: Service{
 				Enabled:  true,
@@ -176,7 +176,7 @@ var consoles = map[Console]console{
 			},
 			APIVCD: Service{
 				Enabled:  true,
-				Endpoint: "https://console7.cloudavenue-vdr.itn.intraorange/cloudapi",
+				Endpoint: "https://console7.cloudavenue-vdr.itn.intraorange",
 			},
 			Netbackup: Service{
 				Enabled:  true,
@@ -196,7 +196,7 @@ var consoles = map[Console]console{
 			},
 			APIVCD: Service{
 				Enabled:  true,
-				Endpoint: "https://console8.cloudavenue-vdr.itn.intraorange/cloudapi",
+				Endpoint: "https://console8.cloudavenue-vdr.itn.intraorange",
 			},
 			Netbackup: Service{
 				Enabled:  true,
@@ -217,7 +217,7 @@ var consoles = map[Console]console{
 			},
 			APIVCD: Service{
 				Enabled:  true,
-				Endpoint: "https://console9.cloudavenue.orange-business.com/cloudapi",
+				Endpoint: "https://console9.cloudavenue.orange-business.com",
 			},
 			Netbackup: Service{
 				Enabled:  false,
