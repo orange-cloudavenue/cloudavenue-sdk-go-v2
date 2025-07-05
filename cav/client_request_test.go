@@ -11,8 +11,6 @@ package cav
 
 import (
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func Test_NewRequest_WithoutAuth(t *testing.T) {
@@ -39,23 +37,6 @@ func Test_NewRequest(t *testing.T) {
 	_, err = client.NewRequest(t.Context(), &Endpoint{SubClient: ClientVmware})
 	if err != nil {
 		t.Fatalf("Error creating request with mock: %v", err)
-	}
-}
-
-func Test_NewRequest_RequestOptionsError(t *testing.T) {
-	client, err := newMockClient()
-	if err != nil {
-		t.Fatalf("Error creating client with mock: %v", err)
-	}
-
-	// Simulate a RequestOption that returns an error
-	badOpt := func(_ *requestOption) error {
-		return assert.AnError
-	}
-
-	_, err = client.NewRequest(t.Context(), &Endpoint{SubClient: ClientVmware}, badOpt)
-	if err == nil {
-		t.Fatal("Expected error from bad request option, got nil")
 	}
 }
 

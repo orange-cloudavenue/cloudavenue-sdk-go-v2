@@ -12,5 +12,5 @@ package httpclient
 import "resty.dev/v3"
 
 func NewHTTPClient() *resty.Client {
-	return resty.New().SetHeader("User-Agent", "GoCloudAvenueSDK/2.0").SetDebug(true)
+	return resty.New().SetHeader("User-Agent", "GoCloudAvenueSDK/2.0")
 }
