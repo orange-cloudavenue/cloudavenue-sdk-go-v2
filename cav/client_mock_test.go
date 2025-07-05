@@ -78,7 +78,7 @@ func newMockClient() (Client, error) {
 			},
 			APIVCD: consoles.Service{
 				Enabled:  true,
-				Endpoint: hts.URL + "",
+				Endpoint: hts.URL,
 			},
 			APICerberus: consoles.Service{
 				Enabled:  true,
