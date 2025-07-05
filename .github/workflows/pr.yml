@@ -7,7 +7,7 @@ name: PR All events
 
 on:
   pull_request_target:
-    types: [ opened, reopened, synchronize ]
+    types: [ opened, reopened, synchronize, edited ]
 
 
 concurrency:
@@ -29,24 +29,42 @@ jobs:
       
 
   pr-size:
+    if: event.type != 'edited'
     name: "PR Size"
     uses: orange-cloudavenue/workflows/.github/workflows/pr_label_size.yml@main
+    with:
+      ref: ${{ github.ref }}
+      repository: ${{ github.repository }}
     secrets:
       TOKEN: ${{ secrets.CHANGELOG_PAT }}
 
   pr-conventional-commits:
+    if: event.type == 'opened' || event.type == 'edited'
     name: "Conventional Commits"
     uses: orange-cloudavenue/workflows/.github/workflows/pr_conventional_commits.yml@main
     secrets:
       TOKEN: ${{ secrets.CHANGELOG_PAT }}
 
   pr-license:
+    if: event.type != 'edited' && github.event.pull_request.draft == false
     name: "License Check"
     uses: orange-cloudavenue/workflows/.github/workflows/pr_license.yml@main
+    with:
+      ref: ${{ github.ref }}
+      repository: ${{ github.repository }}
 
   golang-ci-lint:
+    if: event.type != 'edited' && github.event.pull_request.draft == false
     name: "Lint"
     uses: orange-cloudavenue/workflows/.github/workflows/go_golangci-lint.yml@main
+    with:
+      ref: ${{ github.ref }}
+      repository: ${{ github.repository }}
   tests:
+    if: event.type != 'edited' && github.event.pull_request.draft == false
     name: "Unit Tests"
     uses: orange-cloudavenue/workflows/.github/workflows/go_unit-test.yml@main
+    with:
+      ref: ${{ github.ref }}
+      repository: ${{ github.repository }}    with:
+      send-coverage: true
