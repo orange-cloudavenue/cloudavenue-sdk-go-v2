@@ -70,29 +70,6 @@ func NewClient(organization string, opts ...ClientOption) (Client, error) {
 	return client, nil
 }
 
-// NewRequest creates a new request using the resty client.
-func (c *client) NewRequest(ctx context.Context, client SubClientName) (req *resty.Request, err error) {
-	logger := c.logger.WithGroup("NewRequest").With("subclient", client)
-
-	sc, err := c.identifyClient(ctx, client)
-	if err != nil {
-		logger.ErrorContext(ctx, "Failed to identify client", "error", err)
-		return nil, err
-	}
-
-	ctxv := context.WithValue(ctx, contextKeyClientName, client)
-
-	logger.DebugContext(ctxv, "Creating new http client for subclient")
-	hC, err := sc.NewHTTPClient(ctxv)
-	if err != nil {
-		logger.ErrorContext(ctxv, "Failed to create new HTTP client", "error", err)
-		return nil, err
-	}
-
-	logger.DebugContext(ctxv, "Successfully created new request for subclient")
-	return hC.NewRequest().SetContext(ctxv), nil
-}
-
 // ParseAPIError parses the API error response from the subclient.
 func (c *client) ParseAPIError(action string, resp *resty.Response) *errors.APIError {
 	if resp == nil {
@@ -121,7 +98,7 @@ func (c *client) ParseAPIError(action string, resp *resty.Response) *errors.APIE
 
 // Logger returns the logger for the client.
 func (c *client) Logger() *slog.Logger {
-	return xlogger
+	return c.logger
 }
 
 // identifyClient identifies the client type.

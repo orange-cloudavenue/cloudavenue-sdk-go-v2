@@ -15,6 +15,7 @@ import (
 
 	"resty.dev/v3"
 
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/xlog"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )
 
@@ -92,6 +93,7 @@ func WithCloudAvenueCredential(username, password string) ClientOption {
 // WithLogger sets the logger for the client.
 func WithLogger(customLogger *slog.Logger) ClientOption {
 	return func(_ *settings) error {
+		xlog.SetGlobalLogger(customLogger)
 		xlogger = customLogger
 		return nil
 	}

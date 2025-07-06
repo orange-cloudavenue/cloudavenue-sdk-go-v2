@@ -10,7 +10,7 @@
 package mock
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -19,6 +19,7 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/xlog"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )
 
@@ -34,7 +35,9 @@ var pathPrefix = map[cav.SubClientName]string{
 	cav.SubClientName("s3"):  "/s3",
 }
 
-func NewClient() (cav.Client, error) {
+var logger = xlog.GetGlobalLogger()
+
+func NewClient(opts ...OptionFunc) (cav.Client, error) {
 	// Mock implementation for testing purposes
 
 	// Get All endpoints available in the endpoint package
@@ -42,13 +45,25 @@ func NewClient() (cav.Client, error) {
 	// Each handler should return a mock response
 	// This is a placeholder for the actual implementation
 
+	Options := &Options{}
+	for _, opt := range opts {
+		if err := opt(Options); err != nil {
+			return nil, err
+		}
+	}
+
+	if Options.logger != nil {
+		xlog.SetGlobalLogger(Options.logger)
+		logger = Options.logger
+	}
+
 	endpoints := cav.GetEndpointsUncategorized()
 
 	mux := chi.NewRouter()
 
 	for _, ep := range endpoints {
 		if ep.MockResponseFuncIsDefined() {
-			log.Default().Printf("Registering mock responseFunc for endpoint %s with method %s", ep.Name, ep.Method)
+			logger.Debug("Registering mock responseFunc for endpoint", slog.String("endpoint", ep.Name), slog.String("method", ep.Method.String()))
 			mux.MethodFunc(ep.Method.String(), buildPath(ep.SubClient, ep.PathTemplate), ep.GetMockResponseFunc())
 			continue
 		}
@@ -82,7 +97,7 @@ func NewClient() (cav.Client, error) {
 
 	hts := httptest.NewServer(mux)
 
-	log.Default().Println("Mock server started at", hts.URL)
+	logger.Debug("Mock client created", slog.String("organization", mockOrg))
 
 	nC, err := cav.NewClient(
 		mockOrg,
@@ -109,6 +124,7 @@ func NewClient() (cav.Client, error) {
 			},
 		}),
 		cav.WithCloudAvenueCredential("mockuser", "mockpassword"),
+		cav.WithLogger(logger),
 	)
 	if err != nil {
 		return nil, err
@@ -126,12 +142,12 @@ func buildPath(subClient cav.SubClientName, path string) string {
 
 func SetMockResponse(ep *cav.Endpoint, mockResponseData any, mockResponseStatusCode *int) {
 	if ep.MockResponseFuncIsDefined() {
-		log.Default().Println("Mock response already defined for endpoint", ep.Name)
+		logger.Debug("Mock response already defined for endpoint", slog.String("endpoint", ep.Name))
 		return
 	}
 
 	ep.SetMockResponse(mockResponseData, mockResponseStatusCode)
-	log.Default().Printf("Mock response set for endpoint %s with status code %d", ep.Name, mockResponseStatusCode)
+	logger.Debug("Mock response set for endpoint", slog.String("endpoint", ep.Name), slog.Int("status_code", *mockResponseStatusCode))
 }
 
 func CleanMockResponses() {
@@ -139,7 +155,7 @@ func CleanMockResponses() {
 	for _, ep := range endpoints {
 		if ep.MockResponseFuncIsDefined() {
 			ep.CleanMockResponse()
-			log.Default().Printf("Mock response cleaned for endpoint %s", ep.Name)
+			logger.Debug("Mock response cleaned for endpoint", slog.String("endpoint", ep.Name))
 		}
 	}
 }

@@ -9,8 +9,10 @@
 
 package httpclient
 
-import "resty.dev/v3"
+import (
+	"resty.dev/v3"
+)
 
 func NewHTTPClient() *resty.Client {
-	return resty.New().SetHeader("User-Agent", "GoCloudAvenueSDK/2.0")
+	return resty.New().SetHeader("User-Agent", "GoCloudAvenueSDK/2.0").SetLogger(logger())
 }

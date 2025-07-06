@@ -8,8 +8,10 @@
 package cav
 
 import (
-	"log"
+	"log/slog"
+	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -42,30 +44,42 @@ func newMockClient() (Client, error) {
 	mux := chi.NewRouter()
 
 	for _, ep := range endpoints {
-		switch ep.Method {
-		case MethodGET:
-			if ep.MockResponseFuncIsDefined() {
-				mux.Get(buildPath(ep.SubClient, ep.PathTemplate), ep.GetMockResponseFunc())
-				continue
-			}
-
-			log.Default().Println("No mock response defined for endpoint", ep.Name)
-			mux.Get(buildPath(ep.SubClient, ep.PathTemplate), GetDefaultMockResponseFunc(ep))
-		case MethodPOST:
-
-			if ep.MockResponseFuncIsDefined() {
-				mux.Post(buildPath(ep.SubClient, ep.PathTemplate), ep.GetMockResponseFunc())
-				continue
-			}
-
-			log.Default().Println("No mock response defined for endpoint", ep.Name)
-			mux.Post(buildPath(ep.SubClient, ep.PathTemplate), PostDefaultMockResponseFunc(ep))
+		if ep.MockResponseFuncIsDefined() {
+			xlogger.Debug("Registering mock responseFunc for endpoint", slog.String("endpoint", ep.Name), slog.String("method", ep.Method.String()))
+			mux.MethodFunc(ep.Method.String(), buildPath(ep.SubClient, ep.PathTemplate), ep.GetMockResponseFunc())
+			continue
 		}
+
+		if ep.Method == MethodGET {
+			mux.MethodFunc(ep.Method.String(), buildPath(ep.SubClient, ep.PathTemplate), GetDefaultMockResponseFunc(ep))
+			continue
+		}
+
+		// Methods POST/PUT/PATCH/DELETE require a body
+		if ep.BodyResponseType != nil {
+			// If the request body type is defined, we need to check if it is a pointer
+			// and dereference it to get the actual type
+			reflectBodyType := reflect.TypeOf(ep.BodyResponseType)
+			if reflectBodyType.Kind() == reflect.Ptr {
+				// If the request body type is a pointer, we need to dereference it
+				reflectBodyType = reflectBodyType.Elem()
+			}
+
+			if reflectBodyType == reflect.TypeOf(Job{}) {
+				statusAccepted := http.StatusAccepted
+				ep.SetMockResponseFunc(func(w http.ResponseWriter, _ *http.Request) {
+					w.Header().Add("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
+					w.WriteHeader(statusAccepted)
+				})
+			}
+		}
+
+		mux.MethodFunc(ep.Method.String(), buildPath(ep.SubClient, ep.PathTemplate), GetDefaultMockResponseFunc(ep))
 	}
 
 	hts := httptest.NewServer(mux)
 
-	log.Default().Println("Mock server started at", hts.URL)
+	xlogger.Debug("Mock server started", slog.String("url", hts.URL))
 
 	nC, err := NewClient(
 		mockOrg,
@@ -111,12 +125,10 @@ func buildPath(subClient SubClientName, path string) string {
 
 // func setMockResponse(ep *Endpoint, mockResponseData any, mockResponseStatusCode *int) {
 // 	if ep.MockResponseFuncIsDefined() {
-// 		log.Default().Println("Mock response already defined for endpoint", ep.Name)
 // 		return
 // 	}
 
 // 	ep.SetMockResponse(mockResponseData, mockResponseStatusCode)
-// 	log.Default().Printf("Mock response set for endpoint %s with status code %d", ep.Name, mockResponseStatusCode)
 // }
 
 // func cleanMockResponses() {
@@ -124,7 +136,6 @@ func buildPath(subClient SubClientName, path string) string {
 // 	for _, ep := range endpoints {
 // 		if ep.MockResponseFuncIsDefined() {
 // 			ep.CleanMockResponse()
-// 			log.Default().Printf("Mock response cleaned for endpoint %s", ep.Name)
 // 		}
 // 	}
 // }

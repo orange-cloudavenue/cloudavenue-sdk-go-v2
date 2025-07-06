@@ -43,3 +43,8 @@ const (
 func (s JobStatus) IsTerminated() bool {
 	return s == JobSuccess || s == JobError || s == JobAborted
 }
+
+// String returns the string representation of the JobStatus.
+func (s JobStatus) String() string {
+	return string(s)
+}
