@@ -54,7 +54,7 @@ type OrgResponse struct { //nolint:revive
 		Name string `json:"name"`
 	} `json:"managedBy"`
 	Name           string `json:"name"`
-	OrgVdcCount    int64  `json:"orgVdcCount"`
+	VDCCount       int64  `json:"orgVdcCount"`
 	RunningVMCount int64  `json:"runningVmCount"`
 	UserCount      int64  `json:"userCount"`
 	VappCount      int64  `json:"vappCount"`
