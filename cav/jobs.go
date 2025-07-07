@@ -11,7 +11,7 @@ package cav
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 
 	"resty.dev/v3"
 )
@@ -70,8 +70,7 @@ func newJobMiddleware(httpC *resty.Client, c jobsInterface, jobOpts *JobOptions)
 		job, err := c.JobRefresh(httpC, resp, reqOpts)
 
 		if job != nil {
-			// TODO(azrod) Replace log.Default with a proper logger
-			log.Default().Println("Job completed, status:", job.Status)
+			xlogger.Debug("Job completed", slog.String("jobID", job.ID), slog.String("status", job.Status.String()))
 		}
 
 		// If an error occurs while refreshing the job status, return an err.
@@ -83,27 +82,25 @@ func newJobMiddleware(httpC *resty.Client, c jobsInterface, jobOpts *JobOptions)
 
 var jobRetryCondition = func(c jobsInterface) resty.RetryConditionFunc {
 	return func(r *resty.Response, err error) bool {
-		// TODO(azrod) Replace log.Default with a proper logger
-		log.Default().Printf("Retrying job status check, retry count: %d, retry wait time: %s",
-			r.Request.Attempt, r.Request.RetryWaitTime)
+		xlogger.Debug("Checking job status", slog.Int("attempt", r.Request.Attempt), slog.Duration("retryWaitTime", r.Request.RetryWaitTime))
 
 		if err != nil {
-			log.Default().Printf("Error occurred while waiting for job response: %v", err)
+			xlogger.Error("Error occurred while waiting for job response", slog.String("error", err.Error()))
 			return false // Stop retrying if an error occurs
 		}
 
 		job, err := c.JobParser(r)
 		if err != nil {
-			log.Default().Printf("Failed to parse job response: %v", err)
+			xlogger.Error("Failed to parse job response", slog.String("error", err.Error()))
 			return false // Stop retrying if parsing fails
 		}
 
 		if job == nil {
-			log.Default().Println("Job response is nil, stopping retries")
+			xlogger.Warn("Job response is nil, stopping retries")
 			return false // Stop retrying if the job response is nil
 		}
 
-		log.Default().Printf("Job response status: %s", job.Status)
+		xlogger.Debug("Job response status", slog.String("status", job.Status.String()))
 		return !job.Status.IsTerminated() // Continue retrying if the job is not terminated
 	}
 }

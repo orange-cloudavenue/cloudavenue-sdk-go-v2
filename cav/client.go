@@ -12,6 +12,7 @@ package cav
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"resty.dev/v3"
 
@@ -21,6 +22,7 @@ import (
 )
 
 type client struct {
+	logger             *slog.Logger
 	httpClient         *resty.Client
 	console            consoles.Console
 	clientsInitialized map[SubClientName]SubClient
@@ -29,6 +31,7 @@ type client struct {
 type Client interface {
 	NewRequest(ctx context.Context, endpoint *Endpoint, opts ...RequestOption) (req *resty.Request, err error)
 	ParseAPIError(action string, resp *resty.Response) *errors.APIError
+	Logger() *slog.Logger
 }
 
 // NewClient creates a new client object
@@ -36,6 +39,8 @@ type Client interface {
 // Zero or more ClientOption object can be passed as a parameter.
 // These options will then be applied to the client.
 func NewClient(organization string, opts ...ClientOption) (Client, error) {
+	// organization format validation are done in the withConsole option.
+
 	settings := newSettings(organization)
 
 	// Load the console based on the organization name.
@@ -59,6 +64,7 @@ func NewClient(organization string, opts ...ClientOption) (Client, error) {
 		}
 	}
 
+	client.logger = xlogger.WithGroup("client").With("organization", settings.Organization)
 	client.clientsInitialized = settings.SubClients
 
 	return client, nil
@@ -88,6 +94,11 @@ func (c *client) ParseAPIError(action string, resp *resty.Response) *errors.APIE
 		Duration:   resp.Duration(),
 		Endpoint:   resp.Request.URL,
 	}
+}
+
+// Logger returns the logger for the client.
+func (c *client) Logger() *slog.Logger {
+	return c.logger
 }
 
 // identifyClient identifies the client type.

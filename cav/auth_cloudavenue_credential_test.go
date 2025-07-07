@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/httpClient"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/xlog"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )
 
@@ -88,6 +89,7 @@ func Test_CloudavenueCredential_Refresh_with_Bearer(t *testing.T) {
 	console, _ := consoles.FindByOrganizationName(mockOrg)
 
 	auth := &cloudavenueCredential{
+		logger:       xlog.GetGlobalLogger(),
 		httpC:        httpclient.NewHTTPClient().SetBaseURL(console.GetAPIVCDEndpoint()),
 		console:      console,
 		organization: mockOrg,

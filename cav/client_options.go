@@ -11,10 +11,11 @@ package cav
 
 import (
 	"errors"
-	"log"
+	"log/slog"
 
 	"resty.dev/v3"
 
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/xlog"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )
 
@@ -59,6 +60,8 @@ func withConsole() ClientOption {
 // WithCustomEndpoints sets custom endpoints for the sub-clients.
 func WithCustomEndpoints(endpoints consoles.Services) ClientOption {
 	return func(s *settings) error {
+		logger := xlogger.WithGroup("client").WithGroup("options").WithGroup("WithCustomEndpoints")
+		logger.Debug("Overriding endpoints in the console", "console", s.Console.GetSiteID())
 		s.Console.OverrideEndpoint(endpoints)
 		return nil
 	}
@@ -67,21 +70,31 @@ func WithCustomEndpoints(endpoints consoles.Services) ClientOption {
 // WithCloudAvenueCredential sets the credential for the client.
 func WithCloudAvenueCredential(username, password string) ClientOption {
 	return func(s *settings) error {
+		logger := xlogger.WithGroup("client").WithGroup("options").WithGroup("WithCloudAvenueCredential")
 		for _, client := range []SubClientName{ClientCerberus, ClientVmware} {
 			if _, ok := s.SubClients[client]; !ok {
 				s.SubClients[client] = subClients[client]
 			}
 
-			log.Default().Printf("Setting console %s for client %s", s.Console, client)
 			s.SubClients[client].SetConsole(s.Console)
 
 			cred, err := NewCloudavenueCredential(s.Console, s.Organization, username, password)
 			if err != nil {
+				logger.Error("Failed to create Cloudavenue credential", "error", err)
 				return err
 			}
 			s.SubClients[client].SetCredential(cred)
 		}
 
+		return nil
+	}
+}
+
+// WithLogger sets the logger for the client.
+func WithLogger(customLogger *slog.Logger) ClientOption {
+	return func(_ *settings) error {
+		xlog.SetGlobalLogger(customLogger)
+		xlogger = customLogger
 		return nil
 	}
 }

@@ -11,7 +11,7 @@ package cav
 
 import (
 	"encoding/json"
-	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/go-faker/faker/v4"
@@ -24,14 +24,15 @@ var defaultMockResponseFunc = func(ep *Endpoint) func(w http.ResponseWriter, _ *
 		var body any
 
 		if ep.mockResponseData != nil {
-			log.Default().Printf("Using mock response data for endpoint %s", ep.Name)
+			xlogger.WithGroup("mock").With("endpoint", ep.Name).Debug("Using mock response data for endpoint")
 			// If mock response data is defined, use it directly
 			body = ep.mockResponseData
 		} else if ep.BodyResponseType != nil {
-			log.Default().Printf("Generating mock response data for endpoint %s %s", ep.Name, ep.PathTemplate)
+			xlogger.WithGroup("mock").With("endpoint", ep.Name).Debug("No mock response data defined, generating mock data")
+			xlogger.WithGroup("mock").With("endpoint", ep.Name).Debug("Generating mock response data for endpoint")
 			body = ep.BodyResponseType
 			if err := faker.FakeData(&body); err != nil {
-				log.Default().Println("Error generating mock data for endpoint:", ep.Name, err)
+				xlogger.WithGroup("mock").With("endpoint", ep.Name).Error("Error generating mock data for endpoint:", slog.Any("error", err))
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
@@ -39,7 +40,7 @@ var defaultMockResponseFunc = func(ep *Endpoint) func(w http.ResponseWriter, _ *
 
 		bodyEncoded, err := json.Marshal(body)
 		if err != nil {
-			log.Default().Println("Error encoding body for endpoint:", ep.Name, err)
+			xlogger.WithGroup("mock").With("endpoint", ep.Name).Error("Error encoding body for endpoint:", slog.Any("error", err))
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -50,10 +51,10 @@ var defaultMockResponseFunc = func(ep *Endpoint) func(w http.ResponseWriter, _ *
 		// Case used to set custom status code beetween 200 and 299
 		// If mockResponseStatusCode is defined, use it, otherwise default to 200
 		if ep.mockResponseStatusCode != nil {
-			log.Default().Printf("Setting mock response status code for endpoint %s: %d", ep.Name, *ep.mockResponseStatusCode)
+			xlogger.WithGroup("mock").With("endpoint", ep.Name).With("statusCode", *ep.mockResponseStatusCode).Debug("Setting mock response status code")
 			w.WriteHeader(*ep.mockResponseStatusCode)
 		} else {
-			log.Default().Printf("No mock response status code defined for endpoint %s, using 200 OK", ep.Name)
+			xlogger.WithGroup("mock").With("endpoint", ep.Name).Debug("No mock response status code defined, using 200 OK")
 			w.WriteHeader(http.StatusOK)
 		}
 
@@ -68,16 +69,14 @@ var (
 
 func returnErrFromStatusCodeExpected(w http.ResponseWriter, statusCode *int) {
 	if statusCode == nil {
-		log.Default().Println("No status code defined for mock response, returning 200 OK")
 		return
 	}
-	log.Default().Println("Checking status code for mock response:", *statusCode)
 
 	if *statusCode >= 200 && *statusCode < 300 {
 		return
 	}
 
-	log.Default().Printf("Mock response error for status code %d", *statusCode)
+	xlogger.WithGroup("mock").With("statusCode", *statusCode).Debug("Mock response error")
 	http.Error(w, http.StatusText(*statusCode), *statusCode)
 }
 
@@ -102,7 +101,7 @@ func (e Endpoint) MockResponseFuncIsDefined() bool {
 // SetMockResponse sets the mock response for the endpoint.
 func (e *Endpoint) SetMockResponseFunc(mockResponse func(w http.ResponseWriter, _ *http.Request)) {
 	if mockResponse == nil {
-		log.Default().Println("Mock response is nil, not setting it for endpoint:", e.Name)
+		xlogger.WithGroup("mock").With("endpoint", e.Name).Warn("Attempted to set nil mock response for endpoint, ignoring")
 		return
 	}
 	e.mockResponseFunc = mockResponse

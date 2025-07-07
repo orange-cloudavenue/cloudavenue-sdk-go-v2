@@ -243,6 +243,10 @@ func FindByOrganizationName(organizationName string) (Console, bool) {
 
 // CheckOrganizationName - Returns true if the organization name is valid.
 func CheckOrganizationName(organizationName string) bool {
+	if organizationName == "" {
+		return false
+	}
+
 	mu.RLock()
 	defer mu.RUnlock()
 

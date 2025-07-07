@@ -61,6 +61,9 @@ var endpoints = endpointsMap{
 
 // Register registers an endpoint in the Endpoints map.
 func (e Endpoint) Register() {
+	// logger is not used in Register method, because it is called
+	// by init() function, which is called before the logger is initialized.
+
 	if err := validators.New().Struct(&e); err != nil {
 		panic(err)
 	}
@@ -71,6 +74,7 @@ func (e Endpoint) Register() {
 	}
 
 	if e.api == "" || e.version == "" {
+		// If the API and version are not set, we try to
 		panic("unable to determine API and version from caller context.")
 	}
 

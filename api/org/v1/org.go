@@ -11,6 +11,7 @@ package org
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/orange-cloudavenue/common-go/validators"
 
@@ -53,7 +54,7 @@ type OrgResponse struct { //nolint:revive
 		Name string `json:"name"`
 	} `json:"managedBy"`
 	Name           string `json:"name"`
-	OrgVdcCount    int64  `json:"orgVdcCount"` //nolint:revive
+	VDCCount       int64  `json:"orgVdcCount"`
 	RunningVMCount int64  `json:"runningVmCount"`
 	UserCount      int64  `json:"userCount"`
 	VappCount      int64  `json:"vappCount"`
@@ -61,11 +62,15 @@ type OrgResponse struct { //nolint:revive
 
 // DemoRequest represents a request to the demo cav.
 func (o *Org) DemoRequest(ctx context.Context, orgID string) (*OrgResponse, error) {
+	logger := o.logger.WithGroup("DemoRequest").With(slog.String("orgID", orgID))
+
 	demoEndpoint, err := cav.GetEndpoint("GetOrganization", cav.MethodGET)
 	if err != nil {
+		logger.Error("Failed to get endpoint for GetOrganization", "error", err)
 		return nil, err
 	}
 
+	logger.Debug("Requesting organization detail", "endpoint", demoEndpoint.PathTemplate, "method", demoEndpoint.Method)
 	resp, err := demoEndpoint.RequestFunc(
 		ctx,
 		o.c,
@@ -73,12 +78,15 @@ func (o *Org) DemoRequest(ctx context.Context, orgID string) (*OrgResponse, erro
 		cav.WithPathParam(demoEndpoint.PathParams[0], orgID),
 	)
 	if err != nil {
+		logger.Error("Failed to request organization detail", "error", err)
 		return nil, err
 	}
 
 	if err := o.c.ParseAPIError("Get organization detail", resp); err != nil {
+		logger.Error("Failed to request organization detail", "error", err)
 		return nil, err
 	}
 
+	logger.Debug("Successfully retrieved organization detail", "endpoint", demoEndpoint.PathTemplate, "method", demoEndpoint.Method, "status", resp.StatusCode(), "duration", resp.Duration())
 	return resp.Result().(*OrgResponse), nil
 }

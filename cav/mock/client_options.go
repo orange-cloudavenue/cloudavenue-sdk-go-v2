@@ -7,10 +7,24 @@
  * or see the "LICENSE" file for more details.
  */
 
-package httpclient
+package mock
 
-import "resty.dev/v3"
+import (
+	"log/slog"
+)
 
-func NewHTTPClient() *resty.Client {
-	return resty.New().SetHeader("User-Agent", "GoCloudAvenueSDK/2.0")
+type OptionFunc func(*Options) error
+
+type Options struct {
+	logger *slog.Logger
+}
+
+func WithLogger(logger *slog.Logger) OptionFunc {
+	return func(c *Options) error {
+		if logger != nil {
+			c.logger = logger
+		}
+
+		return nil
+	}
 }

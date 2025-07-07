@@ -10,7 +10,6 @@
 package org
 
 import (
-	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -79,7 +78,6 @@ func TestDemoRequest(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			log.Default().Println("Running test case:", tt.name)
 			if tt.expectedResp != nil || tt.expectedStatus != 0 {
 				// If we expect a valid response, we need to set the mock response
 				mock.SetMockResponse(ep, tt.expectedResp, &tt.expectedStatus)
