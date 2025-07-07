@@ -168,10 +168,10 @@ func TestConsole_GetAPICerberusEndpoint(t *testing.T) {
 		console  Console
 		expected string
 	}{
-		{Console1, "https://console1.cloudavenue.orange-business.com/api/customers"},
-		{Console2, "https://console2.cloudavenue.orange-business.com/api/customers"},
-		{Console4, "https://console4.cloudavenue.orange-business.com/api/customers"},
-		{Console5, "https://console5.cloudavenue-cha.itn.intraorange/api/customers"},
+		{Console1, "https://console1.cloudavenue.orange-business.com"},
+		{Console2, "https://console2.cloudavenue.orange-business.com"},
+		{Console4, "https://console4.cloudavenue.orange-business.com"},
+		{Console5, "https://console5.cloudavenue-cha.itn.intraorange"},
 		// Console7, Console8, Console9 do not have Cerberus API enabled, so expect an empty string
 		{Console7, ""},
 		{Console8, ""},

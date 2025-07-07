@@ -24,8 +24,8 @@ const (
 )
 
 var pathPrefix = map[SubClientName]string{
-	ClientVmware:         "/cloudapi",
-	ClientCerberus:       "/api/customers",
+	ClientVmware:         "",
+	ClientCerberus:       "",
 	ClientNetbackup:      "/netbackup",
 	SubClientName("ihm"): "/ihm",
 	SubClientName("s3"):  "/s3",
@@ -94,7 +94,7 @@ func newMockClient() (Client, error) {
 			},
 			APICerberus: consoles.Service{
 				Enabled:  true,
-				Endpoint: hts.URL + "/api/customers",
+				Endpoint: hts.URL,
 			},
 			S3: consoles.Service{
 				Enabled:  true,
