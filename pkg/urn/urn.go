@@ -125,6 +125,8 @@ func isUUIDV4(urn string) bool {
 	return uuidRegex.MatchString(urn)
 }
 
+// IsUUIDV4 checks if the provided string matches the UUIDv4 format.
+// Returns true if the string is a valid UUIDv4, otherwise false.
 func IsUUIDV4(urn string) bool {
 	return isUUIDV4(urn)
 }
