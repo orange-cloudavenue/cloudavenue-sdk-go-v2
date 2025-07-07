@@ -89,7 +89,7 @@ func NewClient(opts ...OptionFunc) (cav.Client, error) {
 					statusCreated := http.StatusCreated
 					ep.SetMockResponseFunc(func(w http.ResponseWriter, _ *http.Request) {
 						w.WriteHeader(statusCreated)
-						w.Write([]byte(`{"jobId":"87ab1934-0146-4fb0-80bc-815fea03214d","message":"Job created successfully"}`))
+						w.Write([]byte(`{"jobId":"87ab1934-0146-4fb0-80bc-815fea03214d","message":"Job created successfully"}`)) //nolint:errcheck
 					})
 
 				case cav.ClientVmware:
@@ -102,7 +102,7 @@ func NewClient(opts ...OptionFunc) (cav.Client, error) {
 			}
 
 			if ep.MockResponseFuncIsDefined() {
-				log.Default().Printf("Registering mock responseFunc for endpoint %s with method %s", ep.Name, ep.Method)
+				logger.Debug("Registering mock responseFunc for endpoint", slog.String("endpoint", ep.Name), slog.String("method", ep.Method.String()))
 				mux.MethodFunc(ep.Method.String(), buildPath(ep.SubClient, ep.PathTemplate), ep.GetMockResponseFunc())
 				continue
 			}
