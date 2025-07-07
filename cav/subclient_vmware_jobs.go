@@ -17,7 +17,7 @@ import (
 	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go/pkg/urn"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/urn"
 )
 
 func init() {

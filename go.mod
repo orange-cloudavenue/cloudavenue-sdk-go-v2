@@ -5,8 +5,7 @@ go 1.24.4
 require (
 	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-faker/faker/v4 v4.6.1
-	github.com/google/uuid v1.6.0
-	github.com/orange-cloudavenue/cloudavenue-sdk-go v0.26.1
+	github.com/hashicorp/terraform-plugin-sdk/v2 v2.36.1
 	github.com/orange-cloudavenue/common-go/validators v0.2.2
 	github.com/stretchr/testify v1.10.0
 	resty.dev/v3 v3.0.0-beta.3
@@ -43,7 +42,6 @@ require (
 	github.com/hashicorp/terraform-json v0.24.0 // indirect
 	github.com/hashicorp/terraform-plugin-go v0.26.0 // indirect
 	github.com/hashicorp/terraform-plugin-log v0.9.0 // indirect
-	github.com/hashicorp/terraform-plugin-sdk/v2 v2.36.1 // indirect
 	github.com/hashicorp/terraform-registry-address v0.2.4 // indirect
 	github.com/hashicorp/terraform-svchost v0.1.1 // indirect
 	github.com/hashicorp/yamux v0.1.1 // indirect
@@ -56,6 +54,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/oklog/run v1.0.0 // indirect
+	github.com/orange-cloudavenue/cloudavenue-sdk-go v0.26.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
