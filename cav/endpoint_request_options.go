@@ -30,7 +30,7 @@ func WithPathParam(pp PathParam, value string) EndpointRequestOption {
 		}
 
 		for _, p := range endpoint.PathParams {
-			if p.Name == pp.Name {
+			if p.Name == pp.Name && p.Value == "" {
 				if p.Required && value == "" {
 					return errors.Newf("path param %s is required for endpoint %s %s %s %s", pp.Name, endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
 				}
@@ -54,7 +54,7 @@ func WithQueryParam(qp QueryParam, value string) EndpointRequestOption {
 		}
 
 		for _, p := range endpoint.QueryParams {
-			if p.Name == qp.Name {
+			if p.Name == qp.Name && p.Value == "" {
 				if p.Required && value == "" {
 					return errors.Newf("query param %s is required for endpoint %s %s %s %s", qp.Name, endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
 				}

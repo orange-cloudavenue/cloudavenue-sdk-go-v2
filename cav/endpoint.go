@@ -98,6 +98,8 @@ type (
 		// and body content.
 		requestInternalFunc func(ctx context.Context, client *resty.Client, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error)
 
+		// * Response
+
 		// * Mock
 
 		// mockResponse is the mock response that can be used for testing purposes.
@@ -123,6 +125,12 @@ type (
 		Description   string `validate:"required"`
 		Required      bool
 		ValidatorFunc func(value string) error
+
+		// Ability to provides a value for the query parameter.
+		// This is useful when the query parameter value is known at the time of registration.
+		// For example, if the query parameter is {type}, you can provide a value like "firewall" or "loadBalancer".
+		// If the query parameter is provided Required and ValidatorFunc are ignored.
+		Value string
 	}
 
 	PathParam struct {
@@ -130,5 +138,11 @@ type (
 		Description   string `validate:"required"`
 		Required      bool
 		ValidatorFunc func(value string) error
+
+		// Ability to provides a value for the path parameter.
+		// This is useful when the path parameter value is known at the time of registration.
+		// For example, if the path parameter is {type}, you can provide a value like "firewall" or "loadBalancer".
+		// If the path parameter is provided Required and ValidatorFunc are ignored.
+		Value string
 	}
 )

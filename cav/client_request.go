@@ -95,5 +95,21 @@ func (c *client) NewRequest(ctx context.Context, endpoint *Endpoint, _ ...Reques
 		SetRetryWaitTime(500 * time.Millisecond).
 		AddRetryHooks(endpoint.RetryHooksFuncs...)
 
+	for _, q := range endpoint.QueryParams {
+		if q.Value != "" {
+			// If a value is provided for the query parameter, use it directly.
+			hR.SetQueryParam(q.Name, q.Value)
+		}
+	}
+
+	// Set the path parameters in the request.
+	// This is done to replace the path parameters in the endpoint path template.
+	for _, p := range endpoint.PathParams {
+		if p.Value != "" {
+			// If a value is provided for the path parameter, use it directly.
+			hR.SetPathParam(p.Name, p.Value)
+		}
+	}
+
 	return hR, nil
 }
