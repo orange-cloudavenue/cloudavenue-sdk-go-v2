@@ -81,6 +81,12 @@ type (
 		// and body content.
 		RequestFunc func(ctx context.Context, client Client, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error)
 
+		// RetryHooksFuncs is a list of functions that can be used to customize the retry behavior of the request.
+		// These functions can be used to modify the request, such as adding headers or query parameters,
+		// or to handle specific conditions that require a retry.
+		// To know more about retry see https://resty.dev/docs/retry-mechanism/
+		RetryHooksFuncs []resty.RetryHookFunc
+
 		// RequestInternalFunc is a function that takes a client and options and returns a resty.Response and an error.
 		// This function is used to make the actual HTTP request (from internal package) to the endpoint.
 		// It allows for customization of the request, such as setting headers, query parameters,

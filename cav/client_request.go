@@ -12,6 +12,7 @@ package cav
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"resty.dev/v3"
 )
@@ -77,8 +78,14 @@ func (c *client) NewRequest(ctx context.Context, endpoint *Endpoint, _ ...Reques
 	}
 
 	// Create a new request with the context and options.
+	// To know more about retry see https://resty.dev/docs/retry-mechanism/
 	hR := hC.NewRequest().
-		SetContext(ctxv)
+		SetContext(ctxv).
+		EnableRetryDefaultConditions().
+		SetRetryCount(5).
+		SetRetryMaxWaitTime(5 * time.Second).
+		SetRetryWaitTime(500 * time.Millisecond).
+		AddRetryHooks(endpoint.RetryHooksFuncs...)
 
 	return hR, nil
 }
