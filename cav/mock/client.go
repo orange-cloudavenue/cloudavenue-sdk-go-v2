@@ -96,8 +96,7 @@ func NewClient(opts ...OptionFunc) (cav.Client, error) {
 	}
 
 	hts := httptest.NewServer(mux)
-
-	logger.Debug("Mock client created", slog.String("organization", mockOrg))
+	logger.Debug("Mock server created", slog.String("url", hts.URL))
 
 	nC, err := cav.NewClient(
 		mockOrg,
@@ -129,6 +128,8 @@ func NewClient(opts ...OptionFunc) (cav.Client, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	logger.Debug("Mock client created", slog.String("organization", mockOrg))
 
 	return nC, nil
 }

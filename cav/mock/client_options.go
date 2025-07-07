@@ -21,11 +21,10 @@ type Options struct {
 
 func WithLogger(logger *slog.Logger) OptionFunc {
 	return func(c *Options) error {
-		if logger == nil {
-			return nil
+		if logger != nil {
+			c.logger = logger
 		}
 
-		c.logger = logger
 		return nil
 	}
 }
