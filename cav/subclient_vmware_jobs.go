@@ -16,8 +16,9 @@ import (
 	"github.com/orange-cloudavenue/common-go/validators"
 	"resty.dev/v3"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go/pkg/urn"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
 func init() {
@@ -120,11 +121,23 @@ func (v *vmware) JobParser(resp *resty.Response) (job *Job, err error) {
 				// The ID is the last segment of the HREF URL.
 				parts := strings.Split(href, "/")
 				if len(parts) > 0 {
-					return parts[len(parts)-1]
+					// If the last part is a UUID, return it.
+					if validators.New().Var(parts[len(parts)-1], "uuid4") == nil {
+						// Return the last part as the job ID.
+						// This is the expected format for VMware job IDs.
+						// Example: /api/task/d3c42a20-96b9-4452-91dd-f71b71dfe314
+						// If the last part is not a UUID, return an empty string.
+						return parts[len(parts)-1]
+					}
 				}
 				return ""
 			}(),
 		}
+
+		if job.ID == "" {
+			return nil, errors.New("failed to parse vmware job ID from response header")
+		}
+
 		return job, nil
 	}
 
@@ -138,7 +151,7 @@ func (v *vmware) JobParser(resp *resty.Response) (job *Job, err error) {
 
 		status, err := v.JobStatusParser(apiR.Status)
 		if err != nil {
-			return job, errors.New("failed to parse vmware job status: " + err.Error())
+			return nil, errors.New("failed to parse vmware job status: " + err.Error())
 		}
 
 		job.Status = status

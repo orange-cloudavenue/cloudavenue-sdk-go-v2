@@ -87,6 +87,11 @@ type (
 		// To know more about retry see https://resty.dev/docs/retry-mechanism/
 		RetryHooksFuncs []resty.RetryHookFunc
 
+		// RequestMiddleware is a function that takes a resty.Request and returns a resty.Request.
+		// This function is used to modify the request before it is sent.
+		// It allows for adding headers, query parameters, and other modifications to the request.
+		RequestMiddlewares []resty.RequestMiddleware
+
 		// RequestInternalFunc is a function that takes a client and options and returns a resty.Response and an error.
 		// This function is used to make the actual HTTP request (from internal package) to the endpoint.
 		// It allows for customization of the request, such as setting headers, query parameters,

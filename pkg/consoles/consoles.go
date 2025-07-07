@@ -74,7 +74,7 @@ var consoles = map[Console]console{
 			},
 			APICerberus: Service{
 				Enabled:  true,
-				Endpoint: "https://console1.cloudavenue.orange-business.com/api/customers",
+				Endpoint: "https://console1.cloudavenue.orange-business.com",
 			},
 			S3: Service{
 				Enabled:  true,
@@ -102,7 +102,7 @@ var consoles = map[Console]console{
 			},
 			APICerberus: Service{
 				Enabled:  true,
-				Endpoint: "https://console2.cloudavenue.orange-business.com/api/customers",
+				Endpoint: "https://console2.cloudavenue.orange-business.com",
 			},
 			S3: Service{
 				Enabled:  true,
@@ -131,7 +131,7 @@ var consoles = map[Console]console{
 			},
 			APICerberus: Service{
 				Enabled:  true,
-				Endpoint: "https://console4.cloudavenue.orange-business.com/api/customers",
+				Endpoint: "https://console4.cloudavenue.orange-business.com",
 			},
 			Netbackup: Service{
 				Enabled:  true,
@@ -155,7 +155,7 @@ var consoles = map[Console]console{
 			},
 			APICerberus: Service{
 				Enabled:  true,
-				Endpoint: "https://console5.cloudavenue-cha.itn.intraorange/api/customers",
+				Endpoint: "https://console5.cloudavenue-cha.itn.intraorange",
 			},
 			Netbackup: Service{
 				Enabled:  true,

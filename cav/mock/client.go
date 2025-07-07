@@ -29,7 +29,7 @@ const (
 
 var pathPrefix = map[cav.SubClientName]string{
 	cav.ClientVmware:         "",
-	cav.ClientCerberus:       "/api/customers",
+	cav.ClientCerberus:       "",
 	cav.ClientNetbackup:      "/netbackup",
 	cav.SubClientName("ihm"): "/ihm",
 	cav.SubClientName("s3"):  "/s3",
@@ -84,11 +84,27 @@ func NewClient(opts ...OptionFunc) (cav.Client, error) {
 			}
 
 			if reflectBodyType == reflect.TypeOf(cav.Job{}) {
-				statusAccepted := http.StatusAccepted
-				ep.SetMockResponseFunc(func(w http.ResponseWriter, _ *http.Request) {
-					w.Header().Add("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
-					w.WriteHeader(statusAccepted)
-				})
+				switch ep.SubClient {
+				case cav.ClientCerberus:
+					statusCreated := http.StatusCreated
+					ep.SetMockResponseFunc(func(w http.ResponseWriter, _ *http.Request) {
+						w.WriteHeader(statusCreated)
+						w.Write([]byte(`{"jobId":"87ab1934-0146-4fb0-80bc-815fea03214d","message":"Job created successfully"}`))
+					})
+
+				case cav.ClientVmware:
+					statusAccepted := http.StatusAccepted
+					ep.SetMockResponseFunc(func(w http.ResponseWriter, _ *http.Request) {
+						w.Header().Add("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
+						w.WriteHeader(statusAccepted)
+					})
+				}
+			}
+
+			if ep.MockResponseFuncIsDefined() {
+				log.Default().Printf("Registering mock responseFunc for endpoint %s with method %s", ep.Name, ep.Method)
+				mux.MethodFunc(ep.Method.String(), buildPath(ep.SubClient, ep.PathTemplate), ep.GetMockResponseFunc())
+				continue
 			}
 		}
 
@@ -111,7 +127,7 @@ func NewClient(opts ...OptionFunc) (cav.Client, error) {
 			},
 			APICerberus: consoles.Service{
 				Enabled:  true,
-				Endpoint: hts.URL + "/api/customers",
+				Endpoint: hts.URL,
 			},
 			S3: consoles.Service{
 				Enabled:  true,

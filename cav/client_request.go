@@ -48,6 +48,14 @@ func (c *client) NewRequest(ctx context.Context, endpoint *Endpoint, _ ...Reques
 		return nil, err
 	}
 
+	if endpoint.RequestMiddlewares != nil {
+		// If the endpoint has request middlewares, set them on the HTTP client.
+		// This allows for custom processing of the request before it is sent.
+		for _, mw := range endpoint.RequestMiddlewares {
+			hC.AddRequestMiddleware(mw)
+		}
+	}
+
 	// If JobOpts are provided, we need to create a request with job middleware.
 	// This is used to handle job responses and status checks.
 	if endpoint.JobOptions != nil {
