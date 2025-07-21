@@ -8,8 +8,8 @@ import (
 	"github.com/orange-cloudavenue/common-go/validators"
 )
 
-type (
-	classOfService struct { //nolint:linter-sdkv2
+type ( //nolint:gocritic
+	classOfService struct {
 		// MaxBandwidth defines the maximum bandwidth in Mbps for this class of service.
 		MaxBandwidth int
 

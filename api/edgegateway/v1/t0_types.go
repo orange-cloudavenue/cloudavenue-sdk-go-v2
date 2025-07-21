@@ -102,7 +102,7 @@ type (
 	}
 )
 
-func (t0s apiResponseT0s) ToModel() *ModelT0s {
+func (t0s apiResponseT0s) toModel() *ModelT0s {
 	var modelT0s ModelT0s
 	for _, t0 := range t0s {
 		modelT0 := ModelT0{

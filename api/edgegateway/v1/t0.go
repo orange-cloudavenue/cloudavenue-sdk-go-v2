@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/orange-cloudavenue/common-go/validators"
+
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
-	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 // ListT0 lists all T0s available in the organization.
@@ -21,7 +22,7 @@ func (c *Client) ListT0(ctx context.Context) (*ModelT0s, error) {
 		return nil, fmt.Errorf("error listing T0: %w", err)
 	}
 
-	return resp.Result().(*apiResponseT0s).ToModel(), nil
+	return resp.Result().(*apiResponseT0s).toModel(), nil
 }
 
 // GetTO retrieves a specific T0.
@@ -43,7 +44,7 @@ func (c *Client) GetT0(ctx context.Context, params ParamsGetT0) (*ModelT0, error
 		return nil, fmt.Errorf("error getting T0: %w", err)
 	}
 
-	t0s := resp.Result().(*apiResponseT0s).ToModel()
+	t0s := resp.Result().(*apiResponseT0s).toModel()
 	var t0 *ModelT0
 
 	for _, t := range t0s.T0s {
@@ -92,7 +93,7 @@ func (c *Client) GetT0FromEdgeGateway(ctx context.Context, params ParamsEdgeGate
 		return nil, err
 	}
 
-	t0s := resp.Result().(*apiResponseT0s).ToModel()
+	t0s := resp.Result().(*apiResponseT0s).toModel()
 	for _, t0 := range t0s.T0s {
 		for _, edgeGateway := range t0.EdgeGateways {
 			if edgeGateway.ID == params.ID || edgeGateway.Name == params.Name {
