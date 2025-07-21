@@ -126,6 +126,23 @@ func TestWithQueryParam_ValidatorFails(t *testing.T) {
 	}
 }
 
+func TestWithQueryParam_TransformFails(t *testing.T) {
+	transformer := func(_ string) (string, error) {
+		return "", errors.Newf("transformation failed")
+	}
+	endpoint := &Endpoint{
+		api: "cat", version: "v1", Name: "name", Method: "GET",
+		QueryParams: []QueryParam{{Name: "foo", TransformFunc: transformer}},
+	}
+	req := resty.New().R()
+	qp := QueryParam{Name: "foo", TransformFunc: transformer}
+	opt := WithQueryParam(qp, "value")
+	err := opt(endpoint, req)
+	if err == nil || err.Error() == "" {
+		t.Error("expected error for transformation failure, got nil")
+	}
+}
+
 func TestWithQueryParam_Success(t *testing.T) {
 	endpoint := &Endpoint{
 		api: "cat", version: "v1", Name: "name", Method: "GET",
@@ -140,6 +157,25 @@ func TestWithQueryParam_Success(t *testing.T) {
 	}
 	if req.QueryParams.Get("foo") != "bar" {
 		t.Error("expected query param to be set in request")
+	}
+}
+
+func TestWithQueryParamTransform_Success(t *testing.T) {
+	endpoint := &Endpoint{
+		api: "cat", version: "v1", Name: "name", Method: "GET",
+		QueryParams: []QueryParam{{Name: "foo", TransformFunc: func(value string) (string, error) {
+			return "transformed-" + value, nil
+		}}},
+	}
+	req := resty.New().R()
+	qp := QueryParam{Name: "foo"}
+	opt := WithQueryParam(qp, "bar")
+	err := opt(endpoint, req)
+	if err != nil {
+		t.Errorf("expected no error, got: %v", err)
+	}
+	if req.QueryParams.Get("foo") != "transformed-bar" {
+		t.Error("expected transformed query param to be set in request")
 	}
 }
 
@@ -214,6 +250,23 @@ func TestWithPathParam_ValidatorFails(t *testing.T) {
 	}
 }
 
+func TestWithPathParam_TransformFails(t *testing.T) {
+	transformer := func(_ string) (string, error) {
+		return "", errors.Newf("transformation failed")
+	}
+	endpoint := &Endpoint{
+		api: "cat", version: "v1", Name: "name", Method: "GET",
+		PathParams: []PathParam{{Name: "foo", TransformFunc: transformer}},
+	}
+	req := resty.New().R()
+	pp := PathParam{Name: "foo", TransformFunc: transformer}
+	opt := WithPathParam(pp, "value")
+	err := opt(endpoint, req)
+	if err == nil || err.Error() == "" {
+		t.Error("expected error for transformation failure, got nil")
+	}
+}
+
 func TestWithPathParam_Success(t *testing.T) {
 	endpoint := &Endpoint{
 		api: "cat", version: "v1", Name: "name", Method: "GET",
@@ -228,5 +281,24 @@ func TestWithPathParam_Success(t *testing.T) {
 	}
 	if req.PathParams["foo"] != "bar" {
 		t.Error("expected path param to be set in request")
+	}
+}
+
+func TestWithPathParamTransform_Success(t *testing.T) {
+	endpoint := &Endpoint{
+		api: "cat", version: "v1", Name: "name", Method: "GET",
+		PathParams: []PathParam{{Name: "foo", TransformFunc: func(value string) (string, error) {
+			return "transformed-" + value, nil
+		}}},
+	}
+	req := resty.New().R()
+	pp := PathParam{Name: "foo"}
+	opt := WithPathParam(pp, "bar")
+	err := opt(endpoint, req)
+	if err != nil {
+		t.Errorf("expected no error, got: %v", err)
+	}
+	if req.PathParams["foo"] != "transformed-bar" {
+		t.Error("expected transformed path param to be set in request")
 	}
 }

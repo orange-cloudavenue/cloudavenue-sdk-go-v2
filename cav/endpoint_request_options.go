@@ -39,6 +39,13 @@ func WithPathParam(pp PathParam, value string) EndpointRequestOption {
 						return errors.Newf("path param %s validation failed for endpoint %s %s %s %s: %v", pp.Name, endpoint.api, endpoint.version, endpoint.Name, endpoint.Method, err)
 					}
 				}
+				if p.TransformFunc != nil && value != "" {
+					newValue, err := p.TransformFunc(value)
+					if err != nil {
+						return errors.Newf("path param %s transformation failed for endpoint %s %s %s %s: %v", pp.Name, endpoint.api, endpoint.version, endpoint.Name, endpoint.Method, err)
+					}
+					value = newValue
+				}
 			}
 		}
 
@@ -62,6 +69,13 @@ func WithQueryParam(qp QueryParam, value string) EndpointRequestOption {
 					if err := p.ValidatorFunc(value); err != nil {
 						return errors.Newf("query param %s validation failed for endpoint %s %s %s %s: %v", qp.Name, endpoint.api, endpoint.version, endpoint.Name, endpoint.Method, err)
 					}
+				}
+				if p.TransformFunc != nil && value != "" {
+					newValue, err := p.TransformFunc(value)
+					if err != nil {
+						return errors.Newf("query param %s transformation failed for endpoint %s %s %s %s: %v", qp.Name, endpoint.api, endpoint.version, endpoint.Name, endpoint.Method, err)
+					}
+					value = newValue
 				}
 			}
 		}

@@ -144,10 +144,16 @@ type (
 	}
 
 	QueryParam struct {
-		Name          string `validate:"required"`
-		Description   string `validate:"required"`
-		Required      bool
+		Name        string `validate:"required"`
+		Description string `validate:"required"`
+		Required    bool
+
+		// ValidatorFunc is a function that validates the value of the query parameter.
+		// It is used to ensure that the value of the query parameter is valid before making the request.
 		ValidatorFunc func(value string) error
+
+		// Optional transformation function for the query parameter value.
+		TransformFunc func(value string) (string, error)
 
 		// Ability to provides a value for the query parameter.
 		// This is useful when the query parameter value is known at the time of registration.
@@ -157,10 +163,16 @@ type (
 	}
 
 	PathParam struct {
-		Name          string `validate:"required"`
-		Description   string `validate:"required"`
-		Required      bool
+		Name        string `validate:"required"`
+		Description string `validate:"required"`
+		Required    bool
+
+		// ValidatorFunc is a function that validates the value of the path parameter.
+		// It is used to ensure that the value of the path parameter is valid before making the request.
 		ValidatorFunc func(value string) error
+
+		// Optional transformation function for the path parameter
+		TransformFunc func(value string) (string, error)
 
 		// Ability to provides a value for the path parameter.
 		// This is useful when the path parameter value is known at the time of registration.

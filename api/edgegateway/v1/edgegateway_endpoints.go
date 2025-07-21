@@ -178,6 +178,10 @@ func init() {
 				ValidatorFunc: func(value string) error {
 					return validators.New().Var(value, "required,urn=edgeGateway")
 				},
+				TransformFunc: func(value string) (string, error) {
+					// Transform the value to a uuidv4 format
+					return extractor.ExtractUUID(value)
+				},
 			},
 		},
 		QueryParams:      nil,
