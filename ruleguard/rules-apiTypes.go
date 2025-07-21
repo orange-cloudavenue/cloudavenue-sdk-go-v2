@@ -7,12 +7,6 @@ import (
 	"github.com/quasilyte/go-ruleguard/dsl"
 )
 
-func apiResponseTypes(m dsl.Matcher) {
-	m.Match(`type $name struct { $*_ }`).
-		Where(m.File().PkgPath.Matches(`api/`) && !m["name"].Text.Matches(`^(apiResponse|apiRequest|Model|Params)[A-Z][A-Za-z0-9]*$|^Client$`)).
-		Report(`Nom de la structure non conforme : $name`)
-}
-
 // apiTypes checks for common API types in the codebase.
 // It ensures that the types used in API endpoints are consistent and follow best practices.
 // Ensures that struct types in any `api/` directory follow these naming conventions:
@@ -27,11 +21,10 @@ func apiResponseTypes(m dsl.Matcher) {
 //   - **Client Types:**
 //     Must be named `Client` (exactly, for the main client struct of an API group, e.g., `type Client struct { ... }`).
 //
+// Regex101 https://regex101.com/r/9Mv2Ak
 // If a struct type in an `api/` directory does not follow one of these conventions, the linter will report an error.
-
-// // Regex101 https://regex101.com/r/9Mv2Ak
-// var apiTypesRe = regexp.MustCompile(`(^(apiResponse|apiRequest|Model|Params)[A-Z][A-Za-z0-9]*$|^Client$)`)
-
-// func regexMatcher(ctx *dsl.VarFilterContext) bool {
-// 	return apiTypesRe.MatchString(ctx.GetInterface(ctx.GetType("Name")).String())
-// }
+func apiResponseTypes(m dsl.Matcher) {
+	m.Match(`type $name struct { $*_ }`).
+		Where(m.File().PkgPath.Matches(`api/`) && !m["name"].Text.Matches(`^(apiResponse|apiRequest|Model|Params)[A-Z][A-Za-z0-9]*$|^Client$`)).
+		Report(`Struct type in an api/ directory should follow naming conventions (See CONTRIBUTING.md)`)
+}
