@@ -4,9 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/orange-cloudavenue/common-go/validators"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 func (c *Client) GetEdgeGateway(ctx context.Context, params ParamsEdgeGateway) (*ModelEdgeGateway, error) {

@@ -7,23 +7,20 @@ import (
 	"github.com/quasilyte/go-ruleguard/dsl"
 )
 
-// func apiResponseToModel(m dsl.Matcher) {
-// 	isExported := func(v dsl.Var) bool {
-// 		return v.Text.Matches(`^\p{Lu}`)
-// 	}
-
-// 	m.Match(
-// 		`func ($object) $funcName($*params) $*outputname { $*_ }`,
-// 	).
-// 		Where(
-// 			m.File().PkgPath.Matches(`api/`) &&
-// 				m["object"].Text.Matches(`^apiResponse[A-Z][A-Za-z0-9]*$`) &&
-// 				m["funcName"].Text.Matches(`^ToModel$`) &&
-// 				isExported(m["funcName"]),
-// 		).
-// 		Report(`Disallow exported ToModel functions in API response types. Use a private function instead.`).
-// 		Suggest("func (apiResponse$name) toModel($*params) $outputname { $*_ }")
-// }
+// apiResponseToModel checks for exported ToModel functions in API response/request types.
+// It disallows exported ToModel methods for types named apiResponse* or apiRequest* in any `api/` directory.
+// Instead, it suggests using a private toModel method to prevent exposing internal conversion logic.
+// This helps enforce encapsulation and maintain clean API boundaries.
+func apiResponseToModel(m dsl.Matcher) {
+	m.Match(`func ($recv $recvtype) $f($params) ($output) { $body }`).
+		Where(
+			m.File().PkgPath.Matches(`api/`) &&
+				m["recvtype"].Text.Matches(`^(apiResponse|apiRequest)[A-Za-z0-9_]*$`) &&
+				m["f"].Text.Matches(`^ToModel$`),
+		).
+		Report(`Disallow exported ToModel functions in API response types. Use a private function instead.`).
+		Suggest(`func ($recv $recvtype) toModel$params ($output) { $body }`)
+}
 
 // apiTypes checks for common API types in the codebase.
 // It ensures that the types used in API endpoints are consistent and follow best practices.
@@ -72,4 +69,20 @@ func apiFuncPrefix(m dsl.Matcher) {
 				isExported(m["name"]),
 		).
 		Report(`Function names must start with Get | Create | List | Delete | Update | Enable | Disable (See CONTRIBUTING.md)`)
+}
+
+// boolFunctionNaming enforces naming conventions for functions that return a boolean value.
+// It ensures that any function returning a bool starts with one of the following prefixes:
+//   - Is
+//   - is
+//   - Has
+//   - has
+//   - match
+//   - Match
+//
+// If a bool-returning function does not follow this convention, the linter will report an error.
+func boolFunctionNaming(m dsl.Matcher) {
+	m.Match(`func $name($*params) bool { $*body }`).
+		Where(!m["name"].Text.Matches(`^(Is|is|Has|has|match|Match).*`)).
+		Report("bool function name should start with 'Is' | 'is' | 'Has' | 'has' | 'match' | 'Match'")
 }

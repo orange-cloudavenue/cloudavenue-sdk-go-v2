@@ -95,7 +95,7 @@ linters:
           # The placeholder '${config-path}' is substituted with a path relative to the configuration file.
           # Glob patterns such as 'rules-*.go' may be specified.
           # Default: ""
-          rules: '${base-path}/ruleguard/rules-*.go'
+          rules: '${base-path}/ruleguard/rules_*.go'
   
     # custom:
     #   linter-sdkv2:

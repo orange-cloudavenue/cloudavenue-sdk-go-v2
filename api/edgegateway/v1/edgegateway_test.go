@@ -9,10 +9,9 @@ import (
 	"github.com/kr/pretty"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/orange-cloudavenue/common-go/generator"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
+	"github.com/orange-cloudavenue/common-go/generator"
 )
 
 func TestGetEdgeGateway(t *testing.T) {
@@ -201,6 +200,7 @@ func TestRetrieveEdgeGatewayIDByName(t *testing.T) {
 		})
 	}
 }
+
 func TestDeleteEdgeGateway(t *testing.T) {
 	tests := []struct {
 		name                    string
@@ -307,7 +307,6 @@ func TestDeleteEdgeGateway(t *testing.T) {
 			} else {
 				assert.Nil(t, err, "Expected no error for params: %v", tt.params)
 			}
-
 		})
 	}
 }

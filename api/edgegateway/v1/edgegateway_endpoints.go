@@ -7,11 +7,10 @@ import (
 
 	"resty.dev/v3"
 
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/urn"
 	"github.com/orange-cloudavenue/common-go/validators"
-
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
 
 func init() {
@@ -188,5 +187,4 @@ func init() {
 		BodyRequestType:  nil,
 		BodyResponseType: cav.Job{},
 	}.Register()
-
 }

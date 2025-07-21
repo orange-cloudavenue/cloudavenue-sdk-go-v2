@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/orange-cloudavenue/common-go/validators"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
+	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 // ListT0 lists all T0s available in the organization.

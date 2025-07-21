@@ -10,7 +10,7 @@
     },
     "go.lintTool": "golangci-lint-v2",
     "go.lintFlags": [
-        // "--fix"
+        "--fix"
     ],
     "go.lintOnSave": "package",
 }
