@@ -9,9 +9,10 @@ import (
 	"github.com/kr/pretty"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/orange-cloudavenue/common-go/generator"
+
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
-	"github.com/orange-cloudavenue/common-go/generator"
 )
 
 func TestGetEdgeGateway(t *testing.T) {
@@ -199,4 +200,130 @@ func TestRetrieveEdgeGatewayIDByName(t *testing.T) {
 			}
 		})
 	}
+}
+func TestDeleteEdgeGateway(t *testing.T) {
+	tests := []struct {
+		name                    string
+		params                  *ParamsEdgeGateway
+		mockResponse            any
+		mockResponseStatus      int
+		mockQueryResponseStatus int
+		expectedErr             bool
+	}{
+		{
+			name: "Valid Edge Gateway ID",
+			params: &ParamsEdgeGateway{
+				ID: generator.MustGenerate("{urn:edgeGateway}"),
+			},
+			mockResponse: nil,
+			// mockResponseStatus: 202,
+			expectedErr: false,
+		},
+		{
+			name: "Valid Edge Gateway Name",
+			params: &ParamsEdgeGateway{
+				Name: generator.MustGenerate("{edgegateway_name}"),
+			},
+			mockResponse: nil,
+			// mockResponseStatus: 204,
+			expectedErr: false,
+		},
+		{
+			name: "Invalid Edge Gateway Name",
+			params: &ParamsEdgeGateway{
+				Name: "invalidEdgeGateway",
+			},
+			mockResponse:       nil,
+			mockResponseStatus: 404,
+			expectedErr:        true,
+		},
+		{
+			name: "Invalid Edge Gateway ID",
+			params: &ParamsEdgeGateway{
+				ID: "urn:vcloud:gateway:invalid-id",
+			},
+			mockResponse:       nil,
+			mockResponseStatus: 404,
+			expectedErr:        true,
+		},
+		{
+			name: "Error 500",
+			params: &ParamsEdgeGateway{
+				ID: generator.MustGenerate("{urn:edgeGateway}"),
+			},
+			mockResponse:       nil,
+			mockResponseStatus: 500,
+			expectedErr:        false,
+		},
+		{
+			name: "Error 401",
+			params: &ParamsEdgeGateway{
+				ID: generator.MustGenerate("{urn:edgeGateway}"),
+			},
+			mockResponse:       nil,
+			mockResponseStatus: 401,
+			expectedErr:        true,
+		},
+		{
+			name: "error 404 edge gateway name and id not found",
+			params: &ParamsEdgeGateway{
+				Name: generator.MustGenerate("{edgegateway_name}"),
+			},
+			mockResponse:            nil,
+			mockResponseStatus:      404,
+			mockQueryResponseStatus: 404,
+			expectedErr:             true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			epDelete, err := mock.GetEndpoint("EdgeGateway", cav.MethodDELETE)
+			if err != nil {
+				t.Fatalf("Error getting delete endpoint: %v", err)
+			}
+
+			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
+				t.Logf("Setting mock response for endpoint %s with status %d", epDelete.Name, tt.mockResponseStatus)
+				// If we expect a valid response, we need to set the mock response
+				mock.SetMockResponse(epDelete, tt.mockResponse, &tt.mockResponseStatus)
+			}
+
+			epQuery, err := mock.GetEndpoint("QueryEdgeGateway", cav.MethodGET)
+			if err != nil {
+				t.Fatalf("Error getting query endpoint: %v", err)
+			}
+
+			if tt.mockQueryResponseStatus != 0 {
+				t.Logf("Setting mock response for query endpoint %s with status %d", epQuery.Name, tt.mockQueryResponseStatus)
+				// If we expect a query response, we need to set the mock response for the
+				mock.SetMockResponse(epQuery, nil, &tt.mockQueryResponseStatus)
+			}
+
+			eC := newClient(t)
+			err = eC.DeleteEdgeGateway(t.Context(), *tt.params)
+			if tt.expectedErr {
+				assert.NotNil(t, err, "Expected error for params: %v", tt.params)
+			} else {
+				assert.Nil(t, err, "Expected no error for params: %v", tt.params)
+			}
+
+		})
+	}
+}
+
+func TestDeleteEdgeGateway_ContextDeadlineExceeded(t *testing.T) {
+	mC, err := mock.NewClient()
+	assert.Nil(t, err, "Error creating mock client")
+
+	eC, err := New(mC)
+	assert.Nil(t, err, "Error creating edgegateway client")
+
+	// Simulate a context deadline exceeded error
+	ctx, cancel := context.WithTimeout(t.Context(), 0)
+	defer cancel()
+
+	err = eC.DeleteEdgeGateway(ctx, ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgeGateway}")})
+	assert.NotNil(t, err, "Expected context deadline exceeded error")
+	assert.Contains(t, err.Error(), "context deadline exceeded", "Expected error to contain 'context deadline exceeded'")
 }

@@ -7,10 +7,11 @@ import (
 
 	"resty.dev/v3"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/urn"
 	"github.com/orange-cloudavenue/common-go/validators"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
 
 func init() {
@@ -160,4 +161,28 @@ func init() {
 	// 	BodyRequestType:  edgegatewayAPICreateRequest{},
 	// 	BodyResponseType: edgegatewayAPICreateResponse{},
 	// }.Register()
+
+	// Delete EdgeGateway
+	cav.Endpoint{
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/deleteEdge",
+		Name:             "EdgeGateway",
+		Description:      "Delete EdgeGateway",
+		Method:           cav.MethodDELETE,
+		SubClient:        cav.ClientCerberus,
+		PathTemplate:     "/api/customers/v2.0/edges/{edgeId}",
+		PathParams: []cav.PathParam{
+			{
+				Name:        "edgeId",
+				Description: "The ID of the edge gateway.",
+				Required:    true,
+				ValidatorFunc: func(value string) error {
+					return validators.New().Var(value, "required,urn=edgeGateway")
+				},
+			},
+		},
+		QueryParams:      nil,
+		BodyRequestType:  nil,
+		BodyResponseType: cav.Job{},
+	}.Register()
+
 }
