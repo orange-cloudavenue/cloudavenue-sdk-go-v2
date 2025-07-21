@@ -30,6 +30,7 @@ func Test_Endpoint_Register(t *testing.T) {
 				QueryParams:      []QueryParam{},
 				DocumentationURL: "https://foo.bar",
 				RequestFunc:      nil,
+				Description:      "This is a fake endpoint",
 			},
 			expectedError: false,
 		},

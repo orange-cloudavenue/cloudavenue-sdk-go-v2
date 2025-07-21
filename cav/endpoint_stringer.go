@@ -9,7 +9,10 @@
 
 package cav
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 func (e Endpoint) String() string {
 	return fmt.Sprintf("[%s] %s %s %s %s",
@@ -33,4 +36,9 @@ func (e Version) String() string {
 // String returns a string representation of the Method.
 func (e Method) String() string {
 	return string(e)
+}
+
+// MockPath returns the mock path for the endpoint.
+func (e Endpoint) MockPath() string {
+	return fmt.Sprintf("/mock/%s/%s/%s%s", e.api, e.version, strings.ToLower(e.Name), e.PathTemplate)
 }

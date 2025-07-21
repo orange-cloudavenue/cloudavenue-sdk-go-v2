@@ -175,4 +175,28 @@ This approach allows the SDK to evolve and support multiple API versions for eac
 
 ---
 
-Thank you for following these guidelines to help ensure the quality and
+## 4. Naming Conventions for Go Types in API Packages
+
+To ensure consistency and clarity across the SDK, please follow these naming conventions for Go types related to API requests and responses:
+
+- **API Response Types:**  
+  Use the prefix `apiResponse` followed by the object name in PascalCase.  
+  _Example:_ `apiResponseEdgeGateway`
+
+- **API Request Body Types:**  
+  Use the prefix `apiRequest` followed by the object name in PascalCase.  
+  _Example:_ `apiRequestEdgeGateway`
+
+- **User-facing Model Types:**  
+  Use the prefix `Model` followed by the object name in CamelCase.  
+  _Example:_ `ModelEdgeGateway`
+
+- **User-supplied Parameter Types:**  
+  Use the prefix `Params` followed by the object name in CamelCase.  
+  _Example:_ `ParamsEdgeGateway`
+
+These conventions help distinguish between internal API representations, user-facing models, and parameter objects, making the codebase easier to understand and work with.
+
+---
+
+Thank you for following these guidelines to help ensure the quality and maintainability of the CloudAvenue SDK. We appreciate your contributions!

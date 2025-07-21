@@ -12,6 +12,7 @@ package cav
 import (
 	"context"
 	"fmt"
+	"regexp"
 
 	"resty.dev/v3"
 
@@ -27,9 +28,9 @@ type cerberus struct {
 }
 
 type cerberusError struct {
-	Code    string `json:"code"`
-	Reason  string `json:"reason"`
-	Message string `json:"message"`
+	Code    string `json:"code" fake:"{regex:err-[0-9]{4}}"`
+	Reason  string `json:"reason" fake:"{regex:mock-[0-9]{4}}"`
+	Message string `json:"message" fake:"{sentence:3,10}"`
 }
 
 var newCerberusClient = func() SubClient {
@@ -68,7 +69,7 @@ func (v *cerberus) SetConsole(c consoles.Console) {
 }
 
 // ParseAPIError parses the API error response from the Cerberus client.
-func (v *cerberus) ParseAPIError(operation string, resp *resty.Response) *errors.APIError {
+func (v *cerberus) parseAPIError(operation string, resp *resty.Response) *errors.APIError {
 	if resp == nil || !resp.IsError() {
 		return nil
 	}
@@ -82,6 +83,7 @@ func (v *cerberus) ParseAPIError(operation string, resp *resty.Response) *errors
 			Message:    fmt.Sprintf("%s: %s", err.Reason, err.Message),
 			Duration:   resp.Duration(),
 			Endpoint:   resp.Request.URL,
+			Method:     resp.Request.Method,
 		}
 	}
 
@@ -92,5 +94,27 @@ func (v *cerberus) ParseAPIError(operation string, resp *resty.Response) *errors
 		Message:    "Unknown error occurred",
 		Duration:   resp.Duration(),
 		Endpoint:   resp.Request.URL,
+		Method:     resp.Request.Method,
+	}
+}
+
+// Regexp to match the error message indicating that a job already exists.
+//
+//	{
+//	   "code": "cf-0002",
+//	   "message": "another job present on org xxxx",
+//	   "reason": "Job already exists"
+//	}
+var regexCerberusJobAlreadyExists = regexp.MustCompile(`Job already exists`)
+
+// idempotentRetryCondition returns a retry condition function for idempotent operations.
+func (v *cerberus) idempotentRetryCondition() resty.RetryConditionFunc {
+	return func(_ *resty.Response, err error) bool {
+		// Check if the error message indicates that the job already exists.
+		if err != nil && regexCerberusJobAlreadyExists.MatchString(err.Error()) {
+			return true // Retry if the error message indicates that the job already exists.
+		}
+
+		return false
 	}
 }

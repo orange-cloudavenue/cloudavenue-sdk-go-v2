@@ -4,13 +4,28 @@
 // See https://github.com/orange-cloudavenue/workflows for more information.
 // --------------------------------------------------------------
 {
+    // "go.lintTool": "golangci-lint-v2",
+    // "go.lintFlags": [
+    //     "--path-mode=abs",
+    //     "--fast-only",
+    //     "--fix"
+    // ],
+    // // "go.formatTool": "custom",
+    // // "go.alternateTools": {
+    // //     "golangci-lint-v2": "${workspaceFolder}/custom-gcl"
+    // // },
+    // "go.formatFlags": [
+    //     "fmt",
+    //     "--stdin"
+    // ],
+    // "go.lintOnSave": "package",
     "gopls": {
         "ui.semanticTokens": true,
         "formatting.local": "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2",
     },
-    "go.lintTool": "golangci-lint",
+    "go.lintTool": "golangci-lint-v2",
     "go.lintFlags": [
-        "--fast",
+        // "--fast",
         "--fix"
     ],
     "go.lintOnSave": "package",

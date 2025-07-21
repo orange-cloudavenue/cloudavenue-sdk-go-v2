@@ -15,16 +15,17 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/orange-cloudavenue/common-go/validators"
 	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go/pkg/urn"
+	"github.com/orange-cloudavenue/common-go/urn"
+	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 func init() {
 	Endpoint{
 		Name:             "JobCerberus",
+		Description:      "Get Cerberus Job",
 		Method:           MethodGET,
 		SubClient:        ClientCerberus,
 		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Jobs/getJobById",
@@ -52,6 +53,10 @@ func init() {
 				}
 			}
 
+			if isMockClient {
+				return r.Get(endpoint.MockPath())
+			}
+
 			return r.Get(endpoint.PathTemplate)
 		},
 		BodyRequestType:  nil, // No request body for this endpoint.
@@ -64,20 +69,20 @@ var _ jobsInterface = &cerberus{}
 
 // cerberusJobCreatedAPIResponse represents the response body when a job is created
 type cerberusJobCreatedAPIResponse struct {
-	ID      string `json:"jobId" faker:"uuid_hyphenated"`
-	Message string `json:"message" faker:"sentence"`
+	ID      string `json:"jobId" fake:"{uuid}"`
+	Message string `json:"message" fake:"{sentence}"`
 }
 
 // cerberusJobAPIResponse represents an asynchronous operation in VCD.
 type cerberusJobAPIResponse []struct {
 	Actions []struct {
-		Name    string `json:"name" faker:"word"`
-		Status  string `json:"status" faker:"oneof:DONE"`
-		Details string `json:"details" faker:"sentence"`
-	} `json:"actions" faker:"slice_len=2"`
-	Description string `json:"description" faker:"sentence"`
-	Name        string `json:"name" faker:"word"`
-	Status      string `json:"status" faker:"oneof:DONE"` // Status of the job.
+		Name    string `json:"name" fake:"{word}"`
+		Status  string `json:"status" fake:"DONE"`
+		Details string `json:"details" fake:"{sentence}"`
+	} `json:"actions" fakesize:"3"`
+	Description string `json:"description" fake:"{sentence}"`
+	Name        string `json:"name" fake:"{word}"`
+	Status      string `json:"status" fake:"DONE"` // Status of the job.
 }
 
 // JobRefresh is a function type that defines how to refresh a job status.
@@ -169,7 +174,7 @@ func (v *cerberus) JobParser(resp *resty.Response) (job *Job, err error) {
 		return job, nil
 	}
 
-	if err := v.ParseAPIError("JobParser", resp); err != nil {
+	if err := v.parseAPIError("JobParser", resp); err != nil {
 		return nil, err
 	}
 

@@ -16,22 +16,23 @@ import (
 
 	"resty.dev/v3"
 
-	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/httpClient"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
+// isMockClient is a boolean flag to indicate if the client is a mock client.
+var isMockClient bool
+
 type client struct {
 	logger             *slog.Logger
-	httpClient         *resty.Client
 	console            consoles.Console
 	clientsInitialized map[SubClientName]SubClient
 }
 
 type Client interface {
 	NewRequest(ctx context.Context, endpoint *Endpoint, opts ...RequestOption) (req *resty.Request, err error)
-	ParseAPIError(action string, resp *resty.Response) *errors.APIError
 	Logger() *slog.Logger
+	Do(ctx context.Context, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error)
 }
 
 // NewClient creates a new client object
@@ -49,13 +50,8 @@ func NewClient(organization string, opts ...ClientOption) (Client, error) {
 		return nil, err
 	}
 
-	if settings.httpClient == nil {
-		settings.httpClient = httpclient.NewHTTPClient()
-	}
-
 	client := &client{
-		httpClient: settings.httpClient,
-		console:    settings.Console,
+		console: settings.Console,
 	}
 
 	for _, opt := range opts {
@@ -66,6 +62,12 @@ func NewClient(organization string, opts ...ClientOption) (Client, error) {
 
 	client.logger = xlogger.WithGroup("client").With("organization", settings.Organization)
 	client.clientsInitialized = settings.SubClients
+
+	// Detect if the client is a mock client based on the organization name.
+	// This is a simple heuristic to determine if the client is a mock client.
+	if organization == "cav01ev01ocb0001234" {
+		isMockClient = true
+	}
 
 	return client, nil
 }
@@ -83,16 +85,18 @@ func (c *client) ParseAPIError(action string, resp *resty.Response) *errors.APIE
 			Message:    "unknown client",
 			Duration:   resp.Duration(),
 			Endpoint:   resp.Request.URL,
+			Method:     resp.Request.Method,
 		}
 	}
 	if v, ok := c.clientsInitialized[clientName]; ok {
-		return v.ParseAPIError(action, resp)
+		return v.parseAPIError(action, resp)
 	}
 	return &errors.APIError{
 		StatusCode: resp.StatusCode(),
 		Message:    "unknown client",
 		Duration:   resp.Duration(),
 		Endpoint:   resp.Request.URL,
+		Method:     resp.Request.Method,
 	}
 }
 

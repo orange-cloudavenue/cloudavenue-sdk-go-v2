@@ -66,7 +66,9 @@ func WithQueryParam(qp QueryParam, value string) EndpointRequestOption {
 			}
 		}
 
-		req.SetQueryParam(qp.Name, value)
+		if value != "" {
+			req.SetQueryParam(qp.Name, value)
+		}
 		return nil
 	}
 }

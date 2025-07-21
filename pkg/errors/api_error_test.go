@@ -21,8 +21,9 @@ func TestAPIError_Error(t *testing.T) {
 		Message:    "internal error",
 		Duration:   2 * time.Second,
 		Endpoint:   "/test",
+		Method:     "POST",
 	}
-	want := "[API operation] request API error: internal error (status code: 500, duration: 2s, endpoint: /test)"
+	want := "[API operation] request API error: internal error (method:POST status code: 500, duration: 2s, endpoint: /test)"
 	if got := apiErr.Error(); got != want {
 		t.Errorf("APIError.Error() = %q, want %q", got, want)
 	}

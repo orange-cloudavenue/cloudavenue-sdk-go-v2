@@ -1,0 +1,202 @@
+package edgegateway
+
+import (
+	"context"
+	"errors"
+	"testing"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/kr/pretty"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
+	"github.com/orange-cloudavenue/common-go/generator"
+)
+
+func TestGetEdgeGateway(t *testing.T) {
+	tests := []struct {
+		name                string
+		params              *ParamsEdgeGateway
+		queryResponse       any
+		queryResponseStatus int
+		expectedErr         bool
+		expectedResp        any
+		expectedStatus      int
+	}{
+		{
+			name: "Valid Edge Gateway ID",
+			params: &ParamsEdgeGateway{
+				ID: generator.MustGenerate("{urn:edgeGateway}"),
+			},
+			expectedErr: false,
+		},
+		{
+			name: "Valid Edge Gateway Name",
+			params: &ParamsEdgeGateway{
+				Name: generator.MustGenerate("{edgegateway_name}"),
+			},
+			expectedErr:    false,
+			expectedResp:   &ModelEdgeGateway{ID: "urn:vcloud:gateway:12345678-1234-4234-1234-123456789012", Name: "myEdgeGateway"},
+			expectedStatus: 200,
+		},
+		{
+			name: "Invalid Edge Gateway Name",
+			params: &ParamsEdgeGateway{
+				Name: "myEdgeGateway",
+			},
+			expectedErr:         true,
+			expectedResp:        nil,
+			queryResponseStatus: 404,
+		},
+		{
+			name: "Invalid Edge Gateway ID",
+			params: &ParamsEdgeGateway{
+				ID: "urn:vcloud:vm:invalid-id",
+			},
+			expectedErr: true,
+		},
+		{
+			name: "Error 500",
+			params: &ParamsEdgeGateway{
+				ID: "urn:vcloud:gateway:12345678-1234-4234-1234-123456789012",
+			},
+			expectedErr:    false, // Error HTTP 500 does not return an error because a retry is performed.
+			expectedResp:   nil,
+			expectedStatus: 500,
+		},
+		{
+			name:           "Error 404",
+			params:         &ParamsEdgeGateway{},
+			expectedErr:    true,
+			expectedResp:   nil,
+			expectedStatus: 404,
+		},
+		{
+			name: "Error 401",
+			params: &ParamsEdgeGateway{
+				ID: generator.MustGenerate("{urn:edgeGateway}"),
+			},
+			expectedErr:         true,
+			expectedResp:        nil,
+			queryResponseStatus: 401,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ep, err := mock.GetEndpoint("EdgeGateway", cav.MethodGET)
+			if err != nil {
+				t.Fatalf("Error getting endpoint: %v", err)
+			}
+
+			epQuery, err := mock.GetEndpoint("QueryEdgeGateway", cav.MethodGET)
+			if err != nil {
+				t.Fatalf("Error getting query endpoint: %v", err)
+			}
+
+			if tt.expectedResp != nil || tt.expectedStatus != 0 {
+				t.Logf("Setting mock response for endpoint %s with status %d", ep.Name, tt.expectedStatus)
+				// If we expect a valid response, we need to set the mock response
+				mock.SetMockResponse(ep, tt.expectedResp, &tt.expectedStatus)
+			}
+
+			if tt.queryResponse != nil || tt.queryResponseStatus != 0 {
+				// If we expect a query response, we need to set the mock response for the
+				mock.SetMockResponse(epQuery, tt.queryResponse, &tt.queryResponseStatus)
+			}
+
+			eC := newClient(t)
+
+			if tt.params == nil {
+				tt.params = &ParamsEdgeGateway{}
+				_ = generator.Struct(tt.params)
+
+				pretty.Print(tt.params)
+			}
+
+			// Call the GetEdgeGateway method
+			result, err := eC.GetEdgeGateway(t.Context(), *tt.params)
+			if tt.expectedErr {
+				verr := &validator.ValidationErrors{}
+				if errors.As(err, &verr) {
+					t.Log("Validation errors:", verr)
+				}
+
+				assert.NotNil(t, err, "Expected error: %v", tt.params)
+				assert.Nil(t, result, "Result should be nil: %v", tt.params)
+			} else {
+				assert.Nil(t, err, "Expected no error: %v", tt.params)
+				assert.NotNil(t, result, "Result should not be nil: %v", tt.params)
+			}
+		})
+	}
+}
+
+func TestGetEdgeGateway_ContextDeadlineExceeded(t *testing.T) {
+	mC, err := mock.NewClient()
+	assert.Nil(t, err, "Error creating mock client")
+
+	eC, err := New(mC)
+	assert.Nil(t, err, "Error creating edgegateway client")
+
+	// Simulate a context deadline exceeded error
+	ctx, cancel := context.WithTimeout(t.Context(), 0)
+	defer cancel()
+
+	_, err = eC.GetEdgeGateway(ctx, ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgeGateway}")})
+	assert.NotNil(t, err, "Expected context deadline exceeded error")
+	assert.Contains(t, err.Error(), "context deadline exceeded", "Expected error to contain 'context deadline exceeded'")
+}
+
+func TestRetrieveEdgeGatewayIDByName(t *testing.T) {
+	mC, err := mock.NewClient()
+	assert.Nil(t, err, "Error creating mock client")
+
+	eC, err := New(mC)
+	assert.Nil(t, err, "Error creating edgegateway client")
+
+	// Mock the QueryEdgeGateway endpoint
+	epQuery, err := mock.GetEndpoint("QueryEdgeGateway", cav.MethodGET)
+	if err != nil {
+		t.Fatalf("Error getting query endpoint: %v", err)
+	}
+	defer epQuery.CleanMockResponse()
+
+	tests := []struct {
+		name        string
+		edgeName    string
+		queryResp   *apiResponseQueryEdgeGateway
+		queryStatus int
+		expectedID  string
+		expectedErr bool
+	}{
+		{
+			name:     "Valid Edge Gateway Name",
+			edgeName: generator.MustGenerate("{edgegateway_name}"),
+			queryResp: &apiResponseQueryEdgeGateway{
+				Record: []apiResponseQueryEdgeGatewayRecord{
+					{ID: "urn:vcloud:gateway:ed0a243a-374b-4306-ab25-9c3787cbdb4c", HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c"},
+				},
+			},
+			queryStatus: 200,
+			expectedID:  "urn:vcloud:gateway:ed0a243a-374b-4306-ab25-9c3787cbdb4c",
+			expectedErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mock.SetMockResponse(epQuery, tt.queryResp, &tt.queryStatus)
+
+			id, err := eC.retrieveEdgeGatewayIDByName(t.Context(), tt.edgeName)
+			if tt.expectedErr {
+				assert.NotNil(t, err, "Expected error but got nil")
+				assert.Empty(t, id, "Expected empty ID but got %s", id)
+			} else {
+				assert.Nil(t, err, "Expected no error but got %v", err)
+				assert.Equal(t, tt.expectedID, id, "Expected ID %s but got %s", tt.expectedID, id)
+			}
+		})
+	}
+}

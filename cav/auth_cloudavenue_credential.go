@@ -14,11 +14,11 @@ import (
 	"errors"
 	"log/slog"
 
-	"github.com/orange-cloudavenue/common-go/validators"
 	"resty.dev/v3"
 
 	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/httpClient"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
+	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 var _ auth = (*cloudavenueCredential)(nil)
@@ -121,7 +121,7 @@ func (c *cloudavenueCredential) Refresh(ctx context.Context) error {
 		return err
 	}
 
-	if err := (&vmware{}).ParseAPIError("SessionVmware", resp); err != nil {
+	if err := (&vmware{}).parseAPIError("SessionVmware", resp); err != nil {
 		c.bearer = ""
 		logger.ErrorContext(ctx, "Failed to refresh session", "error", err)
 		return err

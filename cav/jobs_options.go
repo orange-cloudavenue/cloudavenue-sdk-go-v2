@@ -13,8 +13,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/orange-cloudavenue/common-go/validators"
 	"resty.dev/v3"
+
+	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 type (

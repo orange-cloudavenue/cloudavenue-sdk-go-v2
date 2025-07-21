@@ -41,5 +41,6 @@ type SubClient interface {
 	SetCredential(auth)
 	SetConsole(consoles.Console)
 	NewHTTPClient(context.Context) (*resty.Client, error)
-	ParseAPIError(operation string, resp *resty.Response) *errors.APIError
+	parseAPIError(operation string, resp *resty.Response) *errors.APIError
+	idempotentRetryCondition() resty.RetryConditionFunc
 }

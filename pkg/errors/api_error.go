@@ -38,6 +38,9 @@ type APIError struct {
 	// It helps identify which specific API endpoint was involved in the error.
 	// This is useful for debugging and logging purposes.
 	Endpoint string
+
+	// Method is the HTTP method used for the API request (e.g., GET, POST).
+	Method string
 }
 
 // IsNotFound checks if the APIError indicates a "not found" error.
@@ -51,7 +54,7 @@ func (e *APIError) Error() string {
 		return "nil APIError"
 	}
 
-	return fmt.Sprintf("[%s] request API error: %s (status code: %d, duration: %s, endpoint: %s)",
-		e.Operation, e.Message, e.StatusCode, e.Duration, e.Endpoint,
+	return fmt.Sprintf("[%s] request API error: %s (method:%s status code: %d, duration: %s, endpoint: %s)",
+		e.Operation, e.Message, e.Method, e.StatusCode, e.Duration, e.Endpoint,
 	)
 }

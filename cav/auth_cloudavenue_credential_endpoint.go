@@ -11,19 +11,21 @@ package cav
 
 import (
 	"context"
+	"net/http"
 
 	"resty.dev/v3"
 )
 
 func init() {
 	Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/sessions/post/",
 		Name:             "SessionVmware",
+		Description:      "Create a new VMware session",
 		Method:           MethodPOST,
 		SubClient:        ClientVmware,
 		PathTemplate:     "/cloudapi/1.0.0/sessions",
 		PathParams:       []PathParam{},
 		QueryParams:      []QueryParam{},
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/sessions/post/",
 		RequestFunc:      nil,
 		requestInternalFunc: func(ctx context.Context, client *resty.Client, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error) {
 			r := client.R().
@@ -36,7 +38,15 @@ func init() {
 				}
 			}
 
+			if isMockClient {
+				// If the client is a mock client, we return a mock response.
+				return r.Post(endpoint.MockPath())
+			}
+
 			return r.Post(endpoint.PathTemplate)
 		},
+		MockResponseFunc: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			w.Header().Add(cloudavenueCredentialXVmwareAccessToken, "mock-access-token")
+		}),
 	}.Register()
 }

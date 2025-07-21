@@ -22,6 +22,10 @@ type (
 	Method  string
 
 	Endpoint struct {
+		// ID is the unique identifier of the endpoint.
+		// It is used to uniquely identify the endpoint in the registry.
+		ID string
+
 		// api is the api of the endpoint, e.g., "vdc", "edgegateway", "vapp"
 		api API `validate:"required"`
 
@@ -33,6 +37,11 @@ type (
 		// It is used to group endpoints by their functionality.
 		// For example, all endpoints related to firewall operations can be grouped under the "firewall" name.
 		Name string `validate:"required"`
+
+		// Description is a brief description of the endpoint.
+		// It provides additional information about the endpoint's purpose and functionality.
+		// Description is used to provide context in the error messages.
+		Description string `validate:"required"`
 
 		// SubClient is the name of the sub-client that this endpoint belongs to.
 		SubClient SubClientName `validate:"required"`
@@ -60,20 +69,13 @@ type (
 		// DocumentationURL is the URL to the documentation for this endpoint.
 		DocumentationURL string `validate:"required,url"` // e.g., "https://docs.xx.com/api/v1/xx"
 
+		// * Request
+
 		// BodyRequestType is the golang type of the request body.
 		// It is used to validate the body arguments passed to the endpoint.
 		// BodyType is optional and can be used to specify the type of the request body
 		// for POST, PUT, or PATCH requests.
-		BodyRequestType any `validate:"required_if=Method POST PUT PATCH"`
-
-		// BodyResponseType is the golang type of the response body.
-		// It is used to validate the response body returned by the endpoint.
-		//
-		// If your set `cav.Job{}` as BodyResponseType, the system will automatically
-		// handle the job response and retrieve the job status until it is completed (success or error).
-		BodyResponseType any `validate:"omitempty"`
-
-		// * Request
+		BodyRequestType any `validate:"-"`
 
 		// RequestFunc is a function that takes a client and options and returns a resty.Response and an error.
 		// This function is used to make the actual HTTP request to the endpoint.
@@ -81,11 +83,11 @@ type (
 		// and body content.
 		RequestFunc func(ctx context.Context, client Client, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error)
 
-		// RetryHooksFuncs is a list of functions that can be used to customize the retry behavior of the request.
+		// RetryConditions is a list of functions that can be used to customize the retry behavior of the request.
 		// These functions can be used to modify the request, such as adding headers or query parameters,
 		// or to handle specific conditions that require a retry.
 		// To know more about retry see https://resty.dev/docs/retry-mechanism/
-		RetryHooksFuncs []resty.RetryHookFunc
+		RetryConditionsFuncs []resty.RetryConditionFunc
 
 		// RequestMiddleware is a function that takes a resty.Request and returns a resty.Request.
 		// This function is used to modify the request before it is sent.
@@ -100,13 +102,34 @@ type (
 
 		// * Response
 
+		// BodyResponseType is the golang type of the response body.
+		// It is used to validate the response body returned by the endpoint.
+		//
+		// If your set `cav.Job{}` as BodyResponseType, the system will automatically
+		// handle the job response and retrieve the job status until it is completed (success or error).
+		BodyResponseType any `validate:"-"`
+
+		// ResponseMiddleware is a function that takes a resty.Response and returns a resty.Response.
+		// This function is used to modify the response after it is received.
+		// It allows for handling the response, such as parsing the body, checking headers,
+		// and handling errors.
+		ResponseMiddlewares []resty.ResponseMiddleware
+
 		// * Mock
 
 		// mockResponse is the mock response that can be used for testing purposes.
 		// It is optional and can be used to simulate a response from the endpoint without making an actual HTTP request.
-		mockResponseFunc func(w http.ResponseWriter, _ *http.Request)
+		MockResponseFunc http.HandlerFunc
 
-		// mockResponseData is the mock response data that can be used for testing purposes.
+		// internalMockResponseFunc is used to store original mock response function.
+		// It is used to restore the original mock response function after it has been overridden.
+		mockResponseFunc http.HandlerFunc
+
+		// MockResponseData is the mock response data that can be used for testing purposes.
+		MockResponseData any
+
+		// mockResponseData is used to store the original mock response data.
+		// It is used to restore the original mock response data after it has been overridden.
 		mockResponseData any
 
 		// mockResponseStatusCode int

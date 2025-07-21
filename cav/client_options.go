@@ -13,8 +13,6 @@ import (
 	"errors"
 	"log/slog"
 
-	"resty.dev/v3"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/xlog"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )
@@ -27,8 +25,6 @@ type settings struct {
 	Console consoles.Console
 	// SubClients contains the sub-clients for the client.
 	SubClients map[SubClientName]SubClient
-
-	httpClient *resty.Client
 }
 
 func newSettings(organization string) *settings {
@@ -71,18 +67,21 @@ func WithCustomEndpoints(endpoints consoles.Services) ClientOption {
 func WithCloudAvenueCredential(username, password string) ClientOption {
 	return func(s *settings) error {
 		logger := xlogger.WithGroup("client").WithGroup("options").WithGroup("WithCloudAvenueCredential")
+
+		// Auth client is created before the loop to avoid creating it multiple times.
+		// auth cloudavenue is shared between sub-clients vmware and cerberus.
+		cred, err := NewCloudavenueCredential(s.Console, s.Organization, username, password)
+		if err != nil {
+			logger.Error("Failed to create Cloudavenue credential", "error", err)
+			return err
+		}
+
 		for _, client := range []SubClientName{ClientCerberus, ClientVmware} {
 			if _, ok := s.SubClients[client]; !ok {
 				s.SubClients[client] = subClients[client]
 			}
 
 			s.SubClients[client].SetConsole(s.Console)
-
-			cred, err := NewCloudavenueCredential(s.Console, s.Organization, username, password)
-			if err != nil {
-				logger.Error("Failed to create Cloudavenue credential", "error", err)
-				return err
-			}
 			s.SubClients[client].SetCredential(cred)
 		}
 

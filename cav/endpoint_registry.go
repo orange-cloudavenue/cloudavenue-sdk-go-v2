@@ -16,9 +16,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/orange-cloudavenue/common-go/validators"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
+	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 const (
@@ -27,7 +26,7 @@ const (
 
 	// * Exported api
 	// APIVDC         API = "vdc"
-	// APIEdgeGateway API = "edgegateway"
+	APIEdgeGateway API = "edgegateway"
 	// APIVApp        API = "vapp"
 	APIOrg API = "org"
 
@@ -56,6 +55,7 @@ type (
 )
 
 var endpoints = endpointsMap{
+	mu:  sync.RWMutex{},
 	Map: make(map[string]*Endpoint),
 }
 
@@ -99,8 +99,20 @@ func (e *endpointsMap) register(endpoint *Endpoint) {
 		}
 	}
 
+	// Store mockResponseFunc in the internal to restore it later.
+	if endpoint.MockResponseFunc != nil {
+		endpoint.mockResponseFunc = endpoint.MockResponseFunc
+	}
+
+	// Store mockResponseData in the internal to restore it later.
+	if endpoint.MockResponseData != nil {
+		endpoint.mockResponseData = endpoint.MockResponseData
+	}
+
 	// Encode the endpoint to create a unique key
 	encodedKey := encodeEndpoint(endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
+
+	endpoint.ID = encodedKey // Set the ID of the endpoint to the encoded key
 
 	// Store the endpoint in the map using the encoded key
 	e.Map[encodedKey] = endpoint
@@ -173,7 +185,10 @@ func decodeCallerPackageName(funcName string) (API, Version) {
 	switch {
 	case strings.HasPrefix(pkg, "api/"):
 		x := strings.SplitN(pkg, "/", 3)
-		if len(x) == 3 {
+		if len(x) >= 3 {
+			// 0 = "api"
+			// 1 = "vdc"
+			// 2 = "v1"
 			return API(x[1]), Version(x[2])
 		}
 	case strings.HasPrefix(pkg, "cav"):
