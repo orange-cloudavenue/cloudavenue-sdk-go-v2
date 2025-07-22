@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/kr/pretty"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
@@ -16,13 +15,13 @@ import (
 
 func TestGetEdgeGateway(t *testing.T) {
 	tests := []struct {
-		name                string
-		params              *ParamsEdgeGateway
-		queryResponse       any
-		queryResponseStatus int
-		expectedErr         bool
-		expectedResp        any
-		expectedStatus      int
+		name                    string
+		params                  *ParamsEdgeGateway
+		mockQueryResponse       any
+		mockQueryResponseStatus int
+		mockResponse            any
+		mockResponseStatus      int
+		expectedErr             bool
 	}{
 		{
 			name: "Valid Edge Gateway ID",
@@ -36,18 +35,20 @@ func TestGetEdgeGateway(t *testing.T) {
 			params: &ParamsEdgeGateway{
 				Name: generator.MustGenerate("{edgegateway_name}"),
 			},
-			expectedErr:    false,
-			expectedResp:   &ModelEdgeGateway{ID: "urn:vcloud:gateway:12345678-1234-4234-1234-123456789012", Name: "myEdgeGateway"},
-			expectedStatus: 200,
+			expectedErr: false,
+			mockResponse: &ModelEdgeGateway{
+				ID:   generator.MustGenerate("{urn:edgeGateway}"),
+				Name: generator.MustGenerate("{edgegateway_name}"),
+			},
+			mockResponseStatus: 200,
 		},
 		{
-			name: "Invalid Edge Gateway Name",
+			name: "Failed to retrieve Edge Gateway ID by name",
 			params: &ParamsEdgeGateway{
-				Name: "myEdgeGateway",
+				Name: generator.MustGenerate("{edgegateway_name}"),
 			},
-			expectedErr:         true,
-			expectedResp:        nil,
-			queryResponseStatus: 404,
+			mockQueryResponseStatus: 404,
+			expectedErr:             true,
 		},
 		{
 			name: "Invalid Edge Gateway ID",
@@ -59,27 +60,16 @@ func TestGetEdgeGateway(t *testing.T) {
 		{
 			name: "Error 500",
 			params: &ParamsEdgeGateway{
-				ID: "urn:vcloud:gateway:12345678-1234-4234-1234-123456789012",
-			},
-			expectedErr:    false, // Error HTTP 500 does not return an error because a retry is performed.
-			expectedResp:   nil,
-			expectedStatus: 500,
-		},
-		{
-			name:           "Error 404",
-			params:         &ParamsEdgeGateway{},
-			expectedErr:    true,
-			expectedResp:   nil,
-			expectedStatus: 404,
-		},
-		{
-			name: "Error 401",
-			params: &ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgeGateway}"),
 			},
-			expectedErr:         true,
-			expectedResp:        nil,
-			queryResponseStatus: 401,
+			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
+			mockResponse:       nil,
+			mockResponseStatus: 500,
+		},
+		{
+			name:        "Error validation params",
+			params:      &ParamsEdgeGateway{},
+			expectedErr: true,
 		},
 	}
 
@@ -95,25 +85,18 @@ func TestGetEdgeGateway(t *testing.T) {
 				t.Fatalf("Error getting query endpoint: %v", err)
 			}
 
-			if tt.expectedResp != nil || tt.expectedStatus != 0 {
-				t.Logf("Setting mock response for endpoint %s with status %d", ep.Name, tt.expectedStatus)
+			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
+				t.Logf("Setting mock response for endpoint %s with status %d", ep.Name, tt.mockResponseStatus)
 				// If we expect a valid response, we need to set the mock response
-				mock.SetMockResponse(ep, tt.expectedResp, &tt.expectedStatus)
+				mock.SetMockResponse(ep, tt.mockResponse, &tt.mockResponseStatus)
 			}
 
-			if tt.queryResponse != nil || tt.queryResponseStatus != 0 {
+			if tt.mockQueryResponse != nil || tt.mockQueryResponseStatus != 0 {
 				// If we expect a query response, we need to set the mock response for the
-				mock.SetMockResponse(epQuery, tt.queryResponse, &tt.queryResponseStatus)
+				mock.SetMockResponse(epQuery, tt.mockQueryResponse, &tt.mockQueryResponseStatus)
 			}
 
 			eC := newClient(t)
-
-			if tt.params == nil {
-				tt.params = &ParamsEdgeGateway{}
-				_ = generator.Struct(tt.params)
-
-				pretty.Print(tt.params)
-			}
 
 			// Call the GetEdgeGateway method
 			result, err := eC.GetEdgeGateway(t.Context(), *tt.params)
@@ -203,12 +186,12 @@ func TestRetrieveEdgeGatewayIDByName(t *testing.T) {
 
 func TestDeleteEdgeGateway(t *testing.T) {
 	tests := []struct {
-		name                    string
-		params                  *ParamsEdgeGateway
-		mockResponse            any
-		mockResponseStatus      int
-		mockQueryResponseStatus int
-		expectedErr             bool
+		name                        string
+		params                      *ParamsEdgeGateway
+		mockResponse                any
+		mockResponseStatus          int
+		mockMockQueryResponseStatus int
+		expectedErr                 bool
 	}{
 		{
 			name: "Valid Edge Gateway ID",
@@ -269,10 +252,10 @@ func TestDeleteEdgeGateway(t *testing.T) {
 			params: &ParamsEdgeGateway{
 				Name: generator.MustGenerate("{edgegateway_name}"),
 			},
-			mockResponse:            nil,
-			mockResponseStatus:      404,
-			mockQueryResponseStatus: 404,
-			expectedErr:             true,
+			mockResponse:                nil,
+			mockResponseStatus:          404,
+			mockMockQueryResponseStatus: 404,
+			expectedErr:                 true,
 		},
 	}
 
@@ -294,10 +277,10 @@ func TestDeleteEdgeGateway(t *testing.T) {
 				t.Fatalf("Error getting query endpoint: %v", err)
 			}
 
-			if tt.mockQueryResponseStatus != 0 {
-				t.Logf("Setting mock response for query endpoint %s with status %d", epQuery.Name, tt.mockQueryResponseStatus)
+			if tt.mockMockQueryResponseStatus != 0 {
+				t.Logf("Setting mock response for query endpoint %s with status %d", epQuery.Name, tt.mockMockQueryResponseStatus)
 				// If we expect a query response, we need to set the mock response for the
-				mock.SetMockResponse(epQuery, nil, &tt.mockQueryResponseStatus)
+				mock.SetMockResponse(epQuery, nil, &tt.mockMockQueryResponseStatus)
 			}
 
 			eC := newClient(t)

@@ -143,41 +143,58 @@ type (
 		JobOptions *JobOptions
 	}
 
+	// QueryParam represents a query parameter in the URL.
+	// Query parameters are appended to the URL as key-value pairs.
+	// For example, in the URL "/v1/edgeGateways/{gatewayId}/firewall/rules?active=true",
+	// "active" is a query parameter that can be used to filter results.
+	// Query parameters are used to add additional information to the URL for the endpoint.
 	QueryParam struct {
-		Name        string `validate:"required"`
+		Name        string `validate:"required,disallow_space"`
 		Description string `validate:"required"`
-		Required    bool
+
+		// Required indicates whether the query parameter is required or not.
+		Required bool
 
 		// ValidatorFunc is a function that validates the value of the query parameter.
 		// It is used to ensure that the value of the query parameter is valid before making the request.
 		ValidatorFunc func(value string) error
 
-		// Optional transformation function for the query parameter value.
+		// TransformFunc is a function that transforms the value of the query parameter.
+		// It is used to modify the value of the query parameter before making the request.
+		// TransformFunc is called after the ValidatorFunc(if provided) and before the value is set in the request.
 		TransformFunc func(value string) (string, error)
 
 		// Ability to provides a value for the query parameter.
 		// This is useful when the query parameter value is known at the time of registration.
-		// For example, if the query parameter is {type}, you can provide a value like "firewall" or "loadBalancer".
-		// If the query parameter is provided Required and ValidatorFunc are ignored.
+		// If the value is provided Required, ValidatorFunc and TransformFunc are ignored.
 		Value string
 	}
 
+	// PathParam represents a path parameter in the URL path.
+	// Path parameters are placeholders in the URL that can be replaced with actual values.
+	// For example, in the URL "/v1/edgeGateways/{gatewayId}/firewall/rules",
+	// "{gatewayId}" is a path parameter that can be replaced with an actual gateway ID.
+	// Path parameters are used to construct the final URL for the endpoint.
 	PathParam struct {
-		Name        string `validate:"required"`
+		Name        string `validate:"required,disallow_space"`
 		Description string `validate:"required"`
-		Required    bool
+
+		// Required indicates whether the path parameter is required or not.
+		Required bool
 
 		// ValidatorFunc is a function that validates the value of the path parameter.
 		// It is used to ensure that the value of the path parameter is valid before making the request.
 		ValidatorFunc func(value string) error
 
-		// Optional transformation function for the path parameter
+		// TransformFunc is a function that transforms the value of the query parameter.
+		// It is used to modify the value of the query parameter before making the request.
+		// TransformFunc is called after the ValidatorFunc(if provided) and before the value is set in the request.
 		TransformFunc func(value string) (string, error)
 
 		// Ability to provides a value for the path parameter.
 		// This is useful when the path parameter value is known at the time of registration.
 		// For example, if the path parameter is {type}, you can provide a value like "firewall" or "loadBalancer".
-		// If the path parameter is provided Required and ValidatorFunc are ignored.
+		// If the value is provided Required, ValidatorFunc and TransformFunc are ignored.
 		Value string
 	}
 )

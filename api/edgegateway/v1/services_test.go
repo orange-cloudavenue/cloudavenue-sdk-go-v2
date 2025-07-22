@@ -14,12 +14,13 @@ import (
 
 func TestGetNetworkServices(t *testing.T) {
 	tests := []struct {
-		name                string
-		params              *ParamsEdgeGateway
-		queryResponse       any
-		queryResponseStatus int
-		expectedErr         bool
-		expectedStatus      int
+		name                    string
+		params                  *ParamsEdgeGateway
+		mockResponse            any
+		mockResponseStatus      int
+		mockQueryResponse       any
+		mockQueryResponseStatus int
+		expectedErr             bool
 	}{
 		{
 			name: "Valid Edge Gateway services",
@@ -45,8 +46,25 @@ func TestGetNetworkServices(t *testing.T) {
 			params: &ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgeGateway}"),
 			},
-			queryResponseStatus: http.StatusInternalServerError,
-			expectedErr:         false, // Error HTTP 500 does not return an error because a retry is performed.
+			mockResponseStatus: http.StatusInternalServerError,
+			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
+		},
+		{
+			name: "Failed to retrieve Edge Gateway ID by name",
+			params: &ParamsEdgeGateway{
+				Name: generator.MustGenerate("{edgegateway_name}"),
+			},
+			mockQueryResponseStatus: http.StatusNotFound,
+			expectedErr:             true,
+		},
+		{
+			name: "Simulate empty response",
+			params: &ParamsEdgeGateway{
+				ID: generator.MustGenerate("{urn:edgeGateway}"),
+			},
+			mockResponse:       &apiResponseNetworkServices{},
+			mockResponseStatus: http.StatusOK,
+			expectedErr:        true,
 		},
 	}
 
@@ -54,11 +72,20 @@ func TestGetNetworkServices(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ep, _ := mock.GetEndpoint("NetworkServices", cav.MethodGET)
 			// Set up mock response
-			if tt.queryResponse != nil || tt.queryResponseStatus != 0 {
+			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				// Clean all default mock responses
 				ep.CleanMockResponse()
 				// Set the mock response
-				ep.SetMockResponse(tt.queryResponse, &tt.queryResponseStatus)
+				ep.SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+			}
+
+			epQuery, _ := mock.GetEndpoint("QueryEdgeGateway", cav.MethodGET)
+			// Set up mock query response
+			if tt.mockQueryResponse != nil || tt.mockQueryResponseStatus != 0 {
+				// Clean all default mock responses
+				epQuery.CleanMockResponse()
+				// Set the mock query response
+				epQuery.SetMockResponse(tt.mockQueryResponse, &tt.mockQueryResponseStatus)
 			}
 
 			eC := newClient(t)
@@ -95,11 +122,11 @@ func TestGetNetworkServices_ContextDeadlineExceeded(t *testing.T) {
 
 func TestEnableCloudavenueServices(t *testing.T) {
 	tests := []struct {
-		name                string
-		params              ParamsEdgeGateway
-		queryResponse       any
-		queryResponseStatus int
-		expectedErr         bool
+		name               string
+		params             ParamsEdgeGateway
+		mockResponse       any
+		mockResponseStatus int
+		expectedErr        bool
 	}{
 		{
 			name: "Enable network services with valid ID",
@@ -127,8 +154,8 @@ func TestEnableCloudavenueServices(t *testing.T) {
 			params: ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgeGateway}"),
 			},
-			queryResponseStatus: http.StatusInternalServerError,
-			expectedErr:         false, // Error HTTP 500 does not return an error because a retry is performed.
+			mockResponseStatus: http.StatusInternalServerError,
+			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
 		},
 	}
 
@@ -136,10 +163,10 @@ func TestEnableCloudavenueServices(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ep, _ := mock.GetEndpoint("NetworkServices", cav.MethodPOST)
 			// Set up mock response
-			if tt.queryResponse != nil || tt.queryResponseStatus != 0 {
+			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				t.Log("Setting up mock response for:", tt.name)
 				ep.CleanMockResponse()
-				ep.SetMockResponse(tt.queryResponse, &tt.queryResponseStatus)
+				ep.SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			eC := newClient(t)
@@ -172,11 +199,11 @@ func TestEnableCloudavenueServices_ContextDeadlineExceeded(t *testing.T) {
 
 func TestDisableCloudavenueServices(t *testing.T) {
 	tests := []struct {
-		name                string
-		params              ParamsEdgeGateway
-		queryResponse       any
-		queryResponseStatus int
-		expectedErr         bool
+		name               string
+		params             ParamsEdgeGateway
+		mockResponse       any
+		mockResponseStatus int
+		expectedErr        bool
 	}{
 		{
 			name: "Disable network services with valid ID",
@@ -204,8 +231,8 @@ func TestDisableCloudavenueServices(t *testing.T) {
 			params: ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgeGateway}"),
 			},
-			queryResponseStatus: http.StatusInternalServerError,
-			expectedErr:         false, // Error HTTP 500 does not return an error because a retry is performed.
+			mockResponseStatus: http.StatusInternalServerError,
+			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
 		},
 	}
 
@@ -213,10 +240,10 @@ func TestDisableCloudavenueServices(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ep, _ := mock.GetEndpoint("NetworkServices", cav.MethodDELETE)
 
-			if tt.queryResponse != nil || tt.queryResponseStatus != 0 {
+			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				t.Log("Setting up mock response for:", tt.name)
 				ep.CleanMockResponse()
-				ep.SetMockResponse(tt.queryResponse, &tt.queryResponseStatus)
+				ep.SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			eC := newClient(t)
