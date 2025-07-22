@@ -175,27 +175,39 @@ This approach allows the SDK to evolve and support multiple API versions for eac
 
 ---
 
-## 4. Naming Conventions for Go Types in API Packages
+## 4. Lint Rules and Naming Conventions
 
-To ensure consistency and clarity across the SDK, please follow these naming conventions for Go types related to API requests and responses:
+To maintain code quality and consistency, the following lint rules are enforced in this project.  
+These rules are checked automatically by custom linters and ruleguard scripts.
+
+### API Type Naming
 
 - **API Response Types:**  
-  Use the prefix `apiResponse` followed by the object name in PascalCase.  
-  _Example:_ `apiResponseEdgeGateway`
-
+  Must be named `apiResponse<Object>` (e.g., `apiResponseEdgeGateway`).
 - **API Request Body Types:**  
-  Use the prefix `apiRequest` followed by the object name in PascalCase.  
-  _Example:_ `apiRequestEdgeGateway`
-
+  Must be named `apiRequest<Object>` (e.g., `apiRequestEdgeGateway`).
 - **User-facing Model Types:**  
-  Use the prefix `Model` followed by the object name in CamelCase.  
-  _Example:_ `ModelEdgeGateway`
-
+  Must be named `Model<Object>` (e.g., `ModelEdgeGateway`).
 - **User-supplied Parameter Types:**  
-  Use the prefix `Params` followed by the object name in CamelCase.  
-  _Example:_ `ParamsEdgeGateway`
+  Must be named `Params<Object>` (e.g., `ParamsEdgeGateway`).
+- **Client Types:**  
+  Must be named `Client` (exactly, for the main client struct of an API group).
 
-These conventions help distinguish between internal API representations, user-facing models, and parameter objects, making the codebase easier to understand and work with.
+You can visualize and debug the naming convention regex used by the linter here: [https://regex101.com/r/g8Av6t/1](https://regex101.com/r/g8Av6t/1)
+
+### API Function Naming
+
+- Exported functions in any `api/` directory must start with one of the following prefixes:  
+  `Get`, `Create`, `List`, `Delete`, `Update`, `Enable`, `Disable`
+  - Example: `GetEdgeGateway`, `CreateVDC`, `ListVApps`
+- Functions returning a boolean value must start with:  
+  `Is`, `is`, `Has`, `has`, `Match`, `match`
+  - Example: `IsEnabled`, `HasPermission`, `matchURN`
+
+### ToModel Method Rule
+
+- Exported `ToModel` methods are **not allowed** on types named `apiResponse*` or `apiRequest*` in any `api/` directory.
+- Use a private `toModel` method instead to avoid exposing internal conversion logic.
 
 ---
 
