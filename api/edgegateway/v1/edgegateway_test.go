@@ -2,10 +2,8 @@ package edgegateway
 
 import (
 	"context"
-	"errors"
 	"testing"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
@@ -101,11 +99,6 @@ func TestGetEdgeGateway(t *testing.T) {
 			// Call the GetEdgeGateway method
 			result, err := eC.GetEdgeGateway(t.Context(), *tt.params)
 			if tt.expectedErr {
-				verr := &validator.ValidationErrors{}
-				if errors.As(err, &verr) {
-					t.Log("Validation errors:", verr)
-				}
-
 				assert.NotNil(t, err, "Expected error: %v", tt.params)
 				assert.Nil(t, result, "Result should be nil: %v", tt.params)
 			} else {

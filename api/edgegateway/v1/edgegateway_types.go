@@ -3,6 +3,10 @@ package edgegateway
 // * Models
 
 type (
+	// ModelEdgeGateways represents a list of edge gateways.
+	ModelEdgeGateways struct {
+		EdgeGateways []ModelEdgeGateway
+	}
 	// ModelEdgeGateway represents the model of an edge gateway.
 	ModelEdgeGateway struct {
 		ID string
@@ -18,11 +22,6 @@ type (
 
 		// UplinkT0 defines the T0 router name that this edge gateway is connected to.
 		UplinkT0 *ModelObjectReference
-
-		// Bandwidth defines the bandwidth of the edge gateway.
-		Bandwidth int
-
-		Status string
 
 		// Services is the list of network services
 		// that are available on the edge gateway
@@ -40,11 +39,32 @@ type (
 		ID   string `validate:"required_if_null=Name,omitempty,urn=edgeGateway" fake:"{urn:edgeGateway}"`
 		Name string `validate:"required_if_null=ID,omitempty,edgegateway_name" fake:"{edgegateway_name}"`
 	}
+
+	ParamsCreateEdgeGateway struct {
+		// OwnerType is the type of the owner of the edge gateway.
+		// It can be either "vdc" or "vdcgroup".
+		OwnerType string `fake:"{randomstring:[vdc]}"`
+
+		// OwnerName is the VDC or VDC Group that this edge gateway belongs to.
+		OwnerName string `fake:"{vdc_name}"`
+
+		// Name is the name of the T0 router that this edge gateway will be connected to.
+		// If not provided and only if one T0 router is available,
+		// the first T0 router will be used.
+		T0Name string `fake:"{t0_name}"`
+	}
 )
 
 // * Request / Response API
 
 type (
+	apiRequestEdgeGateway struct {
+		T0Name string `json:"tier0VrfId" fake:"{t0_name}"`
+	}
+
+	apiResponseEdgegateways struct {
+		Values []apiResponseEdgegateway `json:"values,omitempty" fakesize:"1"` // List of edge gateways.
+	}
 	apiResponseEdgegateway struct {
 		ID          string `json:"id" fake:"{urn:edgeGateway}"`    // The ID of the edge gateway.
 		Name        string `json:"name" fake:"{edgegateway_name}"` // The name of the edge gateway.
@@ -117,6 +137,23 @@ type (
 		IngressProfile struct{} `json:"-"`
 	}
 )
+
+// toModel converts the apiResponseEdgegateways to ModelEdgeGateways.
+func (api *apiResponseEdgegateways) toModel() *ModelEdgeGateways {
+	if api == nil {
+		return nil
+	}
+
+	model := &ModelEdgeGateways{
+		EdgeGateways: make([]ModelEdgeGateway, 0, len(api.Values)),
+	}
+
+	for _, v := range api.Values {
+		model.EdgeGateways = append(model.EdgeGateways, *v.toModel())
+	}
+
+	return model
+}
 
 // toModel converts the edgegatewayAPIResponse to ModelEdgeGateway.
 func (api *apiResponseEdgegateway) toModel() *ModelEdgeGateway {

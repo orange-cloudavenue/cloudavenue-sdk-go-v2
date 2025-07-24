@@ -18,6 +18,7 @@ require (
 	github.com/orange-cloudavenue/common-go/urn v1.0.1
 	github.com/orange-cloudavenue/common-go/validators v1.0.0
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
+	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.34
 	github.com/stretchr/testify v1.10.0
 	resty.dev/v3 v3.0.0-beta.3
 )

@@ -16,7 +16,7 @@ import (
 func init() {
 	// GET - EdgeGateway
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/getEdgeById",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/edgeGateways/gatewayId/get/",
 		Name:             "EdgeGateway",
 		Description:      "Get EdgeGateway",
 		Method:           cav.MethodGET,
@@ -142,24 +142,41 @@ func init() {
 	}.Register()
 
 	// POST - Create EdgeGateway from VDC
-	// cav.Endpoint{
-	// 	DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/createVdcEdge",
-	// 	Name:             "EdgeGatewayVDC",
-	// 	Description:      "Create EdgeGateway from VDC",
-	// 	Method:           cav.MethodPOST,
-	// 	SubClient:        cav.ClientVmware,
-	// 	PathTemplate:     "/api/customers/v2.0/vdcs/{vdc-name}/edges",
-	// 	PathParams: []cav.PathParam{
-	// 		{
-	// 			Name:        "vdc-name",
-	// 			Description: "The name of the VDC where the edge gateway will be created.",
-	// 			Required:    true,
-	// 		},
-	// 	},
-	// 	QueryParams:      nil,
-	// 	BodyRequestType:  edgegatewayAPICreateRequest{},
-	// 	BodyResponseType: edgegatewayAPICreateResponse{},
-	// }.Register()
+	cav.Endpoint{
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/createVdcEdge",
+		Name:             "EdgeGateway",
+		Description:      "Create EdgeGateway from VDC",
+		Method:           cav.MethodPOST,
+		SubClient:        cav.ClientCerberus,
+		PathTemplate:     "/api/customers/v2.0/{vdc-type}/{vdc-name}/edges",
+		PathParams: []cav.PathParam{
+			{
+				Name:        "vdc-type",
+				Description: "The type of the VDC where the edge gateway will be created.",
+				Required:    true,
+				ValidatorFunc: func(value string) error {
+					return validators.New().Var(value, "oneof=vdc vdcgroup")
+				},
+				TransformFunc: func(value string) (string, error) {
+					switch value {
+					case "vdc":
+						return "vdcs", nil
+					case "vdcgroup":
+						return "vdcgroups", nil
+					}
+					return "", fmt.Errorf("invalid vdc-type: %s", value)
+				},
+			},
+			{
+				Name:        "vdc-name",
+				Description: "The name of the VDC where the edge gateway will be created.",
+				Required:    true,
+			},
+		},
+		QueryParams:      nil,
+		BodyRequestType:  apiRequestEdgeGateway{},
+		BodyResponseType: cav.Job{},
+	}.Register()
 
 	// Delete EdgeGateway
 	cav.Endpoint{
@@ -186,5 +203,25 @@ func init() {
 		QueryParams:      nil,
 		BodyRequestType:  nil,
 		BodyResponseType: cav.Job{},
+	}.Register()
+
+	// https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/edgeGateways/get/
+	// GET - List EdgeGateways
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/edgeGateways/get/",
+		Name:             "EdgeGateway",
+		Description:      "List EdgeGateways",
+		Method:           cav.MethodGET,
+		SubClient:        cav.ClientVmware,
+		PathTemplate:     "/cloudapi/1.0.0/edgeGateways",
+		PathParams:       nil,
+		QueryParams: []cav.QueryParam{
+			{
+				Name:        "pageSize",
+				Description: "The number of items to return per page.",
+				Value:       "128",
+			},
+		},
+		BodyResponseType: apiResponseEdgegateways{},
 	}.Register()
 }

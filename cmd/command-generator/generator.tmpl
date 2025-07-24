@@ -1,0 +1,39 @@
+package {{.PackageName}}
+
+import "context"
+
+{{ range .Commands -}}
+{{ if and .ParamsType .ModelType }}
+func (c *Client) {{.Verb}}{{.Namespace}}{{.Resource}}(ctx context.Context, params {{.ParamsType}}) (*{{.ModelType}}, error) {
+    x, err := cmds.Get("{{.Namespace}}", "{{.Resource}}", "{{.Verb}}").Run(ctx, c, params)
+    if err != nil {
+        return nil, err
+    }
+    return x.(*{{.ModelType}}), nil
+}
+{{ end }}
+
+{{ if and .ParamsType (not .ModelType) }}
+func (c *Client) {{.Verb}}{{.Namespace}}{{.Resource}}(ctx context.Context, params {{.ParamsType}}) error {
+    _, err := cmds.Get("{{.Namespace}}", "{{.Resource}}", "{{.Verb}}").Run(ctx, c, params)
+    return err
+}
+{{ end }}
+
+{{ if and (not .ParamsType) (not .ModelType) }}
+func (c *Client) {{.Verb}}{{.Namespace}}{{.Resource}}(ctx context.Context) error {
+    _, err := cmds.Get("{{.Namespace}}", "{{.Resource}}", "{{.Verb}}").Run(ctx, c, nil)
+    return err
+}
+{{ end }}
+
+{{ if and (not .ParamsType) .ModelType }}
+func (c *Client) {{.Verb}}{{.Namespace}}{{.Resource}}(ctx context.Context) (*{{.ModelType}}, error) {
+    x, err := cmds.Get("{{.Namespace}}", "{{.Resource}}", "{{.Verb}}").Run(ctx, c, nil)
+    if err != nil {
+        return nil, err
+    }
+    return x.(*{{.ModelType}}), nil
+}
+{{ end }}
+{{ end }}

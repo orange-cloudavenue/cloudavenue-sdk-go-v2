@@ -144,6 +144,16 @@ func GetEndpointsUncategorized() []*Endpoint {
 	return endpointsList
 }
 
+// MustGetEndpoint retrieves an endpoint from the Endpoints map based on the provided api, version, name, and method.
+// It panics if the endpoint is not found.
+func MustGetEndpoint(name string, method Method, opts ...EndpointRegistryOptions) *Endpoint {
+	endpoint, err := GetEndpoint(name, method, opts...)
+	if err != nil {
+		panic(err)
+	}
+	return endpoint
+}
+
 // GetEndpoint retrieves an endpoint from the Endpoints map based on the provided api, version, name, and method.
 func GetEndpoint(name string, method Method, opts ...EndpointRegistryOptions) (*Endpoint, error) {
 	endpoints.mu.RLock()

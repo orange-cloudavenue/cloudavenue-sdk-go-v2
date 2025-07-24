@@ -60,7 +60,7 @@ func init() {
 			return r.Get(endpoint.PathTemplate)
 		},
 		BodyRequestType:  nil, // No request body for this endpoint.
-		BodyResponseType: cerberusJobAPIResponse{},
+		BodyResponseType: CerberusJobAPIResponse{},
 	}.Register()
 }
 
@@ -74,7 +74,7 @@ type cerberusJobCreatedAPIResponse struct {
 }
 
 // cerberusJobAPIResponse represents an asynchronous operation in VCD.
-type cerberusJobAPIResponse []struct {
+type CerberusJobAPIResponse []struct {
 	Actions []struct {
 		Name    string `json:"name" fake:"{word}"`
 		Status  string `json:"status" fake:"DONE"`
@@ -100,7 +100,7 @@ func (v *cerberus) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts
 	reqOpts = append(reqOpts,
 		SetCustomRestyOption(func(r *resty.Request) { r.SetError(&cerberusError{}) }),
 		WithPathParam(ep.PathParams[0], urn.ExtractUUID(job.ID)),
-		OverrideSetResult(cerberusJobAPIResponse{}),
+		OverrideSetResult(CerberusJobAPIResponse{}),
 	)
 
 	respR, err := ep.requestInternalFunc(resp.Request.Context(), httpC, ep, reqOpts...)
@@ -133,7 +133,7 @@ func (v *cerberus) JobParser(resp *resty.Response) (job *Job, err error) {
 		}
 	}
 
-	if apiR, ok := resp.Result().(*cerberusJobAPIResponse); ok {
+	if apiR, ok := resp.Result().(*CerberusJobAPIResponse); ok {
 		if len(*apiR) == 0 {
 			return nil, &errors.APIError{
 				StatusCode:    resp.StatusCode(),

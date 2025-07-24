@@ -44,7 +44,7 @@ type (
 	//	var dataToExtract *string
 	//
 	//	extractorFunc := func(resp *resty.Response) {
-	//		if v, ok := resp.Result().(*subclient.VmwareJobAPIResponse); ok {
+	//		if v, ok := resp.Result().(*cav.VmwareJobAPIResponse); ok {
 	//			dataToExtract = new(string)
 	//			*dataToExtract = v.ID
 	//		}
