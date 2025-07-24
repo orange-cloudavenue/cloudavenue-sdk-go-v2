@@ -48,10 +48,8 @@ func init() {
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
 			p := params.(ParamsEdgeGateway)
-			ep, err := cav.GetEndpoint("EdgeGateway", cav.MethodGET)
-			if err != nil {
-				return nil, err
-			}
+			ep, _ := cav.GetEndpoint("EdgeGateway", cav.MethodGET)
+
 			logger := cc.logger.WithGroup("GetEdgeGateway")
 
 			// ID is required to request the API.
@@ -86,7 +84,7 @@ func init() {
 		ModelType:          ModelEdgeGateways{},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			ep, _ := cav.GetEndpoint("EdgeGateway", cav.MethodGET)
+			ep, _ := cav.GetEndpoint("ListEdgeGateway", cav.MethodGET)
 
 			logger := cc.logger.WithGroup("ListEdgeGateways")
 

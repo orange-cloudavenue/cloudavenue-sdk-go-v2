@@ -209,7 +209,7 @@ func init() {
 	// GET - List EdgeGateways
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/edgeGateways/get/",
-		Name:             "EdgeGateway",
+		Name:             "ListEdgeGateway",
 		Description:      "List EdgeGateways",
 		Method:           cav.MethodGET,
 		SubClient:        cav.ClientVmware,
