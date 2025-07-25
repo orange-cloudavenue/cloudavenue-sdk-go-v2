@@ -15,13 +15,11 @@ import (
 
 func TestEndpoint_String(t *testing.T) {
 	e := Endpoint{
-		api:          "cat",
-		version:      "v1",
 		Name:         "endpointName",
 		Method:       "GET",
 		PathTemplate: "/path/{id}",
 	}
-	expected := "[cat] v1 endpointName GET /path/{id}"
+	expected := "[endpointName] GET /path/{id}"
 	if got := e.String(); got != expected {
 		t.Errorf("Endpoint.String() = %q, want %q", got, expected)
 	}

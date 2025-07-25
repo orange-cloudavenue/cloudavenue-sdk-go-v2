@@ -5,15 +5,17 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 	"github.com/orange-cloudavenue/common-go/validators"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
 // ListT0 lists all T0s available in the organization.
 func (c *Client) ListT0(ctx context.Context) (*ModelT0s, error) {
 	// Get the endpoint for listing T0
-	ep, _ := cav.GetEndpoint("T0", cav.MethodGET)
+	ep := endpoints.ListT0()
 
 	// Perform the request to list T0
 	resp, err := c.c.Do(ctx, ep)
@@ -31,7 +33,7 @@ func (c *Client) GetT0(ctx context.Context, params ParamsGetT0) (*ModelT0, error
 	}
 
 	// Get the endpoint for getting a specific T0
-	ep, _ := cav.GetEndpoint("T0", cav.MethodGET)
+	ep := endpoints.ListT0()
 
 	// Perform the request to get the specific T0
 	resp, err := c.c.Do(
@@ -78,7 +80,7 @@ func (c *Client) GetT0FromEdgeGateway(ctx context.Context, params ParamsEdgeGate
 	}
 
 	// Get the endpoint for the edge gateway
-	ep, _ := cav.GetEndpoint("T0", cav.MethodGET)
+	ep := endpoints.ListT0()
 
 	// Perform the request to get the specific T0
 	resp, err := c.c.Do(

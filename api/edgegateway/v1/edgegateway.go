@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/common-go/validators"
-)
 
-// TODO List,Create,Delete
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+)
 
 func (c *Client) DeleteEdgeGateway(ctx context.Context, params ParamsEdgeGateway) error {
 	logger := c.logger.WithGroup("DeleteEdgeGateway")
@@ -28,7 +28,7 @@ func (c *Client) DeleteEdgeGateway(ctx context.Context, params ParamsEdgeGateway
 
 	// Get the endpoint for the edge gateway
 	// Error is ignored here because the endpoint is registered at package init time.
-	ep, _ := cav.GetEndpoint("EdgeGateway", cav.MethodDELETE)
+	ep := endpoints.DeleteEdgeGateway()
 
 	if _, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], params.ID)); err != nil {
 		logger.Error("Failed to delete edge gateway", "error", err)

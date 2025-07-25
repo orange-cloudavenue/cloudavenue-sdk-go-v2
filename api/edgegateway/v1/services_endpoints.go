@@ -6,16 +6,19 @@ import (
 
 	"resty.dev/v3"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/orange-cloudavenue/common-go/validators"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
+
+//go:generate endpoint-generator -path services_endpoints.go
 
 func init() {
 	cav.Endpoint{
 		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/getNetworkHierarchy",
-		Name:             "NetworkServices",
+		Name:             "GetNetworkServices",
 		Description:      "Get EdgeGateway Network Services",
 		Method:           cav.MethodGET,
 		SubClient:        cav.ClientCerberus,
@@ -160,8 +163,8 @@ func init() {
 
 	cav.Endpoint{
 		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/addNetworkConnectivity",
-		Name:             "NetworkServices",
-		Description:      "Create EdgeGateway Network Services",
+		Name:             "EnableCloudAvenueServices",
+		Description:      "Enable Cloud Avenue Services",
 		Method:           cav.MethodPOST,
 		SubClient:        cav.ClientCerberus,
 		PathTemplate:     "/api/customers/v2.0/services",
@@ -171,8 +174,8 @@ func init() {
 
 	cav.Endpoint{
 		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/deleteNetworkService",
-		Name:             "NetworkServices",
-		Description:      "Delete EdgeGateway Network Services",
+		Name:             "DisableCloudAvenueServices",
+		Description:      "Disable Cloud Avenue Services",
 		Method:           cav.MethodDELETE,
 		SubClient:        cav.ClientCerberus,
 		PathTemplate:     "/api/customers/v2.0/services/{serviceId}",

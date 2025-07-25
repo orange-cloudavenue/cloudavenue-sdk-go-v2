@@ -7,10 +7,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/generator"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 )
 
 func TestGetBandwidth(t *testing.T) {
@@ -55,10 +56,7 @@ func TestGetBandwidth(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ep, err := mock.GetEndpoint("Bandwidth", cav.MethodGET)
-			if err != nil {
-				t.Fatalf("Error getting endpoint: %v", err)
-			}
+			ep := endpoints.GetEdgeGatewayBandwidth()
 			if tt.queryResponse != nil || tt.queryResponseStatus != 0 {
 				mock.SetMockResponse(ep, tt.queryResponse, &tt.queryResponseStatus)
 			}
@@ -198,10 +196,7 @@ func TestGetRemainingBandwidth(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ep, err := mock.GetEndpoint("T0", cav.MethodGET)
-			if err != nil {
-				t.Fatalf("Error getting query endpoint: %v", err)
-			}
+			ep := endpoints.GetEdgeGatewayBandwidth()
 
 			eC := newClient(t)
 

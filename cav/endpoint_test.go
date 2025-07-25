@@ -20,9 +20,7 @@ func Test_Endpoint_Register(t *testing.T) {
 	}{
 		{
 			Endpoint: Endpoint{
-				api:              API("fake"),
-				version:          VersionV1,
-				Name:             "fake",
+				Name:             "Fake",
 				Method:           MethodPOST,
 				SubClient:        ClientVmware,
 				PathTemplate:     "/1.2.3/sessions",
@@ -36,7 +34,7 @@ func Test_Endpoint_Register(t *testing.T) {
 		},
 		{
 			Endpoint: Endpoint{
-				api: "", // Invalid api
+				Name: "invalid space name", // Invalid name
 			},
 			expectedError: true,
 		},

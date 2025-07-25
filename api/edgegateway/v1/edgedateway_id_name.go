@@ -4,10 +4,11 @@ import (
 	"context"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 )
 
 func (c *Client) retrieveEdgeGatewayIDByName(ctx context.Context, name string) (string, error) {
-	epQuery, _ := cav.GetEndpoint("QueryEdgeGateway", cav.MethodGET)
+	epQuery := endpoints.QueryEdgeGateway()
 
 	respQuery, err := c.c.Do(
 		ctx,

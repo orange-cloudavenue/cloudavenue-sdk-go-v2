@@ -4,16 +4,19 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/orange-cloudavenue/common-go/validators"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
+
+//go:generate endpoint-generator -path t0_endpoints.go
 
 func init() {
 	// GET - List all T0
 	cav.Endpoint{
 		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/getNetworkHierarchy",
-		Name:             "T0",
+		Name:             "ListT0",
 		Description:      "List T0",
 		Method:           cav.MethodGET,
 		SubClient:        cav.ClientCerberus,

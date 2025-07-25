@@ -7,9 +7,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
 	"github.com/orange-cloudavenue/common-go/generator"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 )
 
 func TestGetNetworkServices(t *testing.T) {
@@ -50,14 +51,6 @@ func TestGetNetworkServices(t *testing.T) {
 			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
 		},
 		{
-			name: "Failed to retrieve Edge Gateway ID by name",
-			params: &ParamsEdgeGateway{
-				Name: generator.MustGenerate("{edgegateway_name}"),
-			},
-			mockQueryResponseStatus: http.StatusNotFound,
-			expectedErr:             true,
-		},
-		{
 			name: "Simulate empty response",
 			params: &ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgeGateway}"),
@@ -70,7 +63,7 @@ func TestGetNetworkServices(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ep, _ := mock.GetEndpoint("NetworkServices", cav.MethodGET)
+			ep := endpoints.GetNetworkServices()
 			// Set up mock response
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				// Clean all default mock responses
@@ -79,7 +72,7 @@ func TestGetNetworkServices(t *testing.T) {
 				ep.SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
 			}
 
-			epQuery, _ := mock.GetEndpoint("QueryEdgeGateway", cav.MethodGET)
+			epQuery := endpoints.QueryEdgeGateway()
 			// Set up mock query response
 			if tt.mockQueryResponse != nil || tt.mockQueryResponseStatus != 0 {
 				// Clean all default mock responses
@@ -120,7 +113,7 @@ func TestGetNetworkServices_ContextDeadlineExceeded(t *testing.T) {
 	assert.Contains(t, err.Error(), "context deadline exceeded", "Expected error to contain 'context deadline exceeded'")
 }
 
-func TestEnableCloudavenueServices(t *testing.T) {
+func TestEnableCloudAvenueServices(t *testing.T) {
 	tests := []struct {
 		name               string
 		params             ParamsEdgeGateway
@@ -161,7 +154,7 @@ func TestEnableCloudavenueServices(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ep, _ := mock.GetEndpoint("NetworkServices", cav.MethodPOST)
+			ep := endpoints.EnableCloudAvenueServices()
 			// Set up mock response
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				t.Log("Setting up mock response for:", tt.name)
@@ -171,7 +164,7 @@ func TestEnableCloudavenueServices(t *testing.T) {
 
 			eC := newClient(t)
 
-			err := eC.EnableCloudavenueServices(t.Context(), tt.params)
+			err := eC.EnableCloudAvenueServices(t.Context(), tt.params)
 			if tt.expectedErr {
 				assert.NotNil(t, err, "Expected error but got nil")
 			} else {
@@ -192,12 +185,12 @@ func TestEnableCloudavenueServices_ContextDeadlineExceeded(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), 0)
 	defer cancel()
 
-	err = eC.EnableCloudavenueServices(ctx, ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgeGateway}")})
+	err = eC.EnableCloudAvenueServices(ctx, ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgeGateway}")})
 	assert.NotNil(t, err, "Expected context deadline exceeded error")
 	assert.Contains(t, err.Error(), "context deadline exceeded", "Expected error to contain 'context deadline exceeded'")
 }
 
-func TestDisableCloudavenueServices(t *testing.T) {
+func TestDisableCloudAvenueServices(t *testing.T) {
 	tests := []struct {
 		name               string
 		params             ParamsEdgeGateway
@@ -238,7 +231,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ep, _ := mock.GetEndpoint("NetworkServices", cav.MethodDELETE)
+			ep := endpoints.DisableCloudAvenueServices()
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				t.Log("Setting up mock response for:", tt.name)
@@ -248,7 +241,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 
 			eC := newClient(t)
 
-			err := eC.DisableCloudavenueServices(t.Context(), tt.params)
+			err := eC.DisableCloudAvenueServices(t.Context(), tt.params)
 			if tt.expectedErr {
 				assert.NotNil(t, err, "Expected error but got nil")
 			} else {

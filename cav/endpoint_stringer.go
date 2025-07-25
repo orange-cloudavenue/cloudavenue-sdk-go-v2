@@ -15,9 +15,7 @@ import (
 )
 
 func (e Endpoint) String() string {
-	return fmt.Sprintf("[%s] %s %s %s %s",
-		e.api,
-		e.version,
+	return fmt.Sprintf("[%s] %s %s",
 		e.Name,
 		e.Method,
 		e.PathTemplate)
@@ -40,5 +38,5 @@ func (e Method) String() string {
 
 // MockPath returns the mock path for the endpoint.
 func (e Endpoint) MockPath() string {
-	return fmt.Sprintf("/mock/%s/%s/%s%s", e.api, e.version, strings.ToLower(e.Name), e.PathTemplate)
+	return fmt.Sprintf("/mock/%s%s", strings.ToLower(e.Name), e.PathTemplate)
 }

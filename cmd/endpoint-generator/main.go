@@ -20,7 +20,6 @@ type endpoints []endpoint
 type endpoint struct {
 	Package          string
 	DocumentationURL string
-	Method           string
 	Description      string
 	Name             string
 	SubClient        string
@@ -124,7 +123,7 @@ func main() {
 
 	pretty.Print("Endpoints", endpts)
 
-	var commandTmpl = struct {
+	var endpointTmpl = struct {
 		PackageName string
 		Endpoints   endpoints
 	}{
@@ -132,26 +131,9 @@ func main() {
 		Endpoints:   endpts,
 	}
 
-	funcMap := template.FuncMap{
-		"ToUpper": strings.ToUpper,
-		"ToLower": strings.ToLower,
-		"verb": func(s string) string {
-			switch s {
-			case "cav.MethodGET":
-				return "get"
-			case "cav.MethodPOST":
-				return "post"
-			case "cav.MethodPUT":
-				return "put"
-			case "cav.MethodDELETE":
-				return "delete"
-			default:
-				return ""
-			}
-		},
-	}
+	pretty.Println(endpointTmpl)
 
-	tmpl, err := template.New("generator").Funcs(funcMap).ParseFS(tmplFile, "generator.tmpl")
+	tmpl, err := template.ParseFS(tmplFile, "generator.tmpl")
 	if err != nil {
 		panic(err)
 	}
@@ -162,7 +144,18 @@ func main() {
 	nameExtracted := split[len(split)-1]
 	nameExtracted = nameExtracted[:len(nameExtracted)-len("_endpoints.go")]
 
-	outputPath := strings.Join(split[:len(split)-1], "/") + "/zz_core_" + nameExtracted + ".go"
+	findOutputDir := func() string {
+		// src: /github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/edgegateway/v1/
+		// to: /github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/
+		for i := len(split) - 1; i >= 0; i-- {
+			if split[i] == "cloudavenue-sdk-go-v2" {
+				return strings.Join(split[:i+1], "/")
+			}
+		}
+		return ""
+	}
+
+	outputPath := findOutputDir() + "/endpoints/zz_" + nameExtracted + ".go"
 
 	log.Default().Print("Path to output file: ", outputPath)
 
@@ -173,7 +166,7 @@ func main() {
 	}
 	defer outputFile.Close()
 
-	err = tmpl.Execute(outputFile, commandTmpl)
+	err = tmpl.Execute(outputFile, endpointTmpl)
 	if err != nil {
 		panic(err)
 	}

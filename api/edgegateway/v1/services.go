@@ -13,9 +13,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/common-go/urn"
 	"github.com/orange-cloudavenue/common-go/validators"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 )
 
 func (c *Client) GetNetworkServices(ctx context.Context, params ParamsEdgeGateway) (*ModelNetworkServicesSvcs, error) {
@@ -23,9 +25,7 @@ func (c *Client) GetNetworkServices(ctx context.Context, params ParamsEdgeGatewa
 		return nil, fmt.Errorf("invalid parameters: %w", err)
 	}
 
-	// Get the endpoint for the edge gateway services
-	// Error is ignored here because the endpoint is registered at package init time.
-	ep, _ := cav.GetEndpoint("NetworkServices", cav.MethodGET)
+	ep := endpoints.GetNetworkServices()
 
 	// Get network services
 	resp, err := c.c.Do(
@@ -46,7 +46,7 @@ func (c *Client) GetNetworkServices(ctx context.Context, params ParamsEdgeGatewa
 	return originalResponse.toModel(params), nil
 }
 
-func (c *Client) EnableCloudavenueServices(ctx context.Context, params ParamsEdgeGateway) error {
+func (c *Client) EnableCloudAvenueServices(ctx context.Context, params ParamsEdgeGateway) error {
 	if err := validators.New().Struct(&params); err != nil {
 		return fmt.Errorf("invalid parameters: %w", err)
 	}
@@ -62,7 +62,7 @@ func (c *Client) EnableCloudavenueServices(ctx context.Context, params ParamsEdg
 
 	// Get the endpoint for the edge gateway services
 	// Error is ignored here because the endpoint is registered at package init time.
-	ep, _ := cav.GetEndpoint("NetworkServices", cav.MethodPOST)
+	ep := endpoints.EnableCloudAvenueServices()
 
 	// Prepare the request body
 	requestBody := &apiRequestNetworkServicesCavSvc{
@@ -89,16 +89,14 @@ func (c *Client) EnableCloudavenueServices(ctx context.Context, params ParamsEdg
 	return nil
 }
 
-func (c *Client) DisableCloudavenueServices(ctx context.Context, params ParamsEdgeGateway) error {
+func (c *Client) DisableCloudAvenueServices(ctx context.Context, params ParamsEdgeGateway) error {
 	// Ensure the edge gateway exists and retrieve its services
 	nSvc, err := c.GetNetworkServices(ctx, params)
 	if err != nil {
 		return fmt.Errorf("failed to get network services: %w", err)
 	}
 
-	// Get the endpoint for the edge gateway services
-	// Error is ignored here because the endpoint is registered at package init time.
-	ep, _ := cav.GetEndpoint("NetworkServices", cav.MethodDELETE)
+	ep := endpoints.DisableCloudAvenueServices()
 
 	// Disable network services
 	_, err = c.c.Do(

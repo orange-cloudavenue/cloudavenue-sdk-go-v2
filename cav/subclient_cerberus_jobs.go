@@ -24,7 +24,7 @@ import (
 
 func init() {
 	Endpoint{
-		Name:             "JobCerberus",
+		Name:             "GetJobCerberus",
 		Description:      "Get Cerberus Job",
 		Method:           MethodGET,
 		SubClient:        ClientCerberus,
@@ -92,7 +92,7 @@ func (v *cerberus) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts
 		return job, err
 	}
 
-	ep, err := GetEndpoint("JobCerberus", MethodGET)
+	ep, err := GetEndpoint("GetJobCerberus")
 	if err != nil {
 		return nil, errors.New("failed to get endpoint for JobCerberus: " + err.Error())
 	}

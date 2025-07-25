@@ -8,9 +8,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
 	"github.com/orange-cloudavenue/common-go/generator"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 )
 
 func Test_ListT0(t *testing.T) {
@@ -50,7 +51,7 @@ func Test_ListT0(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ep, _ := mock.GetEndpoint("T0", cav.MethodGET)
+			ep := endpoints.ListT0()
 			// Set up mock response
 			if tt.queryResponse != nil || tt.queryResponseStatus != 0 {
 				ep.CleanMockResponse()
@@ -125,7 +126,7 @@ func Test_GetT0(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ep, _ := mock.GetEndpoint("T0", cav.MethodGET)
+			ep := endpoints.ListT0()
 			if tt.queryResponse != nil || tt.queryResponseStatus != 0 {
 				ep.CleanMockResponse()
 				ep.SetMockResponse(tt.queryResponse, &tt.queryResponseStatus)

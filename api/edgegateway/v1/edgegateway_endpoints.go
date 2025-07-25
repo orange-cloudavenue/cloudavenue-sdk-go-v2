@@ -7,17 +7,20 @@ import (
 
 	"resty.dev/v3"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/urn"
 	"github.com/orange-cloudavenue/common-go/validators"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
+
+//go:generate endpoint-generator -path edgegateway_endpoints.go
 
 func init() {
 	// GET - EdgeGateway
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/edgeGateways/gatewayId/get/",
-		Name:             "EdgeGateway",
+		Name:             "GetEdgeGateway",
 		Description:      "Get EdgeGateway",
 		Method:           cav.MethodGET,
 		SubClient:        cav.ClientVmware,
@@ -93,7 +96,7 @@ func init() {
 	// GET - EdgeGateway Bandwidth
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/edgeGateways/gatewayId/qos/get/",
-		Name:             "Bandwidth",
+		Name:             "GetEdgeGatewayBandwidth",
 		Description:      "Get EdgeGateway Bandwidth",
 		Method:           cav.MethodGET,
 		SubClient:        cav.ClientVmware,
@@ -144,8 +147,8 @@ func init() {
 	// POST - Create EdgeGateway from VDC
 	cav.Endpoint{
 		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/createVdcEdge",
-		Name:             "EdgeGateway",
-		Description:      "Create EdgeGateway from VDC",
+		Name:             "CreateEdgeGateway",
+		Description:      "Create EdgeGateway",
 		Method:           cav.MethodPOST,
 		SubClient:        cav.ClientCerberus,
 		PathTemplate:     "/api/customers/v2.0/{vdc-type}/{vdc-name}/edges",
@@ -181,7 +184,7 @@ func init() {
 	// Delete EdgeGateway
 	cav.Endpoint{
 		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/deleteEdge",
-		Name:             "EdgeGateway",
+		Name:             "DeleteEdgeGateway",
 		Description:      "Delete EdgeGateway",
 		Method:           cav.MethodDELETE,
 		SubClient:        cav.ClientCerberus,

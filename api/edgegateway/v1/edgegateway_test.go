@@ -6,9 +6,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
 	"github.com/orange-cloudavenue/common-go/generator"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 )
 
 func TestGetEdgeGateway(t *testing.T) {
@@ -73,15 +74,8 @@ func TestGetEdgeGateway(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ep, err := mock.GetEndpoint("EdgeGateway", cav.MethodGET)
-			if err != nil {
-				t.Fatalf("Error getting endpoint: %v", err)
-			}
-
-			epQuery, err := mock.GetEndpoint("QueryEdgeGateway", cav.MethodGET)
-			if err != nil {
-				t.Fatalf("Error getting query endpoint: %v", err)
-			}
+			ep := endpoints.GetEdgeGateway()
+			epQuery := endpoints.QueryEdgeGateway()
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				t.Logf("Setting mock response for endpoint %s with status %d", ep.Name, tt.mockResponseStatus)
@@ -133,11 +127,7 @@ func TestRetrieveEdgeGatewayIDByName(t *testing.T) {
 	assert.Nil(t, err, "Error creating edgegateway client")
 
 	// Mock the QueryEdgeGateway endpoint
-	epQuery, err := mock.GetEndpoint("QueryEdgeGateway", cav.MethodGET)
-	if err != nil {
-		t.Fatalf("Error getting query endpoint: %v", err)
-	}
-	defer epQuery.CleanMockResponse()
+	epQuery := endpoints.QueryEdgeGateway()
 
 	tests := []struct {
 		name        string
@@ -254,22 +244,14 @@ func TestDeleteEdgeGateway(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			epDelete, err := mock.GetEndpoint("EdgeGateway", cav.MethodDELETE)
-			if err != nil {
-				t.Fatalf("Error getting delete endpoint: %v", err)
-			}
-
+			epDelete := endpoints.DeleteEdgeGateway()
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				t.Logf("Setting mock response for endpoint %s with status %d", epDelete.Name, tt.mockResponseStatus)
 				// If we expect a valid response, we need to set the mock response
 				mock.SetMockResponse(epDelete, tt.mockResponse, &tt.mockResponseStatus)
 			}
 
-			epQuery, err := mock.GetEndpoint("QueryEdgeGateway", cav.MethodGET)
-			if err != nil {
-				t.Fatalf("Error getting query endpoint: %v", err)
-			}
-
+			epQuery := endpoints.QueryEdgeGateway()
 			if tt.mockMockQueryResponseStatus != 0 {
 				t.Logf("Setting mock response for query endpoint %s with status %d", epQuery.Name, tt.mockMockQueryResponseStatus)
 				// If we expect a query response, we need to set the mock response for the
@@ -277,7 +259,7 @@ func TestDeleteEdgeGateway(t *testing.T) {
 			}
 
 			eC := newClient(t)
-			err = eC.DeleteEdgeGateway(t.Context(), *tt.params)
+			err := eC.DeleteEdgeGateway(t.Context(), *tt.params)
 			if tt.expectedErr {
 				assert.NotNil(t, err, "Expected error for params: %v", tt.params)
 			} else {
@@ -302,3 +284,57 @@ func TestDeleteEdgeGateway_ContextDeadlineExceeded(t *testing.T) {
 	assert.NotNil(t, err, "Expected context deadline exceeded error")
 	assert.Contains(t, err.Error(), "context deadline exceeded", "Expected error to contain 'context deadline exceeded'")
 }
+
+// func TestCreateEdgeGateway(t *testing.T) {
+// 	tests := []struct {
+// 		name               string
+// 		params             *ParamsCreateEdgeGateway
+// 		mockResponse       any
+// 		mockResponseStatus int
+// 		expectedErr        bool
+// 	}{
+// 		{
+// 			name: "Valid Edge Gateway Creation",
+// 			params: &ParamsCreateEdgeGateway{
+// 				OwnerType: "vdc",
+// 				OwnerName: generator.MustGenerate("{word}"),
+// 			},
+// 			// mockResponse: &ModelEdgeGateway{
+// 			// 	ID:   generator.MustGenerate("{urn:edgeGateway}"),
+// 			// 	Name: generator.MustGenerate("{edgegateway_name}"),
+// 			// },
+// 			// mockResponseStatus: 201,
+// 			expectedErr: false,
+// 		},
+// 		// {
+// 		// 	name: "Invalid Edge Gateway Name",
+// 		// 	params: &ParamsCreateEdgeGateway{
+// 		// 		Name: "",
+// 		// 	},
+// 		// 	mockResponseStatus: 400,
+// 		// 	expectedErr: true,
+// 		// },
+// 	}
+
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			ep, _ := mock.GetEndpoint("EdgeGateway", cav.MethodPOST)
+
+// 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
+// 				t.Logf("Setting mock response for endpoint %s with status %d", ep.Name, tt.mockResponseStatus)
+// 				mock.SetMockResponse(ep, tt.mockResponse, &tt.mockResponseStatus)
+// 			}
+
+// 			eC := newClient(t)
+
+// 			result, err := eC.CreateEdgeGateway(t.Context(), *tt.params)
+// 			if tt.expectedErr {
+// 				assert.NotNil(t, err, "Expected error for params: %v", tt.params)
+// 				assert.Nil(t, result, "Result should be nil for params: %v", tt.params)
+// 			} else {
+// 				assert.Nil(t, err, "Expected no error for params: %v", tt.params)
+// 				assert.NotNil(t, result, "Result should not be nil for params: %v", tt.params)
+// 			}
+// 		})
+// 	}
+// }

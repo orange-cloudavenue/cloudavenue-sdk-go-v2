@@ -14,6 +14,7 @@ import (
 //go:generate command-generator -path edgegateway_commands.go
 
 func init() {
+	// * GetEdgeGateway
 	cmds.Register(commands.Command{
 		Namespace: "EdgeGateway",
 		Verb:      "Get",
@@ -76,6 +77,7 @@ func init() {
 		AutoGenerate: true,
 	})
 
+	// * ListEdgeGateway
 	cmds.Register(commands.Command{
 		Namespace:          "EdgeGateway",
 		Verb:               "List",
@@ -102,6 +104,7 @@ func init() {
 		AutoGenerate: true,
 	})
 
+	// * CreateEdgeGateway
 	cmds.Register(commands.Command{
 		Namespace:          "EdgeGateway",
 		Verb:               "Create",

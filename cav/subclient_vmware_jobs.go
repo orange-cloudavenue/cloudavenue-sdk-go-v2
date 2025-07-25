@@ -22,7 +22,7 @@ import (
 
 func init() {
 	Endpoint{
-		Name:             "JobVmware",
+		Name:             "GetJobVmware",
 		Description:      "Get VMware Job",
 		Method:           MethodGET,
 		SubClient:        ClientVmware,
@@ -92,9 +92,9 @@ func (v *vmware) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts [
 		return job, err
 	}
 
-	ep, err := GetEndpoint("JobVmware", MethodGET)
+	ep, err := GetEndpoint("GetJobVmware")
 	if err != nil {
-		return nil, errors.New("failed to get endpoint for JobVmware: " + err.Error())
+		return nil, errors.New("failed to get endpoint for GetJobVmware: " + err.Error())
 	}
 
 	reqOpts = append(reqOpts,

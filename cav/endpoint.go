@@ -26,17 +26,17 @@ type (
 		// It is used to uniquely identify the endpoint in the registry.
 		ID string
 
-		// api is the api of the endpoint, e.g., "vdc", "edgegateway", "vapp"
-		api API `validate:"required"`
+		// // api is the api of the endpoint, e.g., "vdc", "edgegateway", "vapp"
+		// api API `validate:"required"`
 
-		// version is the API version, e.g., "v1", "v2, "v3", etc.
-		// It is used to differentiate between different versions of the API.
-		version Version `validate:"required"`
+		// // version is the API version, e.g., "v1", "v2, "v3", etc.
+		// // It is used to differentiate between different versions of the API.
+		// version Version `validate:"required"`
 
 		// Name is the name of the endpoint, e.g., "firewall", "loadBalancer", etc.
 		// It is used to group endpoints by their functionality.
 		// For example, all endpoints related to firewall operations can be grouped under the "firewall" name.
-		Name string `validate:"required"`
+		Name string `validate:"required,disallow_space,case=PascalCase"` // e.g., "Firewall", "LoadBalancer"
 
 		// Description is a brief description of the endpoint.
 		// It provides additional information about the endpoint's purpose and functionality.
