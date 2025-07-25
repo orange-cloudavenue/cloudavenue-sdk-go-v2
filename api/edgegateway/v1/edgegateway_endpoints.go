@@ -3,21 +3,19 @@ package edgegateway
 import (
 	"fmt"
 	"regexp"
-	"strconv"
 
 	"resty.dev/v3"
 
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/urn"
 	"github.com/orange-cloudavenue/common-go/validators"
-
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
 
 //go:generate endpoint-generator -path edgegateway_endpoints.go
 
 func init() {
-	// GET - EdgeGateway
+	// GetEdgeGateway
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/edgeGateways/gatewayId/get/",
 		Name:             "GetEdgeGateway",
@@ -35,7 +33,7 @@ func init() {
 		BodyResponseType: apiResponseEdgegateway{},
 	}.Register()
 
-	// GET - EdgeGateway Query
+	// QueryEdgeGateway
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/38.1/doc/types/QueryResultEdgeGatewayRecordType.html",
 		Name:             "QueryEdgeGateway",
@@ -93,58 +91,7 @@ func init() {
 		},
 	}.Register()
 
-	// GET - EdgeGateway Bandwidth
-	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/edgeGateways/gatewayId/qos/get/",
-		Name:             "GetEdgeGatewayBandwidth",
-		Description:      "Get EdgeGateway Bandwidth",
-		Method:           cav.MethodGET,
-		SubClient:        cav.ClientVmware,
-		PathTemplate:     "/cloudapi/1.0.0/edgeGateways/{edgeId}/qos",
-		PathParams: []cav.PathParam{
-			{
-				Name:        "edgeId",
-				Description: "The ID of the edge gateway.",
-				Required:    true,
-				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "required,urn=edgeGateway")
-				},
-			},
-		},
-		ResponseMiddlewares: []resty.ResponseMiddleware{
-			func(_ *resty.Client, resp *resty.Response) error {
-				r := resp.Result().(*apiResponseBandwidth)
-
-				// bandwidth has format: qosgw005mbps
-				// Extract the numeric part and convert it to int
-				if r.EgressProfile.Name != "" {
-					re := regexp.MustCompile(`qosgw(\d+)mbps`)
-					matches := re.FindStringSubmatch(r.EgressProfile.Name)
-					if len(matches) > 1 {
-						// Convert the matched string to int
-						bandwidth, err := strconv.Atoi(matches[1])
-						if err != nil {
-							r.Bandwidth = nil
-						} else {
-							r.Bandwidth = &bandwidth
-						}
-						return nil
-					}
-
-					// If profile name does not match the expected format
-					// this is an error case
-					return fmt.Errorf("invalid egress profile name format: %s", r.EgressProfile.Name)
-				}
-				// No egress profile, no bandwidth limit
-				return nil
-			},
-		},
-		QueryParams:      nil,
-		BodyRequestType:  nil,
-		BodyResponseType: apiResponseBandwidth{},
-	}.Register()
-
-	// POST - Create EdgeGateway from VDC
+	// CreateEdgeGateway
 	cav.Endpoint{
 		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/createVdcEdge",
 		Name:             "CreateEdgeGateway",
@@ -181,7 +128,7 @@ func init() {
 		BodyResponseType: cav.Job{},
 	}.Register()
 
-	// Delete EdgeGateway
+	// DeleteEdgeGateway
 	cav.Endpoint{
 		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/deleteEdge",
 		Name:             "DeleteEdgeGateway",
@@ -208,8 +155,7 @@ func init() {
 		BodyResponseType: cav.Job{},
 	}.Register()
 
-	// https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/edgeGateways/get/
-	// GET - List EdgeGateways
+	// ListEdgeGateway
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/edgeGateways/get/",
 		Name:             "ListEdgeGateway",

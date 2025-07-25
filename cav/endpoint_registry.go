@@ -82,6 +82,10 @@ func (e *endpointsMap) register(endpoint *Endpoint) {
 		endpoint.mockResponseData = endpoint.MockResponseData
 	}
 
+	if _, ok := e.Map[endpoint.Name]; ok {
+		panic(errors.Newf("endpoint %q already registered", endpoint.Name))
+	}
+
 	// Store the endpoint in the map using the encoded key
 	e.Map[endpoint.Name] = endpoint
 }

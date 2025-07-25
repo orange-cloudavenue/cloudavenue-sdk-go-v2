@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/orange-cloudavenue/common-go/validators"
-
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
 
 //go:generate endpoint-generator -path t0_endpoints.go
@@ -73,7 +72,7 @@ func init() {
 						Children: []apiResponseT0Children{
 							{
 								Type: "edge-gateway",
-								Name: generator.MustGenerate("{edgegateway_name}"),
+								Name: generator.MustGenerate("{resource_name:edgegateway}"),
 								Properties: struct {
 									RateLimit int    `json:"rateLimit,omitempty" fake:"5"`
 									EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgeGateway}"` // The UUID of the edge gateway
@@ -95,7 +94,7 @@ func init() {
 						if edgeGatewayName != "" {
 							return edgeGatewayName
 						}
-						return generator.MustGenerate("{edgegateway_name}")
+						return generator.MustGenerate("{resource_name:edgegateway}")
 					}(),
 					Properties: struct {
 						RateLimit int    `json:"rateLimit,omitempty" fake:"5"`

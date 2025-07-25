@@ -12,8 +12,6 @@ import (
 	"reflect"
 	"strings"
 	"text/template"
-
-	"github.com/kr/pretty"
 )
 
 type endpoints []endpoint
@@ -34,7 +32,9 @@ var tmplFile embed.FS
 func main() {
 
 	var (
-		flagPath = flag.String("path", "", "The path to the file to generate commands from")
+		flagPath     = flag.String("path", "", "The path to the file to generate commands from")
+		flagFilename = flag.String("filename", "", "The name of the file to generate")
+		flagDebug    = flag.Bool("debug", false, "Enable debug mode")
 	)
 
 	flag.Parse()
@@ -58,7 +58,9 @@ func main() {
 		panic(err)
 	}
 
-	// ast.Print(fset, fileAst)
+	if *flagDebug {
+		ast.Print(fset, fileAst)
+	}
 
 	for _, decl := range fileAst.Decls {
 		f, ok := decl.(*ast.FuncDecl)
@@ -121,8 +123,6 @@ func main() {
 		}
 	}
 
-	pretty.Print("Endpoints", endpts)
-
 	var endpointTmpl = struct {
 		PackageName string
 		Endpoints   endpoints
@@ -131,33 +131,41 @@ func main() {
 		Endpoints:   endpts,
 	}
 
-	pretty.Println(endpointTmpl)
-
 	tmpl, err := template.ParseFS(tmplFile, "generator.tmpl")
 	if err != nil {
 		panic(err)
 	}
 
-	// flagPath == /api/edgegateway/v1/edgegateway_endpoints.go
-	// We want to generate the file in /api/edgegateway/v1/zz_<namespace>.go
-	split := strings.Split(pwd+"/"+*flagPath, "/")
-	nameExtracted := split[len(split)-1]
-	nameExtracted = nameExtracted[:len(nameExtracted)-len("_endpoints.go")]
+	var outputPath string
 
+	split := strings.Split(pwd+"/"+*flagPath, "/")
 	findOutputDir := func() string {
 		// src: /github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/edgegateway/v1/
 		// to: /github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/
 		for i := len(split) - 1; i >= 0; i-- {
 			if split[i] == "cloudavenue-sdk-go-v2" {
-				return strings.Join(split[:i+1], "/")
+				return strings.Join(split[:i+1], "/") + "/endpoints/"
 			}
 		}
 		return ""
 	}
 
-	outputPath := findOutputDir() + "/endpoints/zz_" + nameExtracted + ".go"
+	if *flagFilename == "" {
 
-	log.Default().Print("Path to output file: ", outputPath)
+		// flagPath == /api/edgegateway/v1/edgegateway_endpoints.go
+		// We want to generate the file in /api/edgegateway/v1/zz_<namespace>.go
+		nameExtracted := split[len(split)-1]
+		nameExtracted = nameExtracted[:len(nameExtracted)-len("_endpoints.go")]
+
+		outputPath = findOutputDir() + "zz_" + nameExtracted + ".go"
+
+	} else {
+		outputPath = findOutputDir() + *flagFilename
+	}
+
+	if *flagDebug {
+		log.Default().Print("Path to output file: ", outputPath)
+	}
 
 	// Create io.Writer to write the output to file
 	outputFile, err := os.Create(outputPath)
@@ -195,7 +203,6 @@ func findValue(kv *ast.KeyValueExpr) string {
 	case *ast.CompositeLit:
 		kvc, ok := v.Type.(*ast.Ident)
 		if !ok {
-			fmt.Print("Error: Unable to find composite literal type")
 			return ""
 		}
 		return kvc.Name
@@ -203,20 +210,3 @@ func findValue(kv *ast.KeyValueExpr) string {
 		return ""
 	}
 }
-
-// *ast.KeyValueExpr {
-// .  Key: *ast.Ident {
-// .  .  NamePos: /Users/mickael/go/src/github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cmd/command-generator/../../api/edgegateway/v1/edgegateway_commands.go:24:3
-// .  .  Name: "ParamsType"
-// .  }
-// .  Colon: /Users/mickael/go/src/github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cmd/command-generator/../../api/edgegateway/v1/edgegateway_commands.go:24:13
-// .  Value: *ast.CompositeLit {
-// .  .  Type: *ast.Ident {
-// .  .  .  NamePos: /Users/mickael/go/src/github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cmd/command-generator/../../api/edgegateway/v1/edgegateway_commands.go:24:15
-// .  .  .  Name: "ParamsEdgeGateway"
-// .  .  }
-// .  .  Lbrace: /Users/mickael/go/src/github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cmd/command-generator/../../api/edgegateway/v1/edgegateway_commands.go:24:32
-// .  .  Rbrace: /Users/mickael/go/src/github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cmd/command-generator/../../api/edgegateway/v1/edgegateway_commands.go:24:33
-// .  .  Incomplete: false
-// .  }
-// }

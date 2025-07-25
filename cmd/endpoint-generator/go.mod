@@ -3,10 +3,3 @@ module github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cmd/endpoint-generato
 go 1.24.5
 
 replace github.com/orange-cloudavenue/cloudavenue-sdk-go-v2 => ../..
-
-require github.com/kr/pretty v0.3.1
-
-require (
-	github.com/kr/text v0.2.0 // indirect
-	github.com/rogpeppe/go-internal v1.9.0 // indirect
-)

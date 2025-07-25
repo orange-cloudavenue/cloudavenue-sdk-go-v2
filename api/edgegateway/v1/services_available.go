@@ -10,22 +10,22 @@
 package edgegateway
 
 type (
-	ModelService struct {
-		IPAllocated string
+	// ModelCloudavenueService struct {
+	// 	IPAllocated string
 
-		ServiceDetails []ModelServiceDetails
-	}
+	// 	ServiceDetails []ModelCloudavenueServiceDetails
+	// }
 
-	ModelServiceDetails struct {
+	ModelCloudavenueServiceDetails struct {
 		// Category is the category of the service
 		Category string
 		// Network is the network of the service
 		Network string
 		// Services is the list of services
-		Services []ModelServiceDetail
+		Services []ModelCloudavenueServiceDetail
 	}
 
-	ModelServiceDetail struct {
+	ModelCloudavenueServiceDetail struct {
 		// Name is the name of the service
 		Name string
 		// Description
@@ -40,11 +40,11 @@ type (
 	}
 )
 
-var ListOfServices = []ModelServiceDetails{
+var ListOfServices = []ModelCloudavenueServiceDetails{
 	{
 		Category: "administration",
 		Network:  "57.199.209.192/27",
-		Services: []ModelServiceDetail{
+		Services: []ModelCloudavenueServiceDetail{
 			{
 				Name:        "linux-repository",
 				Description: "Linux (Debian, Ubuntu, CentOS) package repository",
@@ -177,7 +177,7 @@ var ListOfServices = []ModelServiceDetails{
 	{
 		Category: "s3",
 		Network:  "194.206.55.5/32",
-		Services: []ModelServiceDetail{
+		Services: []ModelCloudavenueServiceDetail{
 			{
 				Name:             "s3-internal",
 				Description:      "S3 internal service. Use for accessing S3 directly from the organization",

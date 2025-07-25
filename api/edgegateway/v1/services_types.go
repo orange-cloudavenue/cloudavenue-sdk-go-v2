@@ -18,58 +18,58 @@ import (
 type (
 	// * Model
 
-	ModelNetworkServicesSvcs struct {
-		LoadBalancer *ModelNetworkServicesSvcLoadBalancer
-		PublicIP     []*ModelNetworkServicesSvcPublicIP
-		Service      *ModelNetworkServicesSvcService
+	ModelEdgeGatewayServices struct {
+		LoadBalancer *ModelEdgeGatewayServicesLoadBalancer
+		PublicIP     []*ModelEdgeGatewayServicesPublicIP
+		Service      *ModelCloudavenueServices
 	}
 
-	ModelNetworkServicesSvc struct {
+	ModelEdgeGatewayServicesSvc struct {
 		// ID is the identifier of the network service
-		ID string
+		ID string `documentation:"Identifier of the network service"`
 		// Name is the name of the network service
-		Name string
+		Name string `documentation:"Name of the network service"`
 	}
 
-	ModelNetworkServicesSvcLoadBalancer struct {
-		ModelNetworkServicesSvc
+	ModelEdgeGatewayServicesLoadBalancer struct {
+		ModelEdgeGatewayServicesSvc
 
-		ClassOfService     string
-		MaxVirtualServices int
+		ClassOfService     string `documentation:"Class of service for the load balancer"`
+		MaxVirtualServices int    `documentation:"Maximum number of virtual services"`
 	}
 
-	ModelNetworkServicesSvcPublicIP struct {
-		ModelNetworkServicesSvc
+	ModelEdgeGatewayServicesPublicIP struct {
+		ModelEdgeGatewayServicesSvc
 
 		// IP is the public IP address
-		IP string
+		IP string `documentation:"Public IP address"`
 		// Announced represents if the public IP address is announced
-		Announced bool
+		Announced bool `documentation:"Indicates if the public IP address is announced"`
 	}
 
-	ModelNetworkServicesSvcService struct {
-		ModelNetworkServicesSvc
+	ModelCloudavenueServices struct {
+		ModelEdgeGatewayServicesSvc
 
 		// Network is the network of the service ip/cidr
-		Network string
+		Network string `documentation:"Network of the service in IP/CIDR format"`
 		// DedicatedIPForService is the dedicated IP for the service
 		// Used for the NAT to connect to the service
-		DedicatedIPForService string
+		DedicatedIPForService string `documentation:"Dedicated IP for the service in IP format (Used for the NAT to connect to the service)"`
 		// Services is the list of services
-		ServiceDetails []ModelServiceDetails
+		ServiceDetails []ModelCloudavenueServiceDetails `documentation:"List of services details"`
 	}
 
 	ModelNetworkServicesSvcServiceDetailsPorts struct {
 		// Port is the port of the service
-		Port int
+		Port int `documentation:"Port of the service"`
 		// Protocol is the protocol of the service
-		Protocol string
+		Protocol string `documentation:"Protocol of the service"`
 	}
 
 	// * apiResponse
 	apiResponseNetworkServices []struct {
 		Type     string                               `json:"type" fake:"tier-0-vrf"`
-		Name     string                               `json:"name" fake:"{t0_name}"`
+		Name     string                               `json:"name" fake:"{resource_name:t0}"`
 		Children []apiResponseNetworkServicesChildren `json:"children,omitempty" fakesize:"1"`
 	}
 
@@ -120,8 +120,12 @@ type (
 	}
 )
 
-func (ap *apiResponseNetworkServices) toModel(params ParamsEdgeGateway) *ModelNetworkServicesSvcs {
-	data := &ModelNetworkServicesSvcs{
+func (ap *apiResponseNetworkServices) toModel(params ParamsEdgeGateway) *ModelEdgeGatewayServices {
+	if ap == nil || len(*ap) == 0 {
+		return nil
+	}
+
+	data := &ModelEdgeGatewayServices{
 		Service:      nil,
 		LoadBalancer: nil,
 		PublicIP:     nil,
@@ -137,8 +141,8 @@ func (ap *apiResponseNetworkServices) toModel(params ParamsEdgeGateway) *ModelNe
 					switch service.Type {
 					case "load-balancer":
 						// Found load balancer service
-						data.LoadBalancer = &ModelNetworkServicesSvcLoadBalancer{
-							ModelNetworkServicesSvc: ModelNetworkServicesSvc{
+						data.LoadBalancer = &ModelEdgeGatewayServicesLoadBalancer{
+							ModelEdgeGatewayServicesSvc: ModelEdgeGatewayServicesSvc{
 								ID:   service.Name,        // The name is the ID
 								Name: service.DisplayName, // The display name is the name
 							},
@@ -151,8 +155,8 @@ func (ap *apiResponseNetworkServices) toModel(params ParamsEdgeGateway) *ModelNe
 						switch service.Name {
 						case "cav-services", "cav_services": // Match both cav-services and cav_services
 							// Found cav-services
-							data.Service = &ModelNetworkServicesSvcService{
-								ModelNetworkServicesSvc: ModelNetworkServicesSvc{
+							data.Service = &ModelCloudavenueServices{
+								ModelEdgeGatewayServicesSvc: ModelEdgeGatewayServicesSvc{
 									ID:   service.ServiceID,   // The ServiceID is the ID
 									Name: service.DisplayName, // The display name is the name
 								},
@@ -182,8 +186,8 @@ func (ap *apiResponseNetworkServices) toModel(params ParamsEdgeGateway) *ModelNe
 
 						case "internet":
 							// Found internet service
-							publicIP := &ModelNetworkServicesSvcPublicIP{
-								ModelNetworkServicesSvc: ModelNetworkServicesSvc{
+							publicIP := &ModelEdgeGatewayServicesPublicIP{
+								ModelEdgeGatewayServicesSvc: ModelEdgeGatewayServicesSvc{
 									ID:   service.ServiceID,     // The ServiceID is the ID
 									Name: service.Properties.IP, // The IP don't have a name use IP instead
 								},
@@ -193,7 +197,7 @@ func (ap *apiResponseNetworkServices) toModel(params ParamsEdgeGateway) *ModelNe
 
 							// Prevent nil pointer dereference
 							if data.PublicIP == nil {
-								data.PublicIP = make([]*ModelNetworkServicesSvcPublicIP, 0)
+								data.PublicIP = make([]*ModelEdgeGatewayServicesPublicIP, 0)
 							}
 
 							// Append the public IP to the list

@@ -10,7 +10,7 @@ type (
 
 	apiResponseT0 struct {
 		Type       string                  `json:"type" fake:"tier-0-vrf"`
-		Name       string                  `json:"name" fake:"{t0_name}"`
+		Name       string                  `json:"name" fake:"{resource_name:t0}"`
 		Properties apiResponseT0Properties `json:"properties,omitempty"`
 		Children   []apiResponseT0Children `json:"children,omitempty" fakesize:"1"`
 	}
@@ -21,7 +21,7 @@ type (
 
 	apiResponseT0Children struct {
 		Type       string `json:"type" fake:"edge-gateway"`
-		Name       string `json:"name" fake:"{edgegateway_name}"`
+		Name       string `json:"name" fake:"{resource_name:edgegateway}"`
 		Properties struct {
 			RateLimit int    `json:"rateLimit,omitempty" fake:"5"`
 			EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgeGateway}"` // The UUID of the edge gateway
@@ -31,7 +31,9 @@ type (
 	// * Params
 
 	ParamsGetT0 struct {
-		Name string `validate:"required,t0_name"`
+		T0Name          string
+		EdgegatewayID   string
+		EdgegatewayName string
 	}
 
 	//* Model
@@ -46,20 +48,20 @@ type (
 	// It contains the name, class of service, bandwidth, maximum edge gateways,
 	ModelT0 struct {
 		// Name defines the name of the T0 router.
-		Name string
+		Name string `documentation:"Name of the T0 router"`
 
 		// ClassOfService defines the class of service for the T0 router.
-		ClassOfService string
+		ClassOfService string `documentation:"Class of service for the T0 router."`
 
 		// Bandwidth defines the bandwidth for the T0 router.
-		Bandwidth ModelT0Bandwidth
+		Bandwidth ModelT0Bandwidth `documentation:"Bandwidth for the T0 router in Mbps."`
 
 		// MaxEdgeGateways defines the maximum number of edge gateways for the T0 router.
 		// This is a limit imposed by the Class of Service.
-		MaxEdgeGateways int
+		MaxEdgeGateways int `documentation:"Maximum number of edge gateways for the T0 router."`
 
 		// EdgeGateways contains the list of edge gateways associated with the T0 router.
-		EdgeGateways []ModelT0EdgeGateway
+		EdgeGateways []ModelT0EdgeGateway `documentation:"List of edge gateways associated with the T0 router."`
 	}
 
 	// ModelT0Bandwidth represents the bandwidth model for a T0 router.
@@ -67,38 +69,42 @@ type (
 		// Capacity defines the total bandwidth capacity in Mbps.
 		// This is the maximum bandwidth that can be allocated to the T0 router.
 		// It is a limit imposed by the Class of Service.
-		Capacity int
+		Capacity int `documentation:"Total bandwidth capacity for the T0 router in Mbps. This is the maximum bandwidth that can be allocated to the T0 router. It is a limit imposed by the Class of Service."`
 
 		// Provisioned defines the amount of bandwidth that has been provisioned in the each edge gateway.
 		// This is the total bandwidth that has been allocated to the T0 router across all edge gateways.
 		// It is the sum of the bandwidth allocated to each edge gateway.
-		Provisioned int
+		Provisioned int `documentation:"Total bandwidth provisioned for the T0 router across all edge gateways in Mbps."`
 
 		// Remaining defines the remaining bandwidth that can be allocated to the edge gateways.
-		Remaining int
+		Remaining int `documentation:"Remaining bandwidth that can be allocated to the edge gateways in Mbps. This is calculated as Capacity - Provisioned."`
 
 		// AllowedBandwidthValues returns the allowed bandwidth values for the T0 router.
 		// It's used to determine the available bandwidth options for the new edge gateway.
 		// It returns a slice of integers representing the allowed bandwidth values in Mbps.
 		// If values are empty, no bandwidth remaining to allocate.
-		AllowedBandwidthValues []int
+		AllowedBandwidthValues []int `documentation:"Allowed bandwidth values for the T0 router in Mbps. This is used to determine the available bandwidth options for the new edge gateway. If empty, no bandwidth remaining to allocate."`
+
+		// AllowUnlimited indicates if unlimited bandwidth is allowed for the T0 router.
+		// This is true if the T0 router is DEDICATED.
+		AllowUnlimited bool `documentation:"Indicates if unlimited bandwidth is allowed for the T0 router. This is true if the T0 router is DEDICATED."`
 	}
 
 	// ModelT0EdgeGateway represents an edge gateway associated with a T0 router.
 	ModelT0EdgeGateway struct {
 		// ID defines the unique identifier of the edge gateway.
 		// It is a URN that uniquely identifies the edge gateway.
-		ID string
+		ID string `documentation:"Unique identifier of the edge gateway. It is a URN that uniquely identifies the edge gateway."`
 
 		// Name defines the name of the edge gateway.
-		Name string
+		Name string `documentation:"Name of the edge gateway."`
 
 		// Bandwidth defines the bandwidth allocated to the edge gateway.
 		// The value is in Mbps.
-		Bandwidth int
+		Bandwidth int `documentation:"Bandwidth allocated to the edge gateway in Mbps."`
 
 		// AllowedBandwidthValues returns the allowed bandwidth values for the edge gateway.
-		AllowedBandwidthValues []int
+		AllowedBandwidthValues []int `documentation:"Allowed bandwidth values for the edge gateway in Mbps."`
 	}
 )
 
@@ -130,6 +136,12 @@ func (t0s apiResponseT0s) toModel() *ModelT0s {
 				}(),
 				Remaining:              0,   // Remaining is calculated later
 				AllowedBandwidthValues: nil, // AllowedBandwidthValues is calculated later
+				AllowUnlimited: func() bool {
+					if cof, ok := classOfServices[t0.Properties.ClassOfService]; ok {
+						return cof.AllowUnlimited
+					}
+					return false
+				}(),
 			},
 			MaxEdgeGateways: func() int {
 				if cof, ok := classOfServices[t0.Properties.ClassOfService]; ok {
@@ -160,7 +172,6 @@ func (t0s apiResponseT0s) toModel() *ModelT0s {
 	// Calculate the remaining bandwidth and allowed bandwidth values for each T0 router
 	for i, t0 := range modelT0s.T0s {
 		t0.Bandwidth.Remaining = t0.Bandwidth.Capacity - t0.Bandwidth.Provisioned
-		modelT0s.T0s[i] = t0
 
 		// Calculate the allowed bandwidth values for the T0 router
 		if cof, ok := classOfServices[t0.ClassOfService]; ok {
@@ -173,6 +184,7 @@ func (t0s apiResponseT0s) toModel() *ModelT0s {
 				}
 			}
 		}
+		modelT0s.T0s[i] = t0
 	}
 
 	// Calculate the allowed bandwidth values for each edge gateway
@@ -191,6 +203,5 @@ func (t0s apiResponseT0s) toModel() *ModelT0s {
 	}
 
 	modelT0s.Count = len(modelT0s.T0s)
-
 	return &modelT0s
 }

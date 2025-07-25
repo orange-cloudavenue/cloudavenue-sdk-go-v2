@@ -24,12 +24,11 @@ type cmd struct {
 	Namespace, Resource, Verb string
 	ParamsType, ModelType     string
 	AutoGenerate              bool
+	CommandName               string
 }
 
 //go:embed generator.tmpl
 var tmplFile embed.FS
-
-// TODO match AutoGenerate: true in the command definition
 
 func main() {
 
@@ -154,6 +153,17 @@ func main() {
 					}
 
 					if cmd.AutoGenerate {
+						if cmd.Resource == "" && cmd.Verb == "" {
+							// Command is a top-level command used to generate documentation
+							// Ignore it
+							continue
+						}
+						if cmd.Resource != "" && strings.EqualFold(cmd.Namespace, cmd.Package) {
+							cmd.CommandName = fmt.Sprintf("%s%s", cmd.Verb, cmd.Resource)
+						} else {
+							cmd.CommandName = fmt.Sprintf("%s%s%s", cmd.Verb, cmd.Namespace, cmd.Resource)
+						}
+
 						commands = append(commands, cmd)
 					}
 				}
@@ -203,7 +213,15 @@ func main() {
 
 }
 
-func cleanQuote(s string) string {
+func clean(s string) string {
+	deniedStrings := []string{"nil"}
+
+	for _, denied := range deniedStrings {
+		if strings.Contains(s, denied) {
+			return ""
+		}
+	}
+
 	if len(s) < 2 {
 		return s
 	}
@@ -220,18 +238,18 @@ func findValue(kv *ast.KeyValueExpr) string {
 
 	switch v := kv.Value.(type) {
 	case *ast.BasicLit:
-		return cleanQuote(v.Value)
+		return clean(v.Value)
 	case *ast.SelectorExpr:
 		return fmt.Sprintf("%s.%s", v.X, v.Sel.Name)
 	case *ast.Ident:
-		return cleanQuote(v.Name)
+		return clean(v.Name)
 	case *ast.CompositeLit:
 		kvc, ok := v.Type.(*ast.Ident)
 		if !ok {
 			fmt.Println("Could not find type for composite literal:", v.Type)
 			return ""
 		}
-		return cleanQuote(kvc.Name)
+		return clean(kvc.Name)
 	default:
 		return ""
 	}

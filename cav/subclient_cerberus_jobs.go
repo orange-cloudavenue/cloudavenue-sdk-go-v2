@@ -22,6 +22,8 @@ import (
 	"github.com/orange-cloudavenue/common-go/validators"
 )
 
+//go:generate endpoint-generator -path subclient_cerberus_jobs.go -filename zz_cav_cerberus_jobs.go
+
 func init() {
 	Endpoint{
 		Name:             "GetJobCerberus",
@@ -75,14 +77,16 @@ type cerberusJobCreatedAPIResponse struct {
 
 // cerberusJobAPIResponse represents an asynchronous operation in VCD.
 type CerberusJobAPIResponse []struct {
-	Actions []struct {
-		Name    string `json:"name" fake:"{word}"`
-		Status  string `json:"status" fake:"DONE"`
-		Details string `json:"details" fake:"{sentence}"`
-	} `json:"actions" fakesize:"3"`
-	Description string `json:"description" fake:"{sentence}"`
-	Name        string `json:"name" fake:"{word}"`
-	Status      string `json:"status" fake:"DONE"` // Status of the job.
+	Actions     []CerberusJobAPIResponseAction `json:"actions" fakesize:"3"`
+	Description string                         `json:"description" fake:"{sentence}"`
+	Name        string                         `json:"name" fake:"{word}"`
+	Status      string                         `json:"status" fake:"DONE"` // Status of the job.
+}
+
+type CerberusJobAPIResponseAction struct {
+	Name    string `json:"name" fake:"{word}"`
+	Status  string `json:"status" fake:"DONE"`
+	Details string `json:"details" fake:"{sentence}"`
 }
 
 // JobRefresh is a function type that defines how to refresh a job status.

@@ -5,6 +5,9 @@ import (
 )
 
 {{ range .Endpoints -}}
+// {{.Name}} - {{.Description}}
+//
+// DocumentationURL: {{.DocumentationURL}} 
 func {{.Name}}() *cav.Endpoint {
 	return cav.MustGetEndpoint("{{.Name}}")
 }

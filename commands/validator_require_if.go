@@ -6,7 +6,7 @@ type requireIfParamIsNull struct {
 	paramName string
 }
 
-func RequireIfParamIsNull(paramName string) Validator {
+func ValidatorRequiredIfParamIsNull(paramName string) Validator {
 	return &requireIfParamIsNull{paramName: paramName}
 }
 
@@ -27,7 +27,7 @@ type requireIfParamIsOneOf struct {
 	values    []string
 }
 
-func RequireIfParamIsOneOf(paramName string, values ...string) Validator {
+func ValidatorRequiredIfParamIsOneOf(paramName string, values ...string) Validator {
 	return &requireIfParamIsOneOf{paramName: paramName, values: values}
 }
 

@@ -1,0 +1,780 @@
+{
+  "EdgeGateway": {
+    "Title": "EdgeGateway",
+    "Documentation": "",
+    "MarkdownDocumentation": "\n**EdgeGateway** is a virtualized network appliance designed to provide secure connectivity, routing, and network services at the edge of a virtualized environment. It acts as a critical component for managing network traffic between internal virtual networks and external networks, such as the internet or remote sites.\n\n### Key Features\n\n- **Firewall:** Offers stateful firewall capabilities to control and secure traffic flows between different network segments.\n- **NAT (Network Address Translation):** Supports source and destination NAT, enabling private internal networks to communicate with external networks.\n- **VPN (Virtual Private Network):** Facilitates secure site-to-site and remote-access VPN connections for encrypted communications.\n- **Load Balancing:** Distributes incoming network traffic across multiple servers or services to optimize resource utilization and improve availability.\n- **DHCP Services:** Provides integrated DHCP services for connected networks.\n- **Network Segmentation:** Enables the creation of multiple isolated networks within a virtual environment for enhanced security and compliance.\n",
+    "Commands": {
+      "Create": {
+        "namespace": "EdgeGateway",
+        "resource": "",
+        "verb": "Create",
+        "short_documentation": "CreateEdgeGateway creates a new edge gateway",
+        "long_documentation": "Create EdgeGateway performs a POST request to create a new edge gateway",
+        "markdown_documentation": "",
+        "params": [
+          {
+            "name": "owner_type",
+            "description": "The type of the owner of the edge gateway.",
+            "required": true,
+            "example": "",
+            "type": "string",
+            "validators_description": "Validates that the value is one of: `vdc`, `vdcgroup`. \n"
+          },
+          {
+            "name": "owner_name",
+            "description": "The name of the VDC or VDC Group that this edge gateway belongs to.",
+            "required": true,
+            "example": "my-vdc",
+            "type": "string",
+            "validators_description": ""
+          },
+          {
+            "name": "t0_name",
+            "description": "The name of the T0 router that this edge gateway will be connected to.",
+            "required": false,
+            "example": "tn01e02ocb0001234spt101",
+            "type": "string",
+            "validators_description": ""
+          },
+          {
+            "name": "bandwidth",
+            "description": "The bandwidth limit in Mbps for the edge gateway. If t0 is SHARED, it must be one of the available values for the T0 router (Default value:  5Mbps). If t0 is DEDICATED, unlimited bandwidth is allowed.",
+            "required": false,
+            "example": "",
+            "type": "int",
+            "validators_description": ""
+          }
+        ],
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": [
+          {
+            "object": "id",
+            "type": "string",
+            "documentation": "ID of the edge gateway"
+          },
+          {
+            "object": "name",
+            "type": "string",
+            "documentation": "Name of the edge gateway"
+          },
+          {
+            "object": "description",
+            "type": "string",
+            "documentation": "Description of the edge gateway"
+          },
+          {
+            "object": "owner_ref.id",
+            "type": "string",
+            "documentation": ""
+          },
+          {
+            "object": "owner_ref.name",
+            "type": "string",
+            "documentation": ""
+          },
+          {
+            "object": "uplink_t0.id",
+            "type": "string",
+            "documentation": ""
+          },
+          {
+            "object": "uplink_t0.name",
+            "type": "string",
+            "documentation": ""
+          }
+        ]
+      },
+      "Delete": {
+        "namespace": "EdgeGateway",
+        "resource": "",
+        "verb": "Delete",
+        "short_documentation": "DeleteEdgeGateway deletes an edge gateway",
+        "long_documentation": "Delete EdgeGateway performs a DELETE request to delete an edge gateway",
+        "markdown_documentation": "",
+        "params": [
+          {
+            "name": "id",
+            "description": "The unique identifier of the edge gateway.",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgeGateway`).. \n"
+          },
+          {
+            "name": "name",
+            "description": "The name of the edge gateway.",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `ID` is null., "
+          }
+        ],
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": null
+      },
+      "Get": {
+        "namespace": "EdgeGateway",
+        "resource": "",
+        "verb": "Get",
+        "short_documentation": "GetEdgeGateway retrieves an edge gateway",
+        "long_documentation": "Get EdgeGateway performs a GET request to retrieve an edge gateway",
+        "markdown_documentation": "",
+        "params": [
+          {
+            "name": "id",
+            "description": "The unique identifier of the edge gateway.",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgeGateway`).. \n"
+          },
+          {
+            "name": "name",
+            "description": "The name of the edge gateway.",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `ID` is null., Validates that the value is a valid Edge Gateway name (tn01e02ocb0001234spt101).. \n"
+          }
+        ],
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": [
+          {
+            "object": "id",
+            "type": "string",
+            "documentation": "ID of the edge gateway"
+          },
+          {
+            "object": "name",
+            "type": "string",
+            "documentation": "Name of the edge gateway"
+          },
+          {
+            "object": "description",
+            "type": "string",
+            "documentation": "Description of the edge gateway"
+          },
+          {
+            "object": "owner_ref.id",
+            "type": "string",
+            "documentation": ""
+          },
+          {
+            "object": "owner_ref.name",
+            "type": "string",
+            "documentation": ""
+          },
+          {
+            "object": "uplink_t0.id",
+            "type": "string",
+            "documentation": ""
+          },
+          {
+            "object": "uplink_t0.name",
+            "type": "string",
+            "documentation": ""
+          }
+        ]
+      },
+      "List": {
+        "namespace": "EdgeGateway",
+        "resource": "",
+        "verb": "List",
+        "short_documentation": "ListEdgeGateways retrieves a list of edge gateways",
+        "long_documentation": "List EdgeGateways performs a GET request to retrieve a list of edge gateways",
+        "markdown_documentation": "",
+        "params": null,
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": [
+          {
+            "object": "edge_gateways.{index}.id",
+            "type": "string",
+            "documentation": "ID of the edge gateway"
+          },
+          {
+            "object": "edge_gateways.{index}.name",
+            "type": "string",
+            "documentation": "Name of the edge gateway"
+          },
+          {
+            "object": "edge_gateways.{index}.description",
+            "type": "string",
+            "documentation": "Description of the edge gateway"
+          },
+          {
+            "object": "edge_gateways.{index}.owner_ref.id",
+            "type": "string",
+            "documentation": ""
+          },
+          {
+            "object": "edge_gateways.{index}.owner_ref.name",
+            "type": "string",
+            "documentation": ""
+          },
+          {
+            "object": "edge_gateways.{index}.uplink_t0.id",
+            "type": "string",
+            "documentation": ""
+          },
+          {
+            "object": "edge_gateways.{index}.uplink_t0.name",
+            "type": "string",
+            "documentation": ""
+          }
+        ]
+      },
+      "Update": {
+        "namespace": "EdgeGateway",
+        "resource": "",
+        "verb": "Update",
+        "short_documentation": "UpdateEdgeGateway updates an edge gateway",
+        "long_documentation": "Update EdgeGateway performs a PUT request to update an edge gateway",
+        "markdown_documentation": "",
+        "params": [
+          {
+            "name": "id",
+            "description": "The unique identifier of the edge gateway.",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgeGateway`).. \n"
+          },
+          {
+            "name": "name",
+            "description": "The name of the edge gateway.",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `ID` is null., "
+          },
+          {
+            "name": "bandwidth",
+            "description": "The new bandwidth limit in Mbps for the edge gateway. If t0 is SHARED, it must be one of the available values for the T0 router (Default value: 5Mbps). If t0 is DEDICATED, unlimited bandwidth is allowed.",
+            "required": true,
+            "example": "",
+            "type": "int",
+            "validators_description": ""
+          }
+        ],
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": [
+          {
+            "object": "id",
+            "type": "string",
+            "documentation": "ID of the edge gateway"
+          },
+          {
+            "object": "name",
+            "type": "string",
+            "documentation": "Name of the edge gateway"
+          },
+          {
+            "object": "description",
+            "type": "string",
+            "documentation": "Description of the edge gateway"
+          },
+          {
+            "object": "owner_ref.id",
+            "type": "string",
+            "documentation": ""
+          },
+          {
+            "object": "owner_ref.name",
+            "type": "string",
+            "documentation": ""
+          },
+          {
+            "object": "uplink_t0.id",
+            "type": "string",
+            "documentation": ""
+          },
+          {
+            "object": "uplink_t0.name",
+            "type": "string",
+            "documentation": ""
+          }
+        ]
+      }
+    },
+    "SubFunctionality": {
+      "CloudavenueServices": {
+        "Title": "CloudavenueServices",
+        "Documentation": "",
+        "MarkdownDocumentation": "Manage Cloud Avenue services on an EdgeGateway. Cloudavenue services is a network setting that allows the EdgeGateway to connect to the mutualized Cloud Avenue services (DNS, DHCP, etc.).",
+        "Commands": {
+          "Disable": {
+            "namespace": "EdgeGateway",
+            "resource": "CloudavenueServices",
+            "verb": "Disable",
+            "short_documentation": "Disable Cloud Avenue services on an EdgeGateway.",
+            "long_documentation": "Disable Cloud Avenue services on an EdgeGateway. Cloudavenue services is a network setting that allows the EdgeGateway to connect to the mutualized Cloud Avenue services (DNS, DHCP, etc.).",
+            "markdown_documentation": "",
+            "params": [
+              {
+                "name": "id",
+                "description": "The unique identifier of the edge gateway.",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgeGateway`).. \n"
+              },
+              {
+                "name": "name",
+                "description": "The name of the edge gateway.",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `ID` is null., "
+              }
+            ],
+            "deprecated": false,
+            "deprecated_message": "",
+            "model": null
+          },
+          "Enable": {
+            "namespace": "EdgeGateway",
+            "resource": "CloudavenueServices",
+            "verb": "Enable",
+            "short_documentation": "Enable Cloud Avenue services on an EdgeGateway.",
+            "long_documentation": "Enable Cloud Avenue services on an EdgeGateway. ",
+            "markdown_documentation": "",
+            "params": [
+              {
+                "name": "id",
+                "description": "The unique identifier of the edge gateway.",
+                "required": false,
+                "example": "urn:vcloud:gateway:93baab2e-5a84-4e17-9e2f-333e02c0fcf0",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgeGateway`).. \n"
+              },
+              {
+                "name": "name",
+                "description": "The name of the edge gateway.",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `ID` is null., "
+              }
+            ],
+            "deprecated": false,
+            "deprecated_message": "",
+            "model": null
+          },
+          "Get": {
+            "namespace": "EdgeGateway",
+            "resource": "CloudavenueServices",
+            "verb": "Get",
+            "short_documentation": "Retrieve Cloud Avenue services on an EdgeGateway.",
+            "long_documentation": "Retrieve Cloud Avenue services on an EdgeGateway. This command returns the Cloud Avenue services available on the EdgeGateway, such as DNS, DHCP, and others.",
+            "markdown_documentation": "",
+            "params": [
+              {
+                "name": "id",
+                "description": "The unique identifier of the edge gateway.",
+                "required": false,
+                "example": "urn:vcloud:gateway:02d3cd63-ac2f-4ea8-b876-192916f73f3e",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgeGateway`).. \n"
+              },
+              {
+                "name": "name",
+                "description": "The name of the edge gateway.",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `ID` is null., "
+              }
+            ],
+            "deprecated": false,
+            "deprecated_message": "",
+            "model": [
+              {
+                "object": "id",
+                "type": "string",
+                "documentation": "Identifier of the network service"
+              },
+              {
+                "object": "name",
+                "type": "string",
+                "documentation": "Name of the network service"
+              },
+              {
+                "object": "network",
+                "type": "string",
+                "documentation": "Network of the service in IP/CIDR format"
+              },
+              {
+                "object": "dedicated_ip_for_service",
+                "type": "string",
+                "documentation": "Dedicated IP for the service in IP format (Used for the NAT to connect to the service)"
+              },
+              {
+                "object": "service_details.{index}.category",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "service_details.{index}.network",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "service_details.{index}.services.{index}.name",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "service_details.{index}.services.{index}.description",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "service_details.{index}.services.{index}.documentation_url",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "service_details.{index}.services.{index}.ip.{index}",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "service_details.{index}.services.{index}.fqdn.{index}",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "service_details.{index}.services.{index}.ports.{index}.port",
+                "type": "int",
+                "documentation": "Port of the service"
+              },
+              {
+                "object": "service_details.{index}.services.{index}.ports.{index}.protocol",
+                "type": "string",
+                "documentation": "Protocol of the service"
+              }
+            ]
+          }
+        },
+        "SubFunctionality": {}
+      },
+      "Services": {
+        "Title": "Services",
+        "Documentation": "",
+        "MarkdownDocumentation": "\n**Services** are the services available on the EdgeGateway, such as load balancers, public IPs, and Cloud Avenue services.\n\n## Key Features\n\n - **Load Balancers**: Retrieve information about load balancers configured on the EdgeGateway.\n - **Public IPs**: Get details about public IP addresses associated with the EdgeGateway.\n - **Cloud Avenue Services**: Access information about Cloud Avenue services available on the EdgeGateway.\n",
+        "Commands": {
+          "Get": {
+            "namespace": "EdgeGateway",
+            "resource": "Services",
+            "verb": "Get",
+            "short_documentation": "Retrieve services information about a specific EdgeGateway.",
+            "long_documentation": "Retrieve services information about a specific EdgeGateway. This command retrieves the network services available on the EdgeGateway, such as load balancers, public IPs, and Cloud Avenue services.",
+            "markdown_documentation": "",
+            "params": [
+              {
+                "name": "id",
+                "description": "The unique identifier of the edge gateway.",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgeGateway`).. \n"
+              },
+              {
+                "name": "name",
+                "description": "The name of the edge gateway.",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `ID` is null., "
+              }
+            ],
+            "deprecated": false,
+            "deprecated_message": "",
+            "model": [
+              {
+                "object": "load_balancer.id",
+                "type": "string",
+                "documentation": "Identifier of the network service"
+              },
+              {
+                "object": "load_balancer.name",
+                "type": "string",
+                "documentation": "Name of the network service"
+              },
+              {
+                "object": "load_balancer.class_of_service",
+                "type": "string",
+                "documentation": "Class of service for the load balancer"
+              },
+              {
+                "object": "load_balancer.max_virtual_services",
+                "type": "int",
+                "documentation": "Maximum number of virtual services"
+              },
+              {
+                "object": "public_ip.{index}",
+                "type": "*edgegateway.ModelEdgeGatewayServicesPublicIP",
+                "documentation": ""
+              },
+              {
+                "object": "service.id",
+                "type": "string",
+                "documentation": "Identifier of the network service"
+              },
+              {
+                "object": "service.name",
+                "type": "string",
+                "documentation": "Name of the network service"
+              },
+              {
+                "object": "service.network",
+                "type": "string",
+                "documentation": "Network of the service in IP/CIDR format"
+              },
+              {
+                "object": "service.dedicated_ip_for_service",
+                "type": "string",
+                "documentation": "Dedicated IP for the service in IP format (Used for the NAT to connect to the service)"
+              },
+              {
+                "object": "service.service_details.{index}.category",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "service.service_details.{index}.network",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "service.service_details.{index}.services.{index}.name",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "service.service_details.{index}.services.{index}.description",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "service.service_details.{index}.services.{index}.documentation_url",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "service.service_details.{index}.services.{index}.ip.{index}",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "service.service_details.{index}.services.{index}.fqdn.{index}",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "service.service_details.{index}.services.{index}.ports.{index}.port",
+                "type": "int",
+                "documentation": "Port of the service"
+              },
+              {
+                "object": "service.service_details.{index}.services.{index}.ports.{index}.protocol",
+                "type": "string",
+                "documentation": "Protocol of the service"
+              }
+            ]
+          }
+        },
+        "SubFunctionality": {}
+      }
+    }
+  },
+  "T0": {
+    "Title": "T0",
+    "Documentation": "",
+    "MarkdownDocumentation": "The **Tier0** (T0) router is a core networking component in CloudAvenue's ecosystem. It acts as the gateway between your private cloud networks and external networks, enabling north-south traffic flow, advanced routing, and connectivity to the internet.",
+    "Commands": {
+      "Get": {
+        "namespace": "T0",
+        "resource": "",
+        "verb": "Get",
+        "short_documentation": "Get a specific T0 by name.",
+        "long_documentation": "Retrieve a specific T0 directly by its name or by the edge gateway it is associated with. This command allows you to fetch detailed information about a specific T0.",
+        "markdown_documentation": "",
+        "params": [
+          {
+            "name": "t0_name",
+            "description": "The name of the T0 to retrieve.",
+            "required": false,
+            "example": "prvrf01eocb0001234allsp01",
+            "type": "string",
+            "validators_description": ""
+          },
+          {
+            "name": "edgegateway_id",
+            "description": "The unique identifier of the edge gateway.",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgeGateway`).. \n"
+          },
+          {
+            "name": "edgegateway_name",
+            "description": "The name of the edge gateway.",
+            "required": false,
+            "example": "tn01e02ocb0001234spt101",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `ID` is null., "
+          }
+        ],
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": [
+          {
+            "object": "name",
+            "type": "string",
+            "documentation": "Name of the T0 router"
+          },
+          {
+            "object": "class_of_service",
+            "type": "string",
+            "documentation": "Class of service for the T0 router."
+          },
+          {
+            "object": "bandwidth.capacity",
+            "type": "int",
+            "documentation": "Total bandwidth capacity for the T0 router in Mbps. This is the maximum bandwidth that can be allocated to the T0 router. It is a limit imposed by the Class of Service."
+          },
+          {
+            "object": "bandwidth.provisioned",
+            "type": "int",
+            "documentation": "Total bandwidth provisioned for the T0 router across all edge gateways in Mbps."
+          },
+          {
+            "object": "bandwidth.remaining",
+            "type": "int",
+            "documentation": "Remaining bandwidth that can be allocated to the edge gateways in Mbps. This is calculated as Capacity - Provisioned."
+          },
+          {
+            "object": "bandwidth.allowed_bandwidth_values.{index}",
+            "type": "int",
+            "documentation": "Allowed bandwidth values for the T0 router in Mbps. This is used to determine the available bandwidth options for the new edge gateway. If empty, no bandwidth remaining to allocate."
+          },
+          {
+            "object": "bandwidth.allow_unlimited",
+            "type": "bool",
+            "documentation": "Indicates if unlimited bandwidth is allowed for the T0 router. This is true if the T0 router is DEDICATED."
+          },
+          {
+            "object": "max_edge_gateways",
+            "type": "int",
+            "documentation": "Maximum number of edge gateways for the T0 router."
+          },
+          {
+            "object": "edge_gateways.{index}.id",
+            "type": "string",
+            "documentation": "Unique identifier of the edge gateway. It is a URN that uniquely identifies the edge gateway."
+          },
+          {
+            "object": "edge_gateways.{index}.name",
+            "type": "string",
+            "documentation": "Name of the edge gateway."
+          },
+          {
+            "object": "edge_gateways.{index}.bandwidth",
+            "type": "int",
+            "documentation": "Bandwidth allocated to the edge gateway in Mbps."
+          },
+          {
+            "object": "edge_gateways.{index}.allowed_bandwidth_values.{index}",
+            "type": "int",
+            "documentation": "Allowed bandwidth values for the edge gateway in Mbps."
+          }
+        ]
+      },
+      "List": {
+        "namespace": "T0",
+        "resource": "",
+        "verb": "List",
+        "short_documentation": "List all T0s available in the organization.",
+        "long_documentation": "List all T0s available in the organization. This command retrieves a list of all T0s, which are the top-level network services in the Edge Gateway architecture.",
+        "markdown_documentation": "",
+        "params": null,
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": [
+          {
+            "object": "count",
+            "type": "int",
+            "documentation": ""
+          },
+          {
+            "object": "t0s.{index}.name",
+            "type": "string",
+            "documentation": "Name of the T0 router"
+          },
+          {
+            "object": "t0s.{index}.class_of_service",
+            "type": "string",
+            "documentation": "Class of service for the T0 router."
+          },
+          {
+            "object": "t0s.{index}.bandwidth.capacity",
+            "type": "int",
+            "documentation": "Total bandwidth capacity for the T0 router in Mbps. This is the maximum bandwidth that can be allocated to the T0 router. It is a limit imposed by the Class of Service."
+          },
+          {
+            "object": "t0s.{index}.bandwidth.provisioned",
+            "type": "int",
+            "documentation": "Total bandwidth provisioned for the T0 router across all edge gateways in Mbps."
+          },
+          {
+            "object": "t0s.{index}.bandwidth.remaining",
+            "type": "int",
+            "documentation": "Remaining bandwidth that can be allocated to the edge gateways in Mbps. This is calculated as Capacity - Provisioned."
+          },
+          {
+            "object": "t0s.{index}.bandwidth.allowed_bandwidth_values.{index}",
+            "type": "int",
+            "documentation": "Allowed bandwidth values for the T0 router in Mbps. This is used to determine the available bandwidth options for the new edge gateway. If empty, no bandwidth remaining to allocate."
+          },
+          {
+            "object": "t0s.{index}.bandwidth.allow_unlimited",
+            "type": "bool",
+            "documentation": "Indicates if unlimited bandwidth is allowed for the T0 router. This is true if the T0 router is DEDICATED."
+          },
+          {
+            "object": "t0s.{index}.max_edge_gateways",
+            "type": "int",
+            "documentation": "Maximum number of edge gateways for the T0 router."
+          },
+          {
+            "object": "t0s.{index}.edge_gateways.{index}.id",
+            "type": "string",
+            "documentation": "Unique identifier of the edge gateway. It is a URN that uniquely identifies the edge gateway."
+          },
+          {
+            "object": "t0s.{index}.edge_gateways.{index}.name",
+            "type": "string",
+            "documentation": "Name of the edge gateway."
+          },
+          {
+            "object": "t0s.{index}.edge_gateways.{index}.bandwidth",
+            "type": "int",
+            "documentation": "Bandwidth allocated to the edge gateway in Mbps."
+          },
+          {
+            "object": "t0s.{index}.edge_gateways.{index}.allowed_bandwidth_values.{index}",
+            "type": "int",
+            "documentation": "Allowed bandwidth values for the edge gateway in Mbps."
+          }
+        ]
+      }
+    },
+    "SubFunctionality": {}
+  }
+}

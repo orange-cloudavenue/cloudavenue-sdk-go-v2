@@ -6,11 +6,10 @@ import (
 
 	"resty.dev/v3"
 
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/orange-cloudavenue/common-go/validators"
-
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
 
 //go:generate endpoint-generator -path services_endpoints.go
@@ -18,7 +17,7 @@ import (
 func init() {
 	cav.Endpoint{
 		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/getNetworkHierarchy",
-		Name:             "GetNetworkServices",
+		Name:             "GetEdgeGatewayServices",
 		Description:      "Get EdgeGateway Network Services",
 		Method:           cav.MethodGET,
 		SubClient:        cav.ClientCerberus,
@@ -66,7 +65,7 @@ func init() {
 			data = apiResponseNetworkServices{
 				{
 					Type: "tier-0-vrf",
-					Name: generator.MustGenerate("{t0_name}"),
+					Name: generator.MustGenerate("{resource_name:t0}"),
 					Children: []apiResponseNetworkServicesChildren{
 						{
 							Type: "edge-gateway",
@@ -121,7 +120,7 @@ func init() {
 									},
 								},
 								{
-									ServiceID:   generator.MustGenerate("{edgegateway_name}-cav-services"),
+									ServiceID:   generator.MustGenerate("{resource_name:edgegateway}-cav-services"),
 									Type:        "service",
 									Name:        "cav-services",
 									DisplayName: "Cloud Avenue Services",
@@ -163,7 +162,7 @@ func init() {
 
 	cav.Endpoint{
 		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/addNetworkConnectivity",
-		Name:             "EnableCloudAvenueServices",
+		Name:             "EnableCloudavenueServices",
 		Description:      "Enable Cloud Avenue Services",
 		Method:           cav.MethodPOST,
 		SubClient:        cav.ClientCerberus,
@@ -174,7 +173,7 @@ func init() {
 
 	cav.Endpoint{
 		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/deleteNetworkService",
-		Name:             "DisableCloudAvenueServices",
+		Name:             "DisableCloudavenueServices",
 		Description:      "Disable Cloud Avenue Services",
 		Method:           cav.MethodDELETE,
 		SubClient:        cav.ClientCerberus,

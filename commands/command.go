@@ -22,6 +22,9 @@ type Command struct {
 	ShortDocumentation string `validate:"required"`
 	LongDocumentation  string `validate:"omitempty"`
 
+	// MarkdownDocumentation is the markdown documentation of the command. Used for top-level commands.
+	MarkdownDocumentation string `validate:"omitempty"`
+
 	// Paramspec defines specifications for arguments.
 	ParamsSpecs ParamsSpecs
 
@@ -61,6 +64,9 @@ type (
 		// Description is the description of the argument.
 		Description string `validate:"required"`
 
+		// Example is an example value for the argument.
+		Example string
+
 		// Required defines whether the argument is required.
 		Required bool
 
@@ -72,13 +78,3 @@ type (
 		TransformFunc ParamsTransformFunc
 	}
 )
-
-// // GetParamsSpec returns the ParamsSpec for the given name.
-// func (ps *ParamsSpecs) GetParamsSpec(name string) *ParamsSpec {
-// 	for _, spec := range *ps {
-// 		if spec.Name == name {
-// 			return &spec
-// 		}
-// 	}
-// 	return nil
-// }

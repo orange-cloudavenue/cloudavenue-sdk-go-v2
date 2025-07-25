@@ -3,6 +3,7 @@ package edgegateway
 import (
 	"log/slog"
 	"os"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,8 +11,15 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
 )
 
+var testMutex = sync.Mutex{}
+
 func newClient(t *testing.T) *Client {
 	t.Helper()
+
+	testMutex.Lock()
+	t.Cleanup(func() {
+		testMutex.Unlock()
+	})
 
 	mC, err := mock.NewClient(
 		mock.WithLogger(
@@ -19,7 +27,7 @@ func newClient(t *testing.T) *Client {
 				slog.NewTextHandler(
 					os.Stdout,
 					&slog.HandlerOptions{
-						Level: slog.LevelDebug,
+						Level: slog.LevelInfo,
 					}),
 			),
 		),
@@ -29,11 +37,4 @@ func newClient(t *testing.T) *Client {
 	eC, err := New(mC)
 	assert.Nil(t, err, "Error creating edgegateway client")
 	return eC
-}
-
-func must[T any](v T, err error) T {
-	if err != nil {
-		panic(err)
-	}
-	return v
 }

@@ -1,51 +1,49 @@
 package edgegateway
 
 import (
-	"log/slog"
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/orange-cloudavenue/common-go/generator"
-
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+	"github.com/orange-cloudavenue/common-go/generator"
 )
 
 func Test_ListT0(t *testing.T) {
 	tests := []struct {
-		name                string
-		queryResponse       any
-		queryResponseStatus int
-		expectedErr         bool
+		name string
+
+		mockResponse       any
+		mockResponseStatus int
+
+		expectedErr bool
 	}{
 		{
 			name:        "List T0",
 			expectedErr: false,
 		},
 		{
-			name:                "Error 500",
-			queryResponseStatus: http.StatusInternalServerError,
-			expectedErr:         false, // Error HTTP 500 does not return an error because a retry is performed.
+			name:               "Error 500",
+			mockResponseStatus: http.StatusInternalServerError,
+			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
 		},
 		{
-			name:                "Error 404",
-			queryResponseStatus: http.StatusNotFound,
-			expectedErr:         true, // Error HTTP 404 should return an error.
+			name:               "Error 404",
+			mockResponseStatus: http.StatusNotFound,
+			expectedErr:        true, // Error HTTP 404 should return an error.
 		},
 		{
 			name: "Simulate unknown class of service",
-			queryResponse: &apiResponseT0s{
+			mockResponse: &apiResponseT0s{
 				{
 					Type:       "edge-gateway",
-					Name:       generator.MustGenerate("{edgegateway_name}"),
+					Name:       generator.MustGenerate("{resource_name:edgegateway}"),
 					Properties: apiResponseT0Properties{ClassOfService: "unknown"},
 				},
 			},
-			expectedErr:         false,
-			queryResponseStatus: http.StatusOK,
+			expectedErr:        false,
+			mockResponseStatus: http.StatusOK,
 		},
 	}
 
@@ -53,18 +51,14 @@ func Test_ListT0(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ep := endpoints.ListT0()
 			// Set up mock response
-			if tt.queryResponse != nil || tt.queryResponseStatus != 0 {
+			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				ep.CleanMockResponse()
-				ep.SetMockResponse(tt.queryResponse, &tt.queryResponseStatus)
+				ep.SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
 			}
 
-			mC, err := mock.NewClient(mock.WithLogger(slog.New(slog.NewTextHandler(os.Stderr, nil))))
-			assert.Nil(t, err, "Error creating mock client")
+			eC := newClient(t)
 
-			t0C, err := New(mC)
-			assert.Nil(t, err, "Error creating t0 client")
-
-			t0s, err := t0C.ListT0(t.Context())
+			t0s, err := eC.ListT0(t.Context())
 			if tt.expectedErr {
 				assert.NotNil(t, err, "Expected error but got nil")
 			} else {
@@ -77,68 +71,84 @@ func Test_ListT0(t *testing.T) {
 
 func Test_GetT0(t *testing.T) {
 	tests := []struct {
-		name                string
-		params              ParamsGetT0
-		queryResponse       any
-		queryResponseStatus int
-		expectedErr         bool
+		name   string
+		params ParamsGetT0
+
+		mockResponse       any
+		mockResponseStatus int
+
+		expectedErr bool
 	}{
 		{
 			name: "Valid T0",
 			params: ParamsGetT0{
-				Name: generator.MustGenerate("{t0_name}"),
+				T0Name: generator.MustGenerate("{resource_name:t0}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Invalid TO name",
 			params: ParamsGetT0{
-				Name: "invalid_t0_name",
+				T0Name: "invalid_t0_name",
 			},
 			expectedErr: true,
 		},
 		{
 			name: "Error 500",
 			params: ParamsGetT0{
-				Name: generator.MustGenerate("{t0_name}"),
+				T0Name: generator.MustGenerate("{resource_name:t0}"),
 			},
-			queryResponseStatus: http.StatusInternalServerError,
-			expectedErr:         false, // Error HTTP 500 does not return an error because a retry is performed.
+			mockResponseStatus: http.StatusInternalServerError,
+			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
 		},
 		{
 			name: "Simulate empty response",
 			params: ParamsGetT0{
-				Name: generator.MustGenerate("{t0_name}"),
+				T0Name: generator.MustGenerate("{resource_name:t0}"),
 			},
-			queryResponse:       &apiResponseT0s{},
-			queryResponseStatus: http.StatusOK,
-			expectedErr:         true,
+			mockResponse:       &apiResponseT0s{},
+			mockResponseStatus: http.StatusOK,
+			expectedErr:        true,
+		},
+		{
+			name: "Simulate empty response EdgeGateway Name",
+			params: ParamsGetT0{
+				EdgegatewayName: generator.MustGenerate("{resource_name:edgegateway}"),
+			},
+			mockResponse:       &apiResponseT0s{},
+			mockResponseStatus: http.StatusOK,
+			expectedErr:        true,
+		},
+		{
+			name: "Simulate empty response EdgeGateway ID",
+			params: ParamsGetT0{
+				EdgegatewayID: generator.MustGenerate("{urn:edgeGateway}"),
+			},
+			mockResponse:       &apiResponseT0s{},
+			mockResponseStatus: http.StatusOK,
+			expectedErr:        true,
 		},
 		{
 			name: "Error 404",
 			params: ParamsGetT0{
-				Name: generator.MustGenerate("{t0_name}"),
+				T0Name: generator.MustGenerate("{resource_name:t0}"),
 			},
-			queryResponseStatus: http.StatusNotFound,
-			expectedErr:         true, // Error HTTP 404 should return an error.
+			mockResponseStatus: http.StatusNotFound,
+			expectedErr:        true, // Error HTTP 404 should return an error.
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ep := endpoints.ListT0()
-			if tt.queryResponse != nil || tt.queryResponseStatus != 0 {
+			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				ep.CleanMockResponse()
-				ep.SetMockResponse(tt.queryResponse, &tt.queryResponseStatus)
+				ep.SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
 			}
 
-			mC, err := mock.NewClient(mock.WithLogger(slog.New(slog.NewTextHandler(os.Stderr, nil))))
-			assert.Nil(t, err, "Error creating mock client")
+			eC := newClient(t)
 
-			t0C, err := New(mC)
-			assert.Nil(t, err, "Error creating t0 client")
-
-			t0, err := t0C.GetT0(t.Context(), tt.params)
+			t0, err := eC.GetT0(t.Context(), tt.params)
 
 			if tt.expectedErr {
 				assert.NotNil(t, err, "Expected error but got nil")
@@ -146,8 +156,94 @@ func Test_GetT0(t *testing.T) {
 			} else {
 				assert.Nil(t, err, "Unexpected error while getting T0")
 				assert.NotNil(t, t0, "Expected non-nil T0 response")
-				assert.Equal(t, tt.params.Name, t0.Name, "Expected T0 name to match the requested name")
+				if tt.params.T0Name != "" {
+					assert.Equal(t, tt.params.T0Name, t0.Name, "Expected T0 name to match the requested name")
+				}
+				if tt.params.EdgegatewayID != "" || tt.params.EdgegatewayName != "" {
+					assert.NotEmpty(t, t0.EdgeGateways, "Expected T0 to have edge gateways")
+				}
 			}
 		})
 	}
 }
+
+// func Test_GetT0FromEdgeGateway(t *testing.T) {
+// 	tests := []struct {
+// 		name               string
+// 		params             ParamsEdgeGateway
+// 		mockResponse       any
+// 		mockResponseStatus int
+// 		expectedErr        bool
+// 	}{
+// 		{
+// 			name: "Valid T0 from edge gateway",
+// 			params: ParamsEdgeGateway{
+// 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
+// 			},
+// 			expectedErr: false,
+// 		},
+// 		{
+// 			name: "Invalid edge gateway name",
+// 			params: ParamsEdgeGateway{
+// 				Name: "invalid_edge_gateway_name",
+// 			},
+// 			expectedErr: true,
+// 		},
+// 		{
+// 			name: "Error 500",
+// 			params: ParamsEdgeGateway{
+// 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
+// 			},
+// 			mockResponseStatus: http.StatusInternalServerError,
+// 			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
+// 		},
+// 		{
+// 			name: "Simulate empty response with edge gateway name",
+// 			params: ParamsEdgeGateway{
+// 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
+// 			},
+// 			mockResponse:       &apiResponseT0s{},
+// 			mockResponseStatus: http.StatusOK,
+// 			expectedErr:        true,
+// 		},
+// 		{
+// 			name: "Simulate empty response with edge gateway ID",
+// 			params: ParamsEdgeGateway{
+// 				ID: generator.MustGenerate("{urn:edgeGateway}"),
+// 			},
+// 			mockResponse:       &apiResponseT0s{},
+// 			mockResponseStatus: http.StatusOK,
+// 			expectedErr:        true,
+// 		},
+// 		{
+// 			name: "Error 404",
+// 			params: ParamsEdgeGateway{
+// 				ID: generator.MustGenerate("{urn:edgeGateway}"),
+// 			},
+// 			mockResponseStatus: http.StatusNotFound,
+// 			expectedErr:        true, // Error HTTP 404 should return an error.
+// 		},
+// 	}
+
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			ep := endpoints.ListT0()
+// 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
+// 				ep.CleanMockResponse()
+// 				ep.SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+// 			}
+
+// 			eC := newClient(t)
+
+// 			t0, err := eC.GetT0FromEdgeGateway(t.Context(), tt.params)
+
+// 			if tt.expectedErr {
+// 				assert.NotNil(t, err, "Expected error but got nil")
+// 				assert.Nil(t, t0, "Expected nil T0 response")
+// 			} else {
+// 				assert.Nil(t, err, "Unexpected error while getting T0 from edge gateway")
+// 				assert.NotNil(t, t0, "Expected non-nil T0 response")
+// 			}
+// 		})
+// 	}
+// }

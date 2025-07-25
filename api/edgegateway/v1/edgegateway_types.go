@@ -9,23 +9,19 @@ type (
 	}
 	// ModelEdgeGateway represents the model of an edge gateway.
 	ModelEdgeGateway struct {
-		ID string
+		ID string `documentation:"ID of the edge gateway"`
 
 		// Name of edge gateway
-		Name string
+		Name string `documentation:"Name of the edge gateway"`
 
 		// Description of edge gateway
-		Description string
+		Description string `documentation:"Description of the edge gateway"`
 
 		// OwnerRef defines VDC or VDC Group that this network belongs to.
-		OwnerRef *ModelObjectReference
+		OwnerRef *ModelObjectReference `documentation:"VDC or VDC Group that this edge gateway belongs to"`
 
 		// UplinkT0 defines the T0 router name that this edge gateway is connected to.
-		UplinkT0 *ModelObjectReference
-
-		// Services is the list of network services
-		// that are available on the edge gateway
-		// Services ModelNetworkServicesSvcs
+		UplinkT0 *ModelObjectReference `documentation:"T0 router name that this edge gateway is connected to"`
 	}
 
 	// Bandwidth in Mbps.
@@ -37,7 +33,7 @@ type (
 type (
 	ParamsEdgeGateway struct {
 		ID   string `validate:"required_if_null=Name,omitempty,urn=edgeGateway" fake:"{urn:edgeGateway}"`
-		Name string `validate:"required_if_null=ID,omitempty,edgegateway_name" fake:"{edgegateway_name}"`
+		Name string `validate:"required_if_null=ID,omitempty,edgegateway_name" fake:"{resource_name:edgegateway}"`
 	}
 
 	ParamsCreateEdgeGateway struct {
@@ -51,7 +47,25 @@ type (
 		// Name is the name of the T0 router that this edge gateway will be connected to.
 		// If not provided and only if one T0 router is available,
 		// the first T0 router will be used.
-		T0Name string `fake:"{t0_name}"`
+		T0Name string `fake:"{resource_name:t0}"`
+
+		// Bandwidth is the bandwidth limit in Mbps.
+		// If not provided, default bandwidth will be used (5 Mbps).
+		// You can get bandwidth available values for the new edge gateway
+		// by calling ListT0().
+		// Unlimited bandwidth is allowed if the T0 is DEDICATED.
+		Bandwidth int `fake:"5"`
+	}
+
+	ParamsUpdateEdgeGateway struct {
+		// ID is the ID of the edge gateway to update.
+		ID string `fake:"{urn:edgeGateway}"`
+
+		// Name is the new name of the edge gateway.
+		Name string `fake:"{resource_name:edgegateway}"`
+
+		// Bandwidth is the new bandwidth limit in Mbps.
+		Bandwidth int `fake:"5"`
 	}
 )
 
@@ -59,15 +73,15 @@ type (
 
 type (
 	apiRequestEdgeGateway struct {
-		T0Name string `json:"tier0VrfId" fake:"{t0_name}"`
+		T0Name string `json:"tier0VrfId" fake:"{resource_name:t0}"`
 	}
 
 	apiResponseEdgegateways struct {
 		Values []apiResponseEdgegateway `json:"values,omitempty" fakesize:"1"` // List of edge gateways.
 	}
 	apiResponseEdgegateway struct {
-		ID          string `json:"id" fake:"{urn:edgeGateway}"`    // The ID of the edge gateway.
-		Name        string `json:"name" fake:"{edgegateway_name}"` // The name of the edge gateway.
+		ID          string `json:"id" fake:"{urn:edgeGateway}"`             // The ID of the edge gateway.
+		Name        string `json:"name" fake:"{resource_name:edgegateway}"` // The name of the edge gateway.
 		Description string `json:"description" fake:"{sentence}"`
 
 		EdgeGatewayUplinks []struct {
@@ -93,7 +107,7 @@ type (
 				} `json:"values" fakesize:"1"`
 			} `json:"subnets" fakesize:"1"`
 			UplinkID   string `json:"uplinkId" fake:"{urn:network}"`
-			UplinkName string `json:"uplinkName" fake:"{t0_name}"` // The name of the uplink.
+			UplinkName string `json:"uplinkName" fake:"{resource_name:t0}"` // The name of the uplink.
 		} `json:"edgeGatewayUplinks" fakesize:"1"`
 
 		OrgVDC *ModelObjectReference `json:"orgVdc"`
@@ -113,28 +127,13 @@ type (
 		ID                  string `json:"-"`                                                 // The ID of the entity.
 		HREF                string `json:"href,omitempty" fake:"{href_uuid}"`                 // The URI of the entity.
 		Type                string `json:"type,omitempty"`                                    // The MIME type of the entity.
-		Name                string `json:"name,omitempty" fake:"{edgegateway_name}"`          // EdgeGateway name.
+		Name                string `json:"name,omitempty" fake:"{resource_name:edgegateway}"` // EdgeGateway name.
 		VDCID               string `json:"vdc,omitempty" fake:"{urn:vdc}"`                    // VDC Reference or ID
 		VDCName             string `json:"orgVdcName,omitempty" fake:"{word}"`                // VDC name
 		NumberOfExtNetworks int    `json:"numberOfExtNetworks,omitempty" fake:"{number:1,5}"` // Number of external networks connected to the edgeGateway.
 		NumberOfOrgNetworks int    `json:"numberOfOrgNetworks,omitempty" fake:"{number:1,5}"` // Number of org VDC networks connected to the edgeGateway
 		IsBusy              bool   `json:"isBusy,omitempty" fake:"{bool}"`                    // True if this Edge Gateway is busy.
 		GatewayStatus       string `json:"gatewayStatus,omitempty" fake:"{word}"`             // Status of the edgeGateway
-	}
-
-	apiResponseBandwidth struct {
-		// bandwidth in Mbps. This value is not returned by the API
-		// It will be set by the middleware and the value are extracted
-		// from the egress and ingress profiles names. (e.g. "qosgw005mbps" = 5mbps)
-		// nil value means no bandwidth limit.
-		Bandwidth *int `json:"-" fake:"-"`
-
-		// In cloudavenue egress and ingress profiles are always the same.
-		// Use only egressProfile to get the bandwidth.
-		EgressProfile struct {
-			Name string `json:"name" fake:"{randomstring:[qosgw005mbps,qosgw025mbps,qosgw050mbps,qosgw075mbps,qosgw100mbps,qosgw150mbps,qosgw200mbps,qosgw250mbps,qosgw300mbps]}"`
-		} `json:"egressProfile"`
-		IngressProfile struct{} `json:"-"`
 	}
 )
 
@@ -176,17 +175,4 @@ func (api *apiResponseEdgegateway) toModel() *ModelEdgeGateway {
 			return nil
 		}(),
 	}
-}
-
-// toModel converts the apiResponseBandwidth to ModelBandwidth.
-func (api *apiResponseBandwidth) toModel() *ModelBandwidth {
-	if api == nil {
-		return nil
-	}
-
-	if api.Bandwidth == nil {
-		return nil // No bandwidth limit
-	}
-
-	return (*ModelBandwidth)(api.Bandwidth)
 }
