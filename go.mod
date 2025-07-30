@@ -13,9 +13,9 @@ go 1.24.4
 require (
 	github.com/go-chi/chi/v5 v5.2.2
 	github.com/orange-cloudavenue/common-go/extractor v1.0.0
-	github.com/orange-cloudavenue/common-go/generator v1.3.0
+	github.com/orange-cloudavenue/common-go/generator v1.3.1
 	github.com/orange-cloudavenue/common-go/urn v1.1.0
-	github.com/orange-cloudavenue/common-go/validators v1.1.0
+	github.com/orange-cloudavenue/common-go/validators v1.1.1
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.34
 	github.com/stretchr/testify v1.10.0

@@ -623,7 +623,7 @@
             "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgeGateway`).. \n"
           },
           {
-            "name": "edgegateway_name",
+            "name": "resource_name=edgegateway",
             "description": "The name of the edge gateway.",
             "required": false,
             "example": "tn01e02ocb0001234spt101",

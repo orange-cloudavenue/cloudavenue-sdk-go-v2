@@ -6,11 +6,12 @@ import (
 
 	"resty.dev/v3"
 
+	"github.com/orange-cloudavenue/common-go/validators"
+
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
-	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 //go:generate command-generator -path bandwidth_commands.go
@@ -242,7 +243,7 @@ func init() {
 
 				job := (*r)[0]
 				for _, j := range job.Actions {
-					if err := validators.New().Var(j.Details, "edgegateway_name"); err == nil {
+					if err := validators.New().Var(j.Details, "resource_name=edgegateway"); err == nil {
 						edgeGatewayCreated = j.Details
 						break
 					}

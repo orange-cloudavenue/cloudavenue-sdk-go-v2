@@ -75,7 +75,7 @@ func init() {
 				},
 			},
 			commands.ParamsSpec{
-				Name:        "edgegateway_name",
+				Name:        "resource_name=edgegateway",
 				Description: "The name of the edge gateway.",
 				Required:    false,
 				Example:     "tn01e02ocb0001234spt101",
