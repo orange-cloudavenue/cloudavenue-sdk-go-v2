@@ -6,12 +6,11 @@ import (
 
 	"resty.dev/v3"
 
-	"github.com/orange-cloudavenue/common-go/validators"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
+	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 //go:generate command-generator -path bandwidth_commands.go
@@ -53,7 +52,7 @@ func init() {
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("Name"),
 					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("edgeGateway"),
+					commands.ValidatorURN("edgegateway"),
 				},
 			},
 			commands.ParamsSpec{
@@ -311,7 +310,7 @@ func init() {
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("Name"),
 					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("edgeGateway"),
+					commands.ValidatorURN("edgegateway"),
 				},
 			},
 			commands.ParamsSpec{
@@ -369,7 +368,7 @@ func init() {
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("Name"),
 					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("edgeGateway"),
+					commands.ValidatorURN("edgegateway"),
 				},
 			},
 			commands.ParamsSpec{

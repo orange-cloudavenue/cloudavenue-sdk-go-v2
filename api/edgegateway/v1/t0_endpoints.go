@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/orange-cloudavenue/common-go/validators"
-
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
 
 //go:generate endpoint-generator -path t0_endpoints.go
@@ -47,7 +46,7 @@ func init() {
 				Description: "The ID of the Edge Gateway",
 				Required:    false,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=edgeGateway")
+					return validators.New().Var(value, "urn=edgegateway")
 				},
 			},
 		},

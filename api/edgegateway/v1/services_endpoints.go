@@ -6,11 +6,10 @@ import (
 
 	"resty.dev/v3"
 
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/orange-cloudavenue/common-go/validators"
-
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
 
 //go:generate endpoint-generator -path services_endpoints.go
@@ -32,7 +31,7 @@ func init() {
 				Description: "The ID of the edge gateway to get network services for",
 				Required:    false,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=edgeGateway")
+					return validators.New().Var(value, "urn=edgegateway")
 				},
 			},
 			{

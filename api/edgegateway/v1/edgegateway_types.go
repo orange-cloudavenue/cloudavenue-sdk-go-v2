@@ -32,7 +32,7 @@ type (
 
 type (
 	ParamsEdgeGateway struct {
-		ID   string `validate:"required_if_null=Name,omitempty,urn=edgeGateway" fake:"{urn:edgegateway}"`
+		ID   string `validate:"required_if_null=Name,omitempty,urn=edgegateway" fake:"{urn:edgegateway}"`
 		Name string `validate:"required_if_null=ID,omitempty,resource_name=edgegateway" fake:"{resource_name:edgegateway}"`
 	}
 

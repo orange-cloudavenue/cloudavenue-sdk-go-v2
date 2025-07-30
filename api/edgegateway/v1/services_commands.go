@@ -48,7 +48,7 @@ func init() {
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("Name"),
 					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("edgeGateway"),
+					commands.ValidatorURN("edgegateway"),
 				},
 			},
 			commands.ParamsSpec{
@@ -123,7 +123,7 @@ func init() {
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("Name"),
 					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("edgeGateway"),
+					commands.ValidatorURN("edgegateway"),
 				},
 			},
 			commands.ParamsSpec{
@@ -171,7 +171,7 @@ func init() {
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("Name"),
 					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("edgeGateway"),
+					commands.ValidatorURN("edgegateway"),
 				},
 			},
 			commands.ParamsSpec{
@@ -243,7 +243,7 @@ func init() {
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("Name"),
 					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("edgeGateway"),
+					commands.ValidatorURN("edgegateway"),
 				},
 			},
 			commands.ParamsSpec{

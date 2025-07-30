@@ -25,7 +25,7 @@ func init() {
 	// 			Description: "The ID of the edge gateway.",
 	// 			Required:    true,
 	// 			ValidatorFunc: func(value string) error {
-	// 				return validators.New().Var(value, "required,urn=edgeGateway")
+	// 				return validators.New().Var(value, "required,urn=edgegateway")
 	// 			},
 	// 		},
 	// 	},
@@ -76,7 +76,7 @@ func init() {
 				Description: "The ID of the edge gateway.",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "required,urn=edgeGateway")
+					return validators.New().Var(value, "required,urn=edgegateway")
 				},
 				TransformFunc: func(value string) (string, error) {
 					// Transform the value to a uuidv4 format

@@ -2,13 +2,13 @@ module github.com/orange-cloudavenue/cloudavenue-sdk-go-v2
 
 go 1.24.4
 
-// replace (
-// 	github.com/orange-cloudavenue/common-go => ../common-go
-// 	github.com/orange-cloudavenue/common-go/extractor => ../common-go/extractor
-// 	github.com/orange-cloudavenue/common-go/generator => ../common-go/generator
-// 	github.com/orange-cloudavenue/common-go/print => ../common-go/print
-// 	github.com/orange-cloudavenue/common-go/validators => ../common-go/validators
-// )
+replace (
+	github.com/orange-cloudavenue/common-go => ../common-go
+	github.com/orange-cloudavenue/common-go/extractor => ../common-go/extractor
+	github.com/orange-cloudavenue/common-go/generator => ../common-go/generator
+	github.com/orange-cloudavenue/common-go/print => ../common-go/print
+	github.com/orange-cloudavenue/common-go/validators => ../common-go/validators
+)
 
 require (
 	github.com/go-chi/chi/v5 v5.2.2
