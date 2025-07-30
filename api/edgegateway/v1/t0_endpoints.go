@@ -75,10 +75,10 @@ func init() {
 								Name: generator.MustGenerate("{resource_name:edgegateway}"),
 								Properties: struct {
 									RateLimit int    `json:"rateLimit,omitempty" fake:"5"`
-									EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgeGateway}"` // The UUID of the edge gateway
+									EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"` // The UUID of the edge gateway
 								}{
 									RateLimit: 5,
-									EdgeUUID:  generator.MustGenerate("{urn:edgeGateway}"),
+									EdgeUUID:  generator.MustGenerate("{urn:edgegateway}"),
 								},
 							},
 						},
@@ -98,14 +98,14 @@ func init() {
 					}(),
 					Properties: struct {
 						RateLimit int    `json:"rateLimit,omitempty" fake:"5"`
-						EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgeGateway}"` // The UUID of the edge gateway
+						EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"` // The UUID of the edge gateway
 					}{
 						RateLimit: 5,
 						EdgeUUID: func() string {
 							if edgeGatewayID != "" {
 								return edgeGatewayID
 							}
-							return generator.MustGenerate("{urn:edgeGateway}")
+							return generator.MustGenerate("{urn:edgegateway}")
 						}(),
 					},
 				})

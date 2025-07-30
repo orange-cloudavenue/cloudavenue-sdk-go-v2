@@ -24,7 +24,7 @@ type (
 		Name       string `json:"name" fake:"{resource_name:edgegateway}"`
 		Properties struct {
 			RateLimit int    `json:"rateLimit,omitempty" fake:"5"`
-			EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgeGateway}"` // The UUID of the edge gateway
+			EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"` // The UUID of the edge gateway
 		} `json:"properties,omitempty"`
 	}
 

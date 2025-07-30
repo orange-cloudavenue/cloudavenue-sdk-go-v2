@@ -32,7 +32,7 @@ type (
 
 type (
 	ParamsEdgeGateway struct {
-		ID   string `validate:"required_if_null=Name,omitempty,urn=edgeGateway" fake:"{urn:edgeGateway}"`
+		ID   string `validate:"required_if_null=Name,omitempty,urn=edgeGateway" fake:"{urn:edgegateway}"`
 		Name string `validate:"required_if_null=ID,omitempty,edgegateway_name" fake:"{resource_name:edgegateway}"`
 	}
 
@@ -59,7 +59,7 @@ type (
 
 	ParamsUpdateEdgeGateway struct {
 		// ID is the ID of the edge gateway to update.
-		ID string `fake:"{urn:edgeGateway}"`
+		ID string `fake:"{urn:edgegateway}"`
 
 		// Name is the new name of the edge gateway.
 		Name string `fake:"{resource_name:edgegateway}"`
@@ -80,7 +80,7 @@ type (
 		Values []apiResponseEdgegateway `json:"values,omitempty" fakesize:"1"` // List of edge gateways.
 	}
 	apiResponseEdgegateway struct {
-		ID          string `json:"id" fake:"{urn:edgeGateway}"`             // The ID of the edge gateway.
+		ID          string `json:"id" fake:"{urn:edgegateway}"`             // The ID of the edge gateway.
 		Name        string `json:"name" fake:"{resource_name:edgegateway}"` // The name of the edge gateway.
 		Description string `json:"description" fake:"{sentence}"`
 

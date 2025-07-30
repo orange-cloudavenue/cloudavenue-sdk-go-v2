@@ -27,7 +27,7 @@ func TestGetEdgeGatewayServices(t *testing.T) {
 		{
 			name: "Valid Edge Gateway services",
 			params: &ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			expectedErr: false,
 		},
@@ -55,7 +55,7 @@ func TestGetEdgeGatewayServices(t *testing.T) {
 		{
 			name: "Error 500",
 			params: &ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponseStatus: http.StatusInternalServerError,
 			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
@@ -63,7 +63,7 @@ func TestGetEdgeGatewayServices(t *testing.T) {
 		{
 			name: "Simulate empty response",
 			params: &ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponse:       &apiResponseNetworkServices{},
 			mockResponseStatus: http.StatusOK,
@@ -118,7 +118,7 @@ func TestGetEdgeGatewayServices_ContextDeadlineExceeded(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), 0)
 	defer cancel()
 
-	_, err = eC.GetServices(ctx, ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgeGateway}")})
+	_, err = eC.GetServices(ctx, ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgegateway}")})
 	assert.NotNil(t, err, "Expected context deadline exceeded error")
 	assert.Contains(t, err.Error(), "context deadline exceeded", "Expected error to contain 'context deadline exceeded'")
 }
@@ -138,7 +138,7 @@ func TestEnableCloudavenueServices(t *testing.T) {
 		{
 			name: "Enable network services with valid ID",
 			params: ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			expectedErr: false,
 		},
@@ -159,7 +159,7 @@ func TestEnableCloudavenueServices(t *testing.T) {
 		{
 			name: "Error 500",
 			params: ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponseStatus: http.StatusInternalServerError,
 			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
@@ -216,7 +216,7 @@ func TestEnableCloudavenueServices_ContextDeadlineExceeded(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), 0)
 	defer cancel()
 
-	err = eC.EnableCloudavenueServices(ctx, ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgeGateway}")})
+	err = eC.EnableCloudavenueServices(ctx, ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgegateway}")})
 	assert.NotNil(t, err, "Expected context deadline exceeded error")
 	assert.Contains(t, err.Error(), "context deadline exceeded", "Expected error to contain 'context deadline exceeded'")
 }
@@ -237,7 +237,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 		{
 			name: "Disable network services with valid ID",
 			params: ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			expectedErr: false,
 		},
@@ -258,7 +258,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 		{
 			name: "Failed to get network services",
 			params: ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockGetNetworkServicesResponse:       nil,
 			mockGetNetworkServicesResponseStatus: http.StatusNotFound,
@@ -268,7 +268,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 		{
 			name: "Error 500",
 			params: ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponseStatus: http.StatusInternalServerError,
 			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
@@ -276,7 +276,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 		{
 			name: "Error 401",
 			params: ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponseStatus: http.StatusUnauthorized,
 			expectedErr:        true,
@@ -328,7 +328,7 @@ func TestGetCloudavenueServices(t *testing.T) {
 		{
 			name: "Get Cloud Avenue services with valid ID",
 			params: ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			expectedErr: false,
 		},
@@ -349,7 +349,7 @@ func TestGetCloudavenueServices(t *testing.T) {
 		{
 			name: "Error 500",
 			params: ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponseStatus: http.StatusInternalServerError,
 			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
@@ -357,7 +357,7 @@ func TestGetCloudavenueServices(t *testing.T) {
 		{
 			name: "Error 401",
 			params: ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponseStatus: http.StatusUnauthorized,
 			expectedErr:        true,

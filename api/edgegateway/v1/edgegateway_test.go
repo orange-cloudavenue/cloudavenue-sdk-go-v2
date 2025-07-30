@@ -26,7 +26,7 @@ func TestGetEdgeGateway(t *testing.T) {
 		{
 			name: "Valid Edge Gateway ID",
 			params: &ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			expectedErr: false,
 		},
@@ -37,7 +37,7 @@ func TestGetEdgeGateway(t *testing.T) {
 			},
 			expectedErr: false,
 			mockResponse: &ModelEdgeGateway{
-				ID:   generator.MustGenerate("{urn:edgeGateway}"),
+				ID:   generator.MustGenerate("{urn:edgegateway}"),
 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			mockResponseStatus: 200,
@@ -60,7 +60,7 @@ func TestGetEdgeGateway(t *testing.T) {
 		{
 			name: "Error 500",
 			params: &ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
 			mockResponse:       nil,
@@ -115,7 +115,7 @@ func TestGetEdgeGateway_ContextDeadlineExceeded(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), 0)
 	defer cancel()
 
-	_, err = eC.GetEdgeGateway(ctx, ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgeGateway}")})
+	_, err = eC.GetEdgeGateway(ctx, ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgegateway}")})
 	assert.NotNil(t, err, "Expected context deadline exceeded error")
 	assert.Contains(t, err.Error(), "context deadline exceeded", "Expected error to contain 'context deadline exceeded'")
 }
@@ -180,7 +180,7 @@ func TestDeleteEdgeGateway(t *testing.T) {
 		{
 			name: "Valid Edge Gateway ID",
 			params: &ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponse: nil,
 			// mockResponseStatus: 202,
@@ -216,7 +216,7 @@ func TestDeleteEdgeGateway(t *testing.T) {
 		{
 			name: "Error 500",
 			params: &ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponse:       nil,
 			mockResponseStatus: 500,
@@ -225,7 +225,7 @@ func TestDeleteEdgeGateway(t *testing.T) {
 		{
 			name: "Error 401",
 			params: &ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponse:       nil,
 			mockResponseStatus: 401,
@@ -277,7 +277,7 @@ func TestDeleteEdgeGateway_ContextDeadlineExceeded(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), 0)
 	defer cancel()
 
-	err := eC.DeleteEdgeGateway(ctx, ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgeGateway}")})
+	err := eC.DeleteEdgeGateway(ctx, ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgegateway}")})
 	assert.NotNil(t, err, "Expected context deadline exceeded error")
 	assert.Contains(t, err.Error(), "context deadline exceeded", "Expected error to contain 'context deadline exceeded'")
 }
@@ -640,7 +640,7 @@ func TestUpdateEdgeGateway(t *testing.T) {
 		{
 			name: "Valid Edge Gateway ID",
 			params: &ParamsUpdateEdgeGateway{
-				ID:        generator.MustGenerate("{urn:edgeGateway}"),
+				ID:        generator.MustGenerate("{urn:edgegateway}"),
 				Bandwidth: 25,
 			},
 
@@ -675,7 +675,7 @@ func TestUpdateEdgeGateway(t *testing.T) {
 		{
 			name: "Error 500",
 			params: &ParamsUpdateEdgeGateway{
-				ID:        generator.MustGenerate("{urn:edgeGateway}"),
+				ID:        generator.MustGenerate("{urn:edgegateway}"),
 				Bandwidth: 10,
 			},
 			mockResponse:       struct{}{},
@@ -685,7 +685,7 @@ func TestUpdateEdgeGateway(t *testing.T) {
 		{
 			name: "Error 401",
 			params: &ParamsUpdateEdgeGateway{
-				ID:        generator.MustGenerate("{urn:edgeGateway}"),
+				ID:        generator.MustGenerate("{urn:edgegateway}"),
 				Bandwidth: 10,
 			},
 			mockResponse:       struct{}{},

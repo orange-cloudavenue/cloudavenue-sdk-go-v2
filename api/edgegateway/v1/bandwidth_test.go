@@ -20,7 +20,7 @@ import (
 // 		{
 // 			name: "Valid Edge Gateway ID",
 // 			params: ParamsEdgeGateway{
-// 				ID: generator.MustGenerate("{urn:edgeGateway}"),
+// 				ID: generator.MustGenerate("{urn:edgegateway}"),
 // 			},
 // 			expectedErr: false,
 // 		},
@@ -41,7 +41,7 @@ import (
 // 		{
 // 			name: "Error 500",
 // 			params: ParamsEdgeGateway{
-// 				ID: generator.MustGenerate("{urn:edgeGateway}"),
+// 				ID: generator.MustGenerate("{urn:edgegateway}"),
 // 			},
 // 			queryResponse:       struct{}{},
 // 			queryResponseStatus: 500,
@@ -85,7 +85,7 @@ import (
 // 	ctx, cancel := context.WithTimeout(t.Context(), 0)
 // 	defer cancel()
 
-// 	_, err = eC.GetBandwidth(ctx, ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgeGateway}")})
+// 	_, err = eC.GetBandwidth(ctx, ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgegateway}")})
 // 	assert.NotNil(t, err, "Expected context deadline exceeded error")
 // 	assert.Contains(t, err.Error(), "context deadline exceeded", "Expected error to contain 'context deadline exceeded'")
 // }
@@ -108,7 +108,7 @@ import (
 // 		{
 // 			name: "Valid Edge Gateway ID",
 // 			params: ParamsEdgeGateway{
-// 				ID: generator.MustGenerate("{urn:edgeGateway}"),
+// 				ID: generator.MustGenerate("{urn:edgegateway}"),
 // 			},
 // 			expectedErr: false,
 // 		},
@@ -147,7 +147,7 @@ import (
 // 		{
 // 			name: "EdgeGateway not found by ID",
 // 			params: ParamsEdgeGateway{
-// 				ID: generator.MustGenerate("{urn:edgeGateway}"),
+// 				ID: generator.MustGenerate("{urn:edgegateway}"),
 // 			},
 // 			queryResp: &apiResponseT0s{
 // 				apiResponseT0{
@@ -159,10 +159,10 @@ import (
 // 							Name: generator.MustGenerate("{resource_name:edgegateway}"),
 // 							Properties: struct {
 // 								RateLimit int    "json:\"rateLimit,omitempty\" fake:\"5\""
-// 								EdgeUUID  string "json:\"edgeUuid,omitempty\" fake:\"{urn:edgeGateway}\""
+// 								EdgeUUID  string "json:\"edgeUuid,omitempty\" fake:\"{urn:edgegateway}\""
 // 							}{
 // 								RateLimit: 5,
-// 								EdgeUUID:  must(extractor.ExtractUUID(generator.MustGenerate("{urn:edgeGateway}"))),
+// 								EdgeUUID:  must(extractor.ExtractUUID(generator.MustGenerate("{urn:edgegateway}"))),
 // 							},
 // 						},
 // 					},
@@ -174,7 +174,7 @@ import (
 // 		{
 // 			name: "Error 500",
 // 			params: ParamsEdgeGateway{
-// 				ID: generator.MustGenerate("{urn:edgeGateway}"),
+// 				ID: generator.MustGenerate("{urn:edgegateway}"),
 // 			},
 // 			queryStatus: 500,
 // 			expectedErr: false, // Error HTTP 500 does not return an error because a retry is performed.
@@ -182,7 +182,7 @@ import (
 // 		{
 // 			name: "Error 404",
 // 			params: ParamsEdgeGateway{
-// 				ID: generator.MustGenerate("{urn:edgeGateway}"),
+// 				ID: generator.MustGenerate("{urn:edgegateway}"),
 // 			},
 // 			queryStatus: 404,
 // 			expectedErr: true,
@@ -222,7 +222,7 @@ func Test_GetEdgeGatewayBandwidth(t *testing.T) {
 		{
 			name: "Valid Edge Gateway ID",
 			params: ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			expectedErr: false,
 		},
@@ -243,7 +243,7 @@ func Test_GetEdgeGatewayBandwidth(t *testing.T) {
 		{
 			name: "Error 500",
 			params: ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponse:       struct{}{},
 			mockResponseStatus: 500,
@@ -252,7 +252,7 @@ func Test_GetEdgeGatewayBandwidth(t *testing.T) {
 		{
 			name: "Error 404",
 			params: ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgeGateway}"),
+				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponse:       struct{}{},
 			mockResponseStatus: 404,

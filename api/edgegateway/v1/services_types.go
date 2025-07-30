@@ -80,7 +80,7 @@ type (
 		Properties  struct {
 			// EdgeGateway
 			RateLimit int    `json:"rateLimit,omitempty"`
-			EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgeGateway}"` // The UUID of the edge gateway
+			EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"` // The UUID of the edge gateway
 		} `json:"properties,omitempty"`
 		Children  []apiResponseNetworkServicesSubChildren `json:"children,omitempty" fakesize:"6"`
 		ServiceID string                                  `json:"serviceId,omitempty"`

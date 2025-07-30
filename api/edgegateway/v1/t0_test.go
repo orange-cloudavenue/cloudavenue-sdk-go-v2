@@ -122,7 +122,7 @@ func Test_GetT0(t *testing.T) {
 		{
 			name: "Simulate empty response EdgeGateway ID",
 			params: ParamsGetT0{
-				EdgegatewayID: generator.MustGenerate("{urn:edgeGateway}"),
+				EdgegatewayID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponse:       &apiResponseT0s{},
 			mockResponseStatus: http.StatusOK,
@@ -209,7 +209,7 @@ func Test_GetT0(t *testing.T) {
 // 		{
 // 			name: "Simulate empty response with edge gateway ID",
 // 			params: ParamsEdgeGateway{
-// 				ID: generator.MustGenerate("{urn:edgeGateway}"),
+// 				ID: generator.MustGenerate("{urn:edgegateway}"),
 // 			},
 // 			mockResponse:       &apiResponseT0s{},
 // 			mockResponseStatus: http.StatusOK,
@@ -218,7 +218,7 @@ func Test_GetT0(t *testing.T) {
 // 		{
 // 			name: "Error 404",
 // 			params: ParamsEdgeGateway{
-// 				ID: generator.MustGenerate("{urn:edgeGateway}"),
+// 				ID: generator.MustGenerate("{urn:edgegateway}"),
 // 			},
 // 			mockResponseStatus: http.StatusNotFound,
 // 			expectedErr:        true, // Error HTTP 404 should return an error.

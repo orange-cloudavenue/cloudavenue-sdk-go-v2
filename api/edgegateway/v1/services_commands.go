@@ -119,7 +119,7 @@ func init() {
 				Name:        "id",
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
-				Example:     generator.MustGenerate("{urn:edgeGateway}"),
+				Example:     generator.MustGenerate("{urn:edgegateway}"),
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("Name"),
 					commands.ValidatorOmitempty(),
@@ -167,7 +167,7 @@ func init() {
 				Name:        "id",
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
-				Example:     generator.MustGenerate("{urn:edgeGateway}"),
+				Example:     generator.MustGenerate("{urn:edgegateway}"),
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("Name"),
 					commands.ValidatorOmitempty(),

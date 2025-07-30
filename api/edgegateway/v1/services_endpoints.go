@@ -73,7 +73,7 @@ func init() {
 							Properties: struct {
 								// EdgeGateway
 								RateLimit int    `json:"rateLimit,omitempty"`
-								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgeGateway}"` // The UUID of the edge gateway
+								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"` // The UUID of the edge gateway
 							}{
 								RateLimit: 5,
 								EdgeUUID:  edgeID,
