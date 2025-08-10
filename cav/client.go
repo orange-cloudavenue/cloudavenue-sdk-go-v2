@@ -25,14 +25,18 @@ var isMockClient bool
 
 type client struct {
 	logger             *slog.Logger
-	console            consoles.Console
-	clientsInitialized map[SubClientName]SubClient
+	console            consoles.ConsoleName
+	clientsInitialized map[subClientName]subClientInterface
+
+	cachePassphrase, cachePath string
 }
 
 type Client interface {
 	NewRequest(ctx context.Context, endpoint *Endpoint, opts ...RequestOption) (req *resty.Request, err error)
 	Logger() *slog.Logger
 	Do(ctx context.Context, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error)
+	GetConsole() consoles.ConsoleName
+	Close() error
 }
 
 // NewClient creates a new client object
@@ -69,6 +73,14 @@ func NewClient(organization string, opts ...ClientOption) (Client, error) {
 		isMockClient = true
 	}
 
+	// Cache
+	// If caching is enabled, store the client in the cache.
+	if settings.CachePassphrase != "" && settings.CachePath != "" {
+		if err := client.restoreSessionsFromCache(settings.CachePassphrase, settings.CachePath); err != nil {
+			return nil, err
+		}
+	}
+
 	return client, nil
 }
 
@@ -78,7 +90,7 @@ func (c *client) ParseAPIError(action string, resp *resty.Response) *errors.APIE
 		return nil
 	}
 
-	clientName, ok := resp.Request.Context().Value(contextKeyClientName).(SubClientName)
+	clientName, ok := resp.Request.Context().Value(contextKeyClientName).(subClientName)
 	if !ok {
 		return &errors.APIError{
 			StatusCode: resp.StatusCode(),
@@ -105,8 +117,40 @@ func (c *client) Logger() *slog.Logger {
 	return c.logger
 }
 
+// GetConsole returns the console for the client.
+func (c *client) GetConsole() consoles.ConsoleName {
+	return c.console
+}
+
+// Close closes the client and releases any resources.
+func (c *client) Close() error {
+	errGroup := []error{}
+
+	// Close any subclients if they implement the close method.
+	for _, subClient := range c.clientsInitialized {
+		if err := subClient.close(); err != nil {
+			errGroup = append(errGroup, fmt.Errorf("failed to close subclient: %w", err))
+		}
+	}
+
+	if len(errGroup) > 0 {
+		c.logger.Error("Failed to close some subclients", "errors", errGroup)
+		return fmt.Errorf("failed to close some subclients: %v", errGroup)
+	}
+
+	if c.cachePassphrase != "" && c.cachePath != "" {
+		if err := c.storeSessionsToCache(c.cachePassphrase, c.cachePath); err != nil {
+			c.logger.Error("Failed to store sessions to cache", "error", err)
+			return err
+		}
+	}
+
+	c.logger.Debug("Closing client", "console", c.console)
+	return nil
+}
+
 // identifyClient identifies the client type.
-func (c *client) identifyClient(_ context.Context, cN SubClientName) (SubClient, error) {
+func (c *client) identifyClient(_ context.Context, cN subClientName) (subClientInterface, error) {
 	if c.clientsInitialized[cN] == nil {
 		return nil, fmt.Errorf("invalid client %s", cN)
 	}

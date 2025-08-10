@@ -35,6 +35,7 @@ func init() {
 
 	// QueryEdgeGateway
 	cav.Endpoint{
+		// "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-ExecuteQuery.html"
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/38.1/doc/types/QueryResultEdgeGatewayRecordType.html",
 		Name:             "QueryEdgeGateway",
 		Description:      "Query EdgeGateway",

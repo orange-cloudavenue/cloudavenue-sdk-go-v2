@@ -23,7 +23,7 @@ func Test_newCloudavenueCredential(t *testing.T) {
 	// Test cases for newCloudavenueCredential
 	tests := []struct {
 		name         string
-		console      consoles.Console
+		console      consoles.ConsoleName
 		organization string
 		username     string
 		password     string

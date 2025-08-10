@@ -18,29 +18,51 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
-var subClients = map[SubClientName]SubClient{
+var subClients = map[subClientName]subClientInterface{
 	ClientVmware:   newVmwareClient(),
 	ClientCerberus: newCerberusClient(),
 }
 
-type SubClientName string
+type subClientName string
 
 const (
-	ClientVmware    SubClientName = "vmware"
-	ClientCerberus  SubClientName = "cerberus"
-	ClientNetbackup SubClientName = "netbackup"
+	ClientVmware    subClientName = "vmware"
+	ClientCerberus  subClientName = "cerberus"
+	ClientNetbackup subClientName = "netbackup"
 )
 
 type subclient struct {
 	httpClient *resty.Client
 	credential auth
-	console    consoles.Console
+	console    consoles.ConsoleName
 }
 
-type SubClient interface {
-	SetCredential(auth)
-	SetConsole(consoles.Console)
-	NewHTTPClient(context.Context) (*resty.Client, error)
+type subClientInterface interface {
+	setCredential(auth)
+	getCredential() auth
+	setConsole(consoles.ConsoleName)
+	newHTTPClient(context.Context) (*resty.Client, error)
+
 	parseAPIError(operation string, resp *resty.Response) *errors.APIError
 	idempotentRetryCondition() resty.RetryConditionFunc
+
+	// getID returns the unique identifier for the subclient
+	getID() string
+
+	close() error
+}
+
+// getCredential retrieves the current authentication credentials.
+func (s *subclient) getCredential() auth {
+	return s.credential
+}
+
+// setCredential sets the authentication credential for the subclient.
+func (s *subclient) setCredential(a auth) {
+	s.credential = a
+}
+
+// setConsole sets the console name for the subclient.
+func (s *subclient) setConsole(console consoles.ConsoleName) {
+	s.console = console
 }

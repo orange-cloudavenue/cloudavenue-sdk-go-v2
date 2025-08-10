@@ -5,9 +5,11 @@ import (
 	"reflect"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 
 	// Force import of all commands to register them
 	_ "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/edgegateway/v1"
+	_ "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/vdc/v1"
 )
 
 // NewRegistry get the global command registry
@@ -15,6 +17,7 @@ var reg = commands.NewRegistry()
 
 func main() {
 
+	// * Commands
 	var funcs = make(map[string]Functionality)
 
 	for _, ns := range reg.GetNamespaces() {
@@ -25,6 +28,21 @@ func main() {
 
 	// Output the functionalities to a JSON file
 	err := writeJSONFile("functionalities.json", funcs)
+	if err != nil {
+		log.Default().Println("Error writing functionalities to JSON file:", err)
+		return
+	}
+
+	// * Consoles
+
+	var cs = make(map[string]consoles.Console)
+
+	for _, console := range consoles.GetConsoles() {
+		cs[console.SiteName] = console
+	}
+
+	// Output the functionalities to a JSON file
+	err = writeJSONFile("consoles.json", cs)
 	if err != nil {
 		log.Default().Println("Error writing functionalities to JSON file:", err)
 		return
@@ -158,6 +176,29 @@ func commandToFunc(cmd commands.Command) Func {
 		}
 
 		f.Model = docs
+	}
+
+	// * Rules
+	if cmd.ParamsRules != nil {
+		exported := make([]RuleExport, 0, len(cmd.ParamsRules))
+		for _, r := range cmd.ParamsRules {
+			exported = append(exported, RuleExport{
+				Consoles:    getConsoleNames(r.Consoles),
+				WhenHuman:   ConditionToString(r.When),
+				When:        ExportCondition(r.When),
+				Target:      r.Target,
+				Min:         r.Rule.Min,
+				Max:         r.Rule.Max,
+				Enum:        r.Rule.Enum,
+				Pattern:     r.Rule.Pattern,
+				Description: r.Rule.Description,
+				Unit:        r.Rule.Unit,
+			})
+		}
+
+		if len(exported) > 0 {
+			f.Rules = exported
+		}
 	}
 
 	return f

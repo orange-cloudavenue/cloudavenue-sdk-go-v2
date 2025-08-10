@@ -73,7 +73,7 @@ type (
 
 type (
 	apiRequestEdgeGateway struct {
-		T0Name string `json:"tier0VrfId" fake:"{resource_name:t0}"`
+		T0Name string `json:"tier0VrfId" fake:"{resource_name:t0}" validate:"required,resource_name=t0"`
 	}
 
 	apiResponseEdgegateways struct {

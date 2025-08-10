@@ -28,13 +28,24 @@ type Command struct {
 	// Paramspec defines specifications for arguments.
 	ParamsSpecs ParamsSpecs
 
+	// ParamsRules refers to the rules that apply to the parameters.
+	ParamsRules ParamsRules
+
 	// ParamsType defines the type of parameters for the command.
 	ParamsType any
 
 	// ModelType defines the type of the model returned by the command.
 	ModelType any
 
-	// Runner
+	// PreParamsRunnerFunc is the function that will be called before the command is executed.
+	// It can be used to perform any setup or custom logic before any validation or execution.
+	PreParamsRunnerFunc func(ctx context.Context, cmd *Command, client, paramsIn any) (paramsOut any, err error)
+
+	// PreRulesRunnerFunc is the function that will be called before the command is executed.
+	// It can be used to perform any setup or custom logic after paramsSpecs validation and before rules validation.
+	PreRulesRunnerFunc func(ctx context.Context, cmd *Command, client, paramsIn any) (paramsOut any, err error)
+
+	// RunnerFunc is the function that will be called to execute the command.
 	RunnerFunc func(ctx context.Context, cmd *Command, client, params any) (any, error)
 
 	// Deprecated defines whether the command is deprecated.
@@ -43,6 +54,11 @@ type Command struct {
 
 	// AutoGenerate defines whether the command is auto-generated.
 	AutoGenerate bool
+
+	// Internal
+
+	// Internal use only, used to store the parameters passed to the command.
+	params any
 }
 
 // Func

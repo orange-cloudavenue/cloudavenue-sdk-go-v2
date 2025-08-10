@@ -55,6 +55,8 @@ func apiResponseTypes(m dsl.Matcher) {
 //   - Update
 //   - Enable
 //   - Disable
+//   - Add
+//   - Remove
 //
 // If an exported function does not follow this convention, the linter will report an error.
 func apiFuncPrefix(m dsl.Matcher) {
@@ -65,10 +67,10 @@ func apiFuncPrefix(m dsl.Matcher) {
 	m.Match(`func ($*method) $name($*params) ($*output) { $*body }`).
 		Where(
 			m.File().PkgPath.Matches(`api/`) &&
-				!m["name"].Text.Matches(`^(Get|Create|List|Delete|Update|Enable|Disable)[A-Z]{1}[A-Za-z0-9_]*$`) &&
+				!m["name"].Text.Matches(`^(Get|Create|List|Delete|Update|Enable|Disable|Add|Remove)[A-Z]{1}[A-Za-z0-9_]*$`) &&
 				isExported(m["name"]),
 		).
-		Report(`Function names must start with Get | Create | List | Delete | Update | Enable | Disable (See CONTRIBUTING.md)`)
+		Report(`Function names must start with Get | Create | List | Delete | Update | Enable | Disable | Add | Remove (See CONTRIBUTING.md)`)
 }
 
 // boolFunctionNaming enforces naming conventions for functions that return a boolean value.

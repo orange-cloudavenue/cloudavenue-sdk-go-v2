@@ -13,26 +13,13 @@ import (
 	"github.com/orange-cloudavenue/common-go/validators"
 )
 
-//go:generate command-generator -path bandwidth_commands.go
+//go:generate command-generator -path edgegateway_commands.go
 
 func init() {
 	// * EdgeGateway
 	// This command is a high-level command that allows you to manage documentation for the EdgeGateway resource.
 	cmds.Register(commands.Command{
 		Namespace: "EdgeGateway",
-
-		MarkdownDocumentation: `
-**EdgeGateway** is a virtualized network appliance designed to provide secure connectivity, routing, and network services at the edge of a virtualized environment. It acts as a critical component for managing network traffic between internal virtual networks and external networks, such as the internet or remote sites.
-
-### Key Features
-
-- **Firewall:** Offers stateful firewall capabilities to control and secure traffic flows between different network segments.
-- **NAT (Network Address Translation):** Supports source and destination NAT, enabling private internal networks to communicate with external networks.
-- **VPN (Virtual Private Network):** Facilitates secure site-to-site and remote-access VPN connections for encrypted communications.
-- **Load Balancing:** Distributes incoming network traffic across multiple servers or services to optimize resource utilization and improve availability.
-- **DHCP Services:** Provides integrated DHCP services for connected networks.
-- **Network Segmentation:** Enables the creation of multiple isolated networks within a virtual environment for enhanced security and compliance.
-`,
 	})
 
 	// * GetEdgeGateway
@@ -151,12 +138,12 @@ func init() {
 			},
 			commands.ParamsSpec{
 				Name:        "t0_name",
-				Description: "The name of the T0 router that this edge gateway will be connected to.",
+				Description: "The name of the T0 router that this edge gateway will be connected to. If not provided and only if one T0 router is available, the first T0 router will be used.",
 				Required:    false,
 				Example:     "tn01e02ocb0001234spt101",
 				Validators: []commands.Validator{
 					commands.ValidatorOmitempty(),
-					// TODO validator cav name
+					commands.ValidatorResourceName("t0"),
 				},
 			},
 			commands.ParamsSpec{

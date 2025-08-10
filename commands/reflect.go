@@ -72,10 +72,7 @@ func GetParamType(paramType reflect.Type, name string) (reflect.Type, error) {
 
 // getValuesForFieldByName recursively search for fields in a cmdArgs' value and returns its values if they exist.
 // The search is based on the name of the field.
-func getValuesForFieldByName(
-	value reflect.Value,
-	parts []string,
-) (values []reflect.Value, err error) {
+func getValuesForFieldByName(value reflect.Value, parts []string) (values []reflect.Value, err error) {
 	if len(parts) == 0 {
 		return []reflect.Value{value}, nil
 	}

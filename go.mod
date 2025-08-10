@@ -2,23 +2,25 @@ module github.com/orange-cloudavenue/cloudavenue-sdk-go-v2
 
 go 1.24.4
 
-replace (
-	github.com/orange-cloudavenue/common-go => ../common-go
-	github.com/orange-cloudavenue/common-go/extractor => ../common-go/extractor
-	github.com/orange-cloudavenue/common-go/generator => ../common-go/generator
-	github.com/orange-cloudavenue/common-go/print => ../common-go/print
-	github.com/orange-cloudavenue/common-go/validators => ../common-go/validators
-)
+// replace (
+// 	github.com/orange-cloudavenue/common-go => ../common-go
+// 	github.com/orange-cloudavenue/common-go/extractor => ../common-go/extractor
+// 	github.com/orange-cloudavenue/common-go/generator => ../common-go/generator
+// 	github.com/orange-cloudavenue/common-go/print => ../common-go/print
+// 	github.com/orange-cloudavenue/common-go/validators => ../common-go/validators
+// )
 
 require (
 	github.com/go-chi/chi/v5 v5.2.2
 	github.com/orange-cloudavenue/common-go/extractor v1.0.0
 	github.com/orange-cloudavenue/common-go/generator v1.3.1
 	github.com/orange-cloudavenue/common-go/urn v1.1.0
-	github.com/orange-cloudavenue/common-go/validators v1.1.1
+	github.com/orange-cloudavenue/common-go/utils v1.0.0
+	github.com/orange-cloudavenue/common-go/validators v1.1.2
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.34
 	github.com/stretchr/testify v1.10.0
+	golang.org/x/sync v0.16.0
 	resty.dev/v3 v3.0.0-beta.3
 )
 

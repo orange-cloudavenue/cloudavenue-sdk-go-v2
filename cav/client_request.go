@@ -43,7 +43,7 @@ func (c *client) NewRequest(ctx context.Context, endpoint *Endpoint, _ ...Reques
 
 	// Setup the HTTP client for the request.
 	// This client is used to send the request and handle the response.
-	hC, err := sc.NewHTTPClient(ctxv)
+	hC, err := sc.newHTTPClient(ctxv)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func (c *client) NewRequest(ctx context.Context, endpoint *Endpoint, _ ...Reques
 		// This is necessary because the initial client (hc) have a specific middleware defined below.
 		// If the hc client has used in NewJobMiddleware, it will create an infinite loop.
 		// So we create a new client for job requests.
-		hCForJob, err := sc.NewHTTPClient(ctxv)
+		hCForJob, err := sc.newHTTPClient(ctxv)
 		if err != nil {
 			return nil, err
 		}

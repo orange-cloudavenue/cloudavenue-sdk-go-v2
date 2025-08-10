@@ -198,7 +198,7 @@ You can visualize and debug the naming convention regex used by the linter here:
 ### API Function Naming
 
 - Exported functions in any `api/` directory must start with one of the following prefixes:  
-  `Get`, `Create`, `List`, `Delete`, `Update`, `Enable`, `Disable`
+  `Get`, `Create`, `List`, `Delete`, `Update`, `Enable`, `Disable`, `Add`, `Remove`
   - Example: `GetEdgeGateway`, `CreateVDC`, `ListVApps`
 - Functions returning a boolean value must start with:  
   `Is`, `is`, `Has`, `has`, `Match`, `match`

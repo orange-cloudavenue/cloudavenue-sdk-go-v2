@@ -15,6 +15,7 @@ import (
 	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
+	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 type (
@@ -117,6 +118,11 @@ func SetBody(body any) EndpointRequestOption {
 			if reflectBody != reflectBodyType {
 				return errors.Newf("body must be of type %s (not %s) for endpoint %s %s", reflectBodyType, reflectBody, endpoint.Name, endpoint.Method)
 			}
+		}
+
+		// Validate the body
+		if err := validators.New().Validate.Struct(body); err != nil {
+			return errors.Newf("body validation failed for endpoint %s %s: %v", endpoint.Name, endpoint.Method, err)
 		}
 
 		req.SetBody(body)

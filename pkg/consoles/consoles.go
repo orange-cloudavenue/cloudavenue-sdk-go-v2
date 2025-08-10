@@ -17,13 +17,13 @@ import (
 var mu = &sync.RWMutex{}
 
 type (
-	Console      string
+	ConsoleName  string
 	LocationCode string
 
-	console struct {
+	Console struct {
 		SiteName            string
 		LocationCode        LocationCode
-		SiteID              Console
+		SiteID              ConsoleName
 		Services            Services
 		OrganizationPattern *regexp.Regexp
 	}
@@ -44,20 +44,20 @@ type (
 )
 
 const (
-	Console1 Console = "console1" // Externe VDR
-	Console2 Console = "console2" // Internal VDR
-	Console4 Console = "console4" // Externe CHA
-	Console5 Console = "console5" // Internal CHA
-	Console7 Console = "console7" // Externe VDR
-	Console8 Console = "console8" // Internal VDR
-	Console9 Console = "console9" // Externe VDRCHA
+	Console1 ConsoleName = "console1" // Externe VDR
+	Console2 ConsoleName = "console2" // Internal VDR
+	Console4 ConsoleName = "console4" // Externe CHA
+	Console5 ConsoleName = "console5" // Internal CHA
+	Console7 ConsoleName = "console7" // Externe VDR
+	Console8 ConsoleName = "console8" // Internal VDR
+	Console9 ConsoleName = "console9" // Externe VDRCHA
 
 	LocationVDR    LocationCode = "vdr"
 	LocationCHR    LocationCode = "chr"
 	LocationVDRCHA LocationCode = "vdr-cha"
 )
 
-var consoles = map[Console]console{
+var consoles = map[ConsoleName]Console{
 	Console1: {
 		SiteName:            "Console Externe VDR",
 		LocationCode:        LocationVDR,
@@ -82,7 +82,7 @@ var consoles = map[Console]console{
 			},
 			Netbackup: Service{
 				Enabled:  true,
-				Endpoint: "https://backup1.cloudavenue.orange-business.com/NetBackupSelfService/Api",
+				Endpoint: "https://backup1.cloudavenue.orange-business.com",
 			},
 		},
 	},
@@ -110,7 +110,7 @@ var consoles = map[Console]console{
 			},
 			Netbackup: Service{
 				Enabled:  true,
-				Endpoint: "https://backup2.cloudavenue.orange-business.com/NetBackupSelfService/Api",
+				Endpoint: "https://backup2.cloudavenue.orange-business.com",
 			},
 		},
 	},
@@ -135,7 +135,7 @@ var consoles = map[Console]console{
 			},
 			Netbackup: Service{
 				Enabled:  true,
-				Endpoint: "https://backup4.cloudavenue.orange-business.com/NetBackupSelfService/Api",
+				Endpoint: "https://backup4.cloudavenue.orange-business.com",
 			},
 		},
 	},
@@ -159,7 +159,7 @@ var consoles = map[Console]console{
 			},
 			Netbackup: Service{
 				Enabled:  true,
-				Endpoint: "https://backup5.cloudavenue-cha.itn.intraorange/NetBackupSelfService/Api",
+				Endpoint: "https://backup5.cloudavenue-cha.itn.intraorange",
 			},
 		},
 	},
@@ -180,7 +180,7 @@ var consoles = map[Console]console{
 			},
 			Netbackup: Service{
 				Enabled:  true,
-				Endpoint: "https://backup7.cloudavenue-vdr.itn.intraorange/NetBackupSelfService/Api",
+				Endpoint: "https://backup7.cloudavenue-vdr.itn.intraorange",
 			},
 		},
 	},
@@ -200,7 +200,7 @@ var consoles = map[Console]console{
 			},
 			Netbackup: Service{
 				Enabled:  true,
-				Endpoint: "https://backup8.cloudavenue-vdr.itn.intraorange/NetBackupSelfService/Api",
+				Endpoint: "https://backup8.cloudavenue-vdr.itn.intraorange",
 			},
 		},
 	},
@@ -221,14 +221,18 @@ var consoles = map[Console]console{
 			},
 			Netbackup: Service{
 				Enabled:  false,
-				Endpoint: "https://backup9.cloudavenue.orange-business.com/NetBackupSelfService/Api",
+				Endpoint: "https://backup9.cloudavenue.orange-business.com",
 			},
 		},
 	},
 }
 
+func GetConsoles() map[ConsoleName]Console {
+	return consoles
+}
+
 // FindByOrganizationName - Returns the console by its organization name.
-func FindByOrganizationName(organizationName string) (Console, bool) {
+func FindByOrganizationName(organizationName string) (ConsoleName, bool) {
 	mu.RLock()
 	defer mu.RUnlock()
 
@@ -260,7 +264,7 @@ func CheckOrganizationName(organizationName string) bool {
 }
 
 // Services - Returns the Services.
-func (c Console) Services() Services {
+func (c ConsoleName) Services() Services {
 	mu.RLock()
 	defer mu.RUnlock()
 
@@ -278,7 +282,7 @@ func (ss Service) GetEndpoint() string {
 }
 
 // GetSiteName - Returns the site name.
-func (c Console) GetSiteName() string {
+func (c ConsoleName) GetSiteName() string {
 	mu.RLock()
 	defer mu.RUnlock()
 
@@ -286,7 +290,7 @@ func (c Console) GetSiteName() string {
 }
 
 // GetLocationCode - Returns the location code.
-func (c Console) GetLocationCode() LocationCode {
+func (c ConsoleName) GetLocationCode() LocationCode {
 	mu.RLock()
 	defer mu.RUnlock()
 
@@ -294,7 +298,7 @@ func (c Console) GetLocationCode() LocationCode {
 }
 
 // GetSiteID - Returns the site ID.
-func (c Console) GetSiteID() Console {
+func (c ConsoleName) GetSiteID() ConsoleName {
 	mu.RLock()
 	defer mu.RUnlock()
 
@@ -302,7 +306,7 @@ func (c Console) GetSiteID() Console {
 }
 
 // GetAPIVCDEndpoint - Returns the VMware API endpoint.
-func (c Console) GetAPIVCDEndpoint() string {
+func (c ConsoleName) GetAPIVCDEndpoint() string {
 	mu.RLock()
 	defer mu.RUnlock()
 
@@ -310,7 +314,7 @@ func (c Console) GetAPIVCDEndpoint() string {
 }
 
 // GetAPICerberusEndpoint - Returns the Cerberus API endpoint.
-func (c Console) GetAPICerberusEndpoint() string {
+func (c ConsoleName) GetAPICerberusEndpoint() string {
 	mu.RLock()
 	defer mu.RUnlock()
 
@@ -318,7 +322,7 @@ func (c Console) GetAPICerberusEndpoint() string {
 }
 
 // OverrideEndpoint - Overrides the endpoint for a specific service.
-func (c Console) OverrideEndpoint(svc Services) {
+func (c ConsoleName) OverrideEndpoint(svc Services) {
 	mu.Lock()
 	defer mu.Unlock()
 	x := consoles[c]

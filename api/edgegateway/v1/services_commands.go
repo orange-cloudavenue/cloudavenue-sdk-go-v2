@@ -17,16 +17,6 @@ func init() {
 	cmds.Register(commands.Command{
 		Namespace: "EdgeGateway",
 		Resource:  "Services",
-
-		MarkdownDocumentation: `
-**Services** are the services available on the EdgeGateway, such as load balancers, public IPs, and Cloud Avenue services.
-
-## Key Features
-
- - **Load Balancers**: Retrieve information about load balancers configured on the EdgeGateway.
- - **Public IPs**: Get details about public IP addresses associated with the EdgeGateway.
- - **Cloud Avenue Services**: Access information about Cloud Avenue services available on the EdgeGateway.
-`,
 	})
 
 	// * GetServices

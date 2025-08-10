@@ -17,8 +17,6 @@ func init() {
 	// ! TO
 	cmds.Register(commands.Command{
 		Namespace: "T0",
-
-		MarkdownDocumentation: "The **Tier0** (T0) router is a core networking component in CloudAvenue's ecosystem. It acts as the gateway between your private cloud networks and external networks, enabling north-south traffic flow, advanced routing, and connectivity to the internet.",
 	})
 
 	// * ListT0
@@ -60,8 +58,10 @@ func init() {
 				Description: "The name of the T0 to retrieve.",
 				Required:    false,
 				Example:     "prvrf01eocb0001234allsp01",
-				Validators:  []commands.Validator{
-					// commands.Va
+				Validators: []commands.Validator{
+					commands.ValidatorRequiredIfParamIsNull("edgegateway_id", "edgegateway_name"),
+					commands.ValidatorOmitempty(),
+					commands.ValidatorResourceName("t0"),
 				},
 			},
 			commands.ParamsSpec{
@@ -69,18 +69,18 @@ func init() {
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("Name"),
+					commands.ValidatorRequiredIfParamIsNull("t0_name", "edgegateway_name"),
 					commands.ValidatorOmitempty(),
 					commands.ValidatorURN("edgegateway"),
 				},
 			},
 			commands.ParamsSpec{
-				Name:        "resource_name=edgegateway",
+				Name:        "edgegateway_name",
 				Description: "The name of the edge gateway.",
 				Required:    false,
 				Example:     "tn01e02ocb0001234spt101",
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("ID"),
+					commands.ValidatorRequiredIfParamIsNull("edgegateway_id", "t0_name"),
 					commands.ValidatorOmitempty(),
 				},
 			},

@@ -32,17 +32,13 @@ type cloudavenueCredential struct {
 	password     string `validate:"required"`
 	bearer       string
 	organization string `validate:"required"`
-	console      consoles.Console
+	console      consoles.ConsoleName
 }
 
 // cloudavenueCredentialXVmwareAccessToken is the header used to retrieve the Bearer token in the authentication process.
 const cloudavenueCredentialXVmwareAccessToken = "X-VMWARE-VCLOUD-ACCESS-TOKEN" // #nosec G101
 
-// NewCloudavenueCredential creates a new CloudavenueCredential
-// with the given username and password.
-var NewCloudavenueCredential = newCloudavenueCredential
-
-func newCloudavenueCredential(c consoles.Console, organization, username, password string) (auth, error) {
+func newCloudavenueCredential(c consoles.ConsoleName, organization, username, password string) (auth, error) {
 	cc := &cloudavenueCredential{
 		logger:       xlogger.WithGroup("auth"),
 		console:      c,
@@ -140,4 +136,25 @@ func (c *cloudavenueCredential) Refresh(ctx context.Context) error {
 // IsInitialized checks if the CloudavenueCredential is initialized.
 func (c *cloudavenueCredential) IsInitialized() bool {
 	return c.bearer != ""
+}
+
+// getSession retrieves the current session information.
+func (c *cloudavenueCredential) getSession() map[string]string {
+	return map[string]string{
+		"organization": c.organization,
+		"bearer":       c.bearer,
+	}
+}
+
+// restoreSession restores session-related data from a secure cache.
+func (c *cloudavenueCredential) restoreSession(data map[string]string) error {
+	if data == nil {
+		return errors.New("invalid session data")
+	}
+
+	xlogger.Debug("Restoring session from cache", "data", data)
+
+	c.organization = data["organization"]
+	c.bearer = data["bearer"]
+	return nil
 }

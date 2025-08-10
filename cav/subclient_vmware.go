@@ -16,20 +16,24 @@ import (
 	"resty.dev/v3"
 
 	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/httpClient"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
-var _ SubClient = &vmware{}
+var _ subClientInterface = &vmware{}
 
 const vmwareVCDVersion = "38.1"
 
-var newVmwareClient = func() SubClient {
+var newVmwareClient = func() subClientInterface {
 	return &vmware{}
 }
 
+// getID returns the unique identifier for the subclient
+func (v *vmware) getID() string {
+	return string(ClientVmware)
+}
+
 // NewClient creates a new request for the VMware subclient.
-func (v *vmware) NewHTTPClient(ctx context.Context) (*resty.Client, error) {
+func (v *vmware) newHTTPClient(ctx context.Context) (*resty.Client, error) {
 	// Create a new HTTP client with the base URL and headers.
 	v.httpClient = httpclient.NewHTTPClient().
 		SetBaseURL(v.console.GetAPIVCDEndpoint()).
@@ -50,14 +54,13 @@ func (v *vmware) NewHTTPClient(ctx context.Context) (*resty.Client, error) {
 	return v.httpClient, nil
 }
 
-// SetCredential sets the authentication credential for the VMware client.
-func (v *vmware) SetCredential(a auth) {
-	v.credential = a
-}
-
-// SetConsole sets the console for the VMware client.
-func (v *vmware) SetConsole(c consoles.Console) {
-	v.console = c
+// Close closes the VMware client and releases any resources.
+func (v *vmware) close() error {
+	// Close the HTTP client if it was created.
+	if v.httpClient != nil {
+		return v.httpClient.Close()
+	}
+	return nil
 }
 
 // ParseAPIError parses the API error response from the VMware client.

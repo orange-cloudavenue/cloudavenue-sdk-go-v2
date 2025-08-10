@@ -2,7 +2,7 @@
   "EdgeGateway": {
     "Title": "EdgeGateway",
     "Documentation": "",
-    "MarkdownDocumentation": "\n**EdgeGateway** is a virtualized network appliance designed to provide secure connectivity, routing, and network services at the edge of a virtualized environment. It acts as a critical component for managing network traffic between internal virtual networks and external networks, such as the internet or remote sites.\n\n### Key Features\n\n- **Firewall:** Offers stateful firewall capabilities to control and secure traffic flows between different network segments.\n- **NAT (Network Address Translation):** Supports source and destination NAT, enabling private internal networks to communicate with external networks.\n- **VPN (Virtual Private Network):** Facilitates secure site-to-site and remote-access VPN connections for encrypted communications.\n- **Load Balancing:** Distributes incoming network traffic across multiple servers or services to optimize resource utilization and improve availability.\n- **DHCP Services:** Provides integrated DHCP services for connected networks.\n- **Network Segmentation:** Enables the creation of multiple isolated networks within a virtual environment for enhanced security and compliance.\n",
+    "MarkdownDocumentation": "",
     "Commands": {
       "Create": {
         "namespace": "EdgeGateway",
@@ -30,11 +30,11 @@
           },
           {
             "name": "t0_name",
-            "description": "The name of the T0 router that this edge gateway will be connected to.",
+            "description": "The name of the T0 router that this edge gateway will be connected to. If not provided and only if one T0 router is available, the first T0 router will be used.",
             "required": false,
             "example": "tn01e02ocb0001234spt101",
             "type": "string",
-            "validators_description": ""
+            "validators_description": "Validates that the value is a valid T0 name (pr01e02ocb0001234spt101).. \n"
           },
           {
             "name": "bandwidth",
@@ -99,7 +99,7 @@
             "required": false,
             "example": "",
             "type": "string",
-            "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgeGateway`).. \n"
+            "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
           },
           {
             "name": "name",
@@ -128,7 +128,7 @@
             "required": false,
             "example": "",
             "type": "string",
-            "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgeGateway`).. \n"
+            "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
           },
           {
             "name": "name",
@@ -241,7 +241,7 @@
             "required": false,
             "example": "",
             "type": "string",
-            "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgeGateway`).. \n"
+            "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
           },
           {
             "name": "name",
@@ -321,7 +321,7 @@
                 "required": false,
                 "example": "",
                 "type": "string",
-                "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgeGateway`).. \n"
+                "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
                 "name": "name",
@@ -348,9 +348,9 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:93baab2e-5a84-4e17-9e2f-333e02c0fcf0",
+                "example": "urn:vcloud:gateway:cabb1860-b013-40c6-9292-e74ec4c09efb",
                 "type": "string",
-                "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgeGateway`).. \n"
+                "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
                 "name": "name",
@@ -377,9 +377,9 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:02d3cd63-ac2f-4ea8-b876-192916f73f3e",
+                "example": "urn:vcloud:gateway:bf26a717-e4b8-4271-a70b-6c05bb4e5af9",
                 "type": "string",
-                "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgeGateway`).. \n"
+                "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
                 "name": "name",
@@ -466,7 +466,7 @@
       "Services": {
         "Title": "Services",
         "Documentation": "",
-        "MarkdownDocumentation": "\n**Services** are the services available on the EdgeGateway, such as load balancers, public IPs, and Cloud Avenue services.\n\n## Key Features\n\n - **Load Balancers**: Retrieve information about load balancers configured on the EdgeGateway.\n - **Public IPs**: Get details about public IP addresses associated with the EdgeGateway.\n - **Cloud Avenue Services**: Access information about Cloud Avenue services available on the EdgeGateway.\n",
+        "MarkdownDocumentation": "",
         "Commands": {
           "Get": {
             "namespace": "EdgeGateway",
@@ -482,7 +482,7 @@
                 "required": false,
                 "example": "",
                 "type": "string",
-                "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgeGateway`).. \n"
+                "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
                 "name": "name",
@@ -596,7 +596,7 @@
   "T0": {
     "Title": "T0",
     "Documentation": "",
-    "MarkdownDocumentation": "The **Tier0** (T0) router is a core networking component in CloudAvenue's ecosystem. It acts as the gateway between your private cloud networks and external networks, enabling north-south traffic flow, advanced routing, and connectivity to the internet.",
+    "MarkdownDocumentation": "",
     "Commands": {
       "Get": {
         "namespace": "T0",
@@ -612,7 +612,7 @@
             "required": false,
             "example": "prvrf01eocb0001234allsp01",
             "type": "string",
-            "validators_description": ""
+            "validators_description": "The value is required if one of the parameters `edgegateway_id`, `edgegateway_name` is null., Validates that the value is a valid T0 name (pr01e02ocb0001234spt101).. \n"
           },
           {
             "name": "edgegateway_id",
@@ -620,15 +620,15 @@
             "required": false,
             "example": "",
             "type": "string",
-            "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgeGateway`).. \n"
+            "validators_description": "The value is required if one of the parameters `t0_name`, `edgegateway_name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
           },
           {
-            "name": "resource_name=edgegateway",
+            "name": "edgegateway_name",
             "description": "The name of the edge gateway.",
             "required": false,
             "example": "tn01e02ocb0001234spt101",
             "type": "string",
-            "validators_description": "The value is required if the parameter `ID` is null., "
+            "validators_description": "The value is required if one of the parameters `edgegateway_id`, `t0_name` is null., "
           }
         ],
         "deprecated": false,
@@ -776,5 +776,991 @@
       }
     },
     "SubFunctionality": {}
+  },
+  "VDC": {
+    "Title": "VDC",
+    "Documentation": "",
+    "MarkdownDocumentation": "",
+    "Commands": {
+      "Create": {
+        "namespace": "VDC",
+        "resource": "",
+        "verb": "Create",
+        "short_documentation": "Create a new VDC",
+        "long_documentation": "Create a new Virtual Data Center (VDC) with the specified parameters.",
+        "markdown_documentation": "",
+        "params": [
+          {
+            "name": "name",
+            "description": "Name of the VDC to create",
+            "required": true,
+            "example": "my-vdc",
+            "type": "string",
+            "validators_description": ""
+          },
+          {
+            "name": "description",
+            "description": "Description of the VDC to create",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": ""
+          },
+          {
+            "name": "service_class",
+            "description": "Service class of the VDC to create",
+            "required": true,
+            "example": "STD",
+            "type": "string",
+            "validators_description": "Validates that the value is one of: `ECO`, `STD`, `HP`, `VOIP`. \n"
+          },
+          {
+            "name": "disponibility_class",
+            "description": "Disponibility class of the VDC to create",
+            "required": true,
+            "example": "ONE-ROOM",
+            "type": "string",
+            "validators_description": "Validates that the value is one of: `ONE-ROOM`, `DUAL-ROOM`, `HA-DUAL-ROOM`. \n"
+          },
+          {
+            "name": "billing_model",
+            "description": "Billing model of the VDC to create",
+            "required": true,
+            "example": "PAYG",
+            "type": "string",
+            "validators_description": "Validates that the value is one of: `PAYG`, `DRAAS`, `RESERVED`. \n"
+          },
+          {
+            "name": "storage_billing_model",
+            "description": "Storage billing model of the VDC to create",
+            "required": true,
+            "example": "PAYG",
+            "type": "string",
+            "validators_description": "Validates that the value is one of: `PAYG`, `RESERVED`. \n"
+          },
+          {
+            "name": "vcpu",
+            "description": "Number of vCPUs to allocate to the VDC.",
+            "required": true,
+            "example": "50",
+            "type": "int",
+            "validators_description": ""
+          },
+          {
+            "name": "memory",
+            "description": "Amount of memory (in GB) to allocate to the VDC.",
+            "required": true,
+            "example": "500",
+            "type": "int",
+            "validators_description": ""
+          },
+          {
+            "name": "storage_profiles.{index}.class",
+            "description": "Class of the storage profile to create. Predefined classes or dedicated storage classes can be used. For predefined classes you have different properties (`_r1`, `_r2` and `_hm`) that can be used to define the storage profile.",
+            "required": true,
+            "example": "gold",
+            "type": "string",
+            "validators_description": ""
+          },
+          {
+            "name": "storage_profiles.{index}.limit",
+            "description": "Limit of the storage profile to create. This is the maximum amount of storage that can be used by the VDC. This is in GiB.",
+            "required": true,
+            "example": "500",
+            "type": "int",
+            "validators_description": "Validates that the value is between 100 and 81920. \n"
+          },
+          {
+            "name": "storage_profiles.{index}.default",
+            "description": "Default storage profile to create. This will be used if no specific profile is provided.",
+            "required": false,
+            "example": "true",
+            "type": "bool",
+            "validators_description": ""
+          }
+        ],
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": [
+          {
+            "object": "id",
+            "type": "string",
+            "documentation": "ID of the VDC"
+          },
+          {
+            "object": "name",
+            "type": "string",
+            "documentation": "Name of the VDC"
+          },
+          {
+            "object": "description",
+            "type": "string",
+            "documentation": "Description of the VDC"
+          },
+          {
+            "object": "compute_capacity.cpu.vcpu",
+            "type": "int",
+            "documentation": "Number of VCPUs"
+          },
+          {
+            "object": "compute_capacity.cpu.used",
+            "type": "int",
+            "documentation": "Used VCPUs"
+          },
+          {
+            "object": "compute_capacity.cpu.frequency",
+            "type": "int",
+            "documentation": "Frequency of the VCPUs in MHz"
+          },
+          {
+            "object": "compute_capacity.memory.limit",
+            "type": "int",
+            "documentation": "Limit of memory in GB"
+          },
+          {
+            "object": "compute_capacity.memory.used",
+            "type": "int",
+            "documentation": "Used memory in GB"
+          },
+          {
+            "object": "networks.{index}.id",
+            "type": "string",
+            "documentation": "ID of the network"
+          },
+          {
+            "object": "networks.{index}.name",
+            "type": "string",
+            "documentation": "Name of the network"
+          },
+          {
+            "object": "storage_profiles.{index}.id",
+            "type": "string",
+            "documentation": "ID of the storage profile"
+          },
+          {
+            "object": "storage_profiles.{index}.name",
+            "type": "string",
+            "documentation": "Class name of the storage profile"
+          },
+          {
+            "object": "properties.service_class",
+            "type": "string",
+            "documentation": "Service class of the VDC"
+          },
+          {
+            "object": "properties.disponibility_class",
+            "type": "string",
+            "documentation": "Disponibility class of the VDC"
+          },
+          {
+            "object": "properties.billing_model",
+            "type": "string",
+            "documentation": "Billing model of the VDC compute"
+          },
+          {
+            "object": "properties.storage_billing_model",
+            "type": "string",
+            "documentation": "Billing model of the VDC storage"
+          },
+          {
+            "object": "number_of_vms",
+            "type": "int",
+            "documentation": "Number of VMs in the VDC"
+          },
+          {
+            "object": "number_of_running_vms",
+            "type": "int",
+            "documentation": "Number of running VMs in the VDC"
+          },
+          {
+            "object": "number_of_vapps",
+            "type": "int",
+            "documentation": "Number of deployed VApps in the VDC"
+          },
+          {
+            "object": "number_of_storage_profiles",
+            "type": "int",
+            "documentation": "Number of storage profiles in the VDC"
+          },
+          {
+            "object": "number_of_disks",
+            "type": "int",
+            "documentation": "Number of disks in the VDC"
+          }
+        ],
+        "rules": [
+          {
+            "consoles": [
+              "Console Externe VDR",
+              "Console Interne VDR"
+            ],
+            "whenHuman": "(service_class = ECO)",
+            "when": {
+              "and": [
+                {
+                  "field": "service_class",
+                  "value": "ECO"
+                }
+              ]
+            },
+            "target": "disponibility_class",
+            "enum": [
+              "ONE-ROOM",
+              "DUAL-ROOM"
+            ],
+            "description": "Disponibility class allowed for Service Class ECO"
+          },
+          {
+            "consoles": [
+              "Console Externe CHA",
+              "Console Interne CHA"
+            ],
+            "whenHuman": "",
+            "when": {},
+            "target": "disponibility_class",
+            "enum": [
+              "ONE-ROOM"
+            ],
+            "description": "Disponibility class allowed for Service Class ECO"
+          },
+          {
+            "consoles": [
+              "Console Externe VDR",
+              "Console Interne VDR"
+            ],
+            "whenHuman": "(service_class = STD OR service_class = HP OR service_class = VOIP)",
+            "when": {
+              "or": [
+                {
+                  "field": "service_class",
+                  "value": "STD"
+                },
+                {
+                  "field": "service_class",
+                  "value": "HP"
+                },
+                {
+                  "field": "service_class",
+                  "value": "VOIP"
+                }
+              ]
+            },
+            "target": "disponibility_class",
+            "enum": [
+              "ONE-ROOM",
+              "DUAL-ROOM",
+              "HA-DUAL-ROOM"
+            ],
+            "description": "Disponibility class allowed for Service Class STD, HP, VOIP"
+          },
+          {
+            "consoles": null,
+            "whenHuman": "(service_class = ECO OR service_class = STD)",
+            "when": {
+              "or": [
+                {
+                  "field": "service_class",
+                  "value": "ECO"
+                },
+                {
+                  "field": "service_class",
+                  "value": "STD"
+                }
+              ]
+            },
+            "target": "billing_model",
+            "enum": [
+              "PAYG",
+              "DRAAS",
+              "RESERVED"
+            ],
+            "description": "Billing model allowed for Service Class ECO, STD"
+          },
+          {
+            "consoles": null,
+            "whenHuman": "(service_class = HP)",
+            "when": {
+              "or": [
+                {
+                  "field": "service_class",
+                  "value": "HP"
+                }
+              ]
+            },
+            "target": "billing_model",
+            "enum": [
+              "PAYG",
+              "RESERVED"
+            ],
+            "description": "Billing model allowed for Service Class HP"
+          },
+          {
+            "consoles": null,
+            "whenHuman": "(service_class = VOIP)",
+            "when": {
+              "or": [
+                {
+                  "field": "service_class",
+                  "value": "VOIP"
+                }
+              ]
+            },
+            "target": "billing_model",
+            "enum": [
+              "RESERVED"
+            ],
+            "description": "Billing model allowed for Service Class VOIP"
+          },
+          {
+            "consoles": null,
+            "whenHuman": "",
+            "when": {},
+            "target": "storage_billing_model",
+            "enum": [
+              "PAYG",
+              "RESERVED"
+            ],
+            "description": "Storage billing model allowed for Service Class ECO"
+          },
+          {
+            "consoles": null,
+            "whenHuman": "(billing_model = PAYG OR billing_model = DRAAS)",
+            "when": {
+              "or": [
+                {
+                  "field": "billing_model",
+                  "value": "PAYG"
+                },
+                {
+                  "field": "billing_model",
+                  "value": "DRAAS"
+                }
+              ]
+            },
+            "target": "vcpu",
+            "min": 5,
+            "max": 200,
+            "description": "VCPU allowed for Service Class ECO with PAYG or DRAAS billing model"
+          },
+          {
+            "consoles": null,
+            "whenHuman": "(billing_model = RESERVED)",
+            "when": {
+              "or": [
+                {
+                  "field": "billing_model",
+                  "value": "RESERVED"
+                }
+              ]
+            },
+            "target": "vcpu",
+            "min": 2,
+            "max": 1136,
+            "description": "VCPU allowed for Service Class ECO with RESERVED billing model"
+          },
+          {
+            "consoles": null,
+            "whenHuman": "",
+            "when": {},
+            "target": "memory",
+            "min": 1,
+            "max": 5120,
+            "description": "Memory allowed for Service Class ECO",
+            "unit": "GB"
+          },
+          {
+            "consoles": null,
+            "whenHuman": "(disponibility_class = ONE-ROOM)",
+            "when": {
+              "or": [
+                {
+                  "field": "disponibility_class",
+                  "value": "ONE-ROOM"
+                }
+              ]
+            },
+            "target": "storage_profiles.{index}.class",
+            "enum": [
+              "silver",
+              "gold",
+              "platinum3k",
+              "platinum7k",
+              "^(silver|gold|platinum[3|7]{1}k)_(ocb[0-9]{1,7})$"
+            ],
+            "description": "Storage profile class allowed for Disponibility Class ONE-ROOM"
+          },
+          {
+            "consoles": [
+              "Console Externe VDR",
+              "Console Interne VDR"
+            ],
+            "whenHuman": "(disponibility_class = DUAL-ROOM)",
+            "when": {
+              "or": [
+                {
+                  "field": "disponibility_class",
+                  "value": "DUAL-ROOM"
+                }
+              ]
+            },
+            "target": "storage_profiles.{index}.class",
+            "enum": [
+              "silver_r1",
+              "silver_r2",
+              "gold_r1",
+              "gold_r2",
+              "platinum3k_r1",
+              "platinum3k_r2",
+              "platinum7k_r1",
+              "platinum7k_r2",
+              "^(silver|gold|platinum[3|7]{1}k)_(ocb[0-9]{1,7})_(r1|r2)$"
+            ],
+            "description": "Storage profile class allowed for Disponibility Class DUAL-ROOM"
+          },
+          {
+            "consoles": [
+              "Console Externe VDR",
+              "Console Interne VDR"
+            ],
+            "whenHuman": "(disponibility_class = HA-DUAL-ROOM)",
+            "when": {
+              "or": [
+                {
+                  "field": "disponibility_class",
+                  "value": "HA-DUAL-ROOM"
+                }
+              ]
+            },
+            "target": "storage_profiles.{index}.class",
+            "enum": [
+              "gold_hm",
+              "platinum3k_hm",
+              "platinum7k_hm",
+              "^(gold|platinum[3|7]{1}k)_(ocb[0-9]{1,7})_(hm)$"
+            ],
+            "description": "Storage profile class allowed for Disponibility Class HA-DUAL-ROOM"
+          }
+        ]
+      },
+      "Delete": {
+        "namespace": "VDC",
+        "resource": "",
+        "verb": "Delete",
+        "short_documentation": "DeleteVDC deletes an existing VDC",
+        "long_documentation": "Delete VDC performs a DELETE request to delete an existing VDC.",
+        "markdown_documentation": "",
+        "params": [
+          {
+            "name": "id",
+            "description": "ID of the VDC to delete",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`vdc`).. \n"
+          },
+          {
+            "name": "name",
+            "description": "Name of the VDC to delete",
+            "required": false,
+            "example": "my-vdc",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `id` is null., "
+          }
+        ],
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": null
+      },
+      "Get": {
+        "namespace": "VDC",
+        "resource": "",
+        "verb": "Get",
+        "short_documentation": "Get VDC details",
+        "long_documentation": "Retrieve detailed information about a specific Virtual Data Center (VDC) by its name.",
+        "markdown_documentation": "",
+        "params": [
+          {
+            "name": "id",
+            "description": "ID of the VDC to get",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`vdc`).. \n"
+          },
+          {
+            "name": "name",
+            "description": "Name of the VDC to get",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `id` is null., "
+          }
+        ],
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": [
+          {
+            "object": "id",
+            "type": "string",
+            "documentation": "ID of the VDC"
+          },
+          {
+            "object": "name",
+            "type": "string",
+            "documentation": "Name of the VDC"
+          },
+          {
+            "object": "description",
+            "type": "string",
+            "documentation": "Description of the VDC"
+          },
+          {
+            "object": "compute_capacity.cpu.vcpu",
+            "type": "int",
+            "documentation": "Number of VCPUs"
+          },
+          {
+            "object": "compute_capacity.cpu.used",
+            "type": "int",
+            "documentation": "Used VCPUs"
+          },
+          {
+            "object": "compute_capacity.cpu.frequency",
+            "type": "int",
+            "documentation": "Frequency of the VCPUs in MHz"
+          },
+          {
+            "object": "compute_capacity.memory.limit",
+            "type": "int",
+            "documentation": "Limit of memory in GB"
+          },
+          {
+            "object": "compute_capacity.memory.used",
+            "type": "int",
+            "documentation": "Used memory in GB"
+          },
+          {
+            "object": "networks.{index}.id",
+            "type": "string",
+            "documentation": "ID of the network"
+          },
+          {
+            "object": "networks.{index}.name",
+            "type": "string",
+            "documentation": "Name of the network"
+          },
+          {
+            "object": "storage_profiles.{index}.id",
+            "type": "string",
+            "documentation": "ID of the storage profile"
+          },
+          {
+            "object": "storage_profiles.{index}.name",
+            "type": "string",
+            "documentation": "Class name of the storage profile"
+          },
+          {
+            "object": "properties.service_class",
+            "type": "string",
+            "documentation": "Service class of the VDC"
+          },
+          {
+            "object": "properties.disponibility_class",
+            "type": "string",
+            "documentation": "Disponibility class of the VDC"
+          },
+          {
+            "object": "properties.billing_model",
+            "type": "string",
+            "documentation": "Billing model of the VDC compute"
+          },
+          {
+            "object": "properties.storage_billing_model",
+            "type": "string",
+            "documentation": "Billing model of the VDC storage"
+          },
+          {
+            "object": "number_of_vms",
+            "type": "int",
+            "documentation": "Number of VMs in the VDC"
+          },
+          {
+            "object": "number_of_running_vms",
+            "type": "int",
+            "documentation": "Number of running VMs in the VDC"
+          },
+          {
+            "object": "number_of_vapps",
+            "type": "int",
+            "documentation": "Number of deployed VApps in the VDC"
+          },
+          {
+            "object": "number_of_storage_profiles",
+            "type": "int",
+            "documentation": "Number of storage profiles in the VDC"
+          },
+          {
+            "object": "number_of_disks",
+            "type": "int",
+            "documentation": "Number of disks in the VDC"
+          }
+        ]
+      },
+      "List": {
+        "namespace": "VDC",
+        "resource": "",
+        "verb": "List",
+        "short_documentation": "List VDCs",
+        "long_documentation": "List all Virtual Data Centers (VDCs) available in your organization. If no filters are applied, it returns all VDCs.",
+        "markdown_documentation": "",
+        "params": [
+          {
+            "name": "id",
+            "description": "ID of the VDC to filter by",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "Validates that the value is a valid URN (`vdc`).. \n"
+          },
+          {
+            "name": "name",
+            "description": "Name of the VDC to filter by",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": ""
+          }
+        ],
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": [
+          {
+            "object": "vdcs.{index}.id",
+            "type": "string",
+            "documentation": "ID of the VDC"
+          },
+          {
+            "object": "vdcs.{index}.name",
+            "type": "string",
+            "documentation": "Name of the VDC"
+          },
+          {
+            "object": "vdcs.{index}.description",
+            "type": "string",
+            "documentation": "Description of the VDC"
+          },
+          {
+            "object": "vdcs.{index}.number_of_vms",
+            "type": "int",
+            "documentation": "Number of VMs in the VDC"
+          },
+          {
+            "object": "vdcs.{index}.number_of_running_vms",
+            "type": "int",
+            "documentation": "Number of running VMs in the VDC"
+          },
+          {
+            "object": "vdcs.{index}.number_of_vapps",
+            "type": "int",
+            "documentation": "Number of deployed VApps in the VDC"
+          },
+          {
+            "object": "vdcs.{index}.number_of_storage_profiles",
+            "type": "int",
+            "documentation": "Number of storage profiles in the VDC"
+          },
+          {
+            "object": "vdcs.{index}.number_of_disks",
+            "type": "int",
+            "documentation": "Number of disks in the VDC"
+          }
+        ]
+      },
+      "Update": {
+        "namespace": "VDC",
+        "resource": "",
+        "verb": "Update",
+        "short_documentation": "UpdateVDC updates an existing VDC",
+        "long_documentation": "Update VDC performs a PUT request to update an existing VDC. Enter only the fields you want to update.",
+        "markdown_documentation": "",
+        "params": [
+          {
+            "name": "id",
+            "description": "ID of the VDC to get",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`vdc`).. \n"
+          },
+          {
+            "name": "name",
+            "description": "Name of the VDC to get",
+            "required": false,
+            "example": "my-vdc",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `id` is null., "
+          },
+          {
+            "name": "description",
+            "description": "The description of the VDC.",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": ""
+          },
+          {
+            "name": "vcpu",
+            "description": "The number of virtual CPUs for the VDC.",
+            "required": false,
+            "example": "50",
+            "type": "int",
+            "validators_description": ""
+          },
+          {
+            "name": "memory",
+            "description": "The amount of memory for the VDC.",
+            "required": false,
+            "example": "500",
+            "type": "int",
+            "validators_description": ""
+          }
+        ],
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": null,
+        "rules": [
+          {
+            "consoles": null,
+            "whenHuman": "(billing_model = PAYG OR billing_model = DRAAS)",
+            "when": {
+              "or": [
+                {
+                  "field": "billing_model",
+                  "value": "PAYG"
+                },
+                {
+                  "field": "billing_model",
+                  "value": "DRAAS"
+                }
+              ]
+            },
+            "target": "vcpu",
+            "min": 5,
+            "max": 200,
+            "description": "VCPU allowed for Service Class ECO with PAYG or DRAAS billing model"
+          },
+          {
+            "consoles": null,
+            "whenHuman": "(billing_model = RESERVED)",
+            "when": {
+              "or": [
+                {
+                  "field": "billing_model",
+                  "value": "RESERVED"
+                }
+              ]
+            },
+            "target": "vcpu",
+            "min": 2,
+            "max": 1136,
+            "description": "VCPU allowed for Service Class ECO with RESERVED billing model"
+          },
+          {
+            "consoles": null,
+            "whenHuman": "",
+            "when": {},
+            "target": "memory",
+            "min": 1,
+            "max": 5120,
+            "description": "Memory allowed for Service Class ECO",
+            "unit": "GB"
+          }
+        ]
+      }
+    },
+    "SubFunctionality": {
+      "StorageProfile": {
+        "Title": "StorageProfile",
+        "Documentation": "",
+        "MarkdownDocumentation": "",
+        "Commands": {
+          "Add": {
+            "namespace": "VDC",
+            "resource": "StorageProfile",
+            "verb": "Add",
+            "short_documentation": "Add a new VDC Storage Profile",
+            "long_documentation": "Add a new storage profile to a specific VDC.",
+            "markdown_documentation": "",
+            "params": [
+              {
+                "name": "vdc_id",
+                "description": "ID of the VDC to add the storage profile to",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `vdc_name` is null., Validates that the value is a valid URN (`vdc`).. \n"
+              },
+              {
+                "name": "vdc_name",
+                "description": "Name of the VDC to add the storage profile to",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `vdc_id` is null., "
+              },
+              {
+                "name": "storage_profiles.{index}.class",
+                "description": "Class of the storage profile to create. Predefined classes or dedicated storage classes can be used. For predefined classes you have different properties (`_r1`, `_r2` and `_hm`) that can be used to define the storage profile.",
+                "required": true,
+                "example": "gold",
+                "type": "string",
+                "validators_description": ""
+              },
+              {
+                "name": "storage_profiles.{index}.limit",
+                "description": "Limit of the storage profile to create. This is the maximum amount of storage that can be used by the VDC. This is in GiB.",
+                "required": true,
+                "example": "500",
+                "type": "int",
+                "validators_description": "Validates that the value is between 100 and 81920. \n"
+              },
+              {
+                "name": "storage_profiles.{index}.default",
+                "description": "Default storage profile to create. This will be used if no specific profile is provided.",
+                "required": false,
+                "example": "true",
+                "type": "bool",
+                "validators_description": ""
+              }
+            ],
+            "deprecated": false,
+            "deprecated_message": "",
+            "model": null,
+            "rules": [
+              {
+                "consoles": null,
+                "whenHuman": "(disponibility_class = ONE-ROOM)",
+                "when": {
+                  "or": [
+                    {
+                      "field": "disponibility_class",
+                      "value": "ONE-ROOM"
+                    }
+                  ]
+                },
+                "target": "storage_profiles.{index}.class",
+                "enum": [
+                  "silver",
+                  "gold",
+                  "platinum3k",
+                  "platinum7k",
+                  "^(silver|gold|platinum[3|7]{1}k)_(ocb[0-9]{1,7})$"
+                ],
+                "description": "Storage profile class allowed for Disponibility Class ONE-ROOM"
+              },
+              {
+                "consoles": [
+                  "Console Externe VDR",
+                  "Console Interne VDR"
+                ],
+                "whenHuman": "(disponibility_class = DUAL-ROOM)",
+                "when": {
+                  "or": [
+                    {
+                      "field": "disponibility_class",
+                      "value": "DUAL-ROOM"
+                    }
+                  ]
+                },
+                "target": "storage_profiles.{index}.class",
+                "enum": [
+                  "silver_r1",
+                  "silver_r2",
+                  "gold_r1",
+                  "gold_r2",
+                  "platinum3k_r1",
+                  "platinum3k_r2",
+                  "platinum7k_r1",
+                  "platinum7k_r2",
+                  "^(silver|gold|platinum[3|7]{1}k)_(ocb[0-9]{1,7})_(r1|r2)$"
+                ],
+                "description": "Storage profile class allowed for Disponibility Class DUAL-ROOM"
+              },
+              {
+                "consoles": [
+                  "Console Externe VDR",
+                  "Console Interne VDR"
+                ],
+                "whenHuman": "(disponibility_class = HA-DUAL-ROOM)",
+                "when": {
+                  "or": [
+                    {
+                      "field": "disponibility_class",
+                      "value": "HA-DUAL-ROOM"
+                    }
+                  ]
+                },
+                "target": "storage_profiles.{index}.class",
+                "enum": [
+                  "gold_hm",
+                  "platinum3k_hm",
+                  "platinum7k_hm",
+                  "^(gold|platinum[3|7]{1}k)_(ocb[0-9]{1,7})_(hm)$"
+                ],
+                "description": "Storage profile class allowed for Disponibility Class HA-DUAL-ROOM"
+              }
+            ]
+          },
+          "List": {
+            "namespace": "VDC",
+            "resource": "StorageProfile",
+            "verb": "List",
+            "short_documentation": "List VDC Storage Profiles",
+            "long_documentation": "List of storage profiles available in a specific VDC.",
+            "markdown_documentation": "",
+            "params": [
+              {
+                "name": "id",
+                "description": "ID of the VDC to get",
+                "required": true,
+                "example": "",
+                "type": "string",
+                "validators_description": "Validates that the value is a valid URN (`vdc`).. \n"
+              }
+            ],
+            "deprecated": false,
+            "deprecated_message": "",
+            "model": [
+              {
+                "object": "storage_profiles.{index}.id",
+                "type": "string",
+                "documentation": "ID of the storage profile"
+              },
+              {
+                "object": "storage_profiles.{index}.class",
+                "type": "string",
+                "documentation": "Name of the storage profile"
+              },
+              {
+                "object": "storage_profiles.{index}.limit",
+                "type": "int",
+                "documentation": "Limit of the storage profile in MB"
+              },
+              {
+                "object": "storage_profiles.{index}.used",
+                "type": "int",
+                "documentation": "Used storage of the storage profile in MB"
+              },
+              {
+                "object": "storage_profiles.{index}.default",
+                "type": "bool",
+                "documentation": "Is this storage profile the default one?"
+              }
+            ]
+          }
+        },
+        "SubFunctionality": {}
+      }
+    }
   }
 }

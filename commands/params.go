@@ -1,107 +1,143 @@
 package commands
 
 import (
-	"context"
-	"fmt"
-	"log/slog"
 	"reflect"
-	"regexp"
-	"strings"
+	"unsafe"
 
-	"github.com/scaleway/scaleway-sdk-go/strcase"
-
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
-	"github.com/orange-cloudavenue/common-go/validators"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
 
-// validArgNameRegex regex to check that args words are lower-case or digit starting and ending with a letter.
-var validArgNameRegex = regexp.MustCompile(`^[a-z][a-z0-9-]*$`)
-
-func (c *Command) validate(ctx context.Context, params any) error {
-	// 1. Reflect params.to extract fields and their types.
-	paramType := reflect.TypeOf(params)
-	if paramType.Kind() == reflect.Ptr {
-		paramType = paramType.Elem()
+// Boilerplate to generate a tag from a paramSpec
+func buildTagFromParamSpec(spec *ParamsSpec) string {
+	if spec == nil || len(spec.Validators) == 0 {
+		return ""
 	}
-
-	sfs := []reflect.StructField{}
-
-	// 2. Recreate the struct type with all fields and set the tags.
-	for _, p := range c.ParamsSpecs {
-		tag := ""
-		for _, validator := range p.Validators {
-			if tag != "" {
-				tag += ","
-			}
-			tag += validator.GetKey()
+	tag := ""
+	for _, validator := range spec.Validators {
+		if tag != "" {
+			tag += ","
 		}
-
-		f, ok := paramType.FieldByName(strcase.ToPublicGoName(p.Name))
-		if !ok {
-			continue
-		}
-		sf := reflect.StructField{
-			Name: f.Name,
-			Type: f.Type,
-			Tag:  reflect.StructTag(fmt.Sprintf(`validate:"%s"`, tag)),
-		}
-
-		sfs = append(sfs, sf)
+		tag += validator.GetKey()
 	}
+	return tag
+}
 
-	// 3. Create a new struct type with the fields and tags.
-	newType := reflect.StructOf(sfs)
-	// 4. Create a new value of the new type.
-	paramsValue := reflect.New(newType)
+// getCavClientFromInterface attempts to extract a field named 'c' of type cav.Client from any struct.
+// This function uses reflection and unsafe to access both exported and unexported ('private') fields.
+// It works for both pointer and non-pointer structs, as long as the struct contains a field named 'c'.
+// Returns the cav.Client value and true if found and type assertion is successful, otherwise returns nil and false.
+//
+// Use cases:
+//   - When you receive an interface{} and do not know the concrete struct type, but you know it embeds or contains a cav.Client as the field 'c'.
+//   - To provide a generic access mechanism for packages that wrap or embed cav.Client.
+//
+// Limitations:
+//   - Accessing unexported fields is only possible from within the same package as the struct definition (enforced by Go).
+//   - Using unsafe may break in future Go versions or with changes in internal struct layout.
+//   - If the struct does not have a field named 'c', or if 'c' is not of type cav.Client, (nil, false) is returned.
+//
+// Example usage:
+//
+//	var myAny interface{} = &MyStruct{c: myClient}
+//	client, ok := getCavClientFromInterface(myAny)
+//	if ok {
+//	    // Use client (type cav.Client)
+//	}
+//
+// Safety note:
+//   - Prefer to expose a getter method for cav.Client if possible, for type safety and API clarity.
+//
+// Parameters:
+//   - obj: An interface{} which should point to a struct or be a struct containing a field 'c'.
+//
+// Returns:
+//   - cav.Client: The underlying cav.Client field if found and of correct type, else nil.
+//   - bool: True if extraction and type assertion succeed, false otherwise.
+func getCavClientFromInterface(obj interface{}) (cav.Client, bool) {
+	v := reflect.ValueOf(obj)
+	if !v.IsValid() {
+		return nil, false
+	}
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	if v.Kind() != reflect.Struct {
+		return nil, false
+	}
+	f := v.FieldByName("c")
+	if !f.IsValid() {
+		return nil, false
+	}
+	// If the field is unexported, use unsafe to allow Interface(), only from the same package
+	if !f.CanInterface() {
+		f = reflect.NewAt(f.Type(), unsafe.Pointer(f.UnsafeAddr())).Elem()
+	}
+	client, ok := f.Interface().(cav.Client)
+	return client, ok
+}
 
-	// 5. Set the values of the new value.
-	for _, p := range c.ParamsSpecs {
-		fieldName := strcase.ToPublicGoName(p.Name)
-		fieldValues, err := getValuesForFieldByName(
-			reflect.ValueOf(params),
-			strings.Split(fieldName, "."),
-		)
-		if err != nil {
-			slog.Error("could not validate arg value",
-				slog.String("arg", p.Name),
-				slog.String("fieldName", fieldName),
-				slog.Any("error", err),
-			)
-			// logger.Infof(
-			// 	"could not validate arg value for '%v': invalid fieldName: %v: %v",
-			// 	p.Name,
-			// 	fieldName,
-			// 	err.Error(),
-			// )
-			continue
-		}
+// func (c *Command) validate(client, params interface{}) error {
 
-		// 6. inject the value contained in fieldValues into paramsValue.
-		for _, v := range fieldValues {
-			if !v.IsValid() {
-				continue
-			}
+// 	val := reflect.ValueOf(params)
+// 	if val.Kind() == reflect.Ptr {
+// 		val = val.Elem()
+// 	}
+// 	typ := val.Type()
+// 	if typ.Kind() != reflect.Struct {
+// 		return errors.New("params must be a struct or pointer to struct")
+// 	}
 
-			// If the value is a pointer, we need to set the value of the pointer.
-			if v.Kind() == reflect.Ptr {
-				v = v.Elem()
-			}
+// 	var fields []reflect.StructField
 
-			// If the value is a slice or a map, we need to set the value of each element.
-			if v.Kind() == reflect.Slice || v.Kind() == reflect.Map {
-				for _, key := range v.MapKeys() {
-					paramsValue.Elem().SetMapIndex(key, v.MapIndex(key))
-				}
-			} else {
-				paramsValue.Elem().FieldByName(fieldName).Set(v)
+// 	for i := 0; i < typ.NumField(); i++ {
+// 		field := typ.Field(i)
+// 		// Search for the associated ParamSpec
+// 		paramSpec := c.findParamSpecByGoField(field.Name)
+// 		// Build the dynamic tag
+// 		tag := buildTagFromParamSpec(paramSpec)
+
+// 		// Copy the field and replace/add tag
+// 		newField := field
+// 		// Add or replace the "validate" tag
+// 		if tag != "" {
+// 			if newField.Tag == "" {
+// 				newField.Tag = reflect.StructTag(fmt.Sprintf(`validate:"%s"`, tag))
+// 			} else {
+// 				newField.Tag += reflect.StructTag(fmt.Sprintf(` validate:"%s"`, tag))
+// 			}
+// 		}
+// 		fields = append(fields, newField)
+// 	}
+
+// 	// Create the new dynamic structure
+// 	dynType := reflect.StructOf(fields)
+// 	dynValue := reflect.New(dynType).Elem()
+
+// 	// Fill dynValue with the values from params (recursively)
+// 	copyValuesRecursive(dynValue, val)
+
+// 	// Validation
+// 	validate := validators.New()
+// 	if err := validate.Struct(dynValue.Addr().Interface()); err != nil {
+// 		return errors.New(fmt.Sprintf("invalid params: %v", err.Error()))
+// 	}
+
+// 	return nil
+// }
+
+// Boilerplate: Recursive copy of values val -> dynVal
+// (to be completed to handle Map/Slice/Struct/Embedded)
+func copyValuesRecursive(dynVal, val reflect.Value) {
+	for i := 0; i < dynVal.NumField(); i++ {
+		origField := val.Field(i)
+		newField := dynVal.Field(i)
+		switch origField.Kind() {
+		case reflect.Struct:
+			copyValuesRecursive(newField, origField)
+		default:
+			if newField.CanSet() {
+				newField.Set(origField)
 			}
 		}
 	}
-
-	// 7. Validate the new value.
-	if err := validators.New().Struct(paramsValue.Interface()); err != nil {
-		return errors.New(fmt.Sprintf("invalid params: %v", err.Error()))
-	}
-
-	return nil
 }

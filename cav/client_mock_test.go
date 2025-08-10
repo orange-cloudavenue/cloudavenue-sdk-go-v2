@@ -25,12 +25,12 @@ const (
 	mockOrg = "cav01ev01ocb0001234"
 )
 
-var pathPrefix = map[SubClientName]string{
+var pathPrefix = map[subClientName]string{
 	ClientVmware:         "",
 	ClientCerberus:       "",
 	ClientNetbackup:      "/netbackup",
-	SubClientName("ihm"): "/ihm",
-	SubClientName("s3"):  "/s3",
+	subClientName("ihm"): "/ihm",
+	subClientName("s3"):  "/s3",
 }
 
 func newMockClient() (Client, error) {
@@ -116,7 +116,7 @@ func newMockClient() (Client, error) {
 	return nC, nil
 }
 
-func buildPath(subClient SubClientName, path string) string {
+func buildPath(subClient subClientName, path string) string {
 	if !strings.HasPrefix(path, pathPrefix[subClient]) {
 		return pathPrefix[subClient] + path
 	}

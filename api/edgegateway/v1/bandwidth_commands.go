@@ -6,6 +6,8 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
 )
 
+//go:generate command-generator -path bandwidth_commands.go
+
 func init() {
 	// Register the GetEdgeGatewayBandwidth command
 	cmds.Register(commands.Command{

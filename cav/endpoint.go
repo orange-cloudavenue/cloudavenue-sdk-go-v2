@@ -26,13 +26,6 @@ type (
 		// It is used to uniquely identify the endpoint in the registry.
 		ID string
 
-		// // api is the api of the endpoint, e.g., "vdc", "edgegateway", "vapp"
-		// api API `validate:"required"`
-
-		// // version is the API version, e.g., "v1", "v2, "v3", etc.
-		// // It is used to differentiate between different versions of the API.
-		// version Version `validate:"required"`
-
 		// Name is the name of the endpoint, e.g., "firewall", "loadBalancer", etc.
 		// It is used to group endpoints by their functionality.
 		// For example, all endpoints related to firewall operations can be grouped under the "firewall" name.
@@ -44,7 +37,7 @@ type (
 		Description string `validate:"required"`
 
 		// SubClient is the name of the sub-client that this endpoint belongs to.
-		SubClient SubClientName `validate:"required"`
+		SubClient subClientName `validate:"required"`
 
 		// Method is the HTTP method used for the endpoint, e.g., "GET", "POST", "PUT", "DELETE".
 		Method Method `validate:"required,oneof=GET POST PUT DELETE PATCH"`

@@ -30,6 +30,8 @@ type (
 		DeprecatedMessage string `json:"deprecated_message"`
 
 		Model []commands.DocModel `json:"model"`
+
+		Rules []RuleExport `json:"rules,omitempty"`
 	}
 
 	FuncParam struct {
