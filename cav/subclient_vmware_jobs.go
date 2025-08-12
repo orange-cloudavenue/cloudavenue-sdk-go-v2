@@ -13,16 +13,17 @@ import (
 	"context"
 	"strings"
 
-	"github.com/orange-cloudavenue/common-go/validators"
 	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go/pkg/urn"
+	"github.com/orange-cloudavenue/common-go/urn"
+	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 func init() {
 	Endpoint{
-		Name:             "JobVmware",
+		Name:             "GetJobVmware",
+		Description:      "Get VMware Job",
 		Method:           MethodGET,
 		SubClient:        ClientVmware,
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/38.1/doc/types/TaskType.html",
@@ -50,6 +51,10 @@ func init() {
 				}
 			}
 
+			if isMockClient {
+				return r.Get(endpoint.MockPath())
+			}
+
 			return r.Get(endpoint.PathTemplate)
 		},
 		BodyRequestType:  nil, // No request body for this endpoint.
@@ -62,22 +67,22 @@ var _ jobsInterface = &vmware{}
 
 // vmwareJobAPIResponse represents an asynchronous operation in VCD.
 type vmwareJobAPIResponse struct {
-	HREF             string       `json:"href,omitempty" faker:"url"`              // The URI of the entity.
-	ID               string       `json:"id,omitempty" faker:"uuid_hyphenated"`    // The entity identifier, expressed in URN format. The value of this attribute uniquely identifies the entity, persists for the life of the entity, and is never reused.
-	OperationKey     string       `json:"operationKey,omitempty"`                  // Optional unique identifier to support idempotent semantics for create and delete operations.
-	Name             string       `json:"name,omitempty" faker:"word"`             // The name of the entity.
-	Status           string       `json:"status,omitempty" faker:"oneof: success"` // The execution status of the task. One of queued, preRunning, running, success, error, aborted
-	Operation        string       `json:"operation,omitempty"`                     // A message describing the operation that is tracked by this task.
-	OperationName    string       `json:"operationName,omitempty"`                 // The short name of the operation that is tracked by this task.
-	ServiceNamespace string       `json:"serviceNamespace,omitempty"`              // Identifier of the service that created the task. It must not start with com.vmware.vcloud and the length must be between 1 and 128 symbols.
-	StartTime        string       `json:"startTime,omitempty" faker:"-"`           // The date and time the system started executing the task. May not be present if the task has not been executed yet.
-	EndTime          string       `json:"endTime,omitempty" faker:"-"`             // The date and time that processing of the task was completed. May not be present if the task is still being executed.
-	ExpiryTime       string       `json:"expiryTime,omitempty" faker:"-"`          // The date and time at which the task resource will be destroyed and no longer available for retrieval. May not be present if the task has not been executed or is still being executed.
-	CancelRequested  bool         `json:"cancelRequested,omitempty"`               // Whether user has requested this processing to be canceled.
-	Description      string       `json:"description,omitempty" `                  // Optional description.
-	Error            *vmwareError `json:"error,omitempty" faker:"-"`               // Represents error information from a failed task.
-	Progress         int          `json:"progress,omitempty" faker:"-"`            // Read-only indicator of task progress as an approximate percentage between 0 and 100. Not available for all tasks.
-	Details          string       `json:"details,omitempty" faker:"-"`             // Detailed message about the task. Also contained by the Owner entity when task status is preRunning.
+	HREF             string       `json:"href,omitempty" fake:"{href_uuid}"` // The URI of the entity.
+	ID               string       `json:"id,omitempty" fake:"{uuid}"`        // The entity identifier, expressed in URN format. The value of this attribute uniquely identifies the entity, persists for the life of the entity, and is never reused.
+	OperationKey     string       `json:"operationKey,omitempty"`            // Optional unique identifier to support idempotent semantics for create and delete operations.
+	Name             string       `json:"name,omitempty" fake:"{word}"`      // The name of the entity.
+	Status           string       `json:"status,omitempty" fake:"success"`   // The execution status of the task. One of queued, preRunning, running, success, error, aborted
+	Operation        string       `json:"operation,omitempty"`               // A message describing the operation that is tracked by this task.
+	OperationName    string       `json:"operationName,omitempty"`           // The short name of the operation that is tracked by this task.
+	ServiceNamespace string       `json:"serviceNamespace,omitempty"`        // Identifier of the service that created the task. It must not start with com.vmware.vcloud and the length must be between 1 and 128 symbols.
+	StartTime        string       `json:"startTime,omitempty"`               // The date and time the system started executing the task. May not be present if the task has not been executed yet.
+	EndTime          string       `json:"endTime,omitempty"`                 // The date and time that processing of the task was completed. May not be present if the task is still being executed.
+	ExpiryTime       string       `json:"expiryTime,omitempty"`              // The date and time at which the task resource will be destroyed and no longer available for retrieval. May not be present if the task has not been executed or is still being executed.
+	CancelRequested  bool         `json:"cancelRequested,omitempty"`         // Whether user has requested this processing to be canceled.
+	Description      string       `json:"description,omitempty" `            // Optional description.
+	Error            *vmwareError `json:"error,omitempty" fake:"-"`          // Represents error information from a failed task.
+	Progress         int          `json:"progress,omitempty"`                // Read-only indicator of task progress as an approximate percentage between 0 and 100. Not available for all tasks.
+	Details          string       `json:"details,omitempty"`                 // Detailed message about the task. Also contained by the Owner entity when task status is preRunning.
 }
 
 // JobRefresh is a function type that defines how to refresh a job status.
@@ -87,9 +92,9 @@ func (v *vmware) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts [
 		return job, err
 	}
 
-	ep, err := GetEndpoint("JobVmware", MethodGET)
+	ep, err := GetEndpoint("GetJobVmware")
 	if err != nil {
-		return nil, errors.New("failed to get endpoint for JobVmware: " + err.Error())
+		return nil, errors.New("failed to get endpoint for GetJobVmware: " + err.Error())
 	}
 
 	reqOpts = append(reqOpts,
@@ -169,7 +174,7 @@ func (v *vmware) JobParser(resp *resty.Response) (job *Job, err error) {
 		return job, nil
 	}
 
-	if err := v.ParseAPIError("JobParser", resp); err != nil {
+	if err := v.parseAPIError("JobParser", resp); err != nil {
 		return nil, err
 	}
 

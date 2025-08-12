@@ -1,0 +1,14 @@
+package endpoints
+
+import (
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+)
+
+{{ range .Endpoints -}}
+// {{.Name}} - {{.Description}}
+//
+// DocumentationURL: {{.DocumentationURL}} 
+func {{.Name}}() *cav.Endpoint {
+	return cav.MustGetEndpoint("{{.Name}}")
+}
+{{ end }}

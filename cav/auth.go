@@ -23,4 +23,12 @@ type auth interface {
 
 	// IsInitialized checks if the authentication is initialized.
 	IsInitialized() bool
+
+	// Get session is used to retrieve the current session information.
+	// Usually, this would include details like the organization Name and token
+	// It will be used for storing session-related data in a secure cache.
+	getSession() map[string]string
+
+	// Restore session-related data from a secure cache.
+	restoreSession(data map[string]string) error
 }

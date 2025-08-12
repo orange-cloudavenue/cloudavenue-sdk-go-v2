@@ -11,24 +11,29 @@ package cav
 
 import (
 	"context"
+	"regexp"
 
 	"resty.dev/v3"
 
 	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/httpClient"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
-var _ SubClient = &vmware{}
+var _ subClientInterface = &vmware{}
 
 const vmwareVCDVersion = "38.1"
 
-var newVmwareClient = func() SubClient {
+var newVmwareClient = func() subClientInterface {
 	return &vmware{}
 }
 
+// getID returns the unique identifier for the subclient
+func (v *vmware) getID() string {
+	return string(ClientVmware)
+}
+
 // NewClient creates a new request for the VMware subclient.
-func (v *vmware) NewHTTPClient(ctx context.Context) (*resty.Client, error) {
+func (v *vmware) newHTTPClient(ctx context.Context) (*resty.Client, error) {
 	// Create a new HTTP client with the base URL and headers.
 	v.httpClient = httpclient.NewHTTPClient().
 		SetBaseURL(v.console.GetAPIVCDEndpoint()).
@@ -49,18 +54,17 @@ func (v *vmware) NewHTTPClient(ctx context.Context) (*resty.Client, error) {
 	return v.httpClient, nil
 }
 
-// SetCredential sets the authentication credential for the VMware client.
-func (v *vmware) SetCredential(a auth) {
-	v.credential = a
-}
-
-// SetConsole sets the console for the VMware client.
-func (v *vmware) SetConsole(c consoles.Console) {
-	v.console = c
+// Close closes the VMware client and releases any resources.
+func (v *vmware) close() error {
+	// Close the HTTP client if it was created.
+	if v.httpClient != nil {
+		return v.httpClient.Close()
+	}
+	return nil
 }
 
 // ParseAPIError parses the API error response from the VMware client.
-func (v *vmware) ParseAPIError(operation string, resp *resty.Response) *errors.APIError {
+func (v *vmware) parseAPIError(operation string, resp *resty.Response) *errors.APIError {
 	if resp == nil || !resp.IsError() {
 		return nil
 	}
@@ -74,6 +78,7 @@ func (v *vmware) ParseAPIError(operation string, resp *resty.Response) *errors.A
 			Message:    err.Message,
 			Duration:   resp.Duration(),
 			Endpoint:   resp.Request.URL,
+			Method:     resp.Request.Method,
 		}
 	}
 
@@ -84,5 +89,25 @@ func (v *vmware) ParseAPIError(operation string, resp *resty.Response) *errors.A
 		Message:    "Unknown error occurred",
 		Duration:   resp.Duration(),
 		Endpoint:   resp.Request.URL,
+		Method:     resp.Request.Method,
+	}
+}
+
+var regexVmwareBusyEntity = regexp.MustCompile(`BUSY_ENTITY`)
+
+// idempotentRetryCondition returns a retry condition function for the VMware client.
+func (v *vmware) idempotentRetryCondition() resty.RetryConditionFunc {
+	return func(resp *resty.Response, err error) bool {
+		// If the response is nil or the status code is not 409, do not retry.
+		if resp == nil || resp.StatusCode() != 409 {
+			return false
+		}
+
+		// Check if the error message indicates that the entity is busy.
+		if err != nil && regexVmwareBusyEntity.MatchString(err.Error()) {
+			return true // Retry if the error message indicates that the entity is busy.
+		}
+
+		return false
 	}
 }

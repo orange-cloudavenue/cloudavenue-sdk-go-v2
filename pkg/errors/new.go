@@ -33,4 +33,7 @@ var (
 
 	// Unwrap reimplements the standard library's errors.Unwrap function.
 	Unwrap = errors.Unwrap
+
+	// Join reimplements the standard library's errors.Join function.
+	Join = errors.Join
 )

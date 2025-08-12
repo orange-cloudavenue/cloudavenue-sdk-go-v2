@@ -43,16 +43,40 @@ func (c *client) NewRequest(ctx context.Context, endpoint *Endpoint, _ ...Reques
 
 	// Setup the HTTP client for the request.
 	// This client is used to send the request and handle the response.
-	hC, err := sc.NewHTTPClient(ctxv)
+	hC, err := sc.newHTTPClient(ctxv)
 	if err != nil {
 		return nil, err
 	}
 
+	// * Middlewares
+
+	// ? Request Middlewares
 	if endpoint.RequestMiddlewares != nil {
 		// If the endpoint has request middlewares, set them on the HTTP client.
 		// This allows for custom processing of the request before it is sent.
 		for _, mw := range endpoint.RequestMiddlewares {
 			hC.AddRequestMiddleware(mw)
+		}
+	}
+
+	if isMockClient {
+		// If the client is a mock client, we need to override the request URL to point to special prefix.
+		// This is because the mock client uses a different URL structure for the mock endpoints.
+		// The mock client will handle the request and return a mock response.
+
+		hC.AddRequestMiddleware(resty.RequestMiddleware(func(_ *resty.Client, r *resty.Request) error {
+			// Set the base URL to the mock endpoint URL.
+			r.URL = fmt.Sprintf("%s%s", hC.BaseURL(), endpoint.MockPath())
+			return nil
+		}))
+	}
+
+	// ? Response Middlewares
+	if endpoint.ResponseMiddlewares != nil {
+		// If the endpoint has response middlewares, set them on the HTTP client.
+		// This allows for custom processing of the response after it is received.
+		for _, mw := range endpoint.ResponseMiddlewares {
+			hC.AddResponseMiddleware(mw)
 		}
 	}
 
@@ -73,16 +97,53 @@ func (c *client) NewRequest(ctx context.Context, endpoint *Endpoint, _ ...Reques
 		// This is necessary because the initial client (hc) have a specific middleware defined below.
 		// If the hc client has used in NewJobMiddleware, it will create an infinite loop.
 		// So we create a new client for job requests.
-		hCForJob, err := sc.NewHTTPClient(ctxv)
+		hCForJob, err := sc.newHTTPClient(ctxv)
 		if err != nil {
 			return nil, err
 		}
 
 		// If the request is for a job, set the job middleware.
-		hC.SetResponseMiddlewares(
-			resty.AutoParseResponseMiddleware,
-			newJobMiddleware(hCForJob, sCJob, endpoint.JobOptions),
-		)
+		// hC.SetResponseMiddlewares(
+		// 	resty.AutoParseResponseMiddleware,
+		// 	newJobMiddleware(hCForJob, sCJob, endpoint.JobOptions),
+		// )
+		hC.AddResponseMiddleware(newJobMiddleware(hCForJob, sCJob, endpoint.JobOptions))
+	}
+
+	var (
+		retryCount           = 5
+		retryWaitTime        = 60 * time.Second
+		retryMaxWaitTime     = 5 * time.Second
+		retryConditionsFuncs = make([]resty.RetryConditionFunc, 0)
+		retryIdempotent      = false
+	)
+
+	if endpoint.RetryConditionsFuncs != nil {
+		retryConditionsFuncs = append(retryConditionsFuncs, endpoint.RetryConditionsFuncs...)
+	}
+
+	if isMockClient {
+		// If the client is a mock client, set the retry value to shorter values.
+		retryCount = 1
+		retryWaitTime = 5 * time.Millisecond
+	}
+
+	switch endpoint.Method {
+	case MethodPOST, MethodPUT, MethodDELETE:
+		// For POST, PUT, or PATCH requests, add retry hooks to check if the error return BUSY_ENTITY.
+		var conflictRetry resty.RetryConditionFunc = func(resp *resty.Response, _ error) bool {
+			if sc.idempotentRetryCondition()(resp, nil) {
+				// ! Increment the retry count to allow for retries "unlimited" retry for the busy entity error.
+				// This is because the busy entity has undefined max time to resolve.
+				resp.Request.RetryCount++
+				return true
+			}
+
+			return false
+		}
+
+		retryConditionsFuncs = append(retryConditionsFuncs, conflictRetry)
+		retryIdempotent = true
 	}
 
 	// Create a new request with the context and options.
@@ -90,10 +151,51 @@ func (c *client) NewRequest(ctx context.Context, endpoint *Endpoint, _ ...Reques
 	hR := hC.NewRequest().
 		SetContext(ctxv).
 		EnableRetryDefaultConditions().
-		SetRetryCount(5).
-		SetRetryMaxWaitTime(5 * time.Second).
-		SetRetryWaitTime(500 * time.Millisecond).
-		AddRetryHooks(endpoint.RetryHooksFuncs...)
+		SetRetryCount(retryCount).
+		SetRetryMaxWaitTime(retryMaxWaitTime).
+		SetRetryWaitTime(retryWaitTime).
+		AddRetryConditions(retryConditionsFuncs...).
+		SetAllowNonIdempotentRetry(retryIdempotent)
+
+	for _, q := range endpoint.QueryParams {
+		if q.Value != "" {
+			// If a value is provided for the query parameter, use it directly.
+			hR.SetQueryParam(q.Name, q.Value)
+		}
+	}
+
+	// Set the path parameters in the request.
+	// This is done to replace the path parameters in the endpoint path template.
+	for _, p := range endpoint.PathParams {
+		if p.Value != "" {
+			// If a value is provided for the path parameter, use it directly.
+			hR.SetPathParam(p.Name, p.Value)
+		}
+	}
 
 	return hR, nil
+}
+
+// Do executes the request and returns the response.
+func (c *client) Do(ctx context.Context, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error) {
+	resp, err := endpoint.RequestFunc(ctx, c, endpoint, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	// Retrieve the subclient based on the provided client name.
+	// This method identifies the subclient and returns it.
+	sc, err := c.identifyClient(ctx, endpoint.SubClient)
+	if err != nil {
+		return nil, err
+	}
+
+	if errAPI := sc.parseAPIError(endpoint.Description, resp); errAPI != nil {
+		xlogger.Error("API error occurred", "operation", endpoint.Description, "error", errAPI)
+		// If the response is an error, parse the API error and return it.
+		return nil, errAPI
+	}
+
+	// If the response is successful, return the response.
+	return resp, nil
 }

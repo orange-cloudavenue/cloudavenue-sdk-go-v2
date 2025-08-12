@@ -13,9 +13,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/assert"
 	"resty.dev/v3"
+
+	"github.com/orange-cloudavenue/common-go/generator"
 )
 
 func TestVmwareJobStatusParser(t *testing.T) {
@@ -80,7 +81,7 @@ func TestVmwareJobParser_NormalResponse(t *testing.T) {
 	v := &vmware{}
 
 	data := &vmwareJobAPIResponse{}
-	_ = faker.FakeData(data)
+	_ = generator.Struct(data)
 
 	resp := &resty.Response{
 		RawResponse: &http.Response{

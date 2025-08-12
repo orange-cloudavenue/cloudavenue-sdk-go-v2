@@ -9,4 +9,7 @@
 
 package errors
 
-var ErrClientNotInitialized = New("client not initialized")
+var (
+	ErrClientNotInitialized = New("client not initialized")
+	ErrNotFound             = New("not found")
+)

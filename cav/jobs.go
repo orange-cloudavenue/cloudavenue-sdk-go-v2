@@ -14,6 +14,8 @@ import (
 	"log/slog"
 
 	"resty.dev/v3"
+
+	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 type (
@@ -39,6 +41,12 @@ func newJobMiddleware(httpC *resty.Client, c jobsInterface, jobOpts *JobOptions)
 			return fmt.Errorf("job options cannot be nil, use NewJobOptions() to create a valid job options")
 		}
 
+		if err := validators.New().Struct(jobOpts); err != nil {
+			// If the job options are not valid, return an error.
+			// This ensures that the job options are properly configured before proceeding.
+			return fmt.Errorf("invalid job options: %w", err)
+		}
+
 		if jobOpts.extractorFunc != nil {
 			// If an extractor function is provided, use it to extract extra data from the response.
 			// This allows for custom handling of the response data.
@@ -55,6 +63,7 @@ func newJobMiddleware(httpC *resty.Client, c jobsInterface, jobOpts *JobOptions)
 			SetCustomRestyOption(func(r *resty.Request) { r.SetContext(resp.Request.Context()) }),
 			// Set retry conditions for the job status check.
 			// This will retry the request based on the job status and error conditions.
+			// TODO setstrategyRetry to use poolInterval and not jitter
 			SetCustomRestyOption(func(r *resty.Request) { r.SetRetryConditions(jobRetryCondition(c)) }),
 			SetCustomRestyOption(func(r *resty.Request) { r.SetRetryWaitTime(jobOpts.PollInterval) }),
 			SetCustomRestyOption(func(r *resty.Request) { r.SetRetryMaxWaitTime(jobOpts.Timeout) }),

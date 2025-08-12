@@ -10,37 +10,20 @@
 package cav
 
 import (
-	"crypto/sha256"
-	"fmt"
-	"runtime"
-	"strings"
+	"net/http"
 	"sync"
 
-	"github.com/orange-cloudavenue/common-go/validators"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
+	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 const (
-	// API is the type for API names. (Type available in endpoint.go)
-	// Version is the type for API versions. (Type available in endpoint.go)
-
-	// * Exported api
-	// APIVDC         API = "vdc"
-	// APIEdgeGateway API = "edgegateway"
-	// APIVApp        API = "vapp"
-	APIOrg API = "org"
-
-	// * versions
-	VersionV1 Version = "v1"
-	VersionV2 Version = "v2"
-
 	// * Methods
-	MethodGET    Method = "GET"
-	MethodPOST   Method = "POST"
-	MethodPUT    Method = "PUT"
-	MethodDELETE Method = "DELETE"
-	MethodPATCH  Method = "PATCH"
+	MethodGET    Method = http.MethodGet
+	MethodPOST   Method = http.MethodPost
+	MethodPUT    Method = http.MethodPut
+	MethodDELETE Method = http.MethodDelete
+	MethodPATCH  Method = http.MethodPatch
 )
 
 type (
@@ -56,6 +39,7 @@ type (
 )
 
 var endpoints = endpointsMap{
+	mu:  sync.RWMutex{},
 	Map: make(map[string]*Endpoint),
 }
 
@@ -67,17 +51,6 @@ func (e Endpoint) Register() {
 	if err := validators.New().Struct(&e); err != nil {
 		panic(err)
 	}
-
-	pc, _, _, ok := runtime.Caller(1)
-	if ok {
-		e.api, e.version = decodeCallerPackageName(runtime.FuncForPC(pc).Name())
-	}
-
-	if e.api == "" || e.version == "" {
-		// If the API and version are not set, we try to
-		panic("unable to determine API and version from caller context.")
-	}
-
 	// Set the endpoint in the Endpoints map
 	endpoints.register(&e)
 }
@@ -99,22 +72,22 @@ func (e *endpointsMap) register(endpoint *Endpoint) {
 		}
 	}
 
-	// Encode the endpoint to create a unique key
-	encodedKey := encodeEndpoint(endpoint.api, endpoint.version, endpoint.Name, endpoint.Method)
+	// Store mockResponseFunc in the internal to restore it later.
+	if endpoint.MockResponseFunc != nil {
+		endpoint.mockResponseFunc = endpoint.MockResponseFunc
+	}
+
+	// Store mockResponseData in the internal to restore it later.
+	if endpoint.MockResponseData != nil {
+		endpoint.mockResponseData = endpoint.MockResponseData
+	}
+
+	if _, ok := e.Map[endpoint.Name]; ok {
+		panic(errors.Newf("endpoint %q already registered", endpoint.Name))
+	}
 
 	// Store the endpoint in the map using the encoded key
-	e.Map[encodedKey] = endpoint
-}
-
-// encode encodes the API, version, name, and method into a sha256 string.
-// This is used to create a unique identifier for the endpoint.
-func encodeEndpoint(api API, version Version, name string, method Method) string {
-	delimiter := "/"
-	s := string(api) + delimiter + string(version) + delimiter + name + delimiter + string(method)
-
-	h := sha256.New()
-	h.Write([]byte(s))
-	return fmt.Sprintf("%x", h.Sum(nil))
+	e.Map[endpoint.Name] = endpoint
 }
 
 // GetEndpointsUncategorized retrieves all endpoints without categorization.
@@ -132,54 +105,24 @@ func GetEndpointsUncategorized() []*Endpoint {
 	return endpointsList
 }
 
+// MustGetEndpoint retrieves an endpoint from the Endpoints map based on the provided api, version, name, and method.
+// It panics if the endpoint is not found.
+func MustGetEndpoint(name string) *Endpoint {
+	endpoint, err := GetEndpoint(name)
+	if err != nil {
+		panic(err)
+	}
+	return endpoint
+}
+
 // GetEndpoint retrieves an endpoint from the Endpoints map based on the provided api, version, name, and method.
-func GetEndpoint(name string, method Method, opts ...EndpointRegistryOptions) (*Endpoint, error) {
+func GetEndpoint(name string) (*Endpoint, error) {
 	endpoints.mu.RLock()
 	defer endpoints.mu.RUnlock()
 
-	extraData := endpointRegistryOptions{}
-
-	for _, opt := range opts {
-		opt(&extraData)
-	}
-
-	if extraData.api == "" || extraData.version == "" {
-		pc, _, _, ok := runtime.Caller(1)
-		if ok {
-			extraData.api, extraData.version = decodeCallerPackageName(runtime.FuncForPC(pc).Name())
-		}
-		if extraData.api == "" || extraData.version == "" {
-			return nil, errors.New("unable to determine API and version from caller context, use WithExtraProperties() to specify them explicitly")
-		}
-	}
-
-	encodedKey := encodeEndpoint(extraData.api, extraData.version, name, method)
-	if endpoint, ok := endpoints.Map[encodedKey]; ok {
+	if endpoint, ok := endpoints.Map[name]; ok {
 		return endpoint, nil
 	}
 
-	return nil, errors.Newf("method %s not found for name %s in version %s of api %s", method, name, extraData.version, extraData.api)
-}
-
-func decodeCallerPackageName(funcName string) (API, Version) {
-	// funcName == github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/vdc/v1.funcName
-
-	// Remove prefix  (Result: /api/vdc/v1.funcName)
-	pkg := strings.TrimPrefix(funcName, "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/")
-
-	// Remove funcName from /api/vdc/v1.funcName (Result: /api/vdc/v1)
-	pkg = strings.Split(pkg, ".")[0]
-
-	switch {
-	case strings.HasPrefix(pkg, "api/"):
-		x := strings.SplitN(pkg, "/", 3)
-		if len(x) == 3 {
-			return API(x[1]), Version(x[2])
-		}
-	case strings.HasPrefix(pkg, "cav"):
-		// If the package is "cav", we assume it's a core endpoint
-		return API("cav"), VersionV1
-	}
-
-	return "", ""
+	return nil, errors.Newf("endpoint %q not found", name)
 }

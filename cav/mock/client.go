@@ -10,11 +10,9 @@
 package mock
 
 import (
+	"log"
 	"log/slog"
-	"net/http"
 	"net/http/httptest"
-	"reflect"
-	"strings"
 
 	"github.com/go-chi/chi/v5"
 
@@ -26,14 +24,6 @@ import (
 const (
 	mockOrg = "cav01ev01ocb0001234"
 )
-
-var pathPrefix = map[cav.SubClientName]string{
-	cav.ClientVmware:         "",
-	cav.ClientCerberus:       "",
-	cav.ClientNetbackup:      "/netbackup",
-	cav.SubClientName("ihm"): "/ihm",
-	cav.SubClientName("s3"):  "/s3",
-}
 
 var logger = xlog.GetGlobalLogger()
 
@@ -58,60 +48,18 @@ func NewClient(opts ...OptionFunc) (cav.Client, error) {
 	}
 
 	endpoints := cav.GetEndpointsUncategorized()
-
 	mux := chi.NewRouter()
 
+	// Here, for each endpoint, we build a response handler for the mock HTTP server
 	for _, ep := range endpoints {
-		if ep.MockResponseFuncIsDefined() {
-			logger.Debug("Registering mock responseFunc for endpoint", slog.String("endpoint", ep.Name), slog.String("method", ep.Method.String()))
-			mux.MethodFunc(ep.Method.String(), buildPath(ep.SubClient, ep.PathTemplate), ep.GetMockResponseFunc())
-			continue
-		}
-
-		if ep.Method == cav.MethodGET {
-			mux.MethodFunc(ep.Method.String(), buildPath(ep.SubClient, ep.PathTemplate), cav.GetDefaultMockResponseFunc(ep))
-			continue
-		}
-
-		// Methods POST/PUT/PATCH/DELETE require a body
-		if ep.BodyResponseType != nil {
-			// If the request body type is defined, we need to check if it is a pointer
-			// and dereference it to get the actual type
-			reflectBodyType := reflect.TypeOf(ep.BodyResponseType)
-			if reflectBodyType.Kind() == reflect.Ptr {
-				// If the request body type is a pointer, we need to dereference it
-				reflectBodyType = reflectBodyType.Elem()
-			}
-
-			if reflectBodyType == reflect.TypeOf(cav.Job{}) {
-				switch ep.SubClient {
-				case cav.ClientCerberus:
-					statusCreated := http.StatusCreated
-					ep.SetMockResponseFunc(func(w http.ResponseWriter, _ *http.Request) {
-						w.WriteHeader(statusCreated)
-						w.Write([]byte(`{"jobId":"87ab1934-0146-4fb0-80bc-815fea03214d","message":"Job created successfully"}`)) //nolint:errcheck
-					})
-
-				case cav.ClientVmware:
-					statusAccepted := http.StatusAccepted
-					ep.SetMockResponseFunc(func(w http.ResponseWriter, _ *http.Request) {
-						w.Header().Add("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
-						w.WriteHeader(statusAccepted)
-					})
-				}
-			}
-
-			if ep.MockResponseFuncIsDefined() {
-				logger.Debug("Registering mock responseFunc for endpoint", slog.String("endpoint", ep.Name), slog.String("method", ep.Method.String()))
-				mux.MethodFunc(ep.Method.String(), buildPath(ep.SubClient, ep.PathTemplate), ep.GetMockResponseFunc())
-				continue
-			}
-		}
-
-		mux.MethodFunc(ep.Method.String(), buildPath(ep.SubClient, ep.PathTemplate), cav.GetDefaultMockResponseFunc(ep))
+		logger.Debug("Registering mock endpoint", slog.String("name", ep.Name), slog.String("method", ep.Method.String()), slog.String("path", ep.MockPath()), slog.String("ID", ep.ID))
+		mux.MethodFunc(ep.Method.String(), ep.MockPath(), cav.GetDefaultMockResponseFunc(ep))
 	}
 
 	hts := httptest.NewServer(mux)
+	slog.SetDefault(logger)
+	hts.Config.ErrorLog = log.Default()
+
 	logger.Debug("Mock server created", slog.String("url", hts.URL))
 
 	nC, err := cav.NewClient(
@@ -150,31 +98,9 @@ func NewClient(opts ...OptionFunc) (cav.Client, error) {
 	return nC, nil
 }
 
-func buildPath(subClient cav.SubClientName, path string) string {
-	if !strings.HasPrefix(path, pathPrefix[subClient]) {
-		return pathPrefix[subClient] + path
-	}
-	return path
-}
-
 func SetMockResponse(ep *cav.Endpoint, mockResponseData any, mockResponseStatusCode *int) {
-	if ep.MockResponseFuncIsDefined() {
-		logger.Debug("Mock response already defined for endpoint", slog.String("endpoint", ep.Name))
-		return
-	}
-
 	ep.SetMockResponse(mockResponseData, mockResponseStatusCode)
 	logger.Debug("Mock response set for endpoint", slog.String("endpoint", ep.Name), slog.Int("status_code", *mockResponseStatusCode))
-}
-
-func CleanMockResponses() {
-	endpoints := cav.GetEndpointsUncategorized()
-	for _, ep := range endpoints {
-		if ep.MockResponseFuncIsDefined() {
-			ep.CleanMockResponse()
-			logger.Debug("Mock response cleaned for endpoint", slog.String("endpoint", ep.Name))
-		}
-	}
 }
 
 var GetEndpoint = cav.GetEndpoint

@@ -74,7 +74,7 @@ func TestCerberusJobParser_NormalResponse(t *testing.T) {
 		Request: &resty.Request{
 			PathParams: map[string]string{"taskId": "id-123"},
 			URL:        "http://example.com/job",
-			Result: &cerberusJobAPIResponse{
+			Result: &CerberusJobAPIResponse{
 				{
 					Name:        "test-job",
 					Description: "desc",
@@ -102,7 +102,7 @@ func TestCerberusJobParser_FailedStatus(t *testing.T) {
 		Request: &resty.Request{
 			PathParams: map[string]string{"taskId": "id-123"},
 			URL:        "http://example.com/job",
-			Result: &cerberusJobAPIResponse{
+			Result: &CerberusJobAPIResponse{
 				{
 					Name:        "test-job",
 					Description: "desc",
@@ -126,7 +126,7 @@ func TestCerberusJobParser_EmptyResponse(t *testing.T) {
 		Request: &resty.Request{
 			PathParams: map[string]string{"taskId": "id-123"},
 			URL:        "http://example.com/job",
-			Result:     &cerberusJobAPIResponse{},
+			Result:     &CerberusJobAPIResponse{},
 		},
 	}
 	job, err := v.JobParser(resp)
@@ -150,7 +150,7 @@ func TestCerberusJobParser_UnknownJobStatus(t *testing.T) {
 		Request: &resty.Request{
 			PathParams: map[string]string{"taskId": "id-123"},
 			URL:        "http://example.com/job",
-			Result: &cerberusJobAPIResponse{
+			Result: &CerberusJobAPIResponse{
 				{
 					Name:        "test-job",
 					Description: "desc",

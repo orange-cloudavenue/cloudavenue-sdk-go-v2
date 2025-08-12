@@ -16,7 +16,7 @@ import (
 func TestConsoles(t *testing.T) {
 	tests := []struct {
 		name    string
-		console Console
+		console ConsoleName
 		orgName string
 		wantErr bool
 	}{
@@ -148,7 +148,7 @@ func TestConsole_GetLocationCode(t *testing.T) {
 
 func TestConsole_GetAPIVCDEndpoint(t *testing.T) {
 	tests := []struct {
-		console  Console
+		console  ConsoleName
 		expected string
 	}{
 		{Console1, "https://console1.cloudavenue.orange-business.com"},
@@ -165,7 +165,7 @@ func TestConsole_GetAPIVCDEndpoint(t *testing.T) {
 
 func TestConsole_GetAPICerberusEndpoint(t *testing.T) {
 	tests := []struct {
-		console  Console
+		console  ConsoleName
 		expected string
 	}{
 		{Console1, "https://console1.cloudavenue.orange-business.com"},

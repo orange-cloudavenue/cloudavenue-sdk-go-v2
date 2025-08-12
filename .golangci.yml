@@ -7,8 +7,14 @@
 # and information on other useful linters
 
 version: "2"
+
 linters:
   enable:
+    # Custom local linters
+    # - linter-sdkv2 # Custom linter to check API types naming conventions
+
+    # Standard linters
+    - gocritic # Provides diagnostics that check for bugs, performance and style issues. [fast: false, auto-fix: false]
     - asciicheck # Simple linter to check that your code does not contain non-ASCII identifiers [fast: true, auto-fix: false]
     - bidichk # Checks for dangerous unicode character sequences [fast: true, auto-fix: false]
     - bodyclose # Checks that http.Response.Body is closed [fast: true, auto-fix: false]
@@ -21,7 +27,6 @@ linters:
     - errorlint # Linter for error strings [fast: false, auto-fix: false]
     - forbidigo # Forbids identifiers [fast: true, auto-fix: false]
     - goconst # Finds repeated strings [fast: true, auto-fix: false]
-    - gocritic # Provides diagnostics that check for bugs, performance and style issues. [fast: false, auto-fix: false]
     - gocyclo # Computes and checks the cyclomatic complexity of functions [fast: true, auto-fix: false]
     - goheader # Checks is file header matches to pattern [fast: true, auto-fix: false]
     - gomoddirectives # Manage the use of 'replace', 'retract', and 'excludes' directives in go.mod. [fast: true, auto-fix: false]
@@ -70,6 +75,32 @@ linters:
     - wrapcheck
     - wsl
   settings:
+    gocritic:
+      disable-all: true
+      enabled-checks:
+        - ruleguard
+      settings:
+        ruleguard:
+          # Determines the behavior when an error occurs while parsing ruleguard files.
+          # If flag is not set, log error and skip rule files that contain an error.
+          # If flag is set, the value must be a comma-separated list of error conditions.
+          # - 'all':    fail on all errors.
+          # - 'import': ruleguard rule imports a package that cannot be found.
+          # - 'dsl':    gorule file does not comply with the ruleguard DSL.
+          # Default: ""
+          failOn: all
+          # Comma-separated list of file paths containing ruleguard rules.
+          # By default, if a path is relative, it is relative to the directory where the golangci-lint command is executed.
+          # The placeholder '${base-path}' is substituted with a path relative to the mode defined with `run.relative-path-mode`.
+          # The placeholder '${config-path}' is substituted with a path relative to the configuration file.
+          # Glob patterns such as 'rules-*.go' may be specified.
+          # Default: ""
+          rules: '${base-path}/ruleguard/rules_*.go'
+  
+    # custom:
+    #   linter-sdkv2:
+    #     type: "module"
+    #     description: This linter enforces conventions in the CloudAvenue SDK v2.
     gosec:
       excludes:
         - G115  # Potential integer overflow when converting between integer types
@@ -169,8 +200,7 @@ formatters:
         - prefix(github.com/hashicorp/terraform-plugin-framework/resource/schema/,github.com/hashicorp/terraform-plugin-framework/datasource/schema/)
         - prefix(github.com/hashicorp/terraform-plugin-framework-validators/)
         - prefix(github.com/hashicorp)
-        - prefix(github.com/FrangipaneTeam)
-        - prefix(github.com/orange-cloudavenue/cloudavenue-sdk-go-v2,github.com/orange-cloudavenue/cloudavenue-sdk-go,github.com/orange-cloudavenue/infrapi-sdk-go)
+        - prefix(github.com/orange-cloudavenue/cloudavenue-sdk-go-v2,github.com/orange-cloudavenue/common-go)
         - blank # Blank section: captures all blank lines.
         - dot # Dot section: captures all dot imports.
       custom-order: true

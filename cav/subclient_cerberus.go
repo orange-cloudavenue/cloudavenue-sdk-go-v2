@@ -12,6 +12,7 @@ package cav
 import (
 	"context"
 	"fmt"
+	"regexp"
 
 	"resty.dev/v3"
 
@@ -20,26 +21,31 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
-var _ SubClient = &cerberus{}
+var _ subClientInterface = &cerberus{}
 
 type cerberus struct {
 	subclient
 }
 
 type cerberusError struct {
-	Code    string `json:"code"`
-	Reason  string `json:"reason"`
-	Message string `json:"message"`
+	Code    string `json:"code" fake:"{regex:err-[0-9]{4}}"`
+	Reason  string `json:"reason" fake:"{regex:mock-[0-9]{4}}"`
+	Message string `json:"message" fake:"{sentence:3,10}"`
 }
 
-var newCerberusClient = func() SubClient {
+var newCerberusClient = func() subClientInterface {
 	return &cerberus{}
 }
 
 const cerberusVCDVersion = vmwareVCDVersion // Reusing the same version as VMware
 
+// getID returns the unique identifier for the subclient
+func (v *cerberus) getID() string {
+	return string(ClientCerberus)
+}
+
 // NewClient creates a new request for the Cerberus subclient.
-func (v *cerberus) NewHTTPClient(ctx context.Context) (*resty.Client, error) {
+func (v *cerberus) newHTTPClient(ctx context.Context) (*resty.Client, error) {
 	v.httpClient = httpclient.NewHTTPClient().
 		SetBaseURL(v.console.GetAPICerberusEndpoint()).
 		SetHeader("Accept", "application/json;version="+cerberusVCDVersion).
@@ -57,18 +63,27 @@ func (v *cerberus) NewHTTPClient(ctx context.Context) (*resty.Client, error) {
 	return v.httpClient, nil
 }
 
-// SetCredential sets the authentication credential for the Cerberus client.
-func (v *cerberus) SetCredential(a auth) {
+// setCredential sets the authentication credential for the Cerberus client.
+func (v *cerberus) setCredential(a auth) {
 	v.credential = a
 }
 
-// SetConsole sets the console for the Cerberus client.
-func (v *cerberus) SetConsole(c consoles.Console) {
+// setConsole sets the console for the Cerberus client.
+func (v *cerberus) setConsole(c consoles.ConsoleName) {
 	v.console = c
 }
 
+// Close closes the Cerberus client and releases any resources.
+func (v *cerberus) close() error {
+	// Close the HTTP client if it was created.
+	if v.httpClient != nil {
+		return v.httpClient.Close()
+	}
+	return nil
+}
+
 // ParseAPIError parses the API error response from the Cerberus client.
-func (v *cerberus) ParseAPIError(operation string, resp *resty.Response) *errors.APIError {
+func (v *cerberus) parseAPIError(operation string, resp *resty.Response) *errors.APIError {
 	if resp == nil || !resp.IsError() {
 		return nil
 	}
@@ -82,6 +97,7 @@ func (v *cerberus) ParseAPIError(operation string, resp *resty.Response) *errors
 			Message:    fmt.Sprintf("%s: %s", err.Reason, err.Message),
 			Duration:   resp.Duration(),
 			Endpoint:   resp.Request.URL,
+			Method:     resp.Request.Method,
 		}
 	}
 
@@ -92,5 +108,27 @@ func (v *cerberus) ParseAPIError(operation string, resp *resty.Response) *errors
 		Message:    "Unknown error occurred",
 		Duration:   resp.Duration(),
 		Endpoint:   resp.Request.URL,
+		Method:     resp.Request.Method,
+	}
+}
+
+// Regexp to match the error message indicating that a job already exists.
+//
+//	{
+//	   "code": "cf-0002",
+//	   "message": "another job present on org xxxx",
+//	   "reason": "Job already exists"
+//	}
+var regexCerberusJobAlreadyExists = regexp.MustCompile(`Job already exists`)
+
+// idempotentRetryCondition returns a retry condition function for idempotent operations.
+func (v *cerberus) idempotentRetryCondition() resty.RetryConditionFunc {
+	return func(_ *resty.Response, err error) bool {
+		// Check if the error message indicates that the job already exists.
+		if err != nil && regexCerberusJobAlreadyExists.MatchString(err.Error()) {
+			return true // Retry if the error message indicates that the job already exists.
+		}
+
+		return false
 	}
 }

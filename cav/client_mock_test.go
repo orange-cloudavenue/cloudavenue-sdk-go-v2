@@ -19,16 +19,18 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )
 
+// TODO refacto
+
 const (
 	mockOrg = "cav01ev01ocb0001234"
 )
 
-var pathPrefix = map[SubClientName]string{
+var pathPrefix = map[subClientName]string{
 	ClientVmware:         "",
 	ClientCerberus:       "",
 	ClientNetbackup:      "/netbackup",
-	SubClientName("ihm"): "/ihm",
-	SubClientName("s3"):  "/s3",
+	subClientName("ihm"): "/ihm",
+	subClientName("s3"):  "/s3",
 }
 
 func newMockClient() (Client, error) {
@@ -46,12 +48,12 @@ func newMockClient() (Client, error) {
 	for _, ep := range endpoints {
 		if ep.MockResponseFuncIsDefined() {
 			xlogger.Debug("Registering mock responseFunc for endpoint", slog.String("endpoint", ep.Name), slog.String("method", ep.Method.String()))
-			mux.MethodFunc(ep.Method.String(), buildPath(ep.SubClient, ep.PathTemplate), ep.GetMockResponseFunc())
+			mux.MethodFunc(ep.Method.String(), ep.MockPath(), ep.GetMockResponseFunc(ep))
 			continue
 		}
 
 		if ep.Method == MethodGET {
-			mux.MethodFunc(ep.Method.String(), buildPath(ep.SubClient, ep.PathTemplate), GetDefaultMockResponseFunc(ep))
+			mux.MethodFunc(ep.Method.String(), ep.MockPath(), GetDefaultMockResponseFunc(ep))
 			continue
 		}
 
@@ -67,14 +69,14 @@ func newMockClient() (Client, error) {
 
 			if reflectBodyType == reflect.TypeOf(Job{}) {
 				statusAccepted := http.StatusAccepted
-				ep.SetMockResponseFunc(func(w http.ResponseWriter, _ *http.Request) {
+				ep.SetMockResponseFunc(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 					w.Header().Add("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
 					w.WriteHeader(statusAccepted)
-				})
+				}))
 			}
 		}
 
-		mux.MethodFunc(ep.Method.String(), buildPath(ep.SubClient, ep.PathTemplate), GetDefaultMockResponseFunc(ep))
+		mux.MethodFunc(ep.Method.String(), ep.MockPath(), GetDefaultMockResponseFunc(ep))
 	}
 
 	hts := httptest.NewServer(mux)
@@ -114,7 +116,7 @@ func newMockClient() (Client, error) {
 	return nC, nil
 }
 
-func buildPath(subClient SubClientName, path string) string {
+func buildPath(subClient subClientName, path string) string {
 	if !strings.HasPrefix(path, pathPrefix[subClient]) {
 		return pathPrefix[subClient] + path
 	}

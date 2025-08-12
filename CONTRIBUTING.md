@@ -175,4 +175,40 @@ This approach allows the SDK to evolve and support multiple API versions for eac
 
 ---
 
-Thank you for following these guidelines to help ensure the quality and
+## 4. Lint Rules and Naming Conventions
+
+To maintain code quality and consistency, the following lint rules are enforced in this project.  
+These rules are checked automatically by custom linters and ruleguard scripts.
+
+### API Type Naming
+
+- **API Response Types:**  
+  Must be named `apiResponse<Object>` (e.g., `apiResponseEdgeGateway`).
+- **API Request Body Types:**  
+  Must be named `apiRequest<Object>` (e.g., `apiRequestEdgeGateway`).
+- **User-facing Model Types:**  
+  Must be named `Model<Object>` (e.g., `ModelEdgeGateway`).
+- **User-supplied Parameter Types:**  
+  Must be named `Params<Object>` (e.g., `ParamsEdgeGateway`).
+- **Client Types:**  
+  Must be named `Client` (exactly, for the main client struct of an API group).
+
+You can visualize and debug the naming convention regex used by the linter here: [https://regex101.com/r/g8Av6t/1](https://regex101.com/r/g8Av6t/1)
+
+### API Function Naming
+
+- Exported functions in any `api/` directory must start with one of the following prefixes:  
+  `Get`, `Create`, `List`, `Delete`, `Update`, `Enable`, `Disable`, `Add`, `Remove`
+  - Example: `GetEdgeGateway`, `CreateVDC`, `ListVApps`
+- Functions returning a boolean value must start with:  
+  `Is`, `is`, `Has`, `has`, `Match`, `match`
+  - Example: `IsEnabled`, `HasPermission`, `matchURN`
+
+### ToModel Method Rule
+
+- Exported `ToModel` methods are **not allowed** on types named `apiResponse*` or `apiRequest*` in any `api/` directory.
+- Use a private `toModel` method instead to avoid exposing internal conversion logic.
+
+---
+
+Thank you for following these guidelines to help ensure the quality and maintainability of the CloudAvenue SDK. We appreciate your contributions!

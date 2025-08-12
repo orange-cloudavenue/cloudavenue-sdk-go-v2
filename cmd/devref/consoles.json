@@ -1,0 +1,194 @@
+{
+  "Console Externe CHA": {
+    "SiteName": "Console Externe CHA",
+    "LocationCode": "chr",
+    "SiteID": "console4",
+    "Services": {
+      "IHM": {
+        "Enabled": true,
+        "Endpoint": "https://console4.cloudavenue.orange-business.com"
+      },
+      "APIVCD": {
+        "Enabled": true,
+        "Endpoint": "https://console4.cloudavenue.orange-business.com"
+      },
+      "APICerberus": {
+        "Enabled": true,
+        "Endpoint": "https://console4.cloudavenue.orange-business.com"
+      },
+      "S3": {
+        "Enabled": false,
+        "Endpoint": ""
+      },
+      "VCDA": {
+        "Enabled": false,
+        "Endpoint": ""
+      },
+      "Netbackup": {
+        "Enabled": true,
+        "Endpoint": "https://backup4.cloudavenue.orange-business.com"
+      }
+    },
+    "OrganizationPattern": "^cav02ev04ocb\\d{7}$"
+  },
+  "Console Externe VDR": {
+    "SiteName": "Console Externe VDR",
+    "LocationCode": "vdr",
+    "SiteID": "console1",
+    "Services": {
+      "IHM": {
+        "Enabled": true,
+        "Endpoint": "https://console1.cloudavenue.orange-business.com"
+      },
+      "APIVCD": {
+        "Enabled": true,
+        "Endpoint": "https://console1.cloudavenue.orange-business.com"
+      },
+      "APICerberus": {
+        "Enabled": true,
+        "Endpoint": "https://console1.cloudavenue.orange-business.com"
+      },
+      "S3": {
+        "Enabled": true,
+        "Endpoint": "https://s3console1.cloudavenue.orange-business.com"
+      },
+      "VCDA": {
+        "Enabled": false,
+        "Endpoint": ""
+      },
+      "Netbackup": {
+        "Enabled": true,
+        "Endpoint": "https://backup1.cloudavenue.orange-business.com"
+      }
+    },
+    "OrganizationPattern": "^cav01ev01ocb\\d{7}$"
+  },
+  "Console Interne CHA": {
+    "SiteName": "Console Interne CHA",
+    "LocationCode": "chr",
+    "SiteID": "console5",
+    "Services": {
+      "IHM": {
+        "Enabled": true,
+        "Endpoint": "https://console5.cloudavenue-cha.itn.intraorange"
+      },
+      "APIVCD": {
+        "Enabled": true,
+        "Endpoint": "https://console5.cloudavenue-cha.itn.intraorange"
+      },
+      "APICerberus": {
+        "Enabled": true,
+        "Endpoint": "https://console5.cloudavenue-cha.itn.intraorange"
+      },
+      "S3": {
+        "Enabled": false,
+        "Endpoint": ""
+      },
+      "VCDA": {
+        "Enabled": false,
+        "Endpoint": ""
+      },
+      "Netbackup": {
+        "Enabled": true,
+        "Endpoint": "https://backup5.cloudavenue-cha.itn.intraorange"
+      }
+    },
+    "OrganizationPattern": "^cav02iv05ocb\\d{7}$"
+  },
+  "Console Interne VDR": {
+    "SiteName": "Console Interne VDR",
+    "LocationCode": "vdr",
+    "SiteID": "console2",
+    "Services": {
+      "IHM": {
+        "Enabled": true,
+        "Endpoint": "https://console2.cloudavenue.orange-business.com"
+      },
+      "APIVCD": {
+        "Enabled": true,
+        "Endpoint": "https://console2.cloudavenue.orange-business.com"
+      },
+      "APICerberus": {
+        "Enabled": true,
+        "Endpoint": "https://console2.cloudavenue.orange-business.com"
+      },
+      "S3": {
+        "Enabled": true,
+        "Endpoint": "https://s3console2.cloudavenue.orange-business.com"
+      },
+      "VCDA": {
+        "Enabled": false,
+        "Endpoint": ""
+      },
+      "Netbackup": {
+        "Enabled": true,
+        "Endpoint": "https://backup2.cloudavenue.orange-business.com"
+      }
+    },
+    "OrganizationPattern": "^cav01iv02ocb\\d{7}$"
+  },
+  "Console VCOD": {
+    "SiteName": "Console VCOD",
+    "LocationCode": "vdr-cha",
+    "SiteID": "console9",
+    "Services": {
+      "IHM": {
+        "Enabled": true,
+        "Endpoint": "https://console9.cloudavenue.orange-business.com"
+      },
+      "APIVCD": {
+        "Enabled": true,
+        "Endpoint": "https://console9.cloudavenue.orange-business.com"
+      },
+      "APICerberus": {
+        "Enabled": false,
+        "Endpoint": ""
+      },
+      "S3": {
+        "Enabled": false,
+        "Endpoint": ""
+      },
+      "VCDA": {
+        "Enabled": false,
+        "Endpoint": ""
+      },
+      "Netbackup": {
+        "Enabled": false,
+        "Endpoint": "https://backup9.cloudavenue.orange-business.com"
+      }
+    },
+    "OrganizationPattern": "^cav0[0-2]{1}vv09ocb\\d{7}$"
+  },
+  "Console specific VDR": {
+    "SiteName": "Console specific VDR",
+    "LocationCode": "vdr",
+    "SiteID": "console8",
+    "Services": {
+      "IHM": {
+        "Enabled": true,
+        "Endpoint": "https://console8.cloudavenue-vdr.itn.intraorange"
+      },
+      "APIVCD": {
+        "Enabled": true,
+        "Endpoint": "https://console8.cloudavenue-vdr.itn.intraorange"
+      },
+      "APICerberus": {
+        "Enabled": false,
+        "Endpoint": ""
+      },
+      "S3": {
+        "Enabled": false,
+        "Endpoint": ""
+      },
+      "VCDA": {
+        "Enabled": false,
+        "Endpoint": ""
+      },
+      "Netbackup": {
+        "Enabled": true,
+        "Endpoint": "https://backup8.cloudavenue-vdr.itn.intraorange"
+      }
+    },
+    "OrganizationPattern": "^cav01iv08ocb\\d{7}$"
+  }
+}

@@ -14,11 +14,11 @@ import (
 	"errors"
 	"log/slog"
 
-	"github.com/orange-cloudavenue/common-go/validators"
 	"resty.dev/v3"
 
 	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/httpClient"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
+	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 var _ auth = (*cloudavenueCredential)(nil)
@@ -32,17 +32,13 @@ type cloudavenueCredential struct {
 	password     string `validate:"required"`
 	bearer       string
 	organization string `validate:"required"`
-	console      consoles.Console
+	console      consoles.ConsoleName
 }
 
 // cloudavenueCredentialXVmwareAccessToken is the header used to retrieve the Bearer token in the authentication process.
 const cloudavenueCredentialXVmwareAccessToken = "X-VMWARE-VCLOUD-ACCESS-TOKEN" // #nosec G101
 
-// NewCloudavenueCredential creates a new CloudavenueCredential
-// with the given username and password.
-var NewCloudavenueCredential = newCloudavenueCredential
-
-func newCloudavenueCredential(c consoles.Console, organization, username, password string) (auth, error) {
+func newCloudavenueCredential(c consoles.ConsoleName, organization, username, password string) (auth, error) {
 	cc := &cloudavenueCredential{
 		logger:       xlogger.WithGroup("auth"),
 		console:      c,
@@ -90,7 +86,7 @@ func (c *cloudavenueCredential) Headers() map[string]string {
 // Refresh is a placeholder method for refreshing the authentication token.
 func (c *cloudavenueCredential) Refresh(ctx context.Context) error {
 	logger := c.logger.WithGroup("refresh")
-	ep, err := GetEndpoint("SessionVmware", MethodPOST)
+	ep, err := GetEndpoint("SessionVmware")
 	if err != nil {
 		logger.ErrorContext(ctx, "Failed to get endpoint for CreateSessionVmware", "error", err)
 		return errors.New("failed to get endpoint for CreateSessionVmware: " + err.Error())
@@ -121,7 +117,7 @@ func (c *cloudavenueCredential) Refresh(ctx context.Context) error {
 		return err
 	}
 
-	if err := (&vmware{}).ParseAPIError("SessionVmware", resp); err != nil {
+	if err := (&vmware{}).parseAPIError("SessionVmware", resp); err != nil {
 		c.bearer = ""
 		logger.ErrorContext(ctx, "Failed to refresh session", "error", err)
 		return err
@@ -140,4 +136,25 @@ func (c *cloudavenueCredential) Refresh(ctx context.Context) error {
 // IsInitialized checks if the CloudavenueCredential is initialized.
 func (c *cloudavenueCredential) IsInitialized() bool {
 	return c.bearer != ""
+}
+
+// getSession retrieves the current session information.
+func (c *cloudavenueCredential) getSession() map[string]string {
+	return map[string]string{
+		"organization": c.organization,
+		"bearer":       c.bearer,
+	}
+}
+
+// restoreSession restores session-related data from a secure cache.
+func (c *cloudavenueCredential) restoreSession(data map[string]string) error {
+	if data == nil {
+		return errors.New("invalid session data")
+	}
+
+	xlogger.Debug("Restoring session from cache", "data", data)
+
+	c.organization = data["organization"]
+	c.bearer = data["bearer"]
+	return nil
 }
