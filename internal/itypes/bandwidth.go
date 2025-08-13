@@ -7,12 +7,10 @@
  * or see the "LICENSE" file for more details.
  */
 
-package edgegateway
+package itypes
 
 type (
-	ModelEdgeGatewayBandwidth ModelT0EdgeGateway
-
-	apiRequestBandwidth struct {
+	ApiRequestBandwidth struct {
 		Bandwidth int `json:"rateLimit" fake:"5"`
 	}
 )

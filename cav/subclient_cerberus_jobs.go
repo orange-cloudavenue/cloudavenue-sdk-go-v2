@@ -22,7 +22,7 @@ import (
 	"github.com/orange-cloudavenue/common-go/validators"
 )
 
-//go:generate endpoint-generator -path subclient_cerberus_jobs.go -filename zz_cav_cerberus_jobs.go
+//go:generate endpoint-generator -path subclient_cerberus_jobs.go -filename zz_cav_cerberus_jobs.go -output cav_cerberus_jobs.go
 
 func init() {
 	Endpoint{

@@ -7,88 +7,21 @@
  * or see the "LICENSE" file for more details.
  */
 
-package edgegateway
+package itypes
 
-// * Models
-
-type (
-	// ModelEdgeGateways represents a list of edge gateways.
-	ModelEdgeGateways struct {
-		EdgeGateways []ModelEdgeGateway
-	}
-	// ModelEdgeGateway represents the model of an edge gateway.
-	ModelEdgeGateway struct {
-		ID string `documentation:"ID of the edge gateway"`
-
-		// Name of edge gateway
-		Name string `documentation:"Name of the edge gateway"`
-
-		// Description of edge gateway
-		Description string `documentation:"Description of the edge gateway"`
-
-		// OwnerRef defines VDC or VDC Group that this network belongs to.
-		OwnerRef *ModelObjectReference `documentation:"VDC or VDC Group that this edge gateway belongs to"`
-
-		// UplinkT0 defines the T0 router name that this edge gateway is connected to.
-		UplinkT0 *ModelObjectReference `documentation:"T0 router name that this edge gateway is connected to"`
-	}
-
-	// Bandwidth in Mbps.
-	ModelBandwidth int
-)
-
-// * Functions Parameters
-
-type (
-	ParamsEdgeGateway struct {
-		ID   string `validate:"required_if_null=Name,omitempty,urn=edgegateway" fake:"{urn:edgegateway}"`
-		Name string `validate:"required_if_null=ID,omitempty,resource_name=edgegateway" fake:"{resource_name:edgegateway}"`
-	}
-
-	ParamsCreateEdgeGateway struct {
-		// OwnerType is the type of the owner of the edge gateway.
-		// It can be either "vdc" or "vdcgroup".
-		OwnerType string `fake:"{randomstring:[vdc]}"`
-
-		// OwnerName is the VDC or VDC Group that this edge gateway belongs to.
-		OwnerName string `fake:"{vdc_name}"`
-
-		// Name is the name of the T0 router that this edge gateway will be connected to.
-		// If not provided and only if one T0 router is available,
-		// the first T0 router will be used.
-		T0Name string `fake:"{resource_name:t0}"`
-
-		// Bandwidth is the bandwidth limit in Mbps.
-		// If not provided, default bandwidth will be used (5 Mbps).
-		// You can get bandwidth available values for the new edge gateway
-		// by calling ListT0().
-		// Unlimited bandwidth is allowed if the T0 is DEDICATED.
-		Bandwidth int `fake:"5"`
-	}
-
-	ParamsUpdateEdgeGateway struct {
-		// ID is the ID of the edge gateway to update.
-		ID string `fake:"{urn:edgegateway}"`
-
-		// Name is the new name of the edge gateway.
-		Name string `fake:"{resource_name:edgegateway}"`
-
-		// Bandwidth is the new bandwidth limit in Mbps.
-		Bandwidth int `fake:"5"`
-	}
-)
+import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 
 // * Request / Response API
 
 type (
-	apiRequestEdgeGateway struct {
+	ApiRequestEdgeGateway struct {
 		T0Name string `json:"tier0VrfId" fake:"{resource_name:t0}" validate:"required,resource_name=t0"`
 	}
 
-	apiResponseEdgegateways struct {
-		Values []apiResponseEdgegateway `json:"values,omitempty" fakesize:"1"` // List of edge gateways.
+	ApiResponseEdgegateways struct {
+		Values []ApiResponseEdgegateway `json:"values,omitempty" fakesize:"1"` // List of edge gateways.
 	}
-	apiResponseEdgegateway struct {
+	ApiResponseEdgegateway struct {
 		ID          string `json:"id" fake:"{urn:edgegateway}"`             // The ID of the edge gateway.
 		Name        string `json:"name" fake:"{resource_name:edgegateway}"` // The name of the edge gateway.
 		Description string `json:"description" fake:"{sentence}"`
@@ -119,20 +52,20 @@ type (
 			UplinkName string `json:"uplinkName" fake:"{resource_name:t0}"` // The name of the uplink.
 		} `json:"edgeGatewayUplinks" fakesize:"1"`
 
-		OrgVDC *ModelObjectReference `json:"orgVdc"`
+		OrgVDC *ApiObjectReference `json:"orgVdc"`
 
 		// OwnerRef contains information about the owner of the edge gateway (VDC Or VDCGroup)
-		OwnerRef *ModelObjectReference `json:"ownerRef"`
+		OwnerRef *ApiObjectReference `json:"ownerRef"`
 
 		// OrgVdcNetworkCount holds the number of Org VDC networks connected to the gateway.
 		OrgVDCNetworkCount int64 `json:"orgVdcNetworkCount" fake:"{number:1,10}"`
 	}
 
-	apiResponseQueryEdgeGateway struct {
-		Record []apiResponseQueryEdgeGatewayRecord `json:"record,omitempty" fakesize:"1"` // List of edge gateways.
+	ApiResponseQueryEdgeGateway struct {
+		Record []ApiResponseQueryEdgeGatewayRecord `json:"record,omitempty" fakesize:"1"` // List of edge gateways.
 	}
 
-	apiResponseQueryEdgeGatewayRecord struct {
+	ApiResponseQueryEdgeGatewayRecord struct {
 		ID                  string `json:"-"`                                                 // The ID of the entity.
 		HREF                string `json:"href,omitempty" fake:"{href_uuid}"`                 // The URI of the entity.
 		Type                string `json:"type,omitempty"`                                    // The MIME type of the entity.
@@ -146,37 +79,45 @@ type (
 	}
 )
 
-// toModel converts the apiResponseEdgegateways to ModelEdgeGateways.
-func (api *apiResponseEdgegateways) toModel() *ModelEdgeGateways {
+// ToModel converts the ApiResponseEdgegateways to ModelEdgeGateways.
+func (api *ApiResponseEdgegateways) ToModel() *types.ModelEdgeGateways {
 	if api == nil {
 		return nil
 	}
 
-	model := &ModelEdgeGateways{
-		EdgeGateways: make([]ModelEdgeGateway, 0, len(api.Values)),
+	model := &types.ModelEdgeGateways{
+		EdgeGateways: make([]types.ModelEdgeGateway, 0, len(api.Values)),
 	}
 
 	for _, v := range api.Values {
-		model.EdgeGateways = append(model.EdgeGateways, *v.toModel())
+		model.EdgeGateways = append(model.EdgeGateways, *v.ToModel())
 	}
 
 	return model
 }
 
-// toModel converts the edgegatewayAPIResponse to ModelEdgeGateway.
-func (api *apiResponseEdgegateway) toModel() *ModelEdgeGateway {
+// ToModel converts the edgegatewayAPIResponse to ModelEdgeGateway.
+func (api *ApiResponseEdgegateway) ToModel() *types.ModelEdgeGateway {
 	if api == nil {
 		return nil
 	}
 
-	return &ModelEdgeGateway{
+	return &types.ModelEdgeGateway{
 		ID:          api.ID,
 		Name:        api.Name,
 		Description: api.Description,
-		OwnerRef:    api.OwnerRef,
-		UplinkT0: func() *ModelObjectReference {
+		OwnerRef: func() *types.ModelObjectReference {
+			if api.OwnerRef != nil {
+				return &types.ModelObjectReference{
+					ID:   api.OwnerRef.ID,
+					Name: api.OwnerRef.Name,
+				}
+			}
+			return nil
+		}(),
+		UplinkT0: func() *types.ModelObjectReference {
 			if len(api.EdgeGatewayUplinks) > 0 {
-				return &ModelObjectReference{
+				return &types.ModelObjectReference{
 					ID:   api.EdgeGatewayUplinks[0].UplinkID,
 					Name: api.EdgeGatewayUplinks[0].UplinkName,
 				}

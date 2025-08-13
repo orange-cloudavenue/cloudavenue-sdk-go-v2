@@ -18,13 +18,15 @@ import (
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 	"github.com/orange-cloudavenue/common-go/generator"
 )
 
 func TestGetEdgeGatewayServices(t *testing.T) {
 	tests := []struct {
 		name               string
-		params             *ParamsEdgeGateway
+		params             *types.ParamsEdgeGateway
 		mockResponse       any
 		mockResponseStatus int
 
@@ -35,21 +37,21 @@ func TestGetEdgeGatewayServices(t *testing.T) {
 	}{
 		{
 			name: "Valid Edge Gateway services",
-			params: &ParamsEdgeGateway{
+			params: &types.ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Valid Edge Gateway services with name",
-			params: &ParamsEdgeGateway{
+			params: &types.ParamsEdgeGateway{
 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Failed to retrieve Edge Gateway ID by name",
-			params: &ParamsEdgeGateway{
+			params: &types.ParamsEdgeGateway{
 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			mockQueryResponse:       nil,
@@ -58,12 +60,12 @@ func TestGetEdgeGatewayServices(t *testing.T) {
 		},
 		{
 			name:        "Simulate empty params",
-			params:      &ParamsEdgeGateway{},
+			params:      &types.ParamsEdgeGateway{},
 			expectedErr: true,
 		},
 		{
 			name: "Error 500",
-			params: &ParamsEdgeGateway{
+			params: &types.ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponseStatus: http.StatusInternalServerError,
@@ -71,10 +73,10 @@ func TestGetEdgeGatewayServices(t *testing.T) {
 		},
 		{
 			name: "Simulate empty response",
-			params: &ParamsEdgeGateway{
+			params: &types.ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
-			mockResponse:       &apiResponseNetworkServices{},
+			mockResponse:       &itypes.ApiResponseNetworkServices{},
 			mockResponseStatus: http.StatusOK,
 			expectedErr:        true,
 		},
@@ -127,7 +129,7 @@ func TestGetEdgeGatewayServices_ContextDeadlineExceeded(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), 0)
 	defer cancel()
 
-	_, err = eC.GetServices(ctx, ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgegateway}")})
+	_, err = eC.GetServices(ctx, types.ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgegateway}")})
 	assert.NotNil(t, err, "Expected context deadline exceeded error")
 	assert.Contains(t, err.Error(), "context deadline exceeded", "Expected error to contain 'context deadline exceeded'")
 }
@@ -135,7 +137,7 @@ func TestGetEdgeGatewayServices_ContextDeadlineExceeded(t *testing.T) {
 func TestEnableCloudavenueServices(t *testing.T) {
 	tests := []struct {
 		name               string
-		params             ParamsEdgeGateway
+		params             types.ParamsEdgeGateway
 		mockResponse       any
 		mockResponseStatus int
 
@@ -146,28 +148,28 @@ func TestEnableCloudavenueServices(t *testing.T) {
 	}{
 		{
 			name: "Enable network services with valid ID",
-			params: ParamsEdgeGateway{
+			params: types.ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Enable network services with valid Name",
-			params: ParamsEdgeGateway{
+			params: types.ParamsEdgeGateway{
 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Enable network services with empty params",
-			params: ParamsEdgeGateway{
+			params: types.ParamsEdgeGateway{
 				ID: "",
 			},
 			expectedErr: true,
 		},
 		{
 			name: "Error 500",
-			params: ParamsEdgeGateway{
+			params: types.ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponseStatus: http.StatusInternalServerError,
@@ -175,7 +177,7 @@ func TestEnableCloudavenueServices(t *testing.T) {
 		},
 		{
 			name: "Failed to retrieve Edge Gateway ID by name",
-			params: ParamsEdgeGateway{
+			params: types.ParamsEdgeGateway{
 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			mockQueryResponse:       nil,
@@ -225,7 +227,7 @@ func TestEnableCloudavenueServices_ContextDeadlineExceeded(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), 0)
 	defer cancel()
 
-	err = eC.EnableCloudavenueServices(ctx, ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgegateway}")})
+	err = eC.EnableCloudavenueServices(ctx, types.ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgegateway}")})
 	assert.NotNil(t, err, "Expected context deadline exceeded error")
 	assert.Contains(t, err.Error(), "context deadline exceeded", "Expected error to contain 'context deadline exceeded'")
 }
@@ -233,7 +235,7 @@ func TestEnableCloudavenueServices_ContextDeadlineExceeded(t *testing.T) {
 func TestDisableCloudavenueServices(t *testing.T) {
 	tests := []struct {
 		name   string
-		params ParamsEdgeGateway
+		params types.ParamsEdgeGateway
 
 		mockResponse       any
 		mockResponseStatus int
@@ -245,28 +247,28 @@ func TestDisableCloudavenueServices(t *testing.T) {
 	}{
 		{
 			name: "Disable network services with valid ID",
-			params: ParamsEdgeGateway{
+			params: types.ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Disable network services with valid Name",
-			params: ParamsEdgeGateway{
+			params: types.ParamsEdgeGateway{
 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Disable network services with empty params",
-			params: ParamsEdgeGateway{
+			params: types.ParamsEdgeGateway{
 				ID: "",
 			},
 			expectedErr: true,
 		},
 		{
 			name: "Failed to get network services",
-			params: ParamsEdgeGateway{
+			params: types.ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockGetNetworkServicesResponse:       nil,
@@ -276,7 +278,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 
 		{
 			name: "Error 500",
-			params: ParamsEdgeGateway{
+			params: types.ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponseStatus: http.StatusInternalServerError,
@@ -284,7 +286,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 		},
 		{
 			name: "Error 401",
-			params: ParamsEdgeGateway{
+			params: types.ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponseStatus: http.StatusUnauthorized,
@@ -327,7 +329,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 func TestGetCloudavenueServices(t *testing.T) {
 	tests := []struct {
 		name   string
-		params ParamsEdgeGateway
+		params types.ParamsEdgeGateway
 
 		mockResponse       any
 		mockResponseStatus int
@@ -336,28 +338,28 @@ func TestGetCloudavenueServices(t *testing.T) {
 	}{
 		{
 			name: "Get Cloud Avenue services with valid ID",
-			params: ParamsEdgeGateway{
+			params: types.ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Get Cloud Avenue services with valid Name",
-			params: ParamsEdgeGateway{
+			params: types.ParamsEdgeGateway{
 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Get Cloud Avenue services with empty params",
-			params: ParamsEdgeGateway{
+			params: types.ParamsEdgeGateway{
 				ID: "",
 			},
 			expectedErr: true,
 		},
 		{
 			name: "Error 500",
-			params: ParamsEdgeGateway{
+			params: types.ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponseStatus: http.StatusInternalServerError,
@@ -365,7 +367,7 @@ func TestGetCloudavenueServices(t *testing.T) {
 		},
 		{
 			name: "Error 401",
-			params: ParamsEdgeGateway{
+			params: types.ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponseStatus: http.StatusUnauthorized,

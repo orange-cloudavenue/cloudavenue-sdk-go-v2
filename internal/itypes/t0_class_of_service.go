@@ -7,9 +7,9 @@
  * or see the "LICENSE" file for more details.
  */
 
-package edgegateway
+package itypes
 
-type ( //nolint:gocritic
+type (
 	classOfService struct {
 		// MaxBandwidth defines the maximum bandwidth in Mbps for this class of service.
 		MaxBandwidth int

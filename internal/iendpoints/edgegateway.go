@@ -7,7 +7,7 @@
  * or see the "LICENSE" file for more details.
  */
 
-package edgegateway
+package iendpoints
 
 import (
 	"fmt"
@@ -16,12 +16,13 @@ import (
 	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/urn"
 	"github.com/orange-cloudavenue/common-go/validators"
 )
 
-//go:generate endpoint-generator -path edgegateway_endpoints.go
+//go:generate endpoint-generator -path edgegateway.go -output edgegateway
 
 func init() {
 	// GetEdgeGateway
@@ -39,7 +40,7 @@ func init() {
 				Required:    true,
 			},
 		},
-		BodyResponseType: apiResponseEdgegateway{},
+		BodyResponseType: itypes.ApiResponseEdgegateway{},
 	}.Register()
 
 	// QueryEdgeGateway
@@ -74,7 +75,7 @@ func init() {
 		},
 		PathParams:       nil,
 		BodyRequestType:  nil,
-		BodyResponseType: apiResponseQueryEdgeGateway{},
+		BodyResponseType: itypes.ApiResponseQueryEdgeGateway{},
 		RequestMiddlewares: []resty.RequestMiddleware{
 			func(_ *resty.Client, req *resty.Request) error {
 				// Set the Accept header to application/*+json;version=38.1
@@ -84,7 +85,7 @@ func init() {
 		},
 		ResponseMiddlewares: []resty.ResponseMiddleware{
 			func(_ *resty.Client, resp *resty.Response) error {
-				r := resp.Result().(*apiResponseQueryEdgeGateway)
+				r := resp.Result().(*itypes.ApiResponseQueryEdgeGateway)
 
 				if len(r.Record) == 0 {
 					return fmt.Errorf("no edge gateways found")
@@ -134,7 +135,7 @@ func init() {
 			},
 		},
 		QueryParams:      nil,
-		BodyRequestType:  apiRequestEdgeGateway{},
+		BodyRequestType:  itypes.ApiRequestEdgeGateway{},
 		BodyResponseType: cav.Job{},
 	}.Register()
 
@@ -181,6 +182,6 @@ func init() {
 				Value:       "128",
 			},
 		},
-		BodyResponseType: apiResponseEdgegateways{},
+		BodyResponseType: itypes.ApiResponseEdgegateways{},
 	}.Register()
 }

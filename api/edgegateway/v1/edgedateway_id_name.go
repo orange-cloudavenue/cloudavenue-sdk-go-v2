@@ -14,6 +14,7 @@ import (
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 )
 
 func (c *Client) retrieveEdgeGatewayIDByName(ctx context.Context, name string) (string, error) {
@@ -29,5 +30,5 @@ func (c *Client) retrieveEdgeGatewayIDByName(ctx context.Context, name string) (
 	}
 
 	// Record is already checked in the middleware.
-	return respQuery.Result().(*apiResponseQueryEdgeGateway).Record[0].ID, nil
+	return respQuery.Result().(*itypes.ApiResponseQueryEdgeGateway).Record[0].ID, nil
 }

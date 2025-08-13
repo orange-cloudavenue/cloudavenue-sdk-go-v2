@@ -7,7 +7,7 @@
  * or see the "LICENSE" file for more details.
  */
 
-package vdc
+package iendpoints
 
 import (
 	"fmt"
@@ -15,11 +15,12 @@ import (
 	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/validators"
 )
 
-//go:generate endpoint-generator -path storage_profile_endpoints.go
+//go:generate endpoint-generator -path storage_profile.go -output storage_profile
 
 func init() {
 	// * ListStorageProfiles
@@ -67,7 +68,7 @@ func init() {
 				Value:       "name",
 			},
 		},
-		BodyResponseType: apiResponseListStorageProfiles{},
+		BodyResponseType: itypes.ApiResponseListStorageProfiles{},
 		RequestMiddlewares: []resty.RequestMiddleware{
 			func(_ *resty.Client, req *resty.Request) error {
 				// Set the Accept header to application/*+json;version=38.1
@@ -75,41 +76,5 @@ func init() {
 				return nil
 			},
 		},
-		// MockResponseFunc: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// 	resp := &apiResponseListStorageProfiles{
-		// 		StorageProfiles: make([]apiResponseListStorageProfile, 0),
-		// 	}
-
-		// 	// If QueryParam "filter" is set, return a filtered response
-		// 	if r.URL.Query().Get("filter") != "" {
-		// 		filter := r.URL.Query().Get("filter")
-
-		// 		filterParts := strings.Split(filter, "==")
-
-		// 		r := apiResponseListStorageProfile{}
-		// 		generator.MustStruct(r)
-
-		// 		r.ID = func() string {
-		// 			if filterParts[0] == "vdc" {
-		// 				return filterParts[1]
-		// 			}
-		// 			return ""
-		// 		}()
-		// 	} else {
-		// 		generator.MustStruct(&resp)
-		// 	}
-		// 	// json encode
-		// 	w.Header().Set("Content-Type", "application/json")
-		// 	respJ, err := json.Marshal(resp)
-		// 	if err != nil {
-		// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		// 		return
-		// 	}
-		// 	_, err = w.Write(respJ)
-		// 	if err != nil {
-		// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		// 		return
-		// 	}
-		// }),
 	}.Register()
 }

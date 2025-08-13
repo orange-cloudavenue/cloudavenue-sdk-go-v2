@@ -16,6 +16,8 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/orange-cloudavenue/common-go/urn"
 )
@@ -38,7 +40,7 @@ func init() {
 		LongDocumentation:  "Retrieve services information about a specific EdgeGateway. This command retrieves the network services available on the EdgeGateway, such as load balancers, public IPs, and Cloud Avenue services.",
 		AutoGenerate:       true,
 
-		ParamsType: ParamsEdgeGateway{},
+		ParamsType: types.ParamsEdgeGateway{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "id",
@@ -60,11 +62,11 @@ func init() {
 				},
 			},
 		},
-		ModelType: ModelEdgeGatewayServices{},
+		ModelType: types.ModelEdgeGatewayServices{},
 
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsEdgeGateway)
+			p := params.(types.ParamsEdgeGateway)
 			ep := endpoints.GetEdgeGatewayServices()
 
 			// ID is required to request the API.
@@ -86,7 +88,7 @@ func init() {
 				return nil, fmt.Errorf("error retrieving network services for edge gateway %s: %w", p.ID, err)
 			}
 
-			data := resp.Result().(*apiResponseNetworkServices).toModel(p)
+			data := resp.Result().(*itypes.ApiResponseNetworkServices).ToModel(p)
 			if data == nil {
 				return nil, fmt.Errorf("no network services found for edge gateway %s", p.ID)
 			}
@@ -112,7 +114,7 @@ func init() {
 		LongDocumentation:  "Retrieve Cloud Avenue services on an EdgeGateway. This command returns the Cloud Avenue services available on the EdgeGateway, such as DNS, DHCP, and others.",
 		AutoGenerate:       true,
 
-		ParamsType: ParamsEdgeGateway{},
+		ParamsType: types.ParamsEdgeGateway{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "id",
@@ -136,11 +138,11 @@ func init() {
 			},
 		},
 
-		ModelType: ModelCloudavenueServices{},
+		ModelType: types.ModelCloudavenueServices{},
 
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsEdgeGateway)
+			p := params.(types.ParamsEdgeGateway)
 
 			svcs, err := cc.GetServices(ctx, p)
 			if err != nil {
@@ -160,7 +162,7 @@ func init() {
 		LongDocumentation:  "Enable Cloud Avenue services on an EdgeGateway. ",
 		AutoGenerate:       true,
 
-		ParamsType: ParamsEdgeGateway{},
+		ParamsType: types.ParamsEdgeGateway{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "id",
@@ -188,7 +190,7 @@ func init() {
 
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsEdgeGateway)
+			p := params.(types.ParamsEdgeGateway)
 			ep := endpoints.EnableCloudavenueServices()
 
 			// ID is required to request the API.
@@ -201,7 +203,7 @@ func init() {
 			}
 
 			// Prepare the request body
-			requestBody := &apiRequestNetworkServicesCavSvc{
+			requestBody := &itypes.ApiRequestNetworkServicesCavSvc{
 				NetworkType:   "cav-services",
 				EdgeGatewayID: urn.ExtractUUID(p.ID),
 				Properties: struct {
@@ -233,7 +235,7 @@ func init() {
 		LongDocumentation:  "Disable Cloud Avenue services on an EdgeGateway. Cloudavenue services is a network setting that allows the EdgeGateway to connect to the mutualized Cloud Avenue services (DNS, DHCP, etc.).",
 		AutoGenerate:       true,
 
-		ParamsType: ParamsEdgeGateway{},
+		ParamsType: types.ParamsEdgeGateway{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "id",
@@ -258,7 +260,7 @@ func init() {
 		ModelType: nil, // No model type is returned for this command.
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsEdgeGateway)
+			p := params.(types.ParamsEdgeGateway)
 			ep := endpoints.DisableCloudavenueServices()
 
 			// Ensure the edge gateway exists and retrieve its services

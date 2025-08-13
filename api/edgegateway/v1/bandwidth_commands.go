@@ -13,6 +13,7 @@ import (
 	"context"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
 //go:generate command-generator -path bandwidth_commands.go
@@ -27,7 +28,7 @@ func init() {
 		LongDocumentation:  "Get the bandwidth of an edge gateway. This command retrieves the bandwidth information for a specific edge gateway.",
 		AutoGenerate:       true,
 
-		ParamsType: ParamsEdgeGateway{},
+		ParamsType: types.ParamsEdgeGateway{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "id",
@@ -50,13 +51,13 @@ func init() {
 			},
 		},
 
-		ModelType: ModelEdgeGatewayBandwidth{},
+		ModelType: types.ModelEdgeGatewayBandwidth{},
 
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsEdgeGateway)
+			p := params.(types.ParamsEdgeGateway)
 
-			pT0 := ParamsGetT0{
+			pT0 := types.ParamsGetT0{
 				EdgegatewayID:   p.ID,
 				EdgegatewayName: p.Name,
 			}
@@ -66,7 +67,7 @@ func init() {
 				return nil, err
 			}
 
-			var edgeGateway *ModelT0EdgeGateway
+			var edgeGateway *types.ModelT0EdgeGateway
 			for _, eg := range t0.EdgeGateways {
 				if eg.ID == p.ID || eg.Name == p.Name {
 					edgeGateway = &eg
@@ -76,9 +77,9 @@ func init() {
 
 			// edgeGateway is never nil because GetT0FromEdgeGateway ensures the edge gateway exists
 
-			// Transform ModelT0EdgeGateway to ModelEdgeGatewayBandwidth
-			// Create a new ModelEdgeGatewayBandwidth from ModelT0EdgeGateway
-			bandwidth := &ModelEdgeGatewayBandwidth{
+			// Transform ModelT0EdgeGateway to types.ModelEdgeGatewayBandwidth
+			// Create a new types.ModelEdgeGatewayBandwidth from ModelT0EdgeGateway
+			bandwidth := &types.ModelEdgeGatewayBandwidth{
 				ID:                     edgeGateway.ID,
 				Name:                   edgeGateway.Name,
 				Bandwidth:              edgeGateway.Bandwidth,

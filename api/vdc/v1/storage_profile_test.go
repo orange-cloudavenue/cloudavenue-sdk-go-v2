@@ -14,28 +14,30 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/common-go/generator"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
 func TestListStorageProfiles(t *testing.T) {
 	tests := []struct {
 		name               string
-		params             ParamsListStorageProfiles
+		params             types.ParamsListStorageProfiles
 		mockResponseStatus int
 		mockResponse       any
 		expectedErr        bool
 	}{
 		{
 			name: "List Storage Profiles",
-			params: ParamsListStorageProfiles{
+			params: types.ParamsListStorageProfiles{
 				ID: generator.MustGenerate("{urn:vdc}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Error 401 Unauthorized",
-			params: ParamsListStorageProfiles{
+			params: types.ParamsListStorageProfiles{
 				ID: generator.MustGenerate("{urn:vdc}"),
 			},
 			mockResponseStatus: 401,
@@ -71,17 +73,17 @@ func TestListStorageProfiles(t *testing.T) {
 func TestAddStorageProfile(t *testing.T) {
 	tests := []struct {
 		name               string
-		params             ParamsAddStorageProfile
+		params             types.ParamsAddStorageProfile
 		mockResponseStatus int
 		mockResponse       any
 		expectedErr        bool
 	}{
 		{
 			name: "Add Storage Profile",
-			params: ParamsAddStorageProfile{
+			params: types.ParamsAddStorageProfile{
 				VdcID:   generator.MustGenerate("{urn:vdc}"),
 				VdcName: "my-vdc",
-				StorageProfiles: []ParamsCreateVDCStorageProfile{
+				StorageProfiles: []types.ParamsCreateVDCStorageProfile{
 					{
 						Class:   "gold",
 						Limit:   500,
@@ -93,10 +95,10 @@ func TestAddStorageProfile(t *testing.T) {
 		},
 		{
 			name: "Error 401 Unauthorized",
-			params: ParamsAddStorageProfile{
+			params: types.ParamsAddStorageProfile{
 				VdcID:   generator.MustGenerate("{urn:vdc}"),
 				VdcName: "my-vdc",
-				StorageProfiles: []ParamsCreateVDCStorageProfile{
+				StorageProfiles: []types.ParamsCreateVDCStorageProfile{
 					{
 						Class:   "gold",
 						Limit:   500,

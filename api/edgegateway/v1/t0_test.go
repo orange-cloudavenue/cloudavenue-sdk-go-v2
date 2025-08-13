@@ -16,6 +16,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 	"github.com/orange-cloudavenue/common-go/generator"
 )
 
@@ -44,11 +46,11 @@ func Test_ListT0(t *testing.T) {
 		},
 		{
 			name: "Simulate unknown class of service",
-			mockResponse: &apiResponseT0s{
+			mockResponse: &itypes.ApiResponseT0s{
 				{
 					Type:       "edge-gateway",
 					Name:       generator.MustGenerate("{resource_name:edgegateway}"),
-					Properties: apiResponseT0Properties{ClassOfService: "unknown"},
+					Properties: itypes.ApiResponseT0Properties{ClassOfService: "unknown"},
 				},
 			},
 			expectedErr:        false,
@@ -81,7 +83,7 @@ func Test_ListT0(t *testing.T) {
 func Test_GetT0(t *testing.T) {
 	tests := []struct {
 		name   string
-		params ParamsGetT0
+		params types.ParamsGetT0
 
 		mockResponse       any
 		mockResponseStatus int
@@ -90,21 +92,21 @@ func Test_GetT0(t *testing.T) {
 	}{
 		{
 			name: "Valid T0",
-			params: ParamsGetT0{
+			params: types.ParamsGetT0{
 				T0Name: generator.MustGenerate("{resource_name:t0}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Invalid TO name",
-			params: ParamsGetT0{
+			params: types.ParamsGetT0{
 				T0Name: "invalid_t0_name",
 			},
 			expectedErr: true,
 		},
 		{
 			name: "Error 500",
-			params: ParamsGetT0{
+			params: types.ParamsGetT0{
 				T0Name: generator.MustGenerate("{resource_name:t0}"),
 			},
 			mockResponseStatus: http.StatusInternalServerError,
@@ -112,34 +114,34 @@ func Test_GetT0(t *testing.T) {
 		},
 		{
 			name: "Simulate empty response",
-			params: ParamsGetT0{
+			params: types.ParamsGetT0{
 				T0Name: generator.MustGenerate("{resource_name:t0}"),
 			},
-			mockResponse:       &apiResponseT0s{},
+			mockResponse:       &itypes.ApiResponseT0s{},
 			mockResponseStatus: http.StatusOK,
 			expectedErr:        true,
 		},
 		{
 			name: "Simulate empty response EdgeGateway Name",
-			params: ParamsGetT0{
+			params: types.ParamsGetT0{
 				EdgegatewayName: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
-			mockResponse:       &apiResponseT0s{},
+			mockResponse:       &itypes.ApiResponseT0s{},
 			mockResponseStatus: http.StatusOK,
 			expectedErr:        true,
 		},
 		{
 			name: "Simulate empty response EdgeGateway ID",
-			params: ParamsGetT0{
+			params: types.ParamsGetT0{
 				EdgegatewayID: generator.MustGenerate("{urn:edgegateway}"),
 			},
-			mockResponse:       &apiResponseT0s{},
+			mockResponse:       &itypes.ApiResponseT0s{},
 			mockResponseStatus: http.StatusOK,
 			expectedErr:        true,
 		},
 		{
 			name: "Error 404",
-			params: ParamsGetT0{
+			params: types.ParamsGetT0{
 				T0Name: generator.MustGenerate("{resource_name:t0}"),
 			},
 			mockResponseStatus: http.StatusNotFound,
@@ -175,84 +177,3 @@ func Test_GetT0(t *testing.T) {
 		})
 	}
 }
-
-// func Test_GetT0FromEdgeGateway(t *testing.T) {
-// 	tests := []struct {
-// 		name               string
-// 		params             ParamsEdgeGateway
-// 		mockResponse       any
-// 		mockResponseStatus int
-// 		expectedErr        bool
-// 	}{
-// 		{
-// 			name: "Valid T0 from edge gateway",
-// 			params: ParamsEdgeGateway{
-// 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
-// 			},
-// 			expectedErr: false,
-// 		},
-// 		{
-// 			name: "Invalid edge gateway name",
-// 			params: ParamsEdgeGateway{
-// 				Name: "invalid_edge_gateway_name",
-// 			},
-// 			expectedErr: true,
-// 		},
-// 		{
-// 			name: "Error 500",
-// 			params: ParamsEdgeGateway{
-// 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
-// 			},
-// 			mockResponseStatus: http.StatusInternalServerError,
-// 			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
-// 		},
-// 		{
-// 			name: "Simulate empty response with edge gateway name",
-// 			params: ParamsEdgeGateway{
-// 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
-// 			},
-// 			mockResponse:       &apiResponseT0s{},
-// 			mockResponseStatus: http.StatusOK,
-// 			expectedErr:        true,
-// 		},
-// 		{
-// 			name: "Simulate empty response with edge gateway ID",
-// 			params: ParamsEdgeGateway{
-// 				ID: generator.MustGenerate("{urn:edgegateway}"),
-// 			},
-// 			mockResponse:       &apiResponseT0s{},
-// 			mockResponseStatus: http.StatusOK,
-// 			expectedErr:        true,
-// 		},
-// 		{
-// 			name: "Error 404",
-// 			params: ParamsEdgeGateway{
-// 				ID: generator.MustGenerate("{urn:edgegateway}"),
-// 			},
-// 			mockResponseStatus: http.StatusNotFound,
-// 			expectedErr:        true, // Error HTTP 404 should return an error.
-// 		},
-// 	}
-
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			ep := endpoints.ListT0()
-// 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
-// 				ep.CleanMockResponse()
-// 				ep.SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
-// 			}
-
-// 			eC := newClient(t)
-
-// 			t0, err := eC.GetT0FromEdgeGateway(t.Context(), tt.params)
-
-// 			if tt.expectedErr {
-// 				assert.NotNil(t, err, "Expected error but got nil")
-// 				assert.Nil(t, t0, "Expected nil T0 response")
-// 			} else {
-// 				assert.Nil(t, err, "Unexpected error while getting T0 from edge gateway")
-// 				assert.NotNil(t, t0, "Expected non-nil T0 response")
-// 			}
-// 		})
-// 	}
-// }

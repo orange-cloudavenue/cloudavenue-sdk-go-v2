@@ -128,6 +128,9 @@ func main() {
 							fieldValue := cmdValue.FieldByName(key.Name)
 							if fieldValue.IsValid() && fieldValue.CanSet() {
 								v := findValue(kv)
+								if v == "cav.Job" {
+									v = ""
+								}
 								value := reflect.ValueOf(v)
 								switch fieldValue.Kind() {
 								case reflect.String:
@@ -253,12 +256,15 @@ func findValue(kv *ast.KeyValueExpr) string {
 	case *ast.Ident:
 		return clean(v.Name)
 	case *ast.CompositeLit:
-		kvc, ok := v.Type.(*ast.Ident)
-		if !ok {
+		switch v.Type.(type) {
+		case *ast.Ident:
+			return clean(v.Type.(*ast.Ident).Name)
+		case *ast.SelectorExpr:
+			return fmt.Sprintf("%s.%s", v.Type.(*ast.SelectorExpr).X, v.Type.(*ast.SelectorExpr).Sel.Name)
+		default:
 			fmt.Println("Could not find type for composite literal:", v.Type)
 			return ""
 		}
-		return clean(kvc.Name)
 	default:
 		return ""
 	}

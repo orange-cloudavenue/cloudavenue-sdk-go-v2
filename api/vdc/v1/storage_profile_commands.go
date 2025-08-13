@@ -16,6 +16,8 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
 //go:generate command-generator -path storage_profile_commands.go
@@ -37,7 +39,7 @@ func init() {
 		ShortDocumentation: "List VDC Storage Profiles",
 		LongDocumentation:  "List of storage profiles available in a specific VDC.",
 
-		ParamsType: ParamsListStorageProfiles{},
+		ParamsType: types.ParamsListStorageProfiles{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "id",
@@ -48,10 +50,10 @@ func init() {
 				},
 			},
 		},
-		ModelType: ModelListStorageProfiles{},
+		ModelType: types.ModelListStorageProfiles{},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsListStorageProfiles)
+			p := params.(types.ParamsListStorageProfiles)
 
 			logger := cc.logger.WithGroup("ListStorageProfiles")
 
@@ -67,7 +69,7 @@ func init() {
 				return nil, err
 			}
 
-			return resp.Result().(*apiResponseListStorageProfiles).toModel(), nil
+			return resp.Result().(*itypes.ApiResponseListStorageProfiles).ToModel(), nil
 		},
 		AutoGenerate: true,
 	})
@@ -81,7 +83,7 @@ func init() {
 		ShortDocumentation: "Add a new VDC Storage Profile",
 		LongDocumentation:  "Add one or more storage profiles to a specific VDC.",
 		ModelType:          cav.Job{},
-		ParamsType:         ParamsAddStorageProfile{},
+		ParamsType:         types.ParamsAddStorageProfile{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "vdc_id",
@@ -141,9 +143,9 @@ func init() {
 		// PreRulesRunnerFunc is called before the main command for inject DisponibilityClass in a rules validation
 		PreRulesRunnerFunc: func(ctx context.Context, cmd *commands.Command, client, paramsIn any) (paramsOut any, err error) {
 			cc := client.(*Client)
-			p := paramsIn.(ParamsAddStorageProfile)
+			p := paramsIn.(types.ParamsAddStorageProfile)
 
-			vdc, err := cc.GetVDC(ctx, ParamsGetVDC{
+			vdc, err := cc.GetVDC(ctx, types.ParamsGetVDC{
 				ID:   p.VdcID,
 				Name: p.VdcName,
 			})
@@ -157,7 +159,7 @@ func init() {
 				// VdcName is the name of the VDC to add the storage profile to.
 				VdcName string
 
-				StorageProfiles    []ParamsCreateVDCStorageProfile
+				StorageProfiles    []types.ParamsCreateVDCStorageProfile
 				DisponibilityClass string
 			}{
 				VdcId:              vdc.ID,
@@ -168,14 +170,14 @@ func init() {
 		},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsAddStorageProfile)
+			p := params.(types.ParamsAddStorageProfile)
 
 			logger := cc.logger.WithGroup("AddStorageProfile")
 
 			ep := endpoints.UpdateVdc()
 
-			apiR := apiRequestUpdateVDC{
-				VDC: apiRequestUpdateVDCVDC{
+			apiR := itypes.ApiRequestUpdateVDC{
+				VDC: itypes.ApiRequestUpdateVDCVDC{
 					Name: p.VdcName,
 				},
 			}
@@ -183,7 +185,7 @@ func init() {
 			logger.Debug("Adding storage profiles to VDC", "vdc_name", p.VdcName, "storage_profiles", p.StorageProfiles)
 
 			for _, sp := range p.StorageProfiles {
-				apiR.VDC.StorageProfiles = append(apiR.VDC.StorageProfiles, apiRequestVDCStorageProfile{
+				apiR.VDC.StorageProfiles = append(apiR.VDC.StorageProfiles, itypes.ApiRequestVDCStorageProfile{
 					Class:   sp.Class,
 					Limit:   sp.Limit,
 					Default: sp.Default,

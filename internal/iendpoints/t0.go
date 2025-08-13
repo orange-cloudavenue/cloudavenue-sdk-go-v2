@@ -7,18 +7,19 @@
  * or see the "LICENSE" file for more details.
  */
 
-package edgegateway
+package iendpoints
 
 import (
 	"encoding/json"
 	"net/http"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/orange-cloudavenue/common-go/validators"
 )
 
-//go:generate endpoint-generator -path t0_endpoints.go
+//go:generate endpoint-generator -path t0.go -output t0
 
 func init() {
 	// GET - List all T0
@@ -29,7 +30,7 @@ func init() {
 		Method:           cav.MethodGET,
 		SubClient:        cav.ClientCerberus,
 		PathTemplate:     "/api/customers/v2.0/network",
-		BodyResponseType: apiResponseT0s{},
+		BodyResponseType: itypes.ApiResponseT0s{},
 
 		QueryParams: []cav.QueryParam{
 			// Query parameters are not used in this endpoint, but can be added
@@ -64,21 +65,21 @@ func init() {
 			edgeGatewayName := r.URL.Query().Get("edgeGatewayName")
 			edgeGatewayID := r.URL.Query().Get("edgeGatewayID")
 
-			var data apiResponseT0s
+			var data itypes.ApiResponseT0s
 
 			if t0Name == "" {
-				t0 := apiResponseT0{}
+				t0 := itypes.ApiResponseT0{}
 				_ = generator.Struct(&t0)
 
-				data = apiResponseT0s{
+				data = itypes.ApiResponseT0s{
 					t0,
 				}
 			} else {
-				data = apiResponseT0s{
+				data = itypes.ApiResponseT0s{
 					{
 						Type: "tier-0-vrf",
 						Name: t0Name,
-						Children: []apiResponseT0Children{
+						Children: []itypes.ApiResponseT0Children{
 							{
 								Type: "edge-gateway",
 								Name: generator.MustGenerate("{resource_name:edgegateway}"),
@@ -97,7 +98,7 @@ func init() {
 
 			if edgeGatewayName != "" || edgeGatewayID != "" {
 				// Append the edge gateway to the T0
-				data[0].Children = append(data[0].Children, apiResponseT0Children{
+				data[0].Children = append(data[0].Children, itypes.ApiResponseT0Children{
 					Type: "edge-gateway",
 					Name: func() string {
 						if edgeGatewayName != "" {

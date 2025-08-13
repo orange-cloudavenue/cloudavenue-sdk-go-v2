@@ -19,6 +19,8 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
 //go:generate command-generator -path vdc_commands.go
@@ -38,7 +40,7 @@ func init() { //nolint:gocyclo
 		ShortDocumentation: "List VDCs",
 		LongDocumentation:  "List all Virtual Data Centers (VDCs) available in your organization. If no filters are applied, it returns all VDCs.",
 
-		ParamsType: ParamsListVDC{},
+		ParamsType: types.ParamsListVDC{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "id",
@@ -58,10 +60,10 @@ func init() { //nolint:gocyclo
 				},
 			},
 		},
-		ModelType: ModelListVDC{},
+		ModelType: types.ModelListVDC{},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsListVDC)
+			p := params.(types.ParamsListVDC)
 			ep := endpoints.ListVdc()
 
 			logger := cc.logger.WithGroup("ListVDC")
@@ -84,7 +86,7 @@ func init() { //nolint:gocyclo
 				return nil, err
 			}
 
-			return resp.Result().(*apiResponseListVDC).toModel(), nil
+			return resp.Result().(*itypes.ApiResponseListVDC).ToModel(), nil
 		},
 		AutoGenerate: true,
 	})
@@ -97,7 +99,7 @@ func init() { //nolint:gocyclo
 		ShortDocumentation: "Get VDC details",
 		LongDocumentation:  "Retrieve detailed information about a specific Virtual Data Center (VDC) by its name.",
 
-		ParamsType: ParamsGetVDC{},
+		ParamsType: types.ParamsGetVDC{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "id",
@@ -119,10 +121,10 @@ func init() { //nolint:gocyclo
 				},
 			},
 		},
-		ModelType: ModelGetVDC{},
+		ModelType: types.ModelGetVDC{},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsGetVDC)
+			p := params.(types.ParamsGetVDC)
 
 			logger := cc.logger.WithGroup("GetVDC")
 
@@ -146,7 +148,7 @@ func init() { //nolint:gocyclo
 				return nil, err
 			}
 
-			results := resp.Result().(*apiResponseListVDC)
+			results := resp.Result().(*itypes.ApiResponseListVDC)
 			if len(results.Records) == 0 {
 				logger.Warn("No VDCs found")
 				return nil, fmt.Errorf("The VDC %s does not exist in your organization", p.Name)
@@ -155,8 +157,8 @@ func init() { //nolint:gocyclo
 			vdc := results.Records[0]
 
 			var (
-				vdcMetadata *apiResponseGetVDCMetadatas
-				model       ModelGetVDC
+				vdcMetadata *itypes.ApiResponseGetVDCMetadatas
+				model       types.ModelGetVDC
 			)
 
 			// GET VDC Details and Metadata in Parallel
@@ -176,7 +178,7 @@ func init() { //nolint:gocyclo
 					return fmt.Errorf("failed to get VDC metadata for %s: %w", results.Records[0].Name, err)
 				}
 
-				vdcMetadata = vdcMetadataResp.Result().(*apiResponseGetVDCMetadatas)
+				vdcMetadata = vdcMetadataResp.Result().(*itypes.ApiResponseGetVDCMetadatas)
 				return nil
 			})
 
@@ -193,8 +195,8 @@ func init() { //nolint:gocyclo
 					return err
 				}
 
-				vdcDetails := vdcResp.Result().(*apiResponseGetVDC)
-				model = vdcDetails.toModel()
+				vdcDetails := vdcResp.Result().(*itypes.ApiResponseGetVDC)
+				model = vdcDetails.ToModel()
 				model.NumberOfDisks = vdc.NumberOfDisks
 				model.NumberOfStorageProfiles = vdc.NumberOfStorageProfiles
 				model.NumberOfVMS = vdc.NumberOfVMS
@@ -238,7 +240,7 @@ func init() { //nolint:gocyclo
 		ShortDocumentation: "Create a new VDC",
 		LongDocumentation:  "Create a new Virtual Data Center (VDC) with the specified parameters.",
 
-		ParamsType: ParamsCreateVDC{},
+		ParamsType: types.ParamsCreateVDC{},
 		ParamsSpecs: commands.ParamsSpecs{
 			{
 				Name:        "name",
@@ -322,15 +324,15 @@ func init() { //nolint:gocyclo
 			},
 		},
 		ParamsRules: vdcRules,
-		ModelType:   ModelGetVDC{},
+		ModelType:   types.ModelGetVDC{},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsCreateVDC)
+			p := params.(types.ParamsCreateVDC)
 
 			logger := cc.logger.WithGroup("CreateVDC")
 
-			reqBody := apiRequestCreateVDC{
-				VDC: apiRequestCreateVDCVDC{
+			reqBody := itypes.ApiRequestCreateVDC{
+				VDC: itypes.ApiRequestCreateVDCVDC{
 					Name:                p.Name,
 					Description:         p.Description,
 					ServiceClass:        p.ServiceClass,
@@ -340,12 +342,12 @@ func init() { //nolint:gocyclo
 					VCPUInMhz:           serviceClassToCPUInMhz(p.ServiceClass),
 					CPUAllocated:        serviceClassToCPUInMhz(p.ServiceClass) * p.Vcpu,
 					MemoryAllocated:     p.Memory,
-					StorageProfiles:     make([]apiRequestVDCStorageProfile, len(p.StorageProfiles)),
+					StorageProfiles:     make([]itypes.ApiRequestVDCStorageProfile, len(p.StorageProfiles)),
 				},
 			}
 
 			for i, sp := range p.StorageProfiles {
-				reqBody.VDC.StorageProfiles[i] = apiRequestVDCStorageProfile{
+				reqBody.VDC.StorageProfiles[i] = itypes.ApiRequestVDCStorageProfile{
 					Class:   sp.Class,
 					Limit:   sp.Limit,
 					Default: sp.Default,
@@ -374,7 +376,7 @@ func init() { //nolint:gocyclo
 				return nil, err
 			}
 
-			resp, err := cc.GetVDC(ctx, ParamsGetVDC{
+			resp, err := cc.GetVDC(ctx, types.ParamsGetVDC{
 				Name: p.Name,
 			})
 			if err != nil {
@@ -393,7 +395,7 @@ func init() { //nolint:gocyclo
 		Verb:               "Update",
 		ShortDocumentation: "UpdateVDC updates an existing VDC",
 		LongDocumentation:  "Update VDC performs a PUT request to update an existing VDC. Enter only the fields you want to update.",
-		ParamsType:         ParamsUpdateVDC{},
+		ParamsType:         types.ParamsUpdateVDC{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "id",
@@ -448,19 +450,19 @@ func init() { //nolint:gocyclo
 
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsUpdateVDC)
+			p := params.(types.ParamsUpdateVDC)
 			ep := endpoints.UpdateVdc()
 
 			logger := cc.logger.WithGroup("UpdateVDC")
 
-			apiR := apiRequestUpdateVDC{
-				VDC: apiRequestUpdateVDCVDC{
+			apiR := itypes.ApiRequestUpdateVDC{
+				VDC: itypes.ApiRequestUpdateVDCVDC{
 					Name: p.Name,
 				},
 			}
 
 			if p.Vcpu != nil || p.Name == "" {
-				vdc, err := cc.GetVDC(ctx, ParamsGetVDC{
+				vdc, err := cc.GetVDC(ctx, types.ParamsGetVDC{
 					ID:   p.ID,
 					Name: p.Name,
 				})
@@ -507,7 +509,7 @@ func init() { //nolint:gocyclo
 		ShortDocumentation: "DeleteVDC deletes an existing VDC",
 		LongDocumentation:  "Delete VDC performs a DELETE request to delete an existing VDC.",
 		AutoGenerate:       true,
-		ParamsType:         ParamsDeleteVDC{},
+		ParamsType:         types.ParamsDeleteVDC{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "id",
@@ -532,14 +534,14 @@ func init() { //nolint:gocyclo
 		},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsDeleteVDC)
+			p := params.(types.ParamsDeleteVDC)
 			ep := endpoints.DeleteVdc()
 
 			logger := cc.logger.WithGroup("DeleteVDC")
 
 			if p.Name == "" {
 				// Delete require vdc name
-				vdc, err := cc.GetVDC(ctx, ParamsGetVDC{
+				vdc, err := cc.GetVDC(ctx, types.ParamsGetVDC{
 					ID: p.ID,
 				})
 				if err != nil {
@@ -563,4 +565,20 @@ func init() { //nolint:gocyclo
 			return nil, nil
 		},
 	})
+}
+
+func vcpuToMhz(vcpu, frequency int) int {
+	if vcpu <= 0 || frequency <= 0 {
+		return 0
+	}
+	return vcpu * frequency
+}
+
+func serviceClassToCPUInMhz(serviceClass string) int {
+	switch serviceClass {
+	case "VOIP":
+		return 3000
+	default:
+		return 2200
+	}
 }

@@ -7,17 +7,18 @@
  * or see the "LICENSE" file for more details.
  */
 
-package edgegateway
+package iendpoints
 
 import (
 	"time"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/validators"
 )
 
-//go:generate endpoint-generator -path bandwidth_endpoints.go
+//go:generate endpoint-generator -path edgegateway_bandwidth.go -output edgegateway_bandwidth
 
 func init() {
 	// * UpdateEdgeGatewayBandwidth
@@ -43,7 +44,7 @@ func init() {
 			},
 		},
 		QueryParams:      nil,
-		BodyRequestType:  apiRequestBandwidth{},
+		BodyRequestType:  itypes.ApiRequestBandwidth{},
 		BodyResponseType: cav.Job{},
 		JobOptions: &cav.JobOptions{
 			PollInterval: time.Second * 1,

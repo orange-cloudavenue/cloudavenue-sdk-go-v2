@@ -7,7 +7,7 @@
  * or see the "LICENSE" file for more details.
  */
 
-package vdc
+package types
 
 type (
 	ModelListStorageProfiles struct {
@@ -38,36 +38,3 @@ type (
 		StorageProfiles []ParamsCreateVDCStorageProfile
 	}
 )
-
-type (
-	// * ListStorageProfiles
-	apiResponseListStorageProfiles struct {
-		StorageProfiles []apiResponseListStorageProfile `json:"record" fakesize:"1"`
-	}
-
-	apiResponseListStorageProfile struct {
-		HREF      string `json:"href" fake:"{href_uuid}"`
-		ID        string `json:"id" fake:"{urn:vdcstorageProfile}"`
-		Name      string `json:"name" fake:"platinum3k_r1"`
-		IsEnabled bool   `json:"isEnabled" fake:"true"`
-		Default   bool   `json:"default" fake:"true"`
-
-		// Values are in MB
-		Limit int `json:"storageLimitMB" fake:"{number:100,1000}"` //nolint:tagliatelle
-		Used  int `json:"storageUsedMB" fake:"{number:10,500}"`    //nolint:tagliatelle
-	}
-)
-
-func (r *apiResponseListStorageProfiles) toModel() *ModelListStorageProfiles {
-	storageProfiles := make([]ModelListStorageProfile, 0, len(r.StorageProfiles))
-	for _, sp := range r.StorageProfiles {
-		storageProfiles = append(storageProfiles, ModelListStorageProfile{
-			ID:      sp.ID,
-			Class:   sp.Name,
-			Limit:   sp.Limit,
-			Used:    sp.Used,
-			Default: sp.Default,
-		})
-	}
-	return &ModelListStorageProfiles{StorageProfiles: storageProfiles}
-}

@@ -17,7 +17,9 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
 //go:generate command-generator -path t0_commands.go
@@ -37,7 +39,7 @@ func init() {
 		LongDocumentation:  "List all T0s available in the organization. This command retrieves a list of all T0s, which are the top-level network services in the Edge Gateway architecture.",
 		AutoGenerate:       true,
 
-		ModelType: ModelT0s{},
+		ModelType: types.ModelT0s{},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
 			ep := endpoints.ListT0()
@@ -48,7 +50,7 @@ func init() {
 				return nil, fmt.Errorf("error listing T0s: %w", err)
 			}
 
-			return resp.Result().(*apiResponseT0s).toModel(), nil
+			return resp.Result().(*itypes.ApiResponseT0s).ToModel(), nil
 		},
 	})
 
@@ -60,7 +62,7 @@ func init() {
 		LongDocumentation:  "Retrieve a specific T0 directly by its name or by the edge gateway it is associated with. This command allows you to fetch detailed information about a specific T0.",
 		AutoGenerate:       true,
 
-		ParamsType: ParamsGetT0{},
+		ParamsType: types.ParamsGetT0{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "t0_name",
@@ -94,10 +96,10 @@ func init() {
 				},
 			},
 		},
-		ModelType: ModelT0{},
+		ModelType: types.ModelT0{},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsGetT0)
+			p := params.(types.ParamsGetT0)
 			ep := endpoints.ListT0()
 
 			// Perform the request to get the specific T0
@@ -112,8 +114,8 @@ func init() {
 				return nil, fmt.Errorf("error getting T0: %w", err)
 			}
 
-			t0s := resp.Result().(*apiResponseT0s).toModel()
-			var t0 *ModelT0
+			t0s := resp.Result().(*itypes.ApiResponseT0s).ToModel()
+			var t0 *types.ModelT0
 
 			for _, t := range t0s.T0s {
 				if p.T0Name != "" && t.Name == p.T0Name {

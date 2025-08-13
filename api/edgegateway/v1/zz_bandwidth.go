@@ -9,12 +9,25 @@
 
 package edgegateway
 
-import "context"
+import (
+	"context"
 
-func (c *Client) GetBandwidth(ctx context.Context, params ParamsEdgeGateway) (*ModelEdgeGatewayBandwidth, error) {
-	x, err := cmds.Get("EdgeGateway", "Bandwidth", "Get").Run(ctx, c, params)
-	if err != nil {
-		return nil, err
-	}
-	return x.(*ModelEdgeGatewayBandwidth), nil
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
+)
+
+
+func (c *Client) GetBandwidth(ctx context.Context, params types.ParamsEdgeGateway) (*types.ModelEdgeGatewayBandwidth, error) {
+    x, err := cmds.Get("EdgeGateway", "Bandwidth", "Get").Run(ctx, c, params)
+    if err != nil {
+        return nil, err
+    }
+    return x.(*types.ModelEdgeGatewayBandwidth), nil
 }
+
+
+
+
+
+
+
+

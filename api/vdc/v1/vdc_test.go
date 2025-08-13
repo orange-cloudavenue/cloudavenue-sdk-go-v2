@@ -14,15 +14,18 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/orange-cloudavenue/common-go/utils"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
 func TestListVDC(t *testing.T) {
 	tests := []struct {
 		name               string
-		params             ParamsListVDC
+		params             types.ParamsListVDC
 		mockResponse       any
 		mockResponseStatus int
 
@@ -30,7 +33,7 @@ func TestListVDC(t *testing.T) {
 	}{
 		{
 			name: "List VDCs with no filters",
-			params: ParamsListVDC{
+			params: types.ParamsListVDC{
 				ID:   "",
 				Name: "",
 			},
@@ -38,21 +41,21 @@ func TestListVDC(t *testing.T) {
 		},
 		{
 			name: "List VDCs with filter by Name",
-			params: ParamsListVDC{
+			params: types.ParamsListVDC{
 				Name: "test-name",
 			},
 			expectedErr: false,
 		},
 		{
 			name: "List VDCs with filter by ID",
-			params: ParamsListVDC{
+			params: types.ParamsListVDC{
 				ID: generator.MustGenerate("{urn:vdc}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Error 401 Unauthorized",
-			params: ParamsListVDC{
+			params: types.ParamsListVDC{
 				ID: generator.MustGenerate("{urn:vdc}"),
 			},
 			mockResponseStatus: 401,
@@ -86,7 +89,7 @@ func TestListVDC(t *testing.T) {
 func TestGetVDC(t *testing.T) {
 	tests := []struct {
 		name               string
-		params             ParamsGetVDC
+		params             types.ParamsGetVDC
 		mockResponse       any
 		mockResponseStatus int
 
@@ -99,21 +102,21 @@ func TestGetVDC(t *testing.T) {
 	}{
 		{
 			name: "Get VDC by ID",
-			params: ParamsGetVDC{
+			params: types.ParamsGetVDC{
 				ID: generator.MustGenerate("{urn:vdc}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Get VDC by Name",
-			params: ParamsGetVDC{
+			params: types.ParamsGetVDC{
 				Name: "test-name",
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Error 401 Unauthorized",
-			params: ParamsGetVDC{
+			params: types.ParamsGetVDC{
 				ID: generator.MustGenerate("{urn:vdc}"),
 			},
 			mockResponseStatus: 401,
@@ -121,7 +124,7 @@ func TestGetVDC(t *testing.T) {
 		},
 		{
 			name: "failed to get VDC details",
-			params: ParamsGetVDC{
+			params: types.ParamsGetVDC{
 				ID: generator.MustGenerate("{urn:vdc}"),
 			},
 			mockResponseStatus: 401,
@@ -129,16 +132,16 @@ func TestGetVDC(t *testing.T) {
 		},
 		{
 			name: "List VDCs response with no VDCs",
-			params: ParamsGetVDC{
+			params: types.ParamsGetVDC{
 				ID: generator.MustGenerate("{urn:vdc}"),
 			},
-			mockListVDCResponse:       apiResponseListVDC{Records: []apiResponseListVDCRecord{}},
+			mockListVDCResponse:       itypes.ApiResponseListVDC{Records: []itypes.ApiResponseListVDCRecord{}},
 			mockListVDCResponseStatus: 200,
 			expectedErr:               true,
 		},
 		{
 			name: "Failed to list VDCs",
-			params: ParamsGetVDC{
+			params: types.ParamsGetVDC{
 				ID: generator.MustGenerate("{urn:vdc}"),
 			},
 			mockListVDCResponseStatus: 401,
@@ -146,7 +149,7 @@ func TestGetVDC(t *testing.T) {
 		},
 		{
 			name: "Failed Get VDC Metadata",
-			params: ParamsGetVDC{
+			params: types.ParamsGetVDC{
 				ID: generator.MustGenerate("{urn:vdc}"),
 			},
 			mockGetMetadataResponseStatus: 401,
@@ -187,7 +190,7 @@ func TestGetVDC(t *testing.T) {
 func TestCreateVDC(t *testing.T) {
 	tests := []struct {
 		name               string
-		params             ParamsCreateVDC
+		params             types.ParamsCreateVDC
 		mockResponse       any
 		mockResponseStatus int
 
@@ -198,7 +201,7 @@ func TestCreateVDC(t *testing.T) {
 	}{
 		{
 			name: "Create VDC with valid parameters",
-			params: ParamsCreateVDC{
+			params: types.ParamsCreateVDC{
 				Name:                "test-vdc",
 				Description:         "Test VDC",
 				ServiceClass:        "STD",
@@ -207,7 +210,7 @@ func TestCreateVDC(t *testing.T) {
 				StorageBillingModel: "PAYG",
 				Vcpu:                5,
 				Memory:              16,
-				StorageProfiles: []ParamsCreateVDCStorageProfile{
+				StorageProfiles: []types.ParamsCreateVDCStorageProfile{
 					{
 						Class:   "silver",
 						Limit:   100,
@@ -219,7 +222,7 @@ func TestCreateVDC(t *testing.T) {
 		},
 		{
 			name: "Create VDC with missing required parameters",
-			params: ParamsCreateVDC{
+			params: types.ParamsCreateVDC{
 				Name: "test-vdc",
 				// Missing other required fields
 			},
@@ -227,7 +230,7 @@ func TestCreateVDC(t *testing.T) {
 		},
 		{
 			name: "Create VDC with no default storage profile",
-			params: ParamsCreateVDC{
+			params: types.ParamsCreateVDC{
 				Name:                "test-vdc",
 				Description:         "Test VDC",
 				ServiceClass:        "STD",
@@ -236,7 +239,7 @@ func TestCreateVDC(t *testing.T) {
 				StorageBillingModel: "PAYG",
 				Vcpu:                5,
 				Memory:              16,
-				StorageProfiles: []ParamsCreateVDCStorageProfile{
+				StorageProfiles: []types.ParamsCreateVDCStorageProfile{
 					{
 						Class: "silver",
 						Limit: 100,
@@ -247,7 +250,7 @@ func TestCreateVDC(t *testing.T) {
 		},
 		{
 			name: "Error 401 Unauthorized",
-			params: ParamsCreateVDC{
+			params: types.ParamsCreateVDC{
 				Name:                "test-vdc",
 				Description:         "Test VDC",
 				ServiceClass:        "STD",
@@ -256,7 +259,7 @@ func TestCreateVDC(t *testing.T) {
 				StorageBillingModel: "PAYG",
 				Vcpu:                5,
 				Memory:              16,
-				StorageProfiles: []ParamsCreateVDCStorageProfile{
+				StorageProfiles: []types.ParamsCreateVDCStorageProfile{
 					{
 						Class:   "silver",
 						Limit:   100,
@@ -269,7 +272,7 @@ func TestCreateVDC(t *testing.T) {
 		},
 		{
 			name: "Failed to get VDC details after creation",
-			params: ParamsCreateVDC{
+			params: types.ParamsCreateVDC{
 				Name:                "test-vdc",
 				Description:         "Test VDC",
 				ServiceClass:        "STD",
@@ -278,7 +281,7 @@ func TestCreateVDC(t *testing.T) {
 				StorageBillingModel: "PAYG",
 				Vcpu:                5,
 				Memory:              16,
-				StorageProfiles: []ParamsCreateVDCStorageProfile{
+				StorageProfiles: []types.ParamsCreateVDCStorageProfile{
 					{
 						Class:   "silver",
 						Limit:   100,
@@ -322,7 +325,7 @@ func TestCreateVDC(t *testing.T) {
 func TestUpdateVDC(t *testing.T) {
 	tests := []struct {
 		name               string
-		params             ParamsUpdateVDC
+		params             types.ParamsUpdateVDC
 		mockResponse       any
 		mockResponseStatus int
 
@@ -332,7 +335,7 @@ func TestUpdateVDC(t *testing.T) {
 	}{
 		{
 			name: "Update VDC with valid parameters",
-			params: ParamsUpdateVDC{
+			params: types.ParamsUpdateVDC{
 				Name:        "updated-vdc",
 				Description: utils.ToPTR("Updated VDC"),
 			},
@@ -340,7 +343,7 @@ func TestUpdateVDC(t *testing.T) {
 		},
 		{
 			name: "Failed to retrieve VDC with valid parameters VCPU",
-			params: ParamsUpdateVDC{
+			params: types.ParamsUpdateVDC{
 				Name: "updated-vdc",
 				Vcpu: utils.ToPTR(10),
 			},
@@ -349,7 +352,7 @@ func TestUpdateVDC(t *testing.T) {
 		},
 		{
 			name: "Update VDC with valid parameters Memory",
-			params: ParamsUpdateVDC{
+			params: types.ParamsUpdateVDC{
 				Name:   "updated-vdc",
 				Memory: utils.ToPTR(16),
 			},
@@ -357,14 +360,14 @@ func TestUpdateVDC(t *testing.T) {
 		},
 		{
 			name:   "Update VDC with missing required parameters",
-			params: ParamsUpdateVDC{
+			params: types.ParamsUpdateVDC{
 				// Missing other required fields
 			},
 			expectedErr: true,
 		},
 		{
 			name: "Update VDC with valid parameters VCPU",
-			params: ParamsUpdateVDC{
+			params: types.ParamsUpdateVDC{
 				Name: "updated-vdc",
 				Vcpu: utils.ToPTR(10),
 			},
@@ -372,7 +375,7 @@ func TestUpdateVDC(t *testing.T) {
 		},
 		{
 			name: "Error 404 Not Found",
-			params: ParamsUpdateVDC{
+			params: types.ParamsUpdateVDC{
 				Name:        "updated-vdc",
 				Description: utils.ToPTR("Updated VDC"),
 			},
@@ -409,7 +412,7 @@ func TestUpdateVDC(t *testing.T) {
 func TestDeleteVDC(t *testing.T) {
 	tests := []struct {
 		name               string
-		params             ParamsDeleteVDC
+		params             types.ParamsDeleteVDC
 		mockResponse       any
 		mockResponseStatus int
 
@@ -419,14 +422,14 @@ func TestDeleteVDC(t *testing.T) {
 	}{
 		{
 			name: "Delete VDC with valid ID",
-			params: ParamsDeleteVDC{
+			params: types.ParamsDeleteVDC{
 				ID: generator.MustGenerate("{urn:vdc}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Error 404 Not Found",
-			params: ParamsDeleteVDC{
+			params: types.ParamsDeleteVDC{
 				ID: generator.MustGenerate("{urn:vdc}"),
 			},
 			mockResponseStatus: 404,
@@ -434,7 +437,7 @@ func TestDeleteVDC(t *testing.T) {
 		},
 		{
 			name: "Error 404 on Get VDC",
-			params: ParamsDeleteVDC{
+			params: types.ParamsDeleteVDC{
 				ID: generator.MustGenerate("{urn:vdc}"),
 			},
 			mockGetVDCResponseStatus: 404,

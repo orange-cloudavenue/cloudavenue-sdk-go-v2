@@ -18,7 +18,9 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 	"github.com/orange-cloudavenue/common-go/validators"
 )
 
@@ -39,7 +41,7 @@ func init() {
 		ShortDocumentation: "GetEdgeGateway retrieves an edge gateway",
 		LongDocumentation:  "Get EdgeGateway performs a GET request to retrieve an edge gateway",
 
-		ParamsType: ParamsEdgeGateway{},
+		ParamsType: types.ParamsEdgeGateway{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "id",
@@ -62,11 +64,11 @@ func init() {
 				},
 			},
 		},
-		ModelType: ModelEdgeGateway{},
+		ModelType: types.ModelEdgeGateway{},
 
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsEdgeGateway)
+			p := params.(types.ParamsEdgeGateway)
 			ep := endpoints.GetEdgeGateway()
 
 			logger := cc.logger.WithGroup("GetEdgeGateway")
@@ -90,7 +92,7 @@ func init() {
 				return nil, err
 			}
 
-			return resp.Result().(*apiResponseEdgegateway).toModel(), nil
+			return resp.Result().(*itypes.ApiResponseEdgegateway).ToModel(), nil
 		},
 		AutoGenerate: true,
 	})
@@ -101,7 +103,7 @@ func init() {
 		Verb:               "List",
 		ShortDocumentation: "ListEdgeGateways retrieves a list of edge gateways",
 		LongDocumentation:  "List EdgeGateways performs a GET request to retrieve a list of edge gateways",
-		ModelType:          ModelEdgeGateways{},
+		ModelType:          types.ModelEdgeGateways{},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
 			ep := endpoints.ListEdgeGateway()
@@ -117,7 +119,7 @@ func init() {
 				return nil, err
 			}
 
-			return resp.Result().(*apiResponseEdgegateways).toModel(), nil
+			return resp.Result().(*itypes.ApiResponseEdgegateways).ToModel(), nil
 		},
 		AutoGenerate: true,
 	})
@@ -129,7 +131,7 @@ func init() {
 		ShortDocumentation: "CreateEdgeGateway creates a new edge gateway",
 		LongDocumentation:  "Create EdgeGateway performs a POST request to create a new edge gateway",
 		AutoGenerate:       true,
-		ParamsType:         ParamsCreateEdgeGateway{},
+		ParamsType:         types.ParamsCreateEdgeGateway{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "owner_type",
@@ -164,10 +166,10 @@ func init() {
 				},
 			},
 		},
-		ModelType: ModelEdgeGateway{},
+		ModelType: types.ModelEdgeGateway{},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsCreateEdgeGateway)
+			p := params.(types.ParamsCreateEdgeGateway)
 			ep := endpoints.CreateEdgeGateway()
 
 			logger := cc.logger.WithGroup("CreateEdgeGateway")
@@ -182,7 +184,7 @@ func init() {
 				return nil, errors.New("No T0 routers available to connect the edge gateway")
 			}
 
-			var t0 ModelT0
+			var t0 types.ModelT0
 
 			if p.T0Name == "" {
 				if t0s.Count > 1 {
@@ -210,7 +212,7 @@ func init() {
 			}
 
 			// Prepare the request body
-			reqBody := apiRequestEdgeGateway{
+			reqBody := itypes.ApiRequestEdgeGateway{
 				T0Name: t0.Name,
 			}
 
@@ -259,7 +261,7 @@ func init() {
 			}
 
 			// Get the edge gateway created by name
-			edgeCreated, err := cc.GetEdgeGateway(ctx, ParamsEdgeGateway{
+			edgeCreated, err := cc.GetEdgeGateway(ctx, types.ParamsEdgeGateway{
 				Name: edgeGatewayCreated,
 			})
 			if err != nil {
@@ -270,7 +272,7 @@ func init() {
 			// After creation, update the edge gateway with the bandwidth if provided and the value is upper than 5Mbps.
 			if p.Bandwidth > 5 {
 				// Prepare the update request body
-				updateReqBody := apiRequestBandwidth{
+				updateReqBody := itypes.ApiRequestBandwidth{
 					Bandwidth: p.Bandwidth,
 				}
 				epBandwidth := endpoints.UpdateEdgeGatewayBandwidth()
@@ -297,7 +299,7 @@ func init() {
 		ShortDocumentation: "DeleteEdgeGateway deletes an edge gateway",
 		LongDocumentation:  "Delete EdgeGateway performs a DELETE request to delete an edge gateway",
 		AutoGenerate:       true,
-		ParamsType:         ParamsEdgeGateway{},
+		ParamsType:         types.ParamsEdgeGateway{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "id",
@@ -321,7 +323,7 @@ func init() {
 		},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsEdgeGateway)
+			p := params.(types.ParamsEdgeGateway)
 			ep := endpoints.DeleteEdgeGateway()
 
 			logger := cc.logger.WithGroup("DeleteEdgeGateway")
@@ -355,7 +357,7 @@ func init() {
 		ShortDocumentation: "UpdateEdgeGateway updates an edge gateway",
 		LongDocumentation:  "Update EdgeGateway performs a PUT request to update an edge gateway",
 		AutoGenerate:       true,
-		ParamsType:         ParamsUpdateEdgeGateway{},
+		ParamsType:         types.ParamsUpdateEdgeGateway{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "id",
@@ -382,10 +384,10 @@ func init() {
 				Required:    true,
 			},
 		},
-		ModelType: ModelEdgeGateway{},
+		ModelType: types.ModelEdgeGateway{},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsUpdateEdgeGateway)
+			p := params.(types.ParamsUpdateEdgeGateway)
 			ep := endpoints.UpdateEdgeGatewayBandwidth()
 
 			logger := cc.logger.WithGroup("UpdateEdgeGateway")
@@ -400,7 +402,7 @@ func init() {
 			}
 
 			// Prepare the request body
-			reqBody := apiRequestBandwidth{
+			reqBody := itypes.ApiRequestBandwidth{
 				Bandwidth: p.Bandwidth,
 			}
 
@@ -415,7 +417,7 @@ func init() {
 				return nil, err
 			}
 
-			return cc.GetEdgeGateway(ctx, ParamsEdgeGateway{
+			return cc.GetEdgeGateway(ctx, types.ParamsEdgeGateway{
 				ID: p.ID,
 			})
 		},

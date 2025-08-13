@@ -7,7 +7,7 @@
  * or see the "LICENSE" file for more details.
  */
 
-package vdc
+package iendpoints
 
 import (
 	"encoding/json"
@@ -20,13 +20,14 @@ import (
 	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/orange-cloudavenue/common-go/urn"
 	"github.com/orange-cloudavenue/common-go/validators"
 )
 
-//go:generate endpoint-generator -path vdc_endpoints.go
+//go:generate endpoint-generator -path vdc.go -output vdc
 
 func init() {
 	// ListVDC
@@ -84,7 +85,7 @@ func init() {
 		},
 		ResponseMiddlewares: []resty.ResponseMiddleware{
 			func(_ *resty.Client, resp *resty.Response) error {
-				r := resp.Result().(*apiResponseListVDC)
+				r := resp.Result().(*itypes.ApiResponseListVDC)
 
 				// Extract ID from HREF
 				for i, record := range r.Records {
@@ -98,10 +99,10 @@ func init() {
 				return nil
 			},
 		},
-		BodyResponseType: apiResponseListVDC{},
+		BodyResponseType: itypes.ApiResponseListVDC{},
 		MockResponseFunc: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			resp := apiResponseListVDC{
-				Records: make([]apiResponseListVDCRecord, 0),
+			resp := itypes.ApiResponseListVDC{
+				Records: make([]itypes.ApiResponseListVDCRecord, 0),
 			}
 
 			// If QueryParam "filter" is set, return a filtered response
@@ -110,7 +111,7 @@ func init() {
 
 				filterParts := strings.Split(filter, "==")
 
-				r := &apiResponseListVDCRecord{}
+				r := &itypes.ApiResponseListVDCRecord{}
 				generator.MustStruct(r)
 
 				r.ID = func() string {
@@ -167,7 +168,7 @@ func init() {
 				},
 			},
 		},
-		BodyResponseType: apiResponseGetVDC{},
+		BodyResponseType: itypes.ApiResponseGetVDC{},
 		RequestMiddlewares: []resty.RequestMiddleware{
 			func(_ *resty.Client, req *resty.Request) error {
 				// Set the Accept header to application/*+json;version=38.1
@@ -176,7 +177,7 @@ func init() {
 			},
 		},
 		MockResponseFunc: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			resp := &apiResponseGetVDC{}
+			resp := &itypes.ApiResponseGetVDC{}
 
 			generator.MustStruct(resp)
 
@@ -215,7 +216,7 @@ func init() {
 				},
 			},
 		},
-		BodyResponseType: apiResponseGetVDCMetadatas{},
+		BodyResponseType: itypes.ApiResponseGetVDCMetadatas{},
 		RequestMiddlewares: []resty.RequestMiddleware{
 			func(_ *resty.Client, req *resty.Request) error {
 				// Set the Accept header to application/*+json;version=38.1
@@ -224,26 +225,26 @@ func init() {
 			},
 		},
 		MockResponseFunc: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			resp := &apiResponseGetVDCMetadatas{
-				Metadatas: make([]apiResponseGetVDCMetadata, 0),
+			resp := &itypes.ApiResponseGetVDCMetadatas{
+				Metadatas: make([]itypes.ApiResponseGetVDCMetadata, 0),
 			}
 
 			resp.Metadatas = append(resp.Metadatas,
-				apiResponseGetVDCMetadata{
+				itypes.ApiResponseGetVDCMetadata{
 					Name:  "vdcBillingModel",
-					Value: apiResponseGetVDCMetadataValue{Value: "PAYG"},
+					Value: itypes.ApiResponseGetVDCMetadataValue{Value: "PAYG"},
 				},
-				apiResponseGetVDCMetadata{
+				itypes.ApiResponseGetVDCMetadata{
 					Name:  "vdcStorageBillingModel",
-					Value: apiResponseGetVDCMetadataValue{Value: "PAYG"},
+					Value: itypes.ApiResponseGetVDCMetadataValue{Value: "PAYG"},
 				},
-				apiResponseGetVDCMetadata{
+				itypes.ApiResponseGetVDCMetadata{
 					Name:  "vdcServiceClass",
-					Value: apiResponseGetVDCMetadataValue{Value: "HP"},
+					Value: itypes.ApiResponseGetVDCMetadataValue{Value: "HP"},
 				},
-				apiResponseGetVDCMetadata{
+				itypes.ApiResponseGetVDCMetadata{
 					Name:  "vdcDisponibilityClass",
-					Value: apiResponseGetVDCMetadataValue{Value: "ONE-ROOM"},
+					Value: itypes.ApiResponseGetVDCMetadataValue{Value: "ONE-ROOM"},
 				})
 
 			// json encode
@@ -262,7 +263,7 @@ func init() {
 		Method:           cav.MethodPOST,
 		SubClient:        cav.ClientCerberus,
 		PathTemplate:     "/api/customers/v2.0/vdcs",
-		BodyRequestType:  apiRequestCreateVDC{},
+		BodyRequestType:  itypes.ApiRequestCreateVDC{},
 		BodyResponseType: cav.Job{},
 	}.Register()
 
@@ -281,7 +282,7 @@ func init() {
 				Required:    true,
 			},
 		},
-		BodyRequestType:  apiRequestUpdateVDC{},
+		BodyRequestType:  itypes.ApiRequestUpdateVDC{},
 		BodyResponseType: cav.Job{},
 	}.Register()
 

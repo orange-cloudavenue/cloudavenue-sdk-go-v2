@@ -7,7 +7,7 @@
  * or see the "LICENSE" file for more details.
  */
 
-package edgegateway
+package iendpoints
 
 import (
 	"encoding/json"
@@ -16,12 +16,13 @@ import (
 	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/orange-cloudavenue/common-go/validators"
 )
 
-//go:generate endpoint-generator -path services_endpoints.go
+//go:generate endpoint-generator -path edgegateway_services.go -output edgegateway_services
 
 func init() {
 	cav.Endpoint{
@@ -31,7 +32,7 @@ func init() {
 		Method:           cav.MethodGET,
 		SubClient:        cav.ClientCerberus,
 		PathTemplate:     "/api/customers/v2.0/network",
-		BodyResponseType: apiResponseNetworkServices{},
+		BodyResponseType: itypes.ApiResponseNetworkServices{},
 		QueryParams: []cav.QueryParam{
 			// Query parameters are not used in this endpoint, but can be added
 			// for the mock response if needed
@@ -69,13 +70,13 @@ func init() {
 			edgeID := r.URL.Query().Get("edgeId")
 			edgeName := r.URL.Query().Get("edgeName")
 
-			var data apiResponseNetworkServices
+			var data itypes.ApiResponseNetworkServices
 
-			data = apiResponseNetworkServices{
+			data = itypes.ApiResponseNetworkServices{
 				{
 					Type: "tier-0-vrf",
 					Name: generator.MustGenerate("{resource_name:t0}"),
-					Children: []apiResponseNetworkServicesChildren{
+					Children: []itypes.ApiResponseNetworkServicesChildren{
 						{
 							Type: "edge-gateway",
 							Name: edgeName,
@@ -87,7 +88,7 @@ func init() {
 								RateLimit: 5,
 								EdgeUUID:  edgeID,
 							},
-							Children: []apiResponseNetworkServicesSubChildren{
+							Children: []itypes.ApiResponseNetworkServicesSubChildren{
 								{
 									Type: "load-balancer",
 									Name: generator.MustGenerate("{uuid}"),
@@ -177,7 +178,7 @@ func init() {
 		SubClient:        cav.ClientCerberus,
 		PathTemplate:     "/api/customers/v2.0/services",
 		BodyResponseType: cav.Job{},
-		BodyRequestType:  apiRequestNetworkServicesCavSvc{},
+		BodyRequestType:  itypes.ApiRequestNetworkServicesCavSvc{},
 	}.Register()
 
 	cav.Endpoint{

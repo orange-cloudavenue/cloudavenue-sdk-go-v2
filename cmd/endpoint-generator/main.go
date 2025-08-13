@@ -44,11 +44,12 @@ func main() {
 		flagPath     = flag.String("path", "", "The path to the file to generate commands from")
 		flagFilename = flag.String("filename", "", "The name of the file to generate")
 		flagDebug    = flag.Bool("debug", false, "Enable debug mode")
+		flagOutput   = flag.String("output", "", "The output directory for the generated files")
 	)
 
 	flag.Parse()
 
-	if *flagPath == "" {
+	if *flagPath == "" || *flagOutput == "" {
 		flag.Usage()
 		return
 	}
@@ -160,14 +161,7 @@ func main() {
 	}
 
 	if *flagFilename == "" {
-
-		// flagPath == /api/edgegateway/v1/edgegateway_endpoints.go
-		// We want to generate the file in /api/edgegateway/v1/zz_<namespace>.go
-		nameExtracted := split[len(split)-1]
-		nameExtracted = nameExtracted[:len(nameExtracted)-len("_endpoints.go")]
-
-		outputPath = findOutputDir() + "zz_" + nameExtracted + ".go"
-
+		outputPath = findOutputDir() + "zz_" + *flagOutput + ".go"
 	} else {
 		outputPath = findOutputDir() + *flagFilename
 	}
