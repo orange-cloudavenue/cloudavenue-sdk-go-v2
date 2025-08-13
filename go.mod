@@ -14,7 +14,7 @@ require (
 	github.com/go-chi/chi/v5 v5.2.2
 	github.com/orange-cloudavenue/common-go/extractor v1.0.0
 	github.com/orange-cloudavenue/common-go/generator v1.3.1
-	github.com/orange-cloudavenue/common-go/urn v1.1.0
+	github.com/orange-cloudavenue/common-go/urn v1.2.0
 	github.com/orange-cloudavenue/common-go/utils v1.0.0
 	github.com/orange-cloudavenue/common-go/validators v1.1.2
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
