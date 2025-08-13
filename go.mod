@@ -12,7 +12,7 @@ go 1.24.4
 
 require (
 	github.com/go-chi/chi/v5 v5.2.2
-	github.com/orange-cloudavenue/common-go/extractor v1.0.0
+	github.com/orange-cloudavenue/common-go/extractor v1.0.1
 	github.com/orange-cloudavenue/common-go/generator v1.3.1
 	github.com/orange-cloudavenue/common-go/urn v1.1.0
 	github.com/orange-cloudavenue/common-go/utils v1.0.0
@@ -34,7 +34,7 @@ require (
 	github.com/go-playground/validator/v10 v10.27.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/orange-cloudavenue/common-go/internal/regex v0.0.0-20250729195615-a2902a82caeb // indirect
+	github.com/orange-cloudavenue/common-go/internal/regex v0.0.0-20250812201424-07c3423160b3 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/crypto v0.40.0 // indirect
 	golang.org/x/net v0.42.0 // indirect
