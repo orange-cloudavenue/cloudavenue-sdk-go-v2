@@ -25,12 +25,12 @@ github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWb
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
 github.com/orange-cloudavenue/common-go/extractor v1.0.0 h1:N3si7GXzbq4OcN2CrDisVx15wm+pCqPUZyKhAhn3gdE=
 github.com/orange-cloudavenue/common-go/extractor v1.0.0/go.mod h1:zeeAmrLWAYkjr9QiAj/jdYjN7tgDIQGP+TBF115nItI=
-github.com/orange-cloudavenue/common-go/generator v1.3.1 h1:HFcbDiR2MdvUdmgPd9tfQpvG+rHVk5cxCVlnMovhqbY=
-github.com/orange-cloudavenue/common-go/generator v1.3.1/go.mod h1:h54GwC5D8Xx+f9FFqIgav3xI1diYOvD29MDcluULNi0=
+github.com/orange-cloudavenue/common-go/generator v1.3.2 h1:T8sjXzRHkS9B3Y9aOvq/HLbKfFUPSSg/hXM2jo/VnGs=
+github.com/orange-cloudavenue/common-go/generator v1.3.2/go.mod h1:BHmH3VekokVM/ePhYVVVxtwAMd3oHqJi86m25HM2zkI=
 github.com/orange-cloudavenue/common-go/internal/regex v0.0.0-20250729195615-a2902a82caeb h1:gbpZVoXRWc6tG/U/f/aTQqwKgAm199wB11bJOIAhJjk=
 github.com/orange-cloudavenue/common-go/internal/regex v0.0.0-20250729195615-a2902a82caeb/go.mod h1:T7OxerHaO1q+P6ue/Ka93aoUQK8syveiYhfZaJBMfP0=
-github.com/orange-cloudavenue/common-go/urn v1.1.0 h1:tiEB8nq7RkIOHv4HnmgdxbKnug+X97fpINI9bwcTi2Y=
-github.com/orange-cloudavenue/common-go/urn v1.1.0/go.mod h1:yXpk5u8KLhpCxmR6uugaKZB/YgsrGg08TZ5XQdybHKs=
+github.com/orange-cloudavenue/common-go/urn v1.2.0 h1:FWjMj4aiCJwTb6UAGavthmTTE/KSKGFc3bi2cbNk3r8=
+github.com/orange-cloudavenue/common-go/urn v1.2.0/go.mod h1:yXpk5u8KLhpCxmR6uugaKZB/YgsrGg08TZ5XQdybHKs=
 github.com/orange-cloudavenue/common-go/utils v1.0.0 h1:9dUiS72eRXTrOFpomF3IexjfUF5USH9J49w7cUos+rI=
 github.com/orange-cloudavenue/common-go/utils v1.0.0/go.mod h1:LhE0UATOSRLoazdYuxvDAwKvTUuyVg4Ny+3XXdETU+0=
 github.com/orange-cloudavenue/common-go/validators v1.1.2 h1:UjFfqz//dxnEs6kL/VOm9M0xRIQ5pg7nD+ZU3VuaI9g=
