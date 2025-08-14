@@ -26,6 +26,7 @@ require (
 	github.com/orange-cloudavenue/common-go/urn v1.2.0 // indirect
 	github.com/orange-cloudavenue/common-go/utils v1.0.0 // indirect
 	github.com/orange-cloudavenue/common-go/validators v1.1.3 // indirect
+	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.34 // indirect
 	golang.org/x/crypto v0.40.0 // indirect
 	golang.org/x/net v0.42.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect

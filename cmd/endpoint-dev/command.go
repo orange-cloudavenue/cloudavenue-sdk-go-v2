@@ -18,7 +18,7 @@ import (
 	"github.com/niemeyer/pretty"
 	"github.com/spf13/cobra"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/edgegateway/v1"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/vdc/v1"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
 )
 
@@ -97,7 +97,7 @@ var commandCmd = &cobra.Command{
 			return
 		}
 
-		vdcClient, err := edgegateway.New(client)
+		vdcClient, err := vdc.New(client)
 		if err != nil {
 			log.Error("Error creating VDC client", "error", err)
 			return

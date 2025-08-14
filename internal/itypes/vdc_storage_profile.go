@@ -14,32 +14,59 @@ import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 type (
 	// * ListStorageProfiles
 	ApiResponseListStorageProfiles struct {
-		StorageProfiles []ApiResponseListStorageProfile `json:"record" fakesize:"1"`
+		StorageProfiles []ApiResponseListStorageProfile `json:"record" fakesize:"2"`
 	}
 
 	ApiResponseListStorageProfile struct {
-		HREF      string `json:"href" fake:"{href_uuid}"`
-		ID        string `json:"id" fake:"{urn:vdcstorageProfile}"`
-		Name      string `json:"name" fake:"platinum3k_r1"`
-		IsEnabled bool   `json:"isEnabled" fake:"true"`
-		Default   bool   `json:"default" fake:"true"`
+		HREF                    string `json:"href" fake:"{href_uuid}"`
+		ID                      string `json:"id" fake:"-"` // Because VMware returns an empty ID, we will extract it from the HREF
+		Name                    string `json:"name" fake:"platinum3k_r1"`
+		IsEnabled               bool   `json:"isEnabled" fake:"true"`
+		IsDefaultStorageProfile bool   `json:"isDefaultStorageProfile" fake:"true"`
 
 		// Values are in MB
 		Limit int `json:"storageLimitMB" fake:"{number:100,1000}"` //nolint:tagliatelle
 		Used  int `json:"storageUsedMB" fake:"{number:10,500}"`    //nolint:tagliatelle
+
+		// Vdc information
+		VdcId   string `json:"vdc" fake:"{href_uuid}"` //nolint:revive
+		VdcName string `json:"vdcName" fake:"{word}"`  //nolint:revive
 	}
 )
 
 func (r *ApiResponseListStorageProfiles) ToModel() *types.ModelListStorageProfiles {
-	storageProfiles := make([]types.ModelListStorageProfile, 0, len(r.StorageProfiles))
-	for _, sp := range r.StorageProfiles {
-		storageProfiles = append(storageProfiles, types.ModelListStorageProfile{
-			ID:      sp.ID,
-			Class:   sp.Name,
-			Limit:   sp.Limit,
-			Used:    sp.Used,
-			Default: sp.Default,
+	// Use a map to group storage profiles by unique VDC ID + Name
+	type ModelVDCKey struct {
+		ID, Name string
+	}
+	vdcMap := make(map[ModelVDCKey]*types.ModelListStorageProfilesVDC)
+	for _, apiSP := range r.StorageProfiles {
+		key := ModelVDCKey{ID: apiSP.VdcId, Name: apiSP.VdcName}
+		vdc, exists := vdcMap[key]
+		if !exists {
+			vdc = &types.ModelListStorageProfilesVDC{
+				ID:              apiSP.VdcId,
+				Name:            apiSP.VdcName,
+				StorageProfiles: []types.ModelListStorageProfile{},
+			}
+			vdcMap[key] = vdc
+		}
+		vdc.StorageProfiles = append(vdc.StorageProfiles, types.ModelListStorageProfile{
+			ID:      apiSP.ID,
+			Class:   apiSP.Name,
+			Limit:   apiSP.Limit,
+			Used:    apiSP.Used,
+			Default: apiSP.IsDefaultStorageProfile,
 		})
 	}
-	return &types.ModelListStorageProfiles{StorageProfiles: storageProfiles}
+
+	// Convert map to slice
+	vdcs := make([]types.ModelListStorageProfilesVDC, 0, len(vdcMap))
+	for _, vdc := range vdcMap {
+		vdcs = append(vdcs, *vdc)
+	}
+
+	return &types.ModelListStorageProfiles{
+		VDCS: vdcs,
+	}
 }
