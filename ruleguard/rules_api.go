@@ -1,3 +1,6 @@
+//go:build ruleguard
+// +build ruleguard
+
 /*
  * SPDX-FileCopyrightText: Copyright (c) 2025 Orange
  * SPDX-License-Identifier: Mozilla Public License 2.0
@@ -7,37 +10,19 @@
  * or see the "LICENSE" file for more details.
  */
 
-//go:build ruleguard
-// +build ruleguard
-
 package gorules
 
 import (
 	"github.com/quasilyte/go-ruleguard/dsl"
 )
 
-// apiResponseToModel checks for exported ToModel functions in API response/request types.
-// It disallows exported ToModel methods for types named apiResponse* or apiRequest* in any `api/` directory.
-// Instead, it suggests using a private toModel method to prevent exposing internal conversion logic.
-// This helps enforce encapsulation and maintain clean API boundaries.
-func apiResponseToModel(m dsl.Matcher) {
-	m.Match(`func ($recv $recvtype) $f($params) ($output) { $body }`).
-		Where(
-			m.File().PkgPath.Matches(`api/`) &&
-				m["recvtype"].Text.Matches(`^(apiResponse|apiRequest)[A-Za-z0-9_]*$`) &&
-				m["f"].Text.Matches(`^ToModel$`),
-		).
-		Report(`Disallow exported ToModel functions in API response types. Use a private function instead.`).
-		Suggest(`func ($recv $recvtype) toModel$params ($output) { $body }`)
-}
-
 // apiTypes checks for common API types in the codebase.
 // It ensures that the types used in API endpoints are consistent and follow best practices.
 // Ensures that struct types in any `api/` directory follow these naming conventions:
 //   - **API Response Types:**
-//     Must be named `apiResponse<Object>` (e.g., `apiResponseEdgeGateway`).
+//     Must be named `ApiResponse<Object>` (e.g., `ApiResponseEdgeGateway`).
 //   - **API Request Body Types:**
-//     Must be named `apiRequest<Object>` (e.g., `apiRequestEdgeGateway`).
+//     Must be named `ApiRequest<Object>` (e.g., `ApiRequestEdgeGateway`).
 //   - **User-facing Model Types:**
 //     Must be named `Model<Object>` (e.g., `ModelEdgeGateway`).
 //   - **User-supplied Parameter Types:**
@@ -51,8 +36,8 @@ func apiResponseTypes(m dsl.Matcher) {
 	m.Match(
 		`type $name struct { $*_ }`,
 	).
-		Where(m.File().PkgPath.Matches(`api/`) && !m["name"].Text.Matches(`^(apiResponse|apiRequest|Model|Params)[A-Z][A-Za-z0-9]*$|^Client$`)).
-		Report(`Struct type names must start with apiResponse | apiRequest | Model | Params (See CONTRIBUTING.md)`)
+		Where(m.File().PkgPath.Matches(`api/`) && !m["name"].Text.Matches(`^(ApiResponse|ApiRequest|Model|Params)[A-Z][A-Za-z0-9]*$|^Client$`)).
+		Report(`Struct type names must start with ApiResponse | ApiRequest | Model | Params (See GUIDELINE.md)`)
 }
 
 // apiFuncPrefix enforces naming conventions for exported functions in API packages.
