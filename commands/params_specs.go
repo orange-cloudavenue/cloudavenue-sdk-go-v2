@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/kr/pretty"
 	"github.com/scaleway/scaleway-sdk-go/strcase"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
@@ -66,6 +67,7 @@ func (p *ParamsSpecs) validate(params any) error {
 		return errors.New(fmt.Sprintf("invalid params: %v", err.Error()))
 	}
 
+	pretty.Println("Dynamic struct for validation:", dynValue.Interface())
 	return nil
 }
 

@@ -23,24 +23,100 @@ import (
 func TestListStorageProfiles(t *testing.T) {
 	tests := []struct {
 		name               string
-		params             types.ParamsListStorageProfiles
+		params             ParamsListStorageProfile
 		mockResponseStatus int
 		mockResponse       any
 		expectedErr        bool
 	}{
 		{
-			name: "List Storage Profiles",
-			params: types.ParamsListStorageProfiles{
-				ID: generator.MustGenerate("{urn:vdc}"),
+			name:        "List All Storage Profiles",
+			params:      ParamsListStorageProfile{},
+			expectedErr: false,
+		},
+		{
+			name: "List Storage Profiles by Storage Profile Name",
+			params: ParamsListStorageProfile{
+				Name: "gold",
 			},
 			expectedErr: false,
 		},
 		{
-			name: "Error 401 Unauthorized",
-			params: types.ParamsListStorageProfiles{
-				ID: generator.MustGenerate("{urn:vdc}"),
+			name: "List Storage Profiles by Storage Profile ID",
+			params: ParamsListStorageProfile{
+				ID: generator.MustGenerate("{urn:vdcstorageProfile}"),
 			},
-			mockResponseStatus: 401,
+			expectedErr: false,
+		},
+		{
+			name: "List Storage Profiles by VDC Name",
+			params: ParamsListStorageProfile{
+				VdcName: "my-vdc",
+			},
+			expectedErr: false,
+		},
+		{
+			name: "List Storage Profiles by VDC ID",
+			params: ParamsListStorageProfile{
+				VdcID: generator.MustGenerate("{urn:vdc}"),
+			},
+			expectedErr: false,
+		},
+		{
+			name: "Error wrong Storage Profile ID",
+			params: ParamsListStorageProfile{
+				ID: "urn:vcloud:vdcstorageProfile:f98f6819-2355-478e-a8ee-4442a9dafdcg",
+			},
+			expectedErr: true,
+		},
+		{
+			name: "Error wrong VDC ID",
+			params: ParamsListStorageProfile{
+				VdcID: "urn:vcloud:vdc:f98f6819-2355-478e-a8ee-4442a9dafdcg",
+			},
+			expectedErr: true,
+		},
+		{
+			name: "Error api response return an empty HREF for Storage Profile ID",
+			params: ParamsListStorageProfile{
+				ID: generator.MustGenerate("{urn:vdcstorageProfile}"),
+			},
+			mockResponse: &apiResponseListStorageProfiles{
+				StorageProfiles: []apiResponseListStorageProfile{
+					{
+						HREF:      "", // Empty HREF to simulate error
+						Name:      "platinum3k_r1",
+						IsEnabled: true,
+					},
+				},
+			},
+			mockResponseStatus: 200,
+			expectedErr:        true,
+		},
+		{
+			name: "Error api response return an empty HREF for VDC ID",
+			params: ParamsListStorageProfile{
+				VdcID: generator.MustGenerate("{urn:vdc}"),
+			},
+			mockResponse: &apiResponseListStorageProfiles{
+				StorageProfiles: []apiResponseListStorageProfile{
+					{
+						HREF:      generator.MustGenerate("{href_uuid}"),
+						VdcId:     "", // Empty VdcId to simulate error
+						Name:      "platinum3k_r1",
+						IsEnabled: true,
+					},
+				},
+			},
+			mockResponseStatus: 200,
+			expectedErr:        true,
+		},
+
+		{
+			name: "Error 400 Bad Request",
+			params: ParamsListStorageProfile{
+				VdcID: generator.MustGenerate("{urn:vdc}"),
+			},
+			mockResponseStatus: 400,
 			expectedErr:        true,
 		},
 	}
@@ -48,8 +124,8 @@ func TestListStorageProfiles(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.mockResponseStatus != 0 {
-				endpoints.ListStorageProfiles().CleanMockResponse()
-				endpoints.ListStorageProfiles().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				endpoints.ListStorageProfile().CleanMockResponse()
+				endpoints.ListStorageProfile().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			client := newClient(t)
@@ -61,10 +137,17 @@ func TestListStorageProfiles(t *testing.T) {
 			}
 			assert.NoError(t, err, "Unexpected error: %v", err)
 			assert.NotNil(t, resp, "Response should not be nil")
-			assert.NotEmpty(t, resp.StorageProfiles, "Storage profiles should not be empty")
-			for _, sp := range resp.StorageProfiles {
-				assert.NotEmpty(t, sp.ID, "Storage profile ID should not be empty")
-				assert.NotEmpty(t, sp.Class, "Storage profile Class should not be empty")
+			assert.NotEmpty(t, resp.VDCS, "Storage profiles should not be empty")
+			for _, spVDC := range resp.VDCS {
+				assert.NotEmpty(t, spVDC.ID, "VDC ID should not be empty")
+				assert.NotEmpty(t, spVDC.Name, "VDC Name should not be empty")
+				for i := range spVDC.StorageProfiles {
+					assert.NotEmpty(t, spVDC.StorageProfiles[i].ID, "Storage profile ID should not be empty")
+					assert.NotEmpty(t, spVDC.StorageProfiles[i].Class, "Storage profile Class should not be empty")
+					assert.NotEmpty(t, spVDC.StorageProfiles[i].Limit, "Storage profile Limit should not be empty")
+					assert.NotEmpty(t, spVDC.StorageProfiles[i].Used, "Storage profile Used should not be empty")
+					assert.NotEmpty(t, spVDC.StorageProfiles[i].Default, "Storage profile Default should not be empty")
+				}
 			}
 		})
 	}
@@ -80,8 +163,8 @@ func TestAddStorageProfile(t *testing.T) {
 	}{
 		{
 			name: "Add Storage Profile",
-			params: types.ParamsAddStorageProfile{
-				VdcID:   generator.MustGenerate("{urn:vdc}"),
+			params: ParamsAddStorageProfile{
+				VdcId:   generator.MustGenerate("{urn:vdc}"),
 				VdcName: "my-vdc",
 				StorageProfiles: []types.ParamsCreateVDCStorageProfile{
 					{
@@ -95,8 +178,8 @@ func TestAddStorageProfile(t *testing.T) {
 		},
 		{
 			name: "Error 401 Unauthorized",
-			params: types.ParamsAddStorageProfile{
-				VdcID:   generator.MustGenerate("{urn:vdc}"),
+			params: ParamsAddStorageProfile{
+				VdcId:   generator.MustGenerate("{urn:vdc}"),
 				VdcName: "my-vdc",
 				StorageProfiles: []types.ParamsCreateVDCStorageProfile{
 					{
