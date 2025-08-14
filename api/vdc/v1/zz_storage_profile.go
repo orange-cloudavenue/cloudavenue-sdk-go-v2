@@ -12,50 +12,23 @@ package vdc
 import (
 	"context"
 
-<<<<<<< HEAD
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
-
-func (c *Client) ListStorageProfile(ctx context.Context, params types.ParamsListStorageProfiles) (*types.ModelListStorageProfiles, error) {
-    x, err := cmds.Get("VDC", "StorageProfile", "List").Run(ctx, c, params)
-    if err != nil {
-        return nil, err
-    }
-    return x.(*types.ModelListStorageProfiles), nil
-=======
-func (c *Client) ListStorageProfile(ctx context.Context, params ParamsListStorageProfile) (*ModelListStorageProfiles, error) {
+func (c *Client) ListStorageProfile(ctx context.Context, params types.ParamsListStorageProfile) (*types.ModelListStorageProfiles, error) {
 	x, err := cmds.Get("VDC", "StorageProfile", "List").Run(ctx, c, params)
 	if err != nil {
 		return nil, err
 	}
-	return x.(*ModelListStorageProfiles), nil
->>>>>>> 5f13790 (feat: Add List Storage Profile query)
+	return x.(*types.ModelListStorageProfiles), nil
 }
-
-
-
-
-
-
-
-
-
 
 func (c *Client) AddStorageProfile(ctx context.Context, params types.ParamsAddStorageProfile) error {
-    _, err := cmds.Get("VDC", "StorageProfile", "Add").Run(ctx, c, params)
-    return err
+	_, err := cmds.Get("VDC", "StorageProfile", "Add").Run(ctx, c, params)
+	return err
 }
 
-<<<<<<< HEAD
-
-
-
-
-
-=======
-func (c *Client) DeleteStorageProfile(ctx context.Context, params ParamsDeleteStorageProfile) error {
+func (c *Client) DeleteStorageProfile(ctx context.Context, params types.ParamsDeleteStorageProfile) error {
 	_, err := cmds.Get("VDC", "StorageProfile", "Delete").Run(ctx, c, params)
 	return err
 }
->>>>>>> 5f13790 (feat: Add List Storage Profile query)

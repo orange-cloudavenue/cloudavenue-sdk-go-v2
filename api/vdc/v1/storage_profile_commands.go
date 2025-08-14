@@ -38,7 +38,7 @@ func init() {
 		ShortDocumentation: "List VDC Storage Profiles",
 		LongDocumentation:  "List of storage profiles in All VDC.",
 		AutoGenerate:       true,
-		ParamsType:         ParamsListStorageProfile{},
+		ParamsType:         types.ParamsListStorageProfile{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "id",
@@ -74,7 +74,7 @@ func init() {
 		ModelType: types.ModelListStorageProfiles{},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsListStorageProfile)
+			p := params.(types.ParamsListStorageProfile)
 
 			logger := cc.logger.WithGroup("ListStorageProfile")
 
@@ -124,7 +124,7 @@ func init() {
 
 		ShortDocumentation: "Add a new VDC Storage Profile",
 		LongDocumentation:  "Add one or more storage profiles to a specific VDC.",
-		ModelType:          cav.Job{},
+		AutoGenerate:       true,
 		ParamsType:         types.ParamsAddStorageProfile{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
@@ -187,7 +187,7 @@ func init() {
 			cc := client.(*Client)
 			p := paramsIn.(types.ParamsAddStorageProfile)
 
-			vdc, err := cc.GetVDC(ctx, ParamsGetVDC{
+			vdc, err := cc.GetVDC(ctx, types.ParamsGetVDC{
 				ID:   p.VdcId,
 				Name: p.VdcName,
 			})
@@ -247,7 +247,6 @@ func init() {
 
 			return nil, nil
 		},
-		AutoGenerate: true,
 	})
 
 	// * DeleteStorageProfile
@@ -258,16 +257,15 @@ func init() {
 		ShortDocumentation: "Delete a VDC Storage Profile",
 		LongDocumentation:  "Delete a storage profile from a specific VDC. This will remove the storage profile from the VDC and all associated resources.",
 		AutoGenerate:       true,
-		ModelType:          cav.Job{},
-		ParamsType:         ParamsDeleteStorageProfile{},
+		ParamsType:         types.ParamsDeleteStorageProfile{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "vdc_id",
 				Description: "ID of the VDC to delete the storage profile from",
 				Required:    false,
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("vdc_name"),
 					commands.ValidatorOmitempty(),
+					commands.ValidatorRequiredIfParamIsNull("vdc_name"),
 					commands.ValidatorURN("vdc"),
 				},
 			},
@@ -277,12 +275,12 @@ func init() {
 				Required:    false,
 				Example:     "my-vdc",
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("vdc_id"),
 					commands.ValidatorOmitempty(),
+					commands.ValidatorRequiredIfParamIsNull("vdc_id"),
 				},
 			},
 			{
-				Name:        "storage_profile.class",
+				Name:        "storage_profile.{index}.class",
 				Description: "Class of the storage profile to delete. This is the unique identifier of the storage profile to delete.",
 				Required:    true,
 				Example:     "gold",
@@ -293,21 +291,21 @@ func init() {
 		},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(ParamsDeleteStorageProfile)
+			p := params.(types.ParamsDeleteStorageProfile)
 
 			logger := cc.logger.WithGroup("DeleteStorageProfile")
 
 			ep := endpoints.UpdateVdc()
 
-			apiR := apiRequestUpdateVDC{
-				VDC: apiRequestUpdateVDCVDC{
+			apiR := itypes.ApiRequestUpdateVDC{
+				VDC: itypes.ApiRequestUpdateVDCVDC{
 					Name: p.VdcName,
 				},
 			}
 
 			logger.DebugContext(ctx, "Deleting storage profile from VDC", "vdc_name", p.VdcName, "storage_profile_class", p.StorageProfile[0].Class)
 
-			apiR.VDC.StorageProfiles = []apiRequestVDCStorageProfile{
+			apiR.VDC.StorageProfiles = []itypes.ApiRequestVDCStorageProfile{
 				{
 					Class: p.StorageProfile[0].Class,
 					Limit: 0, // Setting limit to 0 to delete the storage profile

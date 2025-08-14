@@ -14,74 +14,75 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/orange-cloudavenue/common-go/generator"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
+	"github.com/orange-cloudavenue/common-go/generator"
 )
 
 func TestListStorageProfiles(t *testing.T) {
 	tests := []struct {
-		name               string
-		params             ParamsListStorageProfile
+		name   string
+		params types.ParamsListStorageProfile
+		// Mock response for ListStorageProfile endpoint
 		mockResponseStatus int
 		mockResponse       any
 		expectedErr        bool
 	}{
 		{
 			name:        "List All Storage Profiles",
-			params:      ParamsListStorageProfile{},
+			params:      types.ParamsListStorageProfile{},
 			expectedErr: false,
 		},
 		{
 			name: "List Storage Profiles by Storage Profile Name",
-			params: ParamsListStorageProfile{
+			params: types.ParamsListStorageProfile{
 				Name: "gold",
 			},
 			expectedErr: false,
 		},
 		{
 			name: "List Storage Profiles by Storage Profile ID",
-			params: ParamsListStorageProfile{
+			params: types.ParamsListStorageProfile{
 				ID: generator.MustGenerate("{urn:vdcstorageProfile}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "List Storage Profiles by VDC Name",
-			params: ParamsListStorageProfile{
+			params: types.ParamsListStorageProfile{
 				VdcName: "my-vdc",
 			},
 			expectedErr: false,
 		},
 		{
 			name: "List Storage Profiles by VDC ID",
-			params: ParamsListStorageProfile{
+			params: types.ParamsListStorageProfile{
 				VdcID: generator.MustGenerate("{urn:vdc}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Error wrong Storage Profile ID",
-			params: ParamsListStorageProfile{
+			params: types.ParamsListStorageProfile{
 				ID: "urn:vcloud:vdcstorageProfile:f98f6819-2355-478e-a8ee-4442a9dafdcg",
 			},
 			expectedErr: true,
 		},
 		{
 			name: "Error wrong VDC ID",
-			params: ParamsListStorageProfile{
+			params: types.ParamsListStorageProfile{
 				VdcID: "urn:vcloud:vdc:f98f6819-2355-478e-a8ee-4442a9dafdcg",
 			},
 			expectedErr: true,
 		},
 		{
 			name: "Error api response return an empty HREF for Storage Profile ID",
-			params: ParamsListStorageProfile{
+			params: types.ParamsListStorageProfile{
 				ID: generator.MustGenerate("{urn:vdcstorageProfile}"),
 			},
-			mockResponse: &apiResponseListStorageProfiles{
-				StorageProfiles: []apiResponseListStorageProfile{
+			mockResponse: &itypes.ApiResponseListStorageProfiles{
+				StorageProfiles: []itypes.ApiResponseListStorageProfile{
 					{
 						HREF:      "", // Empty HREF to simulate error
 						Name:      "platinum3k_r1",
@@ -94,11 +95,11 @@ func TestListStorageProfiles(t *testing.T) {
 		},
 		{
 			name: "Error api response return an empty HREF for VDC ID",
-			params: ParamsListStorageProfile{
+			params: types.ParamsListStorageProfile{
 				VdcID: generator.MustGenerate("{urn:vdc}"),
 			},
-			mockResponse: &apiResponseListStorageProfiles{
-				StorageProfiles: []apiResponseListStorageProfile{
+			mockResponse: &itypes.ApiResponseListStorageProfiles{
+				StorageProfiles: []itypes.ApiResponseListStorageProfile{
 					{
 						HREF:      generator.MustGenerate("{href_uuid}"),
 						VdcId:     "", // Empty VdcId to simulate error
@@ -113,7 +114,7 @@ func TestListStorageProfiles(t *testing.T) {
 
 		{
 			name: "Error 400 Bad Request",
-			params: ParamsListStorageProfile{
+			params: types.ParamsListStorageProfile{
 				VdcID: generator.MustGenerate("{urn:vdc}"),
 			},
 			mockResponseStatus: 400,
@@ -159,11 +160,14 @@ func TestAddStorageProfile(t *testing.T) {
 		params             types.ParamsAddStorageProfile
 		mockResponseStatus int
 		mockResponse       any
-		expectedErr        bool
+		// Specific mock response for ListVDC endpoint
+		mockResponseVDC       any
+		mockResponseVDCStatus int
+		expectedErr           bool
 	}{
 		{
 			name: "Add Storage Profile",
-			params: ParamsAddStorageProfile{
+			params: types.ParamsAddStorageProfile{
 				VdcId:   generator.MustGenerate("{urn:vdc}"),
 				VdcName: "my-vdc",
 				StorageProfiles: []types.ParamsCreateVDCStorageProfile{
@@ -178,7 +182,7 @@ func TestAddStorageProfile(t *testing.T) {
 		},
 		{
 			name: "Error 401 Unauthorized",
-			params: ParamsAddStorageProfile{
+			params: types.ParamsAddStorageProfile{
 				VdcId:   generator.MustGenerate("{urn:vdc}"),
 				VdcName: "my-vdc",
 				StorageProfiles: []types.ParamsCreateVDCStorageProfile{
@@ -192,6 +196,74 @@ func TestAddStorageProfile(t *testing.T) {
 			mockResponseStatus: 401,
 			expectedErr:        true,
 		},
+		{
+			name: "Error 404 VDC Not Found",
+			params: types.ParamsAddStorageProfile{
+				VdcId:   generator.MustGenerate("{urn:vdc}"),
+				VdcName: "my-vdc",
+			},
+			mockResponseVDCStatus: 404,
+			expectedErr:           true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.mockResponseStatus != 0 {
+				endpoints.UpdateVdc().CleanMockResponse()
+				endpoints.UpdateVdc().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+			}
+
+			if tt.mockResponseVDCStatus != 0 {
+				endpoints.ListVdc().CleanMockResponse()
+				endpoints.ListVdc().SetMockResponse(tt.mockResponseVDC, &tt.mockResponseVDCStatus)
+			}
+
+			client := newClient(t)
+
+			err := client.AddStorageProfile(t.Context(), tt.params)
+			if tt.expectedErr {
+				assert.Error(t, err)
+				return
+			}
+			assert.NoError(t, err, "Unexpected error: %v", err)
+		})
+	}
+}
+
+func TestDeleteStorageProfile(t *testing.T) {
+	tests := []struct {
+		name               string
+		params             types.ParamsDeleteStorageProfile
+		mockResponseStatus int
+		mockResponse       any
+		expectedErr        bool
+	}{
+		{
+			name: "Delete Storage Profile",
+			params: types.ParamsDeleteStorageProfile{
+				VdcId: generator.MustGenerate("{urn:vdc}"),
+				StorageProfile: []types.ParamsCreateVDCStorageProfile{
+					{
+						Class: "gold",
+					},
+				},
+			},
+			expectedErr: false,
+		},
+		{
+			name: "Error 404 Not Found",
+			params: types.ParamsDeleteStorageProfile{
+				VdcId: generator.MustGenerate("{urn:vdc}"),
+				StorageProfile: []types.ParamsCreateVDCStorageProfile{
+					{
+						Class: "gold",
+					},
+				},
+			},
+			mockResponseStatus: 404,
+			expectedErr:        true,
+		},
 	}
 
 	for _, tt := range tests {
@@ -203,7 +275,7 @@ func TestAddStorageProfile(t *testing.T) {
 
 			client := newClient(t)
 
-			err := client.AddStorageProfile(t.Context(), tt.params)
+			err := client.DeleteStorageProfile(t.Context(), tt.params)
 			if tt.expectedErr {
 				assert.Error(t, err)
 				return

@@ -18,12 +18,12 @@ import (
 
 	"resty.dev/v3"
 
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/orange-cloudavenue/common-go/urn"
 	"github.com/orange-cloudavenue/common-go/validators"
-
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
 
 //go:generate endpoint-generator -path storage_profile.go -output storage_profile
@@ -50,7 +50,7 @@ func init() {
 
 					// Validate the value based on the key
 					switch valueSplit[0] {
-					case "vdc": //nolint: goconst
+					case "vdc":
 						// vdc require an urn format for VDC
 						return validators.New().Var(value, "urn=vdc")
 					case "vdcName", "name": //nolint: goconst
@@ -126,11 +126,11 @@ func init() {
 				return nil
 			},
 		},
-		BodyResponseType: apiResponseListStorageProfiles{},
+		BodyResponseType: itypes.ApiResponseListStorageProfiles{},
 		// ResponseMiddlewares is used to extract the ID from the response and set it in the context
 		ResponseMiddlewares: []resty.ResponseMiddleware{
 			func(_ *resty.Client, resp *resty.Response) error {
-				r := resp.Result().(*apiResponseListStorageProfiles)
+				r := resp.Result().(*itypes.ApiResponseListStorageProfiles)
 
 				for i, strPro := range r.StorageProfiles {
 					// Extract ID from HREF
@@ -153,8 +153,8 @@ func init() {
 		},
 
 		MockResponseFunc: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			resp := &apiResponseListStorageProfiles{
-				StorageProfiles: make([]apiResponseListStorageProfile, 0),
+			resp := &itypes.ApiResponseListStorageProfiles{
+				StorageProfiles: make([]itypes.ApiResponseListStorageProfile, 0),
 			}
 
 			// If QueryParam "filter" is set, return a filtered response
@@ -162,7 +162,7 @@ func init() {
 				filter := r.URL.Query().Get("filter")
 				filterParts := strings.Split(filter, "==")
 
-				r := &apiResponseListStorageProfile{}
+				r := &itypes.ApiResponseListStorageProfile{}
 				generator.MustStruct(r)
 
 				r.Name = func() string {
