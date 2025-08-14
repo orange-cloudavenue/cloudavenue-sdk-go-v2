@@ -26,13 +26,15 @@ var _ auth = (*cloudavenueCredential)(nil)
 // cloudavenueCredential implements the auth interface
 // for Cloudavenue authentication using a username and password.
 type cloudavenueCredential struct {
-	logger       *slog.Logger
-	httpC        *resty.Client
-	username     string `validate:"required"`
-	password     string `validate:"required"`
-	bearer       string
-	organization string `validate:"required"`
-	console      consoles.ConsoleName
+	logger         *slog.Logger
+	httpC          *resty.Client
+	username       string `validate:"required"`
+	password       string `validate:"required"`
+	bearer         string
+	organization   string `validate:"required"`
+	organizationID string
+	siteID         string
+	console        consoles.ConsoleName
 }
 
 // cloudavenueCredentialXVmwareAccessToken is the header used to retrieve the Bearer token in the authentication process.
@@ -130,6 +132,10 @@ func (c *cloudavenueCredential) Refresh(ctx context.Context) error {
 	)
 	c.bearer = resp.Header().Get(cloudavenueCredentialXVmwareAccessToken)
 
+	session := resp.Result().(*apiResponseSessionVmware)
+	c.organizationID = session.Org.ID
+	c.siteID = session.Site.ID
+
 	return nil
 }
 
@@ -141,8 +147,10 @@ func (c *cloudavenueCredential) IsInitialized() bool {
 // getSession retrieves the current session information.
 func (c *cloudavenueCredential) getSession() map[string]string {
 	return map[string]string{
-		"organization": c.organization,
-		"bearer":       c.bearer,
+		"organization":   c.organization,
+		"organizationID": c.organizationID,
+		"siteID":         c.siteID,
+		"bearer":         c.bearer,
 	}
 }
 
@@ -156,5 +164,14 @@ func (c *cloudavenueCredential) restoreSession(data map[string]string) error {
 
 	c.organization = data["organization"]
 	c.bearer = data["bearer"]
+	c.organizationID = data["organizationID"]
+	c.siteID = data["siteID"]
 	return nil
+}
+
+func (c *cloudavenueCredential) getExtraData() map[string]string {
+	return map[string]string{
+		"organizationID": c.organizationID,
+		"siteID":         c.siteID,
+	}
 }

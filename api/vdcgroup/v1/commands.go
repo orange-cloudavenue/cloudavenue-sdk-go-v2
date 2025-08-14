@@ -7,15 +7,8 @@
  * or see the "LICENSE" file for more details.
  */
 
-package endpoints
+package vdcgroup
 
-import (
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
-)
+import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
 
-// GetJobCerberus - Get Cerberus Job
-//
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Jobs/getJobById 
-func GetJobCerberus() *cav.Endpoint {
-	return cav.MustGetEndpoint("GetJobCerberus")
-}
+var cmds = commands.NewRegistry()

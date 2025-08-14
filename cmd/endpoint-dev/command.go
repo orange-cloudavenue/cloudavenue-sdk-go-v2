@@ -18,7 +18,7 @@ import (
 	"github.com/niemeyer/pretty"
 	"github.com/spf13/cobra"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/vdc/v1"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/vdcgroup/v1"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
 )
 
@@ -39,19 +39,14 @@ var commandCmd = &cobra.Command{
 		commandParams = make(map[string]string)
 
 		namespace = args[0]
-
-		if strings.HasPrefix(args[2], "--") {
+		switch true {
+		case len(args) == 2 && !strings.HasPrefix(args[1], "--"):
 			verb = args[1]
-		} else {
+		case len(args) > 2 && strings.HasPrefix(args[2], "--"):
+			verb = args[1]
+		case len(args) >= 3 && !strings.HasPrefix(args[2], "--"):
 			resource = args[1]
 			verb = args[2]
-		}
-
-		for i, entry := range args {
-			if strings.HasPrefix(entry, "--") {
-				key := strings.TrimPrefix(entry, "--")
-				commandParams[key] = args[i+1]
-			}
 		}
 
 		reg := commands.NewRegistry()
@@ -64,6 +59,22 @@ var commandCmd = &cobra.Command{
 		}
 
 		command := cmds[0]
+
+		for i, entry := range args {
+			if strings.HasPrefix(entry, "--") {
+				key := strings.TrimPrefix(entry, "--")
+				switch key {
+				case "mock":
+					mockFlag = true
+				case "logger":
+					loggerLevel = args[i+1]
+				case "help":
+					help(command)
+				default:
+					commandParams[key] = args[i+1]
+				}
+			}
+		}
 
 		log.Info("Executing command", "namespace", command.GetNamespace(), "resource", command.GetResource(), "verb", command.GetVerb())
 
@@ -86,7 +97,7 @@ var commandCmd = &cobra.Command{
 			return
 		}
 
-		vdcClient, err := vdc.New(client)
+		vdcClient, err := vdcgroup.New(client)
 		if err != nil {
 			log.Error("Error creating VDC client", "error", err)
 			return

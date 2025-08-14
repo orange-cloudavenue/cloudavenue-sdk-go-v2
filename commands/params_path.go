@@ -16,7 +16,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/scaleway/scaleway-sdk-go/strcase"
+	"github.com/orange-cloudavenue/common-go/strcase"
 )
 
 // GetValueAtPath retrieves the value from a Go struct or nested data structure

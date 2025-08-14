@@ -7,12 +7,16 @@
  * or see the "LICENSE" file for more details.
  */
 
-package cav
+package vdcgroup
 
-// * Context
+import (
+	"testing"
 
-type contextKey string
-
-const (
-	contextKeyClientName contextKey = "subclient.clientName" // Context key for the client name
+	"github.com/stretchr/testify/assert"
 )
+
+func Test_NewClient_ClientNil(t *testing.T) {
+	c, err := New(nil)
+	assert.Nil(t, c, "Expected nil client when input is nil")
+	assert.Error(t, err, "Expected error when input is nil")
+}

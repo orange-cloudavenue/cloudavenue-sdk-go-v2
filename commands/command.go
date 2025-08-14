@@ -63,6 +63,8 @@ type Command struct {
 
 	// AutoGenerate defines whether the command is auto-generated.
 	AutoGenerate bool
+	// AutoGenerateCustomFuncName is the custom function name to be used for auto-generated commands.
+	AutoGenerateCustomFuncName string
 
 	// Internal
 

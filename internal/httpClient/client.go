@@ -17,7 +17,7 @@ func NewHTTPClient() *resty.Client {
 	return resty.New().
 		SetLogger(logger()).
 		SetHeader("User-Agent", "GoCloudAvenueSDK/2.0").
-		SetResponseBodyUnlimitedReads(true).
-		SetDebug(true).
-		SetTrace(true)
+		SetResponseBodyUnlimitedReads(true)
+	// SetDebug(true).
+	// SetTrace(true)
 }

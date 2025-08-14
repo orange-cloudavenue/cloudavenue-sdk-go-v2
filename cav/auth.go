@@ -31,4 +31,7 @@ type auth interface {
 
 	// Restore session-related data from a secure cache.
 	restoreSession(data map[string]string) error
+
+	// getExtraData returns any additional data that should be included in the session.
+	getExtraData() map[string]string
 }

@@ -11,9 +11,12 @@ package cav
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"resty.dev/v3"
+
+	"github.com/orange-cloudavenue/common-go/generator"
 )
 
 func init() {
@@ -30,7 +33,8 @@ func init() {
 		requestInternalFunc: func(ctx context.Context, client *resty.Client, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error) {
 			r := client.R().
 				SetContext(ctx).
-				SetHeader("Accept", "application/json;version="+vmwareVCDVersion)
+				SetHeader("Accept", "application/json;version="+vmwareVCDVersion).
+				SetResult(&apiResponseSessionVmware{})
 
 			for _, opt := range opts {
 				if err := opt(endpoint, r); err != nil {
@@ -47,6 +51,41 @@ func init() {
 		},
 		MockResponseFunc: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 			w.Header().Add(cloudavenueCredentialXVmwareAccessToken, "mock-access-token")
+
+			resp := apiResponseSessionVmware{}
+
+			generator.MustStruct(&resp)
+
+			// json encode
+			w.Header().Set("Content-Type", "application/json")
+			respJ, err := json.Marshal(resp)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			_, err = w.Write(respJ)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 		}),
 	}.Register()
 }
+
+type (
+	apiResponseSessionVmware struct {
+		Org   apiResponseSessionVmwareOrg  `json:"org"`
+		Site  apiResponseSessionVmwareSite `json:"site"`
+		Roles []string                     `json:"roles" fake:"Organization Administrator"`
+	}
+
+	apiResponseSessionVmwareOrg struct {
+		ID   string `json:"id" fake:"{urn:org}"`
+		Name string `json:"name" fake:"cav01ev01ocb0001234"`
+	}
+
+	apiResponseSessionVmwareSite struct {
+		ID   string `json:"id" fake:"{urn:site}"`
+		Name string `json:"name" fake:"cav01ev01ocb0001234"`
+	}
+)
