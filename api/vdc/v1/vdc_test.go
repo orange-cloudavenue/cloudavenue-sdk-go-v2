@@ -14,12 +14,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/orange-cloudavenue/common-go/generator"
-	"github.com/orange-cloudavenue/common-go/utils"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
+	"github.com/orange-cloudavenue/common-go/generator"
+	"github.com/orange-cloudavenue/common-go/utils"
 )
 
 func TestListVDC(t *testing.T) {

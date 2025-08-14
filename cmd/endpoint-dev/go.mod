@@ -28,6 +28,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.27.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
@@ -39,8 +40,9 @@ require (
 	github.com/orange-cloudavenue/common-go/internal/regex v0.0.0-20250729195615-a2902a82caeb // indirect
 	github.com/orange-cloudavenue/common-go/urn v1.1.0 // indirect
 	github.com/orange-cloudavenue/common-go/utils v1.0.0 // indirect
-	github.com/orange-cloudavenue/common-go/validators v1.1.1 // indirect
+	github.com/orange-cloudavenue/common-go/validators v1.1.2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
+	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.34 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
