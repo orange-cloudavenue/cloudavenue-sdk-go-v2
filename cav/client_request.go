@@ -146,6 +146,14 @@ func (c *client) NewRequest(ctx context.Context, endpoint *Endpoint, _ ...Reques
 		retryIdempotent = true
 	}
 
+	contextData := ContextData{}
+	switch sc := sc.(type) {
+	case *vmware:
+		contextData.OrganizationID = sc.getCredential().getExtraData()["organizationID"]
+		contextData.SiteID = sc.getCredential().getExtraData()["siteID"]
+	}
+	ctxv = storeExtraDataInContext(ctxv, contextData)
+
 	// Create a new request with the context and options.
 	// To know more about retry see https://resty.dev/docs/retry-mechanism/
 	hR := hC.NewRequest().

@@ -13,9 +13,8 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/scaleway/scaleway-sdk-go/strcase"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
+	"github.com/orange-cloudavenue/common-go/strcase"
 	"github.com/orange-cloudavenue/common-go/validators"
 )
 

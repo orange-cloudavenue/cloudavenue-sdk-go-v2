@@ -29,11 +29,12 @@ import (
 type cmds []*cmd
 
 type cmd struct {
-	Package                   string
-	Namespace, Resource, Verb string
-	ParamsType, ModelType     string
-	AutoGenerate              bool
-	CommandName               string
+	Package                    string
+	Namespace, Resource, Verb  string
+	AutoGenerateCustomFuncName string
+	ParamsType, ModelType      string
+	AutoGenerate               bool
+	CommandName                string
 }
 
 //go:embed generator.tmpl
@@ -170,7 +171,9 @@ func main() {
 							// Ignore it
 							continue
 						}
-						if cmd.Resource != "" && strings.EqualFold(cmd.Namespace, cmd.Package) {
+						if cmd.AutoGenerateCustomFuncName != "" {
+							cmd.CommandName = cmd.AutoGenerateCustomFuncName
+						} else if cmd.Resource != "" && strings.EqualFold(cmd.Namespace, cmd.Package) {
 							cmd.CommandName = fmt.Sprintf("%s%s", cmd.Verb, cmd.Resource)
 						} else {
 							cmd.CommandName = fmt.Sprintf("%s%s%s", cmd.Verb, cmd.Namespace, cmd.Resource)
