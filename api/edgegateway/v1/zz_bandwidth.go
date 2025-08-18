@@ -15,19 +15,12 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
-
+// Get the bandwidth of an edge gateway. This command retrieves the bandwidth information for a specific edge gateway.
 func (c *Client) GetBandwidth(ctx context.Context, params types.ParamsEdgeGateway) (*types.ModelEdgeGatewayBandwidth, error) {
-    x, err := cmds.Get("EdgeGateway", "Bandwidth", "Get").Run(ctx, c, params)
-    if err != nil {
-        return nil, err
-    }
-    return x.(*types.ModelEdgeGatewayBandwidth), nil
+	x, err := cmds.Get("EdgeGateway", "Bandwidth", "Get").Run(ctx, c, params)
+	if err != nil {
+		return nil, err
+	}
+	return x.(*types.ModelEdgeGatewayBandwidth), nil
 }
-
-
-
-
-
-
-
 

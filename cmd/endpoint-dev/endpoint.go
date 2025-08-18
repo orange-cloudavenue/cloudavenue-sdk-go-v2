@@ -19,6 +19,7 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/niemeyer/pretty"
 	"github.com/spf13/cobra"
+	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
@@ -105,6 +106,12 @@ var endpointCmd = &cobra.Command{
 				if body != nil {
 					opts = append(opts, cav.SetBody(body))
 				}
+				opts = append(opts,
+					cav.SetCustomRestyOption(func(req *resty.Request) {
+						req.SetDebug(true)
+						req.SetTrace(true)
+					}),
+				)
 				return opts
 			}()...,
 		)

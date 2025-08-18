@@ -321,7 +321,7 @@
                 "required": false,
                 "example": "",
                 "type": "string",
-                "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
+                "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
                 "name": "name",
@@ -329,7 +329,7 @@
                 "required": false,
                 "example": "",
                 "type": "string",
-                "validators_description": "The value is required if the parameter `ID` is null., "
+                "validators_description": "The value is required if the parameter `id` is null., "
               }
             ],
             "deprecated": false,
@@ -348,9 +348,9 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:cabb1860-b013-40c6-9292-e74ec4c09efb",
+                "example": "urn:vcloud:gateway:2b25c65a-2428-4641-83f8-47a01c7dd259",
                 "type": "string",
-                "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
+                "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
                 "name": "name",
@@ -358,7 +358,7 @@
                 "required": false,
                 "example": "",
                 "type": "string",
-                "validators_description": "The value is required if the parameter `ID` is null., "
+                "validators_description": "The value is required if the parameter `id` is null., "
               }
             ],
             "deprecated": false,
@@ -377,9 +377,9 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:bf26a717-e4b8-4271-a70b-6c05bb4e5af9",
+                "example": "urn:vcloud:gateway:2876abbd-654d-4bec-a095-b569ea27e38b",
                 "type": "string",
-                "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
+                "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
                 "name": "name",
@@ -387,7 +387,7 @@
                 "required": false,
                 "example": "",
                 "type": "string",
-                "validators_description": "The value is required if the parameter `ID` is null., "
+                "validators_description": "The value is required if the parameter `id` is null., "
               }
             ],
             "deprecated": false,
@@ -463,6 +463,233 @@
         },
         "SubFunctionality": {}
       },
+      "PublicIP": {
+        "Title": "PublicIP",
+        "Documentation": "",
+        "MarkdownDocumentation": "",
+        "Commands": {
+          "Create": {
+            "namespace": "EdgeGateway",
+            "resource": "PublicIP",
+            "verb": "Create",
+            "short_documentation": "Create a new Public IP",
+            "long_documentation": "This command allows you to create a new Public IP in the Edge Gateway.",
+            "markdown_documentation": "",
+            "params": [
+              {
+                "name": "id",
+                "description": "The unique identifier of the edge gateway.",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
+              },
+              {
+                "name": "name",
+                "description": "The name of the edge gateway.",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `id` is null., "
+              }
+            ],
+            "deprecated": false,
+            "deprecated_message": "",
+            "model": [
+              {
+                "object": "edgegateway_id",
+                "type": "string",
+                "documentation": "ID of the edge gateway"
+              },
+              {
+                "object": "edgegateway_name",
+                "type": "string",
+                "documentation": "Name of the edge gateway"
+              },
+              {
+                "object": "id",
+                "type": "string",
+                "documentation": "Identifier of the network service"
+              },
+              {
+                "object": "name",
+                "type": "string",
+                "documentation": "Name of the network service"
+              },
+              {
+                "object": "ip",
+                "type": "string",
+                "documentation": "Public IP address"
+              },
+              {
+                "object": "announced",
+                "type": "bool",
+                "documentation": "Indicates if the public IP address is announced"
+              }
+            ]
+          },
+          "Delete": {
+            "namespace": "EdgeGateway",
+            "resource": "PublicIP",
+            "verb": "Delete",
+            "short_documentation": "Delete a Public IP",
+            "long_documentation": "This command allows you to delete a Public IP in the Edge Gateway.",
+            "markdown_documentation": "",
+            "params": [
+              {
+                "name": "ip",
+                "description": "The public IP address.",
+                "required": true,
+                "example": "",
+                "type": "string",
+                "validators_description": "Validates that the value is a valid IPv4 address. (E.g. 192.168.1.1 or 203.0.113.0). \n"
+              }
+            ],
+            "deprecated": false,
+            "deprecated_message": "",
+            "model": null
+          },
+          "Get": {
+            "namespace": "EdgeGateway",
+            "resource": "PublicIP",
+            "verb": "Get",
+            "short_documentation": "Get a Public IP",
+            "long_documentation": "This command allows you to retrieve information about a Public IP in the Edge Gateway.",
+            "markdown_documentation": "",
+            "params": [
+              {
+                "name": "ip",
+                "description": "The public IP address.",
+                "required": true,
+                "example": "",
+                "type": "string",
+                "validators_description": "Validates that the value is a valid IPv4 address. (E.g. 192.168.1.1 or 203.0.113.0). \n"
+              },
+              {
+                "name": "id",
+                "description": "The unique identifier of the edge gateway.",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
+              },
+              {
+                "name": "name",
+                "description": "The name of the edge gateway.",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `id` is null., "
+              }
+            ],
+            "deprecated": false,
+            "deprecated_message": "",
+            "model": [
+              {
+                "object": "edgegateway_id",
+                "type": "string",
+                "documentation": "ID of the edge gateway"
+              },
+              {
+                "object": "edgegateway_name",
+                "type": "string",
+                "documentation": "Name of the edge gateway"
+              },
+              {
+                "object": "id",
+                "type": "string",
+                "documentation": "Identifier of the network service"
+              },
+              {
+                "object": "name",
+                "type": "string",
+                "documentation": "Name of the network service"
+              },
+              {
+                "object": "ip",
+                "type": "string",
+                "documentation": "Public IP address"
+              },
+              {
+                "object": "announced",
+                "type": "bool",
+                "documentation": "Indicates if the public IP address is announced"
+              }
+            ]
+          },
+          "List": {
+            "namespace": "EdgeGateway",
+            "resource": "PublicIP",
+            "verb": "List",
+            "short_documentation": "List Public IPs",
+            "long_documentation": "This command allows you to list all Public IPs in the Edge Gateway.",
+            "markdown_documentation": "",
+            "params": [
+              {
+                "name": "id",
+                "description": "The unique identifier of the edge gateway.",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
+              },
+              {
+                "name": "name",
+                "description": "The name of the edge gateway.",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `id` is null., "
+              }
+            ],
+            "deprecated": false,
+            "deprecated_message": "",
+            "model": [
+              {
+                "object": "edgegateway_id",
+                "type": "string",
+                "documentation": "ID of the edge gateway"
+              },
+              {
+                "object": "edgegateway_name",
+                "type": "string",
+                "documentation": "Name of the edge gateway"
+              },
+              {
+                "object": "public_i_ps.{index}.edgegateway_id",
+                "type": "string",
+                "documentation": "ID of the edge gateway"
+              },
+              {
+                "object": "public_i_ps.{index}.edgegateway_name",
+                "type": "string",
+                "documentation": "Name of the edge gateway"
+              },
+              {
+                "object": "public_i_ps.{index}.id",
+                "type": "string",
+                "documentation": "Identifier of the network service"
+              },
+              {
+                "object": "public_i_ps.{index}.name",
+                "type": "string",
+                "documentation": "Name of the network service"
+              },
+              {
+                "object": "public_i_ps.{index}.ip",
+                "type": "string",
+                "documentation": "Public IP address"
+              },
+              {
+                "object": "public_i_ps.{index}.announced",
+                "type": "bool",
+                "documentation": "Indicates if the public IP address is announced"
+              }
+            ]
+          }
+        },
+        "SubFunctionality": {}
+      },
       "Services": {
         "Title": "Services",
         "Documentation": "",
@@ -482,7 +709,7 @@
                 "required": false,
                 "example": "",
                 "type": "string",
-                "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
+                "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
                 "name": "name",
@@ -490,12 +717,22 @@
                 "required": false,
                 "example": "",
                 "type": "string",
-                "validators_description": "The value is required if the parameter `ID` is null., "
+                "validators_description": "The value is required if the parameter `id` is null., "
               }
             ],
             "deprecated": false,
             "deprecated_message": "",
             "model": [
+              {
+                "object": "id",
+                "type": "string",
+                "documentation": "Identifier of the edge gateway"
+              },
+              {
+                "object": "name",
+                "type": "string",
+                "documentation": "Name of the edge gateway"
+              },
               {
                 "object": "load_balancer.id",
                 "type": "string",
@@ -518,7 +755,7 @@
               },
               {
                 "object": "public_ip.{index}",
-                "type": "*edgegateway.ModelEdgeGatewayServicesPublicIP",
+                "type": "*types.ModelEdgeGatewayServicesPublicIP",
                 "documentation": ""
               },
               {
@@ -1589,7 +1826,7 @@
             "resource": "StorageProfile",
             "verb": "Add",
             "short_documentation": "Add a new VDC Storage Profile",
-            "long_documentation": "Add a new storage profile to a specific VDC.",
+            "long_documentation": "Add one or more storage profiles to a specific VDC.",
             "markdown_documentation": "",
             "params": [
               {
@@ -1604,13 +1841,13 @@
                 "name": "vdc_name",
                 "description": "Name of the VDC to add the storage profile to",
                 "required": false,
-                "example": "",
+                "example": "my-vdc",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `vdc_id` is null., "
               },
               {
                 "name": "storage_profiles.{index}.class",
-                "description": "Class of the storage profile to create. Predefined classes or dedicated storage classes can be used. For predefined classes you have different properties (`_r1`, `_r2` and `_hm`) that can be used to define the storage profile.",
+                "description": "Class of the storage profile to create. Predefined classes or dedicated storage classes can be used. See rules for more information.",
                 "required": true,
                 "example": "gold",
                 "type": "string",
@@ -1628,14 +1865,40 @@
                 "name": "storage_profiles.{index}.default",
                 "description": "Default storage profile to create. This will be used if no specific profile is provided.",
                 "required": false,
-                "example": "true",
+                "example": "false",
                 "type": "bool",
                 "validators_description": ""
               }
             ],
             "deprecated": false,
             "deprecated_message": "",
-            "model": null,
+            "model": [
+              {
+                "object": "id",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "name",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "description",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "href",
+                "type": "string",
+                "documentation": ""
+              },
+              {
+                "object": "status",
+                "type": "cav.JobStatus",
+                "documentation": ""
+              }
+            ],
             "rules": [
               {
                 "consoles": null,

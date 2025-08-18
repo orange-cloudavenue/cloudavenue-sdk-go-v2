@@ -47,7 +47,7 @@ func init() {
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("Name"),
+					commands.ValidatorRequiredIfParamIsNull("name"),
 					commands.ValidatorOmitempty(),
 					commands.ValidatorURN("edgegateway"),
 				},
@@ -57,7 +57,7 @@ func init() {
 				Description: "The name of the edge gateway.",
 				Required:    false,
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("ID"),
+					commands.ValidatorRequiredIfParamIsNull("id"),
 					commands.ValidatorOmitempty(),
 				},
 			},
@@ -122,7 +122,7 @@ func init() {
 				Required:    false,
 				Example:     generator.MustGenerate("{urn:edgegateway}"),
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("Name"),
+					commands.ValidatorRequiredIfParamIsNull("name"),
 					commands.ValidatorOmitempty(),
 					commands.ValidatorURN("edgegateway"),
 				},
@@ -132,7 +132,7 @@ func init() {
 				Description: "The name of the edge gateway.",
 				Required:    false,
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("ID"),
+					commands.ValidatorRequiredIfParamIsNull("id"),
 					commands.ValidatorOmitempty(),
 				},
 			},
@@ -170,7 +170,7 @@ func init() {
 				Required:    false,
 				Example:     generator.MustGenerate("{urn:edgegateway}"),
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("Name"),
+					commands.ValidatorRequiredIfParamIsNull("name"),
 					commands.ValidatorOmitempty(),
 					commands.ValidatorURN("edgegateway"),
 				},
@@ -180,7 +180,7 @@ func init() {
 				Description: "The name of the edge gateway.",
 				Required:    false,
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("ID"),
+					commands.ValidatorRequiredIfParamIsNull("id"),
 					commands.ValidatorOmitempty(),
 				},
 			},
@@ -242,7 +242,7 @@ func init() {
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("Name"),
+					commands.ValidatorRequiredIfParamIsNull("name"),
 					commands.ValidatorOmitempty(),
 					commands.ValidatorURN("edgegateway"),
 				},
@@ -252,7 +252,7 @@ func init() {
 				Description: "The name of the edge gateway.",
 				Required:    false,
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("ID"),
+					commands.ValidatorRequiredIfParamIsNull("id"),
 					commands.ValidatorOmitempty(),
 				},
 			},

@@ -27,7 +27,7 @@ func (c *Command) Run(ctx context.Context, client, params any) (any, error) {
 	}
 
 	if len(c.ParamsSpecs) > 0 {
-		if err := c.ParamsSpecs.validate(params); err != nil {
+		if err := c.ParamsSpecs.validate(c.params); err != nil {
 			return nil, err
 		}
 	}
