@@ -23,6 +23,7 @@ func (c *Client) GetEdgeGateway(ctx context.Context, params types.ParamsEdgeGate
 	}
 	return x.(*types.ModelEdgeGateway), nil
 }
+
 // List EdgeGateways performs a GET request to retrieve a list of edge gateways
 func (c *Client) ListEdgeGateway(ctx context.Context) (*types.ModelEdgeGateways, error) {
 	x, err := cmds.Get("EdgeGateway", "", "List").Run(ctx, c, nil)
@@ -31,6 +32,7 @@ func (c *Client) ListEdgeGateway(ctx context.Context) (*types.ModelEdgeGateways,
 	}
 	return x.(*types.ModelEdgeGateways), nil
 }
+
 // Create EdgeGateway performs a POST request to create a new edge gateway
 func (c *Client) CreateEdgeGateway(ctx context.Context, params types.ParamsCreateEdgeGateway) (*types.ModelEdgeGateway, error) {
 	x, err := cmds.Get("EdgeGateway", "", "Create").Run(ctx, c, params)
@@ -39,11 +41,13 @@ func (c *Client) CreateEdgeGateway(ctx context.Context, params types.ParamsCreat
 	}
 	return x.(*types.ModelEdgeGateway), nil
 }
+
 // Delete EdgeGateway performs a DELETE request to delete an edge gateway
 func (c *Client) DeleteEdgeGateway(ctx context.Context, params types.ParamsEdgeGateway) error {
 	_, err := cmds.Get("EdgeGateway", "", "Delete").Run(ctx, c, params)
 	return err
 }
+
 // Update EdgeGateway performs a PUT request to update an edge gateway
 func (c *Client) UpdateEdgeGateway(ctx context.Context, params types.ParamsUpdateEdgeGateway) (*types.ModelEdgeGateway, error) {
 	x, err := cmds.Get("EdgeGateway", "", "Update").Run(ctx, c, params)
@@ -52,4 +56,3 @@ func (c *Client) UpdateEdgeGateway(ctx context.Context, params types.ParamsUpdat
 	}
 	return x.(*types.ModelEdgeGateway), nil
 }
-

@@ -1,3 +1,12 @@
+/*
+ * SPDX-FileCopyrightText: Copyright (c) 2025 Orange
+ * SPDX-License-Identifier: Mozilla Public License 2.0
+ *
+ * This software is distributed under the MPL-2.0 license.
+ * the text of which is available at https://www.mozilla.org/en-US/MPL/2.0/
+ * or see the "LICENSE" file for more details.
+ */
+
 package edgegateway
 
 import (
@@ -6,12 +15,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/orange-cloudavenue/common-go/generator"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
+	"github.com/orange-cloudavenue/common-go/generator"
 )
 
 func TestListEdgegatewayPublicIP(t *testing.T) {
@@ -220,7 +228,27 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 			params: types.ParamsEdgeGateway{
 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
-			expectedErr: false,
+			mockJobResponse: &cav.CerberusJobAPIResponse{
+				{
+					Actions: []cav.CerberusJobAPIResponseAction{
+						//  {
+						//     "details": "195.25.101.7",
+						//     "name": "reserve_ip for Org cav01ev01ocb0006205 for public ip",
+						//     "status": "DONE"
+						//  },
+						{
+							Details: generator.MustGenerate("{ipv4address}"),
+							Name:    "reserve_ip for Org cav01ev01ocb0001234 for public ip",
+							Status:  "DONE",
+						},
+					},
+					Name:        "Create PublicIP Job",
+					Status:      "DONE",
+					Description: "PublicIP created successfully",
+				},
+			},
+			mockJobResponseStatus: 200,
+			expectedErr:           false,
 		},
 		{
 			name: "Failed request by name",

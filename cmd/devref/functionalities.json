@@ -348,7 +348,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:2b25c65a-2428-4641-83f8-47a01c7dd259",
+                "example": "urn:vcloud:gateway:f6bb6795-aff1-4583-a453-f6d1034ad484",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -377,7 +377,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:2876abbd-654d-4bec-a095-b569ea27e38b",
+                "example": "urn:vcloud:gateway:d2ab132d-7498-48aa-bc84-ed4a9256af16",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -473,7 +473,7 @@
             "resource": "PublicIP",
             "verb": "Create",
             "short_documentation": "Create a new Public IP",
-            "long_documentation": "This command allows you to create a new Public IP in the Edge Gateway.",
+            "long_documentation": "This command allows you to create a new Public IP on the specified Edge Gateway.",
             "markdown_documentation": "",
             "params": [
               {
@@ -488,9 +488,9 @@
                 "name": "name",
                 "description": "The name of the edge gateway.",
                 "required": false,
-                "example": "",
+                "example": "tn01e02ocb0001234spt101",
                 "type": "string",
-                "validators_description": "The value is required if the parameter `id` is null., "
+                "validators_description": "The value is required if the parameter `id` is null., Validates that the value is a valid Edge Gateway name (tn01e02ocb0001234spt101).. \n"
               }
             ],
             "deprecated": false,
@@ -540,7 +540,7 @@
                 "name": "ip",
                 "description": "The public IP address.",
                 "required": true,
-                "example": "",
+                "example": "195.25.13.4",
                 "type": "string",
                 "validators_description": "Validates that the value is a valid IPv4 address. (E.g. 192.168.1.1 or 203.0.113.0). \n"
               }
@@ -561,7 +561,7 @@
                 "name": "ip",
                 "description": "The public IP address.",
                 "required": true,
-                "example": "",
+                "example": "195.25.13.4",
                 "type": "string",
                 "validators_description": "Validates that the value is a valid IPv4 address. (E.g. 192.168.1.1 or 203.0.113.0). \n"
               },
@@ -577,9 +577,9 @@
                 "name": "name",
                 "description": "The name of the edge gateway.",
                 "required": false,
-                "example": "",
+                "example": "tn01e02ocb0001234spt101",
                 "type": "string",
-                "validators_description": "The value is required if the parameter `id` is null., "
+                "validators_description": "The value is required if the parameter `id` is null., Validates that the value is a valid Edge Gateway name (tn01e02ocb0001234spt101).. \n"
               }
             ],
             "deprecated": false,
@@ -637,9 +637,9 @@
                 "name": "name",
                 "description": "The name of the edge gateway.",
                 "required": false,
-                "example": "",
+                "example": "tn01e02ocb0001234spt101",
                 "type": "string",
-                "validators_description": "The value is required if the parameter `id` is null., "
+                "validators_description": "The value is required if the parameter `id` is null., Validates that the value is a valid Edge Gateway name (tn01e02ocb0001234spt101).. \n"
               }
             ],
             "deprecated": false,

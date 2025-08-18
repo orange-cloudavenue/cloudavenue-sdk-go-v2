@@ -76,7 +76,6 @@ type Command struct {
 type (
 	RunnerFunc          func(ctx context.Context, ep *cav.Endpoint, client, params any) (any, error)
 	ParamsValidatorFunc func(ctx context.Context, value any, paramsSpecs ParamsSpecs, params any) error
-	ParamsTransformFunc func(value any) (any, error)
 )
 
 // * Parameters

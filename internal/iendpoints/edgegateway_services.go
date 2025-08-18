@@ -73,6 +73,7 @@ func init() {
 
 			var data itypes.ApiResponseNetworkServices
 
+			// mock response object that simulates the structure returned by the real API for Edge Gateway network services. It contains a hierarchy of network elements (tier-0-vrf, edge-gateway, services)
 			data = itypes.ApiResponseNetworkServices{
 				{
 					Type: "tier-0-vrf",

@@ -1,3 +1,12 @@
+/*
+ * SPDX-FileCopyrightText: Copyright (c) 2025 Orange
+ * SPDX-License-Identifier: Mozilla Public License 2.0
+ *
+ * This software is distributed under the MPL-2.0 license.
+ * the text of which is available at https://www.mozilla.org/en-US/MPL/2.0/
+ * or see the "LICENSE" file for more details.
+ */
+
 package edgegateway
 
 import (
@@ -7,14 +16,13 @@ import (
 
 	"resty.dev/v3"
 
-	"github.com/orange-cloudavenue/common-go/extractor"
-	"github.com/orange-cloudavenue/common-go/validators"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
+	"github.com/orange-cloudavenue/common-go/extractor"
+	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 //go:generate command-generator -path publicip_commands.go
@@ -32,7 +40,7 @@ func init() {
 		Verb:      "Create",
 
 		ShortDocumentation: "Create a new Public IP",
-		LongDocumentation:  "This command allows you to create a new Public IP in the Edge Gateway.",
+		LongDocumentation:  "This command allows you to create a new Public IP on the specified Edge Gateway.",
 		AutoGenerate:       true,
 
 		ModelType:  types.ModelEdgeGatewayPublicIP{},
@@ -52,9 +60,11 @@ func init() {
 				Name:        "name",
 				Description: "The name of the edge gateway.",
 				Required:    false,
+				Example:     "tn01e02ocb0001234spt101",
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("id"),
 					commands.ValidatorOmitempty(),
+					commands.ValidatorResourceName("edgegateway"),
 				},
 			},
 		},
@@ -89,7 +99,7 @@ func init() {
 				r := resp.Result().(*cav.CerberusJobAPIResponse)
 
 				if len(*r) == 0 {
-					logger.Error("No job information returned")
+					logger.ErrorContext(ctx, "No job information returned")
 					return
 				}
 
@@ -160,9 +170,11 @@ func init() {
 				Name:        "name",
 				Description: "The name of the edge gateway.",
 				Required:    false,
+				Example:     "tn01e02ocb0001234spt101",
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("id"),
 					commands.ValidatorOmitempty(),
+					commands.ValidatorResourceName("edgegateway"),
 				},
 			},
 		},
@@ -210,6 +222,7 @@ func init() {
 				Name:        "ip",
 				Description: "The public IP address.",
 				Required:    true,
+				Example:     "195.25.13.4",
 				Validators: []commands.Validator{
 					commands.ValidatorIPV4(),
 				},
@@ -228,9 +241,11 @@ func init() {
 				Name:        "name",
 				Description: "The name of the edge gateway.",
 				Required:    false,
+				Example:     "tn01e02ocb0001234spt101",
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("id"),
 					commands.ValidatorOmitempty(),
+					commands.ValidatorResourceName("edgegateway"),
 				},
 			},
 		},
@@ -297,6 +312,7 @@ func init() {
 				Name:        "ip",
 				Description: "The public IP address.",
 				Required:    true,
+				Example:     "195.25.13.4",
 				Validators: []commands.Validator{
 					commands.ValidatorIPV4(),
 				},
