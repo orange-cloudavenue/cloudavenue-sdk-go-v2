@@ -88,6 +88,9 @@ func (ap *ApiResponseNetworkServices) ToModel(params types.ParamsEdgeGateway) *t
 		for _, child := range ns.Children {
 			if child.Type == "edge-gateway" && (child.Properties.EdgeUUID == urn.ExtractUUID(params.ID) || child.Name == params.Name) {
 				// Found the edge gateway
+				data.ID = urn.Normalize(urn.EdgeGateway, child.Properties.EdgeUUID).String()
+				data.Name = child.Name
+
 				// iterate over the children to find the services
 				for _, service := range child.Children {
 					switch service.Type {

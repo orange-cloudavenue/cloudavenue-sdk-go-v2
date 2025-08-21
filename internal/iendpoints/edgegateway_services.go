@@ -11,9 +11,9 @@ package iendpoints
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
-
-	"resty.dev/v3"
+	"strings"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
@@ -25,6 +25,7 @@ import (
 //go:generate endpoint-generator -path edgegateway_services.go -output edgegateway_services
 
 func init() {
+	// * GetEdgeGatewayServices
 	cav.Endpoint{
 		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/getNetworkHierarchy",
 		Name:             "GetEdgeGatewayServices",
@@ -43,6 +44,9 @@ func init() {
 				ValidatorFunc: func(value string) error {
 					return validators.New().Var(value, "urn=edgegateway")
 				},
+				TransformFunc: func(value string) (string, error) {
+					return extractor.ExtractUUID(value)
+				},
 			},
 			{
 				Name:        "edgeName",
@@ -52,26 +56,24 @@ func init() {
 					return validators.New().Var(value, "resource_name=edgegateway")
 				},
 			},
-		},
-		RequestMiddlewares: []resty.RequestMiddleware{
-			func(_ *resty.Client, req *resty.Request) error {
-				edgeID := req.QueryParams.Get("edgeId")
-				if edgeID != "" {
-					// Remove the URN prefix if it exists
-					id, _ := extractor.ExtractUUID(edgeID)
-					// Set the edgeId query parameter to the extracted ID
-					req.QueryParams.Set("edgeId", id)
-				}
-				return nil
+			{
+				Name:        "publicIp",
+				Description: "The public IP address of the edge gateway",
+				Required:    false,
+				ValidatorFunc: func(value string) error {
+					return validators.New().Var(value, "ipv4")
+				},
 			},
 		},
 		MockResponseFunc: func(w http.ResponseWriter, r *http.Request) {
 			// One of the two must be filled in. The validator makes sure of this.
 			edgeID := r.URL.Query().Get("edgeId")
 			edgeName := r.URL.Query().Get("edgeName")
+			publicIP := r.URL.Query().Get("publicIp")
 
 			var data itypes.ApiResponseNetworkServices
 
+			// mock response object that simulates the structure returned by the real API for Edge Gateway network services. It contains a hierarchy of network elements (tier-0-vrf, edge-gateway, services)
 			data = itypes.ApiResponseNetworkServices{
 				{
 					Type: "tier-0-vrf",
@@ -109,7 +111,12 @@ func init() {
 									},
 								},
 								{
-									ServiceID:   generator.MustGenerate("ip-{regex:[1-9]{2}}-{regex:[1-9]{2}}-{regex:[1-9]{2}}-{regex:[1-9]{2}}"),
+									ServiceID: func() string {
+										if publicIP != "" {
+											return fmt.Sprintf("ip-%s", strings.ReplaceAll(publicIP, ".", "-"))
+										}
+										return generator.MustGenerate("ip-{regex:[1-9]{2}}-{regex:[1-9]{2}}-{regex:[1-9]{2}}-{regex:[1-9]{2}}")
+									}(),
 									Type:        "service",
 									Name:        "internet",
 									DisplayName: "internet",
@@ -125,7 +132,12 @@ func init() {
 										// Service
 										Ranges []string `json:"ranges,omitempty" fake:"{ipv4address}/{intrange:24,32}"` // The network in ip/cidr format
 									}{
-										IP:        generator.MustGenerate("{ipv4address}"),
+										IP: func() string {
+											if publicIP != "" {
+												return publicIP
+											}
+											return generator.MustGenerate("{ipv4address}")
+										}(),
 										Announced: true,
 									},
 								},

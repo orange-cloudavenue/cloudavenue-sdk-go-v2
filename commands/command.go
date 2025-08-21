@@ -76,7 +76,6 @@ type Command struct {
 type (
 	RunnerFunc          func(ctx context.Context, ep *cav.Endpoint, client, params any) (any, error)
 	ParamsValidatorFunc func(ctx context.Context, value any, paramsSpecs ParamsSpecs, params any) error
-	ParamsTransformFunc func(value string, paramsSpecs ParamsSpecs, params any) (string, error)
 )
 
 // * Parameters
@@ -99,9 +98,5 @@ type (
 
 		// Validator is a function that validates the argument value.
 		Validators []Validator
-
-		// TransformFunc is a function that transforms the argument value.
-		// It is used to transform the value after validation.
-		TransformFunc ParamsTransformFunc
 	}
 )

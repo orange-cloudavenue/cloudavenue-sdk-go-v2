@@ -34,6 +34,7 @@ type cmd struct {
 	AutoGenerateCustomFuncName string
 	ParamsType, ModelType      string
 	AutoGenerate               bool
+	LongDocumentation          string
 	CommandName                string
 }
 

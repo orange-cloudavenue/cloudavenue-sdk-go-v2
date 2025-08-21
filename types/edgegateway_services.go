@@ -13,6 +13,11 @@ type (
 	// * Model
 
 	ModelEdgeGatewayServices struct {
+		// ID is the identifier of the edge gateway
+		ID string `documentation:"Identifier of the edge gateway"`
+		// Name is the name of the edge gateway
+		Name string `documentation:"Name of the edge gateway"`
+
 		LoadBalancer *ModelEdgeGatewayServicesLoadBalancer
 		PublicIP     []*ModelEdgeGatewayServicesPublicIP
 		Service      *ModelCloudavenueServices

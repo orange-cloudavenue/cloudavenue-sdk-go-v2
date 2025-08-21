@@ -36,7 +36,7 @@ func newClient(t *testing.T) *Client {
 				slog.NewTextHandler(
 					os.Stdout,
 					&slog.HandlerOptions{
-						Level: slog.LevelInfo,
+						Level: slog.LevelDebug,
 					}),
 			),
 		),

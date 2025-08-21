@@ -10,6 +10,7 @@
 package commands
 
 import (
+	"slices"
 	"sync"
 )
 
@@ -46,6 +47,18 @@ func (r *Registry) Get(namespace, resource, verb string) *Command {
 		}
 	}
 	return nil
+}
+
+func (r *Registry) GetNamespaces() []string {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	namespaces := make([]string, 0)
+	for _, cmd := range r.Commands {
+		if !slices.Contains(namespaces, cmd.GetNamespace()) {
+			namespaces = append(namespaces, cmd.GetNamespace())
+		}
+	}
+	return namespaces
 }
 
 func (r *Registry) GetCommandsByFilter(filter func(cmd Command) bool) []Command {

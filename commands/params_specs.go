@@ -19,21 +19,16 @@ import (
 )
 
 func (p *ParamsSpecs) validate(params any) error {
-	// Decode struct
-	val := reflect.ValueOf(params)
-	if val.Kind() == reflect.Ptr {
-		val = val.Elem()
-	}
-	typ := val.Type()
-	if typ.Kind() != reflect.Struct {
-		return errors.New("params must be a struct or pointer to struct")
+	rV, rT, err := p.decode(params)
+	if err != nil {
+		return err
 	}
 
 	var fields []reflect.StructField
 
 	// For each field in the struct
-	for i := 0; i < typ.NumField(); i++ {
-		field := typ.Field(i)
+	for i := 0; i < rT.NumField(); i++ {
+		field := rT.Field(i)
 		// Find the associated ParamSpec
 		paramSpec := p.findParamSpecByGoField(field.Name)
 		// Build the dynamic tag
@@ -57,7 +52,7 @@ func (p *ParamsSpecs) validate(params any) error {
 	dynValue := reflect.New(dynType).Elem()
 
 	// Fill dynValue with the values from params (recursively)
-	copyValuesRecursive(dynValue, val)
+	copyValuesRecursive(dynValue, rV)
 
 	// Validation
 	validate := validators.New()
@@ -76,4 +71,17 @@ func (p ParamsSpecs) findParamSpecByGoField(goFieldName string) *ParamsSpec {
 		}
 	}
 	return nil
+}
+
+func (p *ParamsSpecs) decode(params any) (reflect.Value, reflect.Type, error) {
+	// Decode struct
+	val := reflect.ValueOf(params)
+	if val.Kind() == reflect.Ptr {
+		val = val.Elem()
+	}
+	typ := val.Type()
+	if typ.Kind() != reflect.Struct {
+		return reflect.Value{}, nil, errors.New("params must be a struct or pointer to struct")
+	}
+	return val, typ, nil
 }
