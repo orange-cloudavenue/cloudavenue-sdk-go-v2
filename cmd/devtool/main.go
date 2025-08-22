@@ -10,13 +10,14 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"os"
+
+	"github.com/charmbracelet/fang"
 )
 
 func main() {
-	if err := Execute(); err != nil {
-		fmt.Println(err)
+	if err := fang.Execute(context.Background(), rootCmd); err != nil {
 		os.Exit(1)
 	}
 }

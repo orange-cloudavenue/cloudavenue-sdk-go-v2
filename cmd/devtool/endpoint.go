@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/log"
 	"github.com/niemeyer/pretty"
@@ -91,7 +92,7 @@ var endpointCmd = &cobra.Command{
 			}
 			body = reflect.ValueOf(bodyPtr).Elem().Interface()
 		}
-
+		cancel := spinner("Waiting...", monkeys, 200*time.Millisecond)
 		resp, err := client.Do(
 			context.Background(),
 			ep,
@@ -115,6 +116,7 @@ var endpointCmd = &cobra.Command{
 				return opts
 			}()...,
 		)
+		cancel()
 		if err != nil {
 			logger.Error("Error executing endpoint", "endpoint", endpointName, "error", err)
 			return
