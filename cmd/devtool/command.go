@@ -81,11 +81,13 @@ var commandCmd = &cobra.Command{
 
 		log.Info("Executing command", "namespace", command.GetNamespace(), "resource", command.GetResource(), "verb", command.GetVerb())
 
+		// Init rVal with reflect Value nil
 		rVal := reflect.ValueOf(nil)
 
 		if command.ParamsType != nil {
 
 			rType := reflect.TypeOf(command.ParamsType)
+			// Override rVal with a new instance of the command's ParamsType
 			rVal = reflect.New(rType).Elem()
 
 			for paramName, paramValue := range commandParams {
