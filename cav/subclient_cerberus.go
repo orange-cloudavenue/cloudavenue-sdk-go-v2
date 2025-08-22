@@ -122,11 +122,15 @@ func (v *cerberus) parseAPIError(operation string, resp *resty.Response) *errors
 var regexCerberusJobAlreadyExists = regexp.MustCompile(`Job already exists`)
 
 // idempotentRetryCondition returns a retry condition function for idempotent operations.
+// Retries are triggered if the error message indicates that the job already exists.
 func (v *cerberus) idempotentRetryCondition() resty.RetryConditionFunc {
-	return func(_ *resty.Response, err error) bool {
-		// Check if the error message indicates that the job already exists.
-		if err != nil && regexCerberusJobAlreadyExists.MatchString(err.Error()) {
-			return true // Retry if the error message indicates that the job already exists.
+	return func(resp *resty.Response, err error) bool {
+		if err, ok := resp.Error().(*cerberusError); ok {
+			return regexCerberusJobAlreadyExists.MatchString(err.Reason) || regexCerberusJobAlreadyExists.MatchString(err.Message)
+		}
+
+		if err != nil {
+			return regexCerberusJobAlreadyExists.MatchString(err.Error())
 		}
 
 		return false

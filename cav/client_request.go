@@ -146,6 +146,8 @@ func (c *client) NewRequest(ctx context.Context, endpoint *Endpoint, _ ...Reques
 		retryIdempotent = true
 	}
 
+	// ContextData store specific data in the context.
+	// This context is used to pass additional information between middleware and handlers.
 	contextData := ContextData{}
 	switch sc := sc.(type) {
 	case *vmware:
@@ -165,6 +167,8 @@ func (c *client) NewRequest(ctx context.Context, endpoint *Endpoint, _ ...Reques
 		AddRetryConditions(retryConditionsFuncs...).
 		SetAllowNonIdempotentRetry(retryIdempotent)
 
+	// Set the query parameters in the request.
+	// This is done to set the query parameters in the HTTP requests.
 	for _, q := range endpoint.QueryParams {
 		if q.Value != "" {
 			// If a value is provided for the query parameter, use it directly.
