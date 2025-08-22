@@ -82,7 +82,7 @@ func init() { //nolint:gocyclo
 				cav.WithQueryParam(ep.QueryParams[0], qP),
 			)
 			if err != nil {
-				logger.Error("Failed to get VDC", "error", err)
+				logger.ErrorContext(ctx, "Failed to get VDC", "error", err)
 				return nil, err
 			}
 
@@ -144,13 +144,13 @@ func init() { //nolint:gocyclo
 				cav.WithQueryParam(epListVDC.QueryParams[0], qP),
 			)
 			if err != nil {
-				logger.Error("Failed to list VDCs", "error", err)
+				logger.ErrorContext(ctx, "Failed to list VDCs", "error", err)
 				return nil, err
 			}
 
 			results := resp.Result().(*itypes.ApiResponseListVDC)
 			if len(results.Records) == 0 {
-				logger.Warn("No VDCs found")
+				logger.WarnContext(ctx, "No VDCs found")
 				return nil, fmt.Errorf("The VDC %s does not exist in your organization", p.Name)
 			}
 
@@ -167,14 +167,14 @@ func init() { //nolint:gocyclo
 			eg.Go(func() error {
 				// Get VDC Metadata
 				epGetVDCMetadata := endpoints.GetVdcMetadata()
-				logger.Debug("Fetching VDC metadata", "vdcName", results.Records[0].Name, "vdcID", vdc.ID)
+				logger.DebugContext(ctx, "Fetching VDC metadata", "vdcName", results.Records[0].Name, "vdcID", vdc.ID)
 				vdcMetadataResp, err := cc.c.Do(
 					egCtx,
 					epGetVDCMetadata,
 					cav.WithPathParam(epGetVDCMetadata.PathParams[0], results.Records[0].ID),
 				)
 				if err != nil {
-					logger.Error("Failed to get VDC metadata", "error", err, "vdcName", results.Records[0].Name)
+					logger.ErrorContext(ctx, "Failed to get VDC metadata", "error", err, "vdcName", results.Records[0].Name)
 					return fmt.Errorf("failed to get VDC metadata for %s: %w", results.Records[0].Name, err)
 				}
 
@@ -184,14 +184,14 @@ func init() { //nolint:gocyclo
 
 			eg.Go(func() error {
 				epGetVDC := endpoints.GetVdc()
-				logger.Debug("Fetching VDC details", "vdcName", vdc.Name, "vdcID", vdc.ID)
+				logger.DebugContext(ctx, "Fetching VDC details", "vdcName", vdc.Name, "vdcID", vdc.ID)
 				vdcResp, err := cc.c.Do(
 					ctx,
 					epGetVDC,
 					cav.WithPathParam(epGetVDC.PathParams[0], vdc.ID),
 				)
 				if err != nil {
-					logger.Error("Failed to get VDC details", "error", err, "vdcName", vdc.Name)
+					logger.ErrorContext(ctx, "Failed to get VDC details", "error", err, "vdcName", vdc.Name)
 					return err
 				}
 
@@ -207,7 +207,7 @@ func init() { //nolint:gocyclo
 			})
 
 			if err := eg.Wait(); err != nil {
-				logger.Error("Error while fetching VDC details or metadata", "error", err)
+				logger.ErrorContext(ctx, "Error while fetching VDC details or metadata", "error", err)
 				return nil, fmt.Errorf("failed to get VDC details or metadata: %w", err)
 			}
 
@@ -225,7 +225,7 @@ func init() { //nolint:gocyclo
 				}
 			}
 
-			logger.Debug("Successfully retrieved VDC details", "vdcName", model.Name, "vdcID", model.ID)
+			logger.DebugContext(ctx, "Successfully retrieved VDC details", "vdcName", model.Name, "vdcID", model.ID)
 
 			return &model, nil
 		},
@@ -372,7 +372,7 @@ func init() { //nolint:gocyclo
 				cav.SetBody(reqBody),
 			)
 			if err != nil {
-				logger.Error("Failed to create VDC", "error", err)
+				logger.ErrorContext(ctx, "Failed to create VDC", "error", err)
 				return nil, err
 			}
 
@@ -380,7 +380,7 @@ func init() { //nolint:gocyclo
 				Name: p.Name,
 			})
 			if err != nil {
-				logger.Error("Failed to get VDC", "error", err)
+				logger.ErrorContext(ctx, "Failed to get VDC", "error", err)
 				return nil, err
 			}
 
@@ -467,7 +467,7 @@ func init() { //nolint:gocyclo
 					Name: p.Name,
 				})
 				if err != nil {
-					logger.Error("Failed to get VDC", "error", err)
+					logger.ErrorContext(ctx, "Failed to get VDC", "error", err)
 					return nil, err
 				}
 
@@ -493,7 +493,7 @@ func init() { //nolint:gocyclo
 				cav.SetBody(apiR),
 			)
 			if err != nil {
-				logger.Error("Failed to update VDC", "error", err)
+				logger.ErrorContext(ctx, "Failed to update VDC", "error", err)
 				return nil, err
 			}
 
@@ -545,7 +545,7 @@ func init() { //nolint:gocyclo
 					ID: p.ID,
 				})
 				if err != nil {
-					logger.Error("Failed to get VDC", "error", err)
+					logger.ErrorContext(ctx, "Failed to get VDC", "error", err)
 					return nil, err
 				}
 
@@ -558,7 +558,7 @@ func init() { //nolint:gocyclo
 				cav.WithPathParam(ep.PathParams[0], p.Name),
 			)
 			if err != nil {
-				logger.Error("Failed to delete VDC", "error", err)
+				logger.ErrorContext(ctx, "Failed to delete VDC", "error", err)
 				return nil, err
 			}
 

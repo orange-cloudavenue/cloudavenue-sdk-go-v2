@@ -11,8 +11,15 @@ package types
 
 type (
 	ModelListStorageProfiles struct {
+		VDCS []ModelListStorageProfilesVDC `documentation:"List of VDCs to list storage profiles for"`
+	}
+
+	ModelListStorageProfilesVDC struct {
+		ID              string                    `documentation:"ID of the VDC"`
+		Name            string                    `documentation:"Name of the VDC"`
 		StorageProfiles []ModelListStorageProfile `documentation:"List of storage profiles in the VDC"`
 	}
+
 	ModelListStorageProfile struct {
 		ID      string `documentation:"ID of the storage profile"`
 		Class   string `documentation:"Name of the storage profile"`
@@ -23,18 +30,33 @@ type (
 )
 
 type (
-	// ParamsListStorageProfiles defines the parameters for listing storage profiles in a VDC.
-	ParamsListStorageProfiles struct {
-		// ID is the unique identifier of the VDC to get storage profiles from.
-		ID string `documentation:"ID of the VDC to get storage profiles from"`
+	// ParamsListStorageProfile defines the parameters for listing storage profiles in a VDC.
+	ParamsListStorageProfile struct {
+		// ID is the unique identifier of storage profiles from.
+		ID string `documentation:"ID of the storage profile"`
+		// Name is the name of the storage profiles to filter by.
+		Name string `documentation:"Name of the storage profiles to filter by"`
+		// VDCID is the unique identifier of the VDC to get storage profiles from.
+		VdcId string `documentation:"ID of the VDC to get storage profiles from"` //nolint:revive
+		// Name is the name of the VDC to get storage profiles from.
+		VdcName string `documentation:"Name of the VDC to get storage profiles from"` //nolint:revive
 	}
 
 	ParamsAddStorageProfile struct {
 		// VdcId is the unique identifier of the VDC to add the storage profile to.
-		VdcID string
+		VdcId string //nolint:revive
 		// VdcName is the name of the VDC to add the storage profile to.
-		VdcName string
+		VdcName string //nolint:revive
 
 		StorageProfiles []ParamsCreateVDCStorageProfile
+	}
+
+	ParamsDeleteStorageProfile struct {
+		// VdcId is the unique identifier of the VDC to delete the storage profile
+		VdcId string //nolint:revive
+		// VdcName is the name of the VDC to delete the storage profile from
+		VdcName string //nolint:revive
+		// StorageProfile is the list of storage profiles to delete, in this case it is a single storage profile
+		StorageProfiles []ParamsDeleteVDCStorageProfile
 	}
 )

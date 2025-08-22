@@ -15,17 +15,21 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
-// List of storage profiles available in a specific VDC.
-func (c *Client) ListStorageProfile(ctx context.Context, params types.ParamsListStorageProfiles) (*types.ModelListStorageProfiles, error) {
+func (c *Client) ListStorageProfile(ctx context.Context, params types.ParamsListStorageProfile) (*types.ModelListStorageProfiles, error) {
 	x, err := cmds.Get("VDC", "StorageProfile", "List").Run(ctx, c, params)
 	if err != nil {
 		return nil, err
 	}
 	return x.(*types.ModelListStorageProfiles), nil
 }
+
 // Add one or more storage profiles to a specific VDC.
 func (c *Client) AddStorageProfile(ctx context.Context, params types.ParamsAddStorageProfile) error {
 	_, err := cmds.Get("VDC", "StorageProfile", "Add").Run(ctx, c, params)
 	return err
 }
 
+func (c *Client) DeleteStorageProfile(ctx context.Context, params types.ParamsDeleteStorageProfile) error {
+	_, err := cmds.Get("VDC", "StorageProfile", "Delete").Run(ctx, c, params)
+	return err
+}

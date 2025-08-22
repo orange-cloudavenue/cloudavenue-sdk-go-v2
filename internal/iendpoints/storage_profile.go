@@ -10,23 +10,30 @@
 package iendpoints
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
+	"net/http"
+	"strings"
 
 	"resty.dev/v3"
 
+	"github.com/orange-cloudavenue/common-go/extractor"
+	"github.com/orange-cloudavenue/common-go/generator"
+	"github.com/orange-cloudavenue/common-go/urn"
+	"github.com/orange-cloudavenue/common-go/validators"
+
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
-	"github.com/orange-cloudavenue/common-go/extractor"
-	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 //go:generate endpoint-generator -path storage_profile.go -output storage_profile
 
 func init() {
-	// * ListStorageProfiles
+	// * ListStorageProfile
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/queries/orgVdcStorageProfile.html",
-		Name:             "ListStorageProfiles",
+		Name:             "ListStorageProfile",
 		Description:      "List VDC Storage Profiles",
 		Method:           cav.MethodGET,
 		SubClient:        cav.ClientVmware,
@@ -34,17 +41,65 @@ func init() {
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        "filter",
-				Description: "ID of the VDC to get storage profiles for.",
+				Description: "Filter to apply to the list of VDC Storage Profile. Format: key==value. Supported keys: vdc, vdcName, name, id.",
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=vdc")
+					// Support multiple filters separated by ';'
+					filters := strings.Split(value, ";")
+					for _, filter := range filters {
+						valueSplit := strings.Split(filter, "==")
+						if len(valueSplit) != 2 {
+							return errors.New("filter must be in the format 'key==value' or 'key1==value1;key2==value2'")
+						}
+						switch valueSplit[0] {
+						case "vdc":
+							if err := validators.New().Var(valueSplit[1], "urn=vdc"); err != nil {
+								return err
+							}
+						case "vdcName", "name":
+							// No specific format required
+						case "id":
+							if err := validators.New().Var(valueSplit[1], "urn=vdcstorageProfile"); err != nil {
+								return err
+							}
+						default:
+							return fmt.Errorf("filter key '%s' is not allowed", valueSplit[0])
+						}
+					}
+					return nil
 				},
 				TransformFunc: func(value string) (string, error) {
-					// vdc-id require UUID format and not urn format
-					v, err := extractor.ExtractUUID(value)
-					if err != nil {
-						return "", err
+					// Support multiple filters separated by ';'
+					filters := strings.Split(value, ";")
+					var transformed []string
+					for _, filter := range filters {
+						valueSplit := strings.Split(filter, "==")
+						if len(valueSplit) != 2 {
+							return "", errors.New("filter must be in the format 'key==value' or 'key1==value1;key2==value2'")
+						}
+						switch valueSplit[0] {
+						case "vdc":
+							v, err := extractor.ExtractUUID(valueSplit[1])
+							if err != nil {
+								return "", err
+							}
+							transformed = append(transformed, fmt.Sprintf("vdc==%s", v))
+						case "vdcName":
+							v := valueSplit[1]
+							transformed = append(transformed, fmt.Sprintf("vdcName==%s", v))
+						case "name":
+							v := valueSplit[1]
+							transformed = append(transformed, fmt.Sprintf("name==%s", v))
+						case "id":
+							v, err := extractor.ExtractUUID(valueSplit[1])
+							if err != nil {
+								return "", err
+							}
+							transformed = append(transformed, fmt.Sprintf("id==%s", v))
+						default:
+							return "", fmt.Errorf("filter key '%s' is not allowed", valueSplit[0])
+						}
 					}
-					return fmt.Sprintf("vdc==%s", v), nil
+					return strings.Join(transformed, ";"), nil
 				},
 			},
 			{
@@ -68,7 +123,6 @@ func init() {
 				Value:       "name",
 			},
 		},
-		BodyResponseType: itypes.ApiResponseListStorageProfiles{},
 		RequestMiddlewares: []resty.RequestMiddleware{
 			func(_ *resty.Client, req *resty.Request) error {
 				// Set the Accept header to application/*+json;version=38.1
@@ -76,5 +130,83 @@ func init() {
 				return nil
 			},
 		},
+		BodyResponseType: itypes.ApiResponseListStorageProfiles{},
+		// ResponseMiddlewares is used to extract the ID from the response and set it in the context
+		ResponseMiddlewares: []resty.ResponseMiddleware{
+			func(_ *resty.Client, resp *resty.Response) error {
+				r := resp.Result().(*itypes.ApiResponseListStorageProfiles)
+
+				for i, strPro := range r.StorageProfiles {
+					// Extract ID from HREF
+					id, err := extractor.ExtractUUID(strPro.HREF)
+					if err != nil {
+						return fmt.Errorf("failed to extract ID from HREF: %w", err)
+					}
+					r.StorageProfiles[i].ID = urn.Normalize(urn.VDCStorageProfile, id).String()
+
+					// Extract VDC ID from HREF
+					vdcID, err := extractor.ExtractUUID(strPro.VdcId)
+					if err != nil {
+						return fmt.Errorf("failed to extract VDC ID from HREF: %w", err)
+					}
+					r.StorageProfiles[i].VdcId = urn.Normalize(urn.VDC, vdcID).String()
+				}
+
+				return nil
+			},
+		},
+
+		MockResponseFunc: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			resp := &itypes.ApiResponseListStorageProfiles{
+				StorageProfiles: make([]itypes.ApiResponseListStorageProfile, 0),
+			}
+
+			// If QueryParam "filter" is set, return a filtered response
+			if r.URL.Query().Get("filter") != "" {
+				filter := r.URL.Query().Get("filter")
+				filterParts := strings.Split(filter, "==")
+
+				r := &itypes.ApiResponseListStorageProfile{}
+				generator.MustStruct(r)
+
+				r.Name = func() string {
+					if filterParts[0] == "name" {
+						return filterParts[1]
+					}
+					return "platinum3k_r1"
+				}()
+
+				r.ID = func() string {
+					if filterParts[0] == "id" {
+						return filterParts[1]
+					}
+					return ""
+				}()
+
+				r.VdcId = func() string {
+					if filterParts[0] == "vdc" {
+						return urn.Normalize(urn.VDC, filterParts[1]).String()
+					}
+					return generator.MustGenerate("{urn:vdc}")
+				}()
+
+				r.VdcName = func() string {
+					if filterParts[0] == "vdcName" {
+						return filterParts[1]
+					}
+					return generator.MustGenerate("{word}")
+				}()
+				resp.StorageProfiles = append(resp.StorageProfiles, *r)
+			} else {
+				// If no filter is set, generate a random response
+				generator.MustStruct(resp)
+			}
+
+			// json encode
+			w.Header().Set("Content-Type", "application/json")
+			respJ, _ := json.Marshal(resp)
+
+			_, _ = w.Write(respJ)
+		}),
 	}.Register()
 }

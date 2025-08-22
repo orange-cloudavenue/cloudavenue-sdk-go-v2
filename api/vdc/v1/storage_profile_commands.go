@@ -11,12 +11,14 @@ package vdc
 
 import (
 	"context"
+	"fmt"
 	"slices"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
@@ -32,46 +34,95 @@ func init() {
 
 	// * ListStorageProfiles
 	cmds.Register(commands.Command{
-		Namespace: "VDC",
-		Resource:  "StorageProfile",
-		Verb:      "List",
-
+		Namespace:          "VDC",
+		Resource:           "StorageProfile",
+		Verb:               "List",
 		ShortDocumentation: "List VDC Storage Profiles",
-		LongDocumentation:  "List of storage profiles available in a specific VDC.",
-
-		ParamsType: types.ParamsListStorageProfiles{},
+		LongDocumentation:  "List of storage profiles. If no filters are applied, all Storage Profiles for all VDCs are displayed. You can filter by either ID or Name of the storage profile, and you can also filter by either VDC ID or VDC Name. You can combine a storage profile filter (ID or Name) with a VDC filter (ID or Name). If both ID and Name are provided, they must refer to the same object; otherwise, the result will be empty.",
+		AutoGenerate:       true,
+		ParamsType:         types.ParamsListStorageProfile{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "id",
-				Description: "ID of the VDC to get",
-				Required:    true,
+				Description: "ID of the storage profile to list",
+				Required:    false,
 				Validators: []commands.Validator{
+					commands.ValidatorOmitempty(),
+					commands.ValidatorURN("vdcstorageProfile"),
+				},
+			},
+			commands.ParamsSpec{
+				Name:        "vdc_id",
+				Description: "ID of the VDC to get the storage profile from",
+				Required:    false,
+				Validators: []commands.Validator{
+					commands.ValidatorOmitempty(),
 					commands.ValidatorURN("vdc"),
 				},
+			},
+			commands.ParamsSpec{
+				Name:        "vdc_name",
+				Description: "Name of the VDC to get the storage profile from",
+				Required:    false,
+				Example:     "my-vdc",
+			},
+			commands.ParamsSpec{
+				Name:        "name",
+				Description: "Name of the storage profile to list",
+				Required:    false,
+				Example:     "gold",
 			},
 		},
 		ModelType: types.ModelListStorageProfiles{},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(types.ParamsListStorageProfiles)
+			p := params.(types.ParamsListStorageProfile)
 
-			logger := cc.logger.WithGroup("ListStorageProfiles")
+			ep := endpoints.ListStorageProfile()
 
-			ep := endpoints.ListStorageProfiles()
+			// Set the filter query parameter based on the provided parameters
+			// When Required, Validators and TransformFunc are used, use a temp variable to build the filter (ref: QueryParam)
+			var value string
 
+			var filters []string
+			if p.ID != "" {
+				filters = append(filters, "id=="+p.ID)
+			}
+			if p.Name != "" {
+				filters = append(filters, "name=="+p.Name)
+			}
+			if p.VdcId != "" {
+				filters = append(filters, "vdc=="+p.VdcId)
+			}
+			if p.VdcName != "" {
+				filters = append(filters, "vdcName=="+p.VdcName)
+			}
+			if len(filters) > 0 {
+				// Join all filters with ';' to allow multiple filters in the query param
+				value = filters[0]
+				if len(filters) > 1 {
+					value = ""
+					for i, f := range filters {
+						if i > 0 {
+							value += ";"
+						}
+						value += f
+					}
+				}
+			}
+
+			// Execute the request with the query parameters
 			resp, err := cc.c.Do(
 				ctx,
 				ep,
-				cav.WithQueryParam(ep.QueryParams[0], p.ID),
+				cav.WithQueryParam(ep.QueryParams[0], value),
 			)
 			if err != nil {
-				logger.Error("Failed to list VDC Storage Profiles", "error", err)
-				return nil, err
+				return nil, fmt.Errorf("failed to list VDC Storage Profiles: %w", err)
 			}
 
 			return resp.Result().(*itypes.ApiResponseListStorageProfiles).ToModel(), nil
 		},
-		AutoGenerate: true,
 	})
 
 	// * AddStorageProfile
@@ -82,7 +133,7 @@ func init() {
 
 		ShortDocumentation: "Add a new VDC Storage Profile",
 		LongDocumentation:  "Add one or more storage profiles to a specific VDC.",
-		ModelType:          cav.Job{},
+		AutoGenerate:       true,
 		ParamsType:         types.ParamsAddStorageProfile{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
@@ -146,7 +197,7 @@ func init() {
 			p := paramsIn.(types.ParamsAddStorageProfile)
 
 			vdc, err := cc.GetVDC(ctx, types.ParamsGetVDC{
-				ID:   p.VdcID,
+				ID:   p.VdcId,
 				Name: p.VdcName,
 			})
 			if err != nil {
@@ -182,7 +233,7 @@ func init() {
 				},
 			}
 
-			logger.Debug("Adding storage profiles to VDC", "vdc_name", p.VdcName, "storage_profiles", p.StorageProfiles)
+			logger.DebugContext(ctx, "Adding storage profiles to VDC", "vdc_name", p.VdcName, "storage_profiles", p.StorageProfiles)
 
 			for _, sp := range p.StorageProfiles {
 				apiR.VDC.StorageProfiles = append(apiR.VDC.StorageProfiles, itypes.ApiRequestVDCStorageProfile{
@@ -199,12 +250,133 @@ func init() {
 				cav.SetBody(apiR),
 			)
 			if err != nil {
-				logger.Error("Failed to update VDC", "error", err)
-				return nil, err
+				return nil, fmt.Errorf("failed to add storage profiles to VDC %s: %w", p.VdcName, err)
 			}
 
 			return nil, nil
 		},
-		AutoGenerate: true,
+	})
+
+	// * DeleteStorageProfile
+	cmds.Register(commands.Command{
+		Namespace:          "VDC",
+		Resource:           "StorageProfile",
+		Verb:               "Delete",
+		ShortDocumentation: "Delete a VDC Storage Profile",
+		LongDocumentation:  "Delete a storage profile from a given VDC. You cannot delete the default storage profile, the last remaining profile, or a non-empty profile.",
+		AutoGenerate:       true,
+		ParamsType:         types.ParamsDeleteStorageProfile{},
+		ParamsSpecs: commands.ParamsSpecs{
+			commands.ParamsSpec{
+				Name:        "vdc_id",
+				Description: "ID of the VDC to delete the storage profile from",
+				Required:    false,
+				Validators: []commands.Validator{
+					commands.ValidatorRequiredIfParamIsNull("vdc_name"),
+					commands.ValidatorOmitempty(),
+					commands.ValidatorURN("vdc"),
+				},
+			},
+			commands.ParamsSpec{
+				Name:        "vdc_name",
+				Description: "Name of the VDC to delete the storage profile from",
+				Required:    false,
+				Example:     "my-vdc",
+				Validators: []commands.Validator{
+					commands.ValidatorRequiredIfParamIsNull("vdc_id"),
+					commands.ValidatorOmitempty(),
+				},
+			},
+			{
+				Name:        "storage_profiles.{index}.class",
+				Description: "Class of the storage profile to delete. This is the unique identifier of the storage profile to delete.",
+				Required:    true,
+				Example:     "gold",
+			},
+		},
+		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
+			cc := client.(*Client)
+			p := params.(types.ParamsDeleteStorageProfile)
+
+			logger := cc.logger.WithGroup("DeleteStorageProfile")
+
+			ep := endpoints.UpdateVdc()
+
+			// Use FastFailure to ensure VDC ID or Name are provided and valid
+			listSP, err := cc.ListStorageProfile(ctx, types.ParamsListStorageProfile{
+				VdcName: p.VdcName,
+				VdcId:   p.VdcId,
+			})
+			if err != nil {
+				return nil, err
+			}
+			if len(listSP.VDCS) == 0 {
+				return nil, errors.New("no VDC found with the provided ID or Name")
+			}
+			if len(listSP.VDCS) > 1 {
+				return nil, errors.New("multiple VDCs found with the provided ID or Name, please specify a unique VDC")
+			}
+
+			// Set the VDC ID and Name from the list response
+			vdc := listSP.VDCS[0]
+			p.VdcId = vdc.ID
+			p.VdcName = vdc.Name
+
+			// Check if the storage profile to delete is the only one left
+			if len(vdc.StorageProfiles) == 1 {
+				return nil, errors.New("cannot delete storage profile, at least one storage profile must exist for a VDC")
+			}
+
+			// Create api VDC request to delete all storage profiles
+			apiR := itypes.ApiRequestUpdateVDC{
+				VDC: itypes.ApiRequestUpdateVDCVDC{
+					Name: p.VdcName,
+				},
+			}
+
+			// Initialize the storage profiles slice in the API request
+			// This will be used to delete the storage profile
+			// Note: Only the storage profiles to delete will be treated
+			// We will set the Limit to 0 to delete the storage profile
+			// and Default to false.
+			// As we cannot delete a default storage profile
+			// And we need to ensure that the storage profile is not the only one left in the VDC.
+			apiR.VDC.StorageProfiles = make([]itypes.ApiRequestVDCStorageProfile, 0, len(p.StorageProfiles))
+			for _, pSP := range p.StorageProfiles {
+				found := false
+				for _, sp := range vdc.StorageProfiles {
+					if sp.Class == pSP.Class {
+						found = true
+						if sp.Default {
+							return nil, errors.Newf("cannot delete the default storage profile %s from VDC %s", sp.Class, p.VdcName)
+						}
+						if sp.Used > 0 {
+							return nil, errors.Newf("cannot delete a non-empty storage profile %s from VDC %s", sp.Class, p.VdcName)
+						}
+						logger.DebugContext(ctx, "Deleting storage profile from VDC", "vdc_name", p.VdcName, "storage_profile_class", sp.Class)
+						apiR.VDC.StorageProfiles = append(apiR.VDC.StorageProfiles, itypes.ApiRequestVDCStorageProfile{
+							Class:   pSP.Class,
+							Limit:   0,
+							Default: false,
+						})
+					}
+				}
+				if !found {
+					return nil, errors.Newf("storage profile class %s not found in VDC %s", pSP.Class, p.VdcName)
+				}
+			}
+
+			_, err = cc.c.Do(
+				ctx,
+				ep,
+				cav.WithPathParam(ep.PathParams[0], p.VdcName),
+				cav.SetBody(apiR),
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to remove storage profile(s) from VDC %s: %w", p.VdcName, err)
+			}
+			logger.DebugContext(ctx, "Storage profile deleted successfully", "vdc_name", p.VdcName, "storage_profile_class", p.StorageProfiles[0].Class)
+			return nil, nil
+		},
 	})
 }

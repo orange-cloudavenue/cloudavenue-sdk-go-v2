@@ -12,10 +12,9 @@ package vdc
 import (
 	"regexp"
 
-	"github.com/orange-cloudavenue/common-go/utils"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
+	"github.com/orange-cloudavenue/common-go/utils"
 )
 
 var vdcRules = commands.NewRules([]commands.ConditionalRule{

@@ -110,10 +110,16 @@ type (
 		StorageProfiles []ParamsCreateVDCStorageProfile
 	}
 
+	// ParamsCreateVDCStorageProfile defines the parameters for creating a storage profile in a VDC.
 	ParamsCreateVDCStorageProfile struct {
 		Class   string
 		Limit   int
 		Default bool
+	}
+
+	// ParamsDeleteVDCStorageProfile defines the parameters for deleting a storage profile from a VDC.
+	ParamsDeleteVDCStorageProfile struct {
+		Class string
 	}
 
 	ParamsUpdateVDC struct {
