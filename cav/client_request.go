@@ -17,6 +17,35 @@ import (
 	"resty.dev/v3"
 )
 
+// NewRawRequest creates a new raw request using the resty client.
+func (c *client) NewRawRequest(ctx context.Context, subclientName string) (req *resty.Request, err error) {
+	// Retrieve the subclient based on the provided client name.
+	// This method identifies the subclient and returns it.
+
+	// Retrieve the subclient based on the provided client name.
+	// This method identifies the subclient and returns it.
+	sc, err := c.identifyClient(ctx, subClientName(subclientName))
+	if err != nil {
+		return nil, err
+	}
+
+	// Inject the client name into the context for retrieval in the other methods.
+	ctxv := context.WithValue(ctx, contextKeyClientName, subClientName(subclientName))
+
+	// Setup the HTTP client for the request.
+	// This client is used to send the request and handle the response.
+	hC, err := sc.newHTTPClient(ctxv)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a new request with the context and options.
+	hR := hC.NewRequest().
+		SetContext(ctxv)
+
+	return hR, nil
+}
+
 // NewRequest creates a new request using the resty client.
 func (c *client) NewRequest(ctx context.Context, endpoint *Endpoint, _ ...RequestOption) (req *resty.Request, err error) {
 	// Retrieve the subclient based on the provided client name.
