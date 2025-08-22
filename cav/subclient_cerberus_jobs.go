@@ -102,9 +102,12 @@ func (v *cerberus) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts
 	}
 
 	reqOpts = append(reqOpts,
-		SetCustomRestyOption(func(r *resty.Request) { r.SetError(&cerberusError{}) }),
+		SetCustomRestyOption(
+			func(r *resty.Request) {
+				r.SetError(&cerberusError{})
+				r.SetResult(&CerberusJobAPIResponse{})
+			}),
 		WithPathParam(ep.PathParams[0], urn.ExtractUUID(job.ID)),
-		OverrideSetResult(CerberusJobAPIResponse{}),
 	)
 
 	respR, err := ep.requestInternalFunc(resp.Request.Context(), httpC, ep, reqOpts...)

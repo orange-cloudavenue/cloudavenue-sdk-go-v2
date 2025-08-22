@@ -31,6 +31,8 @@ type (
 		// JobStatusParser returns the job status.
 		// This method is used to get the job status from the response body.
 		JobStatusParser(status string) (s JobStatus, err error)
+
+		idempotentRetryCondition() resty.RetryConditionFunc
 	}
 )
 
@@ -64,7 +66,15 @@ func newJobMiddleware(httpC *resty.Client, c jobsInterface, jobOpts *JobOptions)
 			// Set retry conditions for the job status check.
 			// This will retry the request based on the job status and error conditions.
 			// TODO setstrategyRetry to use poolInterval and not jitter
-			SetCustomRestyOption(func(r *resty.Request) { r.SetRetryConditions(jobRetryCondition(c)) }),
+			SetCustomRestyOption(
+				func(r *resty.Request) {
+					r.SetRetryConditions(
+						// First, check if the request is busy.
+						c.idempotentRetryCondition(),
+						// Then, check if the job is still running.
+						jobRetryCondition(c),
+					)
+				}),
 			SetCustomRestyOption(func(r *resty.Request) { r.SetRetryWaitTime(jobOpts.PollInterval) }),
 			SetCustomRestyOption(func(r *resty.Request) { r.SetRetryMaxWaitTime(jobOpts.Timeout) }),
 			// Set the maximum number of retries based on the timeout and poll interval. E.g. if timeout is 5 minutes and poll interval is 15 seconds,
@@ -73,6 +83,11 @@ func newJobMiddleware(httpC *resty.Client, c jobsInterface, jobOpts *JobOptions)
 			SetCustomRestyOption(func(r *resty.Request) { r.SetRetryCount(int(jobOpts.Timeout / jobOpts.PollInterval)) }),
 			SetCustomRestyOption(func(r *resty.Request) { r.SetTimeout(jobOpts.Timeout) }),
 		)
+
+		if ok := c.idempotentRetryCondition()(resp, nil); ok {
+			// If the response match with the retry Condition (BUSY) bypass jobMiddleware
+			return nil
+		}
 
 		// Use the subclient's JobRefresh method to refresh the job status.
 		// This method will handle the job response and return the updated job status.
