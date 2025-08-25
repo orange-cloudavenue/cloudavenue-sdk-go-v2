@@ -1,0 +1,60 @@
+/*
+ * SPDX-FileCopyrightText: Copyright (c) 2025 Orange
+ * SPDX-License-Identifier: Mozilla Public License 2.0
+ *
+ * This software is distributed under the MPL-2.0 license.
+ * the text of which is available at https://www.mozilla.org/en-US/MPL/2.0/
+ * or see the "LICENSE" file for more details.
+ */
+
+package v1
+
+import (
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
+)
+
+// Commandes CRUD pour Organization
+
+var GetOrganization = commands.Command{
+	Namespace:          "org",
+	Resource:           "organization",
+	Verb:               "get",
+	ShortDocumentation: "Get an organization by ID.",
+	ParamsType: struct {
+		ID string `json:"id"`
+	}{},
+	ModelType: types.ModelListOrganization{},
+	// RunnerFunc: à implémenter
+}
+
+var CreateOrganization = commands.Command{
+	Namespace:          "org",
+	Resource:           "organization",
+	Verb:               "create",
+	ShortDocumentation: "Create a new organization.",
+	ParamsType:         org.CreateOrganizationRequest{},
+	ModelType:          org.Organization{},
+	// RunnerFunc: à implémenter
+}
+
+var UpdateOrganization = commands.Command{
+	Namespace:          "org",
+	Resource:           "organization",
+	Verb:               "update",
+	ShortDocumentation: "Update an existing organization.",
+	ParamsType:         org.UpdateOrganizationRequest{},
+	ModelType:          org.Organization{},
+	// RunnerFunc: à implémenter
+}
+
+var DeleteOrganization = commands.Command{
+	Namespace:          "org",
+	Resource:           "organization",
+	Verb:               "delete",
+	ShortDocumentation: "Delete an organization by ID.",
+	ParamsType: struct {
+		ID string `json:"id"`
+	}{},
+	// RunnerFunc: à implémenter
+}
