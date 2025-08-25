@@ -54,12 +54,7 @@ func newClient() (cav.Client, error) {
 		)
 	}
 
-	path := configFile
-	if path == "" {
-		path = defaultConfigPath()
-	}
-
-	config, err := loadConfig(path)
+	config, err := loadConfig()
 	if err != nil {
 		return nil, err
 	}

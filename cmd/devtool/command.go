@@ -13,12 +13,15 @@ import (
 	"context"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/log"
-	"github.com/niemeyer/pretty"
+	"github.com/k0kubun/pp/v3"
 	"github.com/spf13/cobra"
 
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/edgegateway/v1"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/vdc/v1"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/vdcgroup/v1"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
 )
 
@@ -78,18 +81,26 @@ var commandCmd = &cobra.Command{
 
 		log.Info("Executing command", "namespace", command.GetNamespace(), "resource", command.GetResource(), "verb", command.GetVerb())
 
-		rType := reflect.TypeOf(command.ParamsType)
-		rVal := reflect.New(rType).Elem()
+		// Init rVal with reflect Value nil
+		rVal := reflect.ValueOf(nil)
 
-		for paramName, paramValue := range commandParams {
-			if err := commands.StoreValueAtPath(rVal.Addr().Interface(), paramName, paramValue); err != nil {
-				log.Error("Error storing parameter value", "param", paramName, "error", err)
-				return
+		if command.ParamsType != nil {
+
+			rType := reflect.TypeOf(command.ParamsType)
+			// Override rVal with a new instance of the command's ParamsType
+			rVal = reflect.New(rType).Elem()
+
+			for paramName, paramValue := range commandParams {
+				if err := commands.StoreValueAtPath(rVal.Addr().Interface(), paramName, paramValue); err != nil {
+					log.Error("Error storing parameter value", "param", paramName, "error", err)
+					return
+				}
 			}
-		}
 
-		log.Info("Parameters set")
-		pretty.Print(rVal.Interface())
+			log.Info("Parameters set")
+			pp.Println(rVal.Interface())
+
+		}
 
 		client, err := newClient()
 		if err != nil {
@@ -97,10 +108,17 @@ var commandCmd = &cobra.Command{
 			return
 		}
 
-		vdcClient, err := vdc.New(client)
-		if err != nil {
-			log.Error("Error creating VDC client", "error", err)
-			return
+		var cmdClient any
+
+		switch strings.ToLower(command.GetNamespace()) {
+		case "vdc":
+			cmdClient, _ = vdc.New(client)
+		case "edgegateway", "t0":
+			cmdClient, _ = edgegateway.New(client)
+		case "vdcgroup":
+			cmdClient, _ = vdcgroup.New(client)
+		default:
+			log.Error("Unknown namespace", "namespace", command.GetNamespace())
 		}
 
 		// Call the command's RunnerFunc if defined
@@ -109,13 +127,22 @@ var commandCmd = &cobra.Command{
 			return
 		}
 		log.Info("Running command")
-		result, err := command.Run(context.Background(), vdcClient, rVal.Interface())
+		var (
+			result any
+		)
+		cancel := spinner("Waiting...", monkeys, 200*time.Millisecond)
+		if !rVal.IsValid() {
+			result, err = command.Run(context.Background(), cmdClient, nil)
+		} else {
+			result, err = command.Run(context.Background(), cmdClient, rVal.Interface())
+		}
+		cancel()
 		if err != nil {
 			log.Error("Error executing command", "error", err)
 			return
 		}
 
-		pretty.Print(result)
+		pp.Println(result)
 	},
 }
 

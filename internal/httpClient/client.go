@@ -13,11 +13,13 @@ import (
 	"resty.dev/v3"
 )
 
+var DebugMode bool
+
 func NewHTTPClient() *resty.Client {
 	return resty.New().
 		SetLogger(logger()).
 		SetHeader("User-Agent", "GoCloudAvenueSDK/2.0").
-		SetResponseBodyUnlimitedReads(true)
-	// SetDebug(true).
-	// SetTrace(true)
+		SetResponseBodyUnlimitedReads(true).
+		SetDebug(DebugMode).
+		SetTrace(DebugMode)
 }

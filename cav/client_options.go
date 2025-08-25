@@ -10,9 +10,11 @@
 package cav
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 
+	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/httpClient"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/xlog"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )
@@ -98,6 +100,9 @@ func WithLogger(customLogger *slog.Logger) ClientOption {
 	return func(_ *settings) error {
 		xlog.SetGlobalLogger(customLogger)
 		xlogger = customLogger
+		if xlogger.Enabled(context.Background(), slog.LevelDebug) {
+			httpclient.DebugMode = true
+		}
 		return nil
 	}
 }
