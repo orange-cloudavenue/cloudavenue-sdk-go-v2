@@ -49,8 +49,9 @@ require (
 	github.com/muesli/roff v0.1.0 // indirect
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/orange-cloudavenue/common-go/extractor v1.0.1 // indirect
-	github.com/orange-cloudavenue/common-go/generator v1.3.2 // indirect
+	github.com/orange-cloudavenue/common-go/generator v1.3.4 // indirect
 	github.com/orange-cloudavenue/common-go/internal/regex v0.0.0-20250812201424-07c3423160b3 // indirect
+	github.com/orange-cloudavenue/common-go/regex v1.1.1 // indirect
 	github.com/orange-cloudavenue/common-go/strcase v1.0.0 // indirect
 	github.com/orange-cloudavenue/common-go/urn v1.2.0 // indirect
 	github.com/orange-cloudavenue/common-go/utils v1.0.0 // indirect

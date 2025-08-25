@@ -348,7 +348,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:f6bb6795-aff1-4583-a453-f6d1034ad484",
+                "example": "urn:vcloud:gateway:e592b650-88fb-4691-8edb-9c0fcd692429",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -377,7 +377,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:d2ab132d-7498-48aa-bc84-ed4a9256af16",
+                "example": "urn:vcloud:gateway:f37ebc3b-6f53-4c22-9922-e9da001e6486",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -1830,14 +1830,6 @@
             "markdown_documentation": "",
             "params": [
               {
-                "name": "vdc_id",
-                "description": "ID of the VDC to add the storage profile to",
-                "required": false,
-                "example": "",
-                "type": "string",
-                "validators_description": "The value is required if the parameter `vdc_name` is null., Validates that the value is a valid URN (`vdc`).. \n"
-              },
-              {
                 "name": "vdc_name",
                 "description": "Name of the VDC to add the storage profile to",
                 "required": false,
@@ -1872,33 +1864,7 @@
             ],
             "deprecated": false,
             "deprecated_message": "",
-            "model": [
-              {
-                "object": "id",
-                "type": "string",
-                "documentation": ""
-              },
-              {
-                "object": "name",
-                "type": "string",
-                "documentation": ""
-              },
-              {
-                "object": "description",
-                "type": "string",
-                "documentation": ""
-              },
-              {
-                "object": "href",
-                "type": "string",
-                "documentation": ""
-              },
-              {
-                "object": "status",
-                "type": "cav.JobStatus",
-                "documentation": ""
-              }
-            ],
+            "model": null,
             "rules": [
               {
                 "consoles": null,
@@ -1974,48 +1940,103 @@
               }
             ]
           },
+          "Delete": {
+            "namespace": "VDC",
+            "resource": "StorageProfile",
+            "verb": "Delete",
+            "short_documentation": "Delete a VDC Storage Profile",
+            "long_documentation": "Delete a storage profile from a given VDC. You cannot delete the default storage profile, the last remaining profile, or a non-empty profile.",
+            "markdown_documentation": "",
+            "params": [
+              {
+                "name": "vdc_name",
+                "description": "Name of the VDC to delete the storage profile from",
+                "required": false,
+                "example": "my-vdc",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `vdc_id` is null., "
+              },
+              {
+                "name": "storage_profiles.{index}.class",
+                "description": "Class of the storage profile to delete. This is the unique identifier of the storage profile to delete.",
+                "required": true,
+                "example": "gold",
+                "type": "string",
+                "validators_description": ""
+              }
+            ],
+            "deprecated": false,
+            "deprecated_message": "",
+            "model": null
+          },
           "List": {
             "namespace": "VDC",
             "resource": "StorageProfile",
             "verb": "List",
             "short_documentation": "List VDC Storage Profiles",
-            "long_documentation": "List of storage profiles available in a specific VDC.",
+            "long_documentation": "List of storage profiles. If no filters are applied, all Storage Profiles for all VDCs are displayed. You can filter by either ID or Name of the storage profile, and you can also filter by either VDC ID or VDC Name. You can combine a storage profile filter (ID or Name) with a VDC filter (ID or Name). If both ID and Name are provided, they must refer to the same object; otherwise, the result will be empty.",
             "markdown_documentation": "",
             "params": [
               {
                 "name": "id",
-                "description": "ID of the VDC to get",
-                "required": true,
+                "description": "ID of the storage profile to list",
+                "required": false,
                 "example": "",
                 "type": "string",
-                "validators_description": "Validates that the value is a valid URN (`vdc`).. \n"
+                "validators_description": "Validates that the value is a valid URN (`vdcstorageProfile`).. \n"
+              },
+              {
+                "name": "vdc_name",
+                "description": "Name of the VDC to get the storage profile from",
+                "required": false,
+                "example": "my-vdc",
+                "type": "string",
+                "validators_description": ""
+              },
+              {
+                "name": "name",
+                "description": "Name of the storage profile to list",
+                "required": false,
+                "example": "gold",
+                "type": "string",
+                "validators_description": ""
               }
             ],
             "deprecated": false,
             "deprecated_message": "",
             "model": [
               {
-                "object": "storage_profiles.{index}.id",
+                "object": "vdcs.{index}.id",
+                "type": "string",
+                "documentation": "ID of the VDC"
+              },
+              {
+                "object": "vdcs.{index}.name",
+                "type": "string",
+                "documentation": "Name of the VDC"
+              },
+              {
+                "object": "vdcs.{index}.storage_profiles.{index}.id",
                 "type": "string",
                 "documentation": "ID of the storage profile"
               },
               {
-                "object": "storage_profiles.{index}.class",
+                "object": "vdcs.{index}.storage_profiles.{index}.class",
                 "type": "string",
                 "documentation": "Name of the storage profile"
               },
               {
-                "object": "storage_profiles.{index}.limit",
+                "object": "vdcs.{index}.storage_profiles.{index}.limit",
                 "type": "int",
                 "documentation": "Limit of the storage profile in MB"
               },
               {
-                "object": "storage_profiles.{index}.used",
+                "object": "vdcs.{index}.storage_profiles.{index}.used",
                 "type": "int",
                 "documentation": "Used storage of the storage profile in MB"
               },
               {
-                "object": "storage_profiles.{index}.default",
+                "object": "vdcs.{index}.storage_profiles.{index}.default",
                 "type": "bool",
                 "documentation": "Is this storage profile the default one?"
               }

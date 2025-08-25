@@ -21,6 +21,7 @@ import (
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/draas/v1"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/edgegateway/v1"
+	organization "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/org/v1"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/vdc/v1"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/vdcgroup/v1"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
@@ -120,6 +121,8 @@ var commandCmd = &cobra.Command{
 			cmdClient, _ = vdcgroup.New(client)
 		case "draas":
 			cmdClient, _ = draas.New(client)
+		case "org":
+			cmdClient, _ = organization.New(client)
 		default:
 			log.Error("Unknown namespace", "namespace", command.GetNamespace())
 		}
