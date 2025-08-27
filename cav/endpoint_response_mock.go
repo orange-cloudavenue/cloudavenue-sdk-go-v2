@@ -118,7 +118,7 @@ var defaultMockResponseFunc = func(ep *Endpoint) http.HandlerFunc {
 			}
 		}
 
-		xlogger.WithGroup("mock").With("endpoint", ep.Name).Debug("Generated mock response body", slog.Any("body", newBody))
+		xlogger.WithGroup("mock").With("endpoint", ep.Name).Debug("Mock response body", slog.Any("body", newBody))
 
 		bodyEncoded, err := json.Marshal(newBody)
 		if err != nil {

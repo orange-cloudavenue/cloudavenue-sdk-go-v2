@@ -35,7 +35,7 @@ func (v *vmware) getID() string {
 // NewClient creates a new request for the VMware subclient.
 func (v *vmware) newHTTPClient(ctx context.Context) (*resty.Client, error) {
 	// Create a new HTTP client with the base URL and headers.
-	v.httpClient = httpclient.NewHTTPClient().
+	hC := httpclient.NewHTTPClient().
 		SetBaseURL(v.console.GetAPIVCDEndpoint()).
 		SetHeader("Accept", "application/json;version="+vmwareVCDVersion).
 		SetError(vmwareError{})
@@ -48,18 +48,14 @@ func (v *vmware) newHTTPClient(ctx context.Context) (*resty.Client, error) {
 		}
 	}
 
-	v.httpClient.
+	hC.
 		SetHeaders(v.credential.Headers())
 
-	return v.httpClient, nil
+	return hC, nil
 }
 
 // Close closes the VMware client and releases any resources.
 func (v *vmware) close() error {
-	// Close the HTTP client if it was created.
-	if v.httpClient != nil {
-		return v.httpClient.Close()
-	}
 	return nil
 }
 

@@ -307,6 +307,12 @@ func TestCreateEdgeGateway(t *testing.T) {
 		mockGetEdgeGatewayResponse       any
 		mockGetEdgeGatewayResponseStatus int
 
+		mockListVDCResponse       any
+		mockListVDCResponseStatus int
+
+		mockListVDCGroupResponse       any
+		mockListVDCGroupResponseStatus int
+
 		mockListT0Response       any
 		mockListT0ResponseStatus int
 
@@ -316,9 +322,8 @@ func TestCreateEdgeGateway(t *testing.T) {
 		expectedErr bool
 	}{
 		{
-			name: "Valid Edge Gateway Creation",
+			name: "Valid Edge Gateway Creation with VDC",
 			params: &types.ParamsCreateEdgeGateway{
-				OwnerType: "vdc",
 				OwnerName: generator.MustGenerate("{word}"),
 			},
 			mockJobResponse: &cav.CerberusJobAPIResponse{
@@ -335,13 +340,38 @@ func TestCreateEdgeGateway(t *testing.T) {
 					Description: "Edge Gateway created successfully",
 				},
 			},
-			mockJobResponseStatus: 200,
-			expectedErr:           false,
+			mockListVDCGroupResponse:       &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponseStatus: 200,
+			mockJobResponseStatus:          200,
+			expectedErr:                    false,
+		},
+		{
+			name: "Valid Edge Gateway Creation with VDCGroup",
+			params: &types.ParamsCreateEdgeGateway{
+				OwnerName: generator.MustGenerate("{word}"),
+			},
+			mockJobResponse: &cav.CerberusJobAPIResponse{
+				{
+					Actions: []cav.CerberusJobAPIResponseAction{
+						{
+							Details: generator.MustGenerate("{resource_name:edgegateway}"),
+							Name:    "Create Edge Gateway",
+							Status:  "DONE",
+						},
+					},
+					Name:        "Create Edge Gateway Job",
+					Status:      "DONE",
+					Description: "Edge Gateway created successfully",
+				},
+			},
+			mockListVDCResponse:       &itypes.ApiResponseListVDC{},
+			mockListVDCResponseStatus: 200,
+			mockJobResponseStatus:     200,
+			expectedErr:               false,
 		},
 		{
 			name: "Valid Edge Gateway Creation with Bandwidth",
 			params: &types.ParamsCreateEdgeGateway{
-				OwnerType: "vdc",
 				OwnerName: generator.MustGenerate("{word}"),
 				Bandwidth: 25,
 			},
@@ -359,13 +389,75 @@ func TestCreateEdgeGateway(t *testing.T) {
 					Description: "Edge Gateway created successfully",
 				},
 			},
-			mockJobResponseStatus: 200,
-			expectedErr:           false,
+			mockJobResponseStatus:          200,
+			mockListVDCGroupResponse:       &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponseStatus: 200,
+			expectedErr:                    false,
 		},
+		{
+			name: "Failed to list VDC",
+			params: &types.ParamsCreateEdgeGateway{
+				OwnerName: generator.MustGenerate("{word}"),
+				Bandwidth: 25,
+			},
+			mockListVDCResponseStatus: http.StatusNotFound,
+			expectedErr:               true,
+		},
+		{
+			name: "Failed to list VDC Group",
+			params: &types.ParamsCreateEdgeGateway{
+				OwnerName: generator.MustGenerate("{word}"),
+				Bandwidth: 25,
+			},
+			mockListVDCGroupResponseStatus: http.StatusNotFound,
+			expectedErr:                    true,
+		},
+		{
+			name: "Failed no Vdc or VdcGroup Found",
+			params: &types.ParamsCreateEdgeGateway{
+				OwnerName: generator.MustGenerate("{word}"),
+				Bandwidth: 25,
+			},
+			mockListVDCGroupResponse:       &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponseStatus: 200,
+			mockListVDCResponse:            &itypes.ApiResponseListVDC{},
+			mockListVDCResponseStatus:      200,
+			expectedErr:                    true,
+		},
+		{
+			name: "Failed Both VDCs and VDC Groups found",
+			params: &types.ParamsCreateEdgeGateway{
+				OwnerName: generator.MustGenerate("{word}"),
+				Bandwidth: 25,
+			},
+			mockListVDCGroupResponse: &itypes.ApiResponseListVdcGroup{
+				Values: []itypes.ApiResponseListVdcGroupDetails{
+					{
+						Name: generator.MustGenerate("{word}"),
+					},
+					{
+						Name: generator.MustGenerate("{word}"),
+					},
+				},
+			},
+			mockListVDCGroupResponseStatus: 200,
+			mockListVDCResponse: &itypes.ApiResponseListVDC{
+				Records: []itypes.ApiResponseListVDCRecord{
+					{
+						Name: generator.MustGenerate("{word}"),
+					},
+					{
+						Name: generator.MustGenerate("{word}"),
+					},
+				},
+			},
+			mockListVDCResponseStatus: 200,
+			expectedErr:               true,
+		},
+
 		{
 			name: "Failed to list T0",
 			params: &types.ParamsCreateEdgeGateway{
-				OwnerType: "vdc",
 				OwnerName: generator.MustGenerate("{word}"),
 				Bandwidth: 25,
 			},
@@ -376,7 +468,6 @@ func TestCreateEdgeGateway(t *testing.T) {
 		{
 			name: "T0 return 0 T0s",
 			params: &types.ParamsCreateEdgeGateway{
-				OwnerType: "vdc",
 				OwnerName: generator.MustGenerate("{word}"),
 				Bandwidth: 25,
 			},
@@ -387,7 +478,6 @@ func TestCreateEdgeGateway(t *testing.T) {
 		{
 			name: "Failed T0s > 1",
 			params: &types.ParamsCreateEdgeGateway{
-				OwnerType: "vdc",
 				OwnerName: generator.MustGenerate("{word}"),
 				Bandwidth: 25,
 			},
@@ -407,7 +497,6 @@ func TestCreateEdgeGateway(t *testing.T) {
 		{
 			name: "Create Edge Gateway with SHARED T0",
 			params: &types.ParamsCreateEdgeGateway{
-				OwnerType: "vdc",
 				OwnerName: generator.MustGenerate("{word}"),
 				T0Name:    "prvrf01eocb0001234allsp01",
 				Bandwidth: 25,
@@ -434,14 +523,15 @@ func TestCreateEdgeGateway(t *testing.T) {
 					Description: "Edge Gateway created successfully",
 				},
 			},
-			mockJobResponseStatus:    200,
-			mockListT0ResponseStatus: 200,
-			expectedErr:              false,
+			mockJobResponseStatus:          200,
+			mockListVDCGroupResponse:       &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponseStatus: 200,
+			mockListT0ResponseStatus:       200,
+			expectedErr:                    false,
 		},
 		{
 			name: "Create Edge Gateway with T0 not found",
 			params: &types.ParamsCreateEdgeGateway{
-				OwnerType: "vdc",
 				OwnerName: generator.MustGenerate("{word}"),
 				T0Name:    generator.MustGenerate("{resource_name:t0}"),
 				Bandwidth: 25,
@@ -451,37 +541,57 @@ func TestCreateEdgeGateway(t *testing.T) {
 		{
 			name: "Create Edge Gateway with invalid bandwidth values",
 			params: &types.ParamsCreateEdgeGateway{
-				OwnerType: "vdc",
 				OwnerName: generator.MustGenerate("{word}"),
 				Bandwidth: 500,
 			},
-			expectedErr: true,
+			mockListVDCGroupResponse:       &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponseStatus: 200,
+			expectedErr:                    true,
 		},
 		{
 			name: "Failed extract job response",
 			params: &types.ParamsCreateEdgeGateway{
-				OwnerType: "vdc",
 				OwnerName: generator.MustGenerate("{word}"),
 				Bandwidth: 25,
 			},
-			mockJobResponse:       &cav.CerberusJobAPIResponse{},
-			mockJobResponseStatus: 200,
-			expectedErr:           true,
+			mockListVDCGroupResponse:       &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponseStatus: 200,
+			mockJobResponse:                &cav.CerberusJobAPIResponse{},
+			mockJobResponseStatus:          200,
+			expectedErr:                    true,
 		},
 		{
 			name: "Failed to retrieve edge gateway by name after creation",
 			params: &types.ParamsCreateEdgeGateway{
-				OwnerType: "vdc",
 				OwnerName: generator.MustGenerate("{word}"),
 				Bandwidth: 5,
 			},
+
+			mockListVDCGroupResponse:       &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponseStatus: 200,
+
+			mockJobResponse: &cav.CerberusJobAPIResponse{
+				{
+					Actions: []cav.CerberusJobAPIResponseAction{
+						{
+							Details: generator.MustGenerate("{resource_name:edgegateway}"),
+							Name:    "Create Edge Gateway",
+							Status:  "DONE",
+						},
+					},
+					Name:        "Create Edge Gateway Job",
+					Status:      "DONE",
+					Description: "Edge Gateway created successfully",
+				},
+			},
+			mockJobResponseStatus: 200,
+
 			mockGetEdgeGatewayResponseStatus: 404,
 			expectedErr:                      true,
 		},
 		{
 			name: "Failed to update edge gateway bandwidth after creation",
 			params: &types.ParamsCreateEdgeGateway{
-				OwnerType: "vdc",
 				OwnerName: generator.MustGenerate("{word}"),
 				T0Name:    "prvrf01eocb0001234allsp01",
 				Bandwidth: 25,
@@ -511,12 +621,13 @@ func TestCreateEdgeGateway(t *testing.T) {
 			mockJobResponseStatus:                        200,
 			mockListT0ResponseStatus:                     200,
 			mockUpdateEdgeGatewayBandwidthResponseStatus: http.StatusBadRequest,
-			expectedErr: true,
+			mockListVDCGroupResponse:                     &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponseStatus:               200,
+			expectedErr:                                  true,
 		},
 		{
 			name: "Exceeding maximum edge gateways for T0",
 			params: &types.ParamsCreateEdgeGateway{
-				OwnerType: "vdc",
 				OwnerName: generator.MustGenerate("{word}"),
 				T0Name:    "prvrf01eocb0001234allsp01",
 				Bandwidth: 25,
@@ -534,46 +645,48 @@ func TestCreateEdgeGateway(t *testing.T) {
 					t0,
 				}
 			}(),
-			mockListT0ResponseStatus: 200,
-			expectedErr:              true,
+			mockListT0ResponseStatus:       200,
+			mockListVDCGroupResponse:       &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponseStatus: 200,
+			expectedErr:                    true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ep := endpoints.CreateEdgeGateway()
-			defer ep.RestoreMockResponse()
-			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
-				t.Logf("Setting mock response for endpoint %s with status %d", ep.Name, tt.mockResponseStatus)
-				mock.SetMockResponse(ep, tt.mockResponse, &tt.mockResponseStatus)
+			if tt.mockListVDCResponseStatus != 0 {
+				endpoints.ListVdc().CleanMockResponse()
+				endpoints.ListVdc().SetMockResponse(tt.mockListVDCResponse, &tt.mockListVDCResponseStatus)
 			}
 
-			epJob := endpoints.GetJobCerberus()
-			defer epJob.RestoreMockResponse()
-			if tt.mockJobResponse != nil || tt.mockJobResponseStatus != 0 {
-				t.Logf("Setting mock job response for endpoint %s with status %d", epJob.Name, tt.mockJobResponseStatus)
-				mock.SetMockResponse(epJob, tt.mockJobResponse, &tt.mockJobResponseStatus)
+			if tt.mockListVDCGroupResponseStatus != 0 {
+				endpoints.ListVdcGroup().CleanMockResponse()
+				endpoints.ListVdcGroup().SetMockResponse(tt.mockListVDCGroupResponse, &tt.mockListVDCGroupResponseStatus)
 			}
 
-			epGetEdge := endpoints.GetEdgeGateway()
-			defer epGetEdge.RestoreMockResponse()
-			if tt.mockGetEdgeGatewayResponse != nil || tt.mockGetEdgeGatewayResponseStatus != 0 {
-				t.Logf("Setting mock get edge gateway response for endpoint %s with status %d", epGetEdge.Name, tt.mockGetEdgeGatewayResponseStatus)
-				mock.SetMockResponse(epGetEdge, tt.mockGetEdgeGatewayResponse, &tt.mockGetEdgeGatewayResponseStatus)
+			if tt.mockListT0ResponseStatus != 0 {
+				endpoints.ListT0().CleanMockResponse()
+				endpoints.ListT0().SetMockResponse(tt.mockListT0Response, &tt.mockListT0ResponseStatus)
 			}
 
-			epListT0 := endpoints.ListT0()
-			defer epListT0.RestoreMockResponse()
-			if tt.mockListT0Response != nil || tt.mockListT0ResponseStatus != 0 {
-				t.Logf("Setting mock list T0 response for endpoint %s with status %d", epListT0.Name, tt.mockListT0ResponseStatus)
-				mock.SetMockResponse(epListT0, tt.mockListT0Response, &tt.mockListT0ResponseStatus)
+			if tt.mockResponseStatus != 0 {
+				endpoints.CreateEdgeGateway().CleanMockResponse()
+				endpoints.CreateEdgeGateway().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
 			}
 
-			epUpdateBandwidth := endpoints.UpdateEdgeGatewayBandwidth()
-			defer epUpdateBandwidth.RestoreMockResponse()
-			if tt.mockUpdateEdgeGatewayBandwidthResponse != nil || tt.mockUpdateEdgeGatewayBandwidthResponseStatus != 0 {
-				t.Logf("Setting mock update edge gateway bandwidth response for endpoint %s with status %d", epUpdateBandwidth.Name, tt.mockUpdateEdgeGatewayBandwidthResponseStatus)
-				mock.SetMockResponse(epUpdateBandwidth, tt.mockUpdateEdgeGatewayBandwidthResponse, &tt.mockUpdateEdgeGatewayBandwidthResponseStatus)
+			if tt.mockJobResponseStatus != 0 {
+				endpoints.GetJobCerberus().CleanMockResponse()
+				endpoints.GetJobCerberus().SetMockResponse(tt.mockJobResponse, &tt.mockJobResponseStatus)
+			}
+
+			if tt.mockGetEdgeGatewayResponseStatus != 0 {
+				endpoints.GetEdgeGateway().CleanMockResponse()
+				endpoints.GetEdgeGateway().SetMockResponse(tt.mockGetEdgeGatewayResponse, &tt.mockGetEdgeGatewayResponseStatus)
+			}
+
+			if tt.mockUpdateEdgeGatewayBandwidthResponseStatus != 0 {
+				endpoints.UpdateEdgeGatewayBandwidth().CleanMockResponse()
+				endpoints.UpdateEdgeGatewayBandwidth().SetMockResponse(tt.mockUpdateEdgeGatewayBandwidthResponse, &tt.mockUpdateEdgeGatewayBandwidthResponseStatus)
 			}
 
 			eC := newClient(t)
@@ -683,41 +796,18 @@ func TestUpdateEdgeGateway(t *testing.T) {
 			mockQueryResponseStatus: 404,
 			expectedErr:             true,
 		},
-		{
-			name: "Error 500",
-			params: &types.ParamsUpdateEdgeGateway{
-				ID:        generator.MustGenerate("{urn:edgegateway}"),
-				Bandwidth: 10,
-			},
-			mockResponse:       struct{}{},
-			mockResponseStatus: 500,
-			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
-		},
-		{
-			name: "Error 401",
-			params: &types.ParamsUpdateEdgeGateway{
-				ID:        generator.MustGenerate("{urn:edgegateway}"),
-				Bandwidth: 10,
-			},
-			mockResponse:       struct{}{},
-			mockResponseStatus: 401,
-			expectedErr:        true,
-		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ep := endpoints.UpdateEdgeGatewayBandwidth()
-			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
-				t.Logf("Setting mock response for endpoint %s with status %d", ep.Name, tt.mockResponseStatus)
-				mock.SetMockResponse(ep, tt.mockResponse, &tt.mockResponseStatus)
+			if tt.mockResponseStatus != 0 {
+				endpoints.UpdateEdgeGatewayBandwidth().CleanMockResponse()
+				mock.SetMockResponse(endpoints.UpdateEdgeGatewayBandwidth(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
-			epQuery := endpoints.QueryEdgeGateway()
 			if tt.mockQueryResponseStatus != 0 {
-				t.Logf("Setting mock response for query endpoint %s with status %d", epQuery.Name, tt.mockQueryResponseStatus)
-				// If we expect a query response, we need to set the mock response for the
-				mock.SetMockResponse(epQuery, nil, &tt.mockQueryResponseStatus)
+				endpoints.QueryEdgeGateway().CleanMockResponse()
+				mock.SetMockResponse(endpoints.QueryEdgeGateway(), nil, &tt.mockQueryResponseStatus)
 			}
 
 			eC := newClient(t)

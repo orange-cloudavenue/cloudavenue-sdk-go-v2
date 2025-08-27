@@ -38,6 +38,9 @@ func init() {
 				Name:        "edgeId",
 				Description: "The ID of the edge gateway.",
 				Required:    true,
+				ValidatorFunc: func(value string) error {
+					return validators.New().Var(value, "urn=edgegateway")
+				},
 			},
 		},
 		BodyResponseType: itypes.ApiResponseEdgegateway{},
@@ -123,7 +126,7 @@ func init() {
 					case "vdc":
 						return "vdcs", nil
 					case "vdcgroup":
-						return "vdcgroups", nil
+						return "vdc-groups", nil
 					}
 					return "", fmt.Errorf("invalid vdc-type: %s", value)
 				},
