@@ -11,7 +11,7 @@ go 1.24.5
 // )
 
 require (
-	github.com/go-chi/chi/v5 v5.2.2
+	github.com/go-chi/chi/v5 v5.2.3
 	github.com/orange-cloudavenue/common-go/extractor v1.0.1
 	github.com/orange-cloudavenue/common-go/generator v1.3.2
 	github.com/orange-cloudavenue/common-go/strcase v1.0.0
