@@ -69,6 +69,8 @@ func convertStringToType(s string, t reflect.Type) (interface{}, error) {
 			return nil, err
 		}
 		return b, nil
+	case reflect.Ptr:
+		return convertStringToType(s, t.Elem())
 	default:
 		return nil, fmt.Errorf("unsupported map key type: %v", t)
 	}

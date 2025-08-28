@@ -15,7 +15,7 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
-// List all OnPremise IPs allowed for this organization's draas offer
+// List all OnPremise IPs allowed allowed for this organization's draas offer
 func (c *Client) ListOnPremiseIp(ctx context.Context) (*types.ModelListDraasOnPremise, error) {
 	x, err := cmds.Get("Draas", "OnPremiseIp", "List").Run(ctx, c, nil)
 	if err != nil {
@@ -23,15 +23,14 @@ func (c *Client) ListOnPremiseIp(ctx context.Context) (*types.ModelListDraasOnPr
 	}
 	return x.(*types.ModelListDraasOnPremise), nil
 }
-
-// Add a new OnPremise IP address to this organization's draas offer
+// Add a new OnPremise IP (only IPV4) address to this organization's draas offer
 func (c *Client) AddOnPremiseIp(ctx context.Context, params types.ParamsAddDraasOnPremiseIP) error {
 	_, err := cmds.Get("Draas", "OnPremiseIp", "Add").Run(ctx, c, params)
 	return err
 }
-
 // Remove an existing OnPremise IP address from this organization's draas offer
 func (c *Client) RemoveOnPremiseIp(ctx context.Context, params types.ParamsRemoveDraasOnPremiseIP) error {
 	_, err := cmds.Get("Draas", "OnPremiseIp", "Remove").Run(ctx, c, params)
 	return err
 }
+

@@ -92,7 +92,7 @@ func GetValueAtPath(params interface{}, path string) (interface{}, error) {
 	// Dereference if final value is a pointer
 	val = derefValue(val)
 	if val.Kind() == reflect.Ptr && val.IsNil() {
-		return nil, errors.New("final value is nil pointer")
+		return nil, errors.New("getvalueatpath: final value is nil pointer")
 	}
 
 	return val.Interface(), nil
@@ -196,22 +196,20 @@ func StoreValueAtPath(params interface{}, path, value string) error {
 		}
 	}
 
-	// Dereference if final value is a pointer
+	// Dereference if final value is a pointer and not nil
 	val = derefValue(val)
-	if val.Kind() == reflect.Ptr && val.IsNil() {
-		return errors.New("final value is nil pointer")
-	}
 
-	switch val.Kind() {
-	case reflect.String:
-		val.Set(reflect.ValueOf(value))
-	default:
-		x, err := convertStringToType(value, val.Type())
-		if err != nil {
-			return fmt.Errorf("cannot convert value '%s' to type %s: %w", value, val.Type(), err)
-		}
+	x, err := convertStringToType(value, val.Type())
+	if err != nil {
+		return fmt.Errorf("cannot convert value '%s' to type %s: %w", value, val.Type(), err)
+	}
+	if val.Kind() == reflect.Ptr {
+		// Pour les pointeurs, créer un nouveau pointer vers la valeur convertible
+		ptr := reflect.New(val.Type().Elem())
+		ptr.Elem().Set(reflect.ValueOf(x))
+		val.Set(ptr)
+	} else {
 		val.Set(reflect.ValueOf(x))
-		return nil
 	}
 
 	return nil
