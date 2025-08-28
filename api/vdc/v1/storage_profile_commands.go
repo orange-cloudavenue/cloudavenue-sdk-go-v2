@@ -91,8 +91,8 @@ func init() {
 			if p.Name != "" {
 				filters = append(filters, "name=="+p.Name)
 			}
-			if p.VdcId != "" {
-				filters = append(filters, "vdc=="+p.VdcId)
+			if p.VdcID != "" {
+				filters = append(filters, "vdc=="+p.VdcID)
 			}
 			if p.VdcName != "" {
 				filters = append(filters, "vdcName=="+p.VdcName)
@@ -197,7 +197,7 @@ func init() {
 			p := paramsIn.(types.ParamsAddStorageProfile)
 
 			vdc, err := cc.GetVDC(ctx, types.ParamsGetVDC{
-				ID:   p.VdcId,
+				ID:   p.VdcID,
 				Name: p.VdcName,
 			})
 			if err != nil {
@@ -305,7 +305,7 @@ func init() {
 			// Use FastFailure to ensure VDC ID or Name are provided and valid
 			listSP, err := cc.ListStorageProfile(ctx, types.ParamsListStorageProfile{
 				VdcName: p.VdcName,
-				VdcId:   p.VdcId,
+				VdcID:   p.VdcID,
 			})
 			if err != nil {
 				return nil, err
@@ -319,7 +319,7 @@ func init() {
 
 			// Set the VDC ID and Name from the list response
 			vdc := listSP.VDCS[0]
-			p.VdcId = vdc.ID
+			p.VdcID = vdc.ID
 			p.VdcName = vdc.Name
 
 			// Check if the storage profile to delete is the only one left

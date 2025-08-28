@@ -17,8 +17,11 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 
 	// Force import of all commands to register them
+	_ "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/draas/v1"
 	_ "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/edgegateway/v1"
+	_ "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/organization/v1"
 	_ "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/vdc/v1"
+	_ "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/vdcgroup/v1"
 )
 
 // NewRegistry get the global command registry

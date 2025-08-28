@@ -1,4 +1,80 @@
 {
+  "Draas": {
+    "Title": "Draas",
+    "Documentation": "",
+    "MarkdownDocumentation": "",
+    "Commands": {},
+    "SubFunctionality": {
+      "OnPremiseIp": {
+        "Title": "OnPremiseIp",
+        "Documentation": "",
+        "MarkdownDocumentation": "",
+        "Commands": {
+          "Add": {
+            "namespace": "Draas",
+            "resource": "OnPremiseIp",
+            "verb": "Add",
+            "short_documentation": "Add a new OnPremise IP",
+            "long_documentation": "Add a new OnPremise IP (only IPV4) address to this organization's draas offer",
+            "markdown_documentation": "",
+            "params": [
+              {
+                "name": "ip",
+                "description": "Your OnPremise IP address to authorize to the DRaaS offer",
+                "required": true,
+                "example": "195.25.13.4",
+                "type": "string",
+                "validators_description": "Validates that the value is a valid IPv4 address. (E.g. 192.168.1.1 or 203.0.113.0). \n"
+              }
+            ],
+            "deprecated": false,
+            "deprecated_message": "",
+            "model": null
+          },
+          "List": {
+            "namespace": "Draas",
+            "resource": "OnPremiseIp",
+            "verb": "List",
+            "short_documentation": "List all OnPremise IPs allowed",
+            "long_documentation": "List all OnPremise IPs allowed allowed for this organization's draas offer",
+            "markdown_documentation": "",
+            "params": null,
+            "deprecated": false,
+            "deprecated_message": "",
+            "model": [
+              {
+                "object": "i_ps.{index}",
+                "type": "string",
+                "documentation": "List of OnPremise IPs for this organization's draas offer"
+              }
+            ]
+          },
+          "Remove": {
+            "namespace": "Draas",
+            "resource": "OnPremiseIp",
+            "verb": "Remove",
+            "short_documentation": "Remove an existing OnPremise IP",
+            "long_documentation": "Remove an existing OnPremise IP address from this organization's draas offer",
+            "markdown_documentation": "",
+            "params": [
+              {
+                "name": "ip",
+                "description": "Your OnPremise IP address to remove from the DRaaS offer",
+                "required": true,
+                "example": "195.25.13.4",
+                "type": "string",
+                "validators_description": "Validates that the value is a valid IPv4 address. (E.g. 192.168.1.1 or 203.0.113.0). \n"
+              }
+            ],
+            "deprecated": false,
+            "deprecated_message": "",
+            "model": null
+          }
+        },
+        "SubFunctionality": {}
+      }
+    }
+  },
   "EdgeGateway": {
     "Title": "EdgeGateway",
     "Documentation": "",
@@ -348,7 +424,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:e592b650-88fb-4691-8edb-9c0fcd692429",
+                "example": "urn:vcloud:gateway:4bd78167-6850-4a7d-842c-c474a103d4e9",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -377,7 +453,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:f37ebc3b-6f53-4c22-9922-e9da001e6486",
+                "example": "urn:vcloud:gateway:1d9c015e-6a8b-4403-903d-9ca0b840c900",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -829,6 +905,203 @@
         "SubFunctionality": {}
       }
     }
+  },
+  "Organization": {
+    "Title": "Organization",
+    "Documentation": "",
+    "MarkdownDocumentation": "",
+    "Commands": {
+      "Get": {
+        "namespace": "Organization",
+        "resource": "",
+        "verb": "Get",
+        "short_documentation": "Get an organization information.",
+        "long_documentation": "Retrieve detailed information about your organization.",
+        "markdown_documentation": "",
+        "params": null,
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": [
+          {
+            "object": "id",
+            "type": "string",
+            "documentation": "URN of the organization in the format urn:vcloud:org:\u003cUUID\u003e"
+          },
+          {
+            "object": "name",
+            "type": "string",
+            "documentation": "Name of the organization"
+          },
+          {
+            "object": "display_name",
+            "type": "string",
+            "documentation": "Display name of the organization"
+          },
+          {
+            "object": "description",
+            "type": "string",
+            "documentation": "Description of the organization"
+          },
+          {
+            "object": "is_enabled",
+            "type": "bool",
+            "documentation": "Indicates if the organization is enabled"
+          },
+          {
+            "object": "resources.vdc",
+            "type": "int",
+            "documentation": "Number of Org VDCs"
+          },
+          {
+            "object": "resources.catalog",
+            "type": "int",
+            "documentation": "Number of Catalog media(s)"
+          },
+          {
+            "object": "resources.vapp",
+            "type": "int",
+            "documentation": "Number of vApps"
+          },
+          {
+            "object": "resources.running_vm",
+            "type": "int",
+            "documentation": "Number of VM(s) in power on state"
+          },
+          {
+            "object": "resources.user",
+            "type": "int",
+            "documentation": "Number of users in the organization"
+          },
+          {
+            "object": "resources.disk",
+            "type": "int",
+            "documentation": "Number of standalone disks in the organization"
+          },
+          {
+            "object": "customer_mail",
+            "type": "string",
+            "documentation": "Contact email of the organization"
+          },
+          {
+            "object": "internet_billing_mode",
+            "type": "string",
+            "documentation": "Internet billing mode of the organization"
+          }
+        ]
+      },
+      "Update": {
+        "namespace": "Organization",
+        "resource": "",
+        "verb": "Update",
+        "short_documentation": "Update an existing organization.",
+        "long_documentation": "Update the details of an existing organization.",
+        "markdown_documentation": "",
+        "params": [
+          {
+            "name": "full_name",
+            "description": "The full name of the organization.",
+            "required": false,
+            "example": "My Organization to update",
+            "type": "string",
+            "validators_description": ""
+          },
+          {
+            "name": "description",
+            "description": "A description for the organization.",
+            "required": false,
+            "example": "This is my organization description to update",
+            "type": "string",
+            "validators_description": ""
+          },
+          {
+            "name": "customer_mail",
+            "description": "The contact email for the organization.",
+            "required": false,
+            "example": "user@mail.com",
+            "type": "string",
+            "validators_description": "Validates that the value is a valid email address. (E.g. foo@bar.com). \n"
+          },
+          {
+            "name": "internet_billing_mode",
+            "description": "The internet billing mode for the organization. More information about billing modes can be found in the [documentation](https://cloud.orange-business.com/en/offres/infrastructure-iaas/cloud-avenue/wiki-cloud-avenue/services/internet-access/).",
+            "required": false,
+            "example": "A valid internet billing mode",
+            "type": "string",
+            "validators_description": "Validates that the value is one of: `PAYG`, `TRAFFIC_VOLUME`. \n"
+          }
+        ],
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": [
+          {
+            "object": "id",
+            "type": "string",
+            "documentation": "URN of the organization in the format urn:vcloud:org:\u003cUUID\u003e"
+          },
+          {
+            "object": "name",
+            "type": "string",
+            "documentation": "Name of the organization"
+          },
+          {
+            "object": "display_name",
+            "type": "string",
+            "documentation": "Display name of the organization"
+          },
+          {
+            "object": "description",
+            "type": "string",
+            "documentation": "Description of the organization"
+          },
+          {
+            "object": "is_enabled",
+            "type": "bool",
+            "documentation": "Indicates if the organization is enabled"
+          },
+          {
+            "object": "resources.vdc",
+            "type": "int",
+            "documentation": "Number of Org VDCs"
+          },
+          {
+            "object": "resources.catalog",
+            "type": "int",
+            "documentation": "Number of Catalog media(s)"
+          },
+          {
+            "object": "resources.vapp",
+            "type": "int",
+            "documentation": "Number of vApps"
+          },
+          {
+            "object": "resources.running_vm",
+            "type": "int",
+            "documentation": "Number of VM(s) in power on state"
+          },
+          {
+            "object": "resources.user",
+            "type": "int",
+            "documentation": "Number of users in the organization"
+          },
+          {
+            "object": "resources.disk",
+            "type": "int",
+            "documentation": "Number of standalone disks in the organization"
+          },
+          {
+            "object": "customer_mail",
+            "type": "string",
+            "documentation": "Contact email of the organization"
+          },
+          {
+            "object": "internet_billing_mode",
+            "type": "string",
+            "documentation": "Internet billing mode of the organization"
+          }
+        ]
+      }
+    },
+    "SubFunctionality": {}
   },
   "T0": {
     "Title": "T0",
@@ -1830,6 +2103,14 @@
             "markdown_documentation": "",
             "params": [
               {
+                "name": "vdc_id",
+                "description": "ID of the VDC to add the storage profile to",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `vdc_name` is null., Validates that the value is a valid URN (`vdc`).. \n"
+              },
+              {
                 "name": "vdc_name",
                 "description": "Name of the VDC to add the storage profile to",
                 "required": false,
@@ -1949,6 +2230,14 @@
             "markdown_documentation": "",
             "params": [
               {
+                "name": "vdc_id",
+                "description": "ID of the VDC to delete the storage profile from",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `vdc_name` is null., Validates that the value is a valid URN (`vdc`).. \n"
+              },
+              {
                 "name": "vdc_name",
                 "description": "Name of the VDC to delete the storage profile from",
                 "required": false,
@@ -1984,6 +2273,14 @@
                 "example": "",
                 "type": "string",
                 "validators_description": "Validates that the value is a valid URN (`vdcstorageProfile`).. \n"
+              },
+              {
+                "name": "vdc_id",
+                "description": "ID of the VDC to get the storage profile from",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "Validates that the value is a valid URN (`vdc`).. \n"
               },
               {
                 "name": "vdc_name",
@@ -2046,5 +2343,314 @@
         "SubFunctionality": {}
       }
     }
+  },
+  "VdcGroup": {
+    "Title": "VdcGroup",
+    "Documentation": "",
+    "MarkdownDocumentation": "",
+    "Commands": {
+      "Create": {
+        "namespace": "VdcGroup",
+        "resource": "",
+        "verb": "Create",
+        "short_documentation": "Create a Vdc Group",
+        "long_documentation": "Create a new Virtual Data Center Group (Vdc Group) in your organization.",
+        "markdown_documentation": "",
+        "params": [
+          {
+            "name": "name",
+            "description": "Name of the Vdc Group",
+            "required": true,
+            "example": "my-vdc-group",
+            "type": "string",
+            "validators_description": ""
+          },
+          {
+            "name": "description",
+            "description": "Description of the Vdc Group",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": ""
+          },
+          {
+            "name": "vdcs.{index}.id",
+            "description": "ID of the Vdc to associate with the Vdc Group",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `vdcs.{index}.name` is null., "
+          },
+          {
+            "name": "vdcs.{index}.name",
+            "description": "Name of the Vdc to associate with the Vdc Group",
+            "required": false,
+            "example": "my-vdc",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `vdcs.{index}.id` is null., "
+          }
+        ],
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": [
+          {
+            "object": "id",
+            "type": "string",
+            "documentation": "ID of the Vdc Group"
+          },
+          {
+            "object": "name",
+            "type": "string",
+            "documentation": "Name of the Vdc Group"
+          },
+          {
+            "object": "description",
+            "type": "string",
+            "documentation": "Description of the Vdc Group"
+          },
+          {
+            "object": "number_of_vdcs",
+            "type": "int",
+            "documentation": "Number of Vdcs in the Vdc Group"
+          },
+          {
+            "object": "vdcs.{index}.id",
+            "type": "string",
+            "documentation": "ID of the Vdc"
+          },
+          {
+            "object": "vdcs.{index}.name",
+            "type": "string",
+            "documentation": "Name of the Vdc"
+          }
+        ]
+      },
+      "Delete": {
+        "namespace": "VdcGroup",
+        "resource": "",
+        "verb": "Delete",
+        "short_documentation": "Delete a Vdc Group",
+        "long_documentation": "Delete an existing Virtual Data Center Group (Vdc Group) from your organization.",
+        "markdown_documentation": "",
+        "params": [
+          {
+            "name": "id",
+            "description": "ID of the Vdc Group",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`vdcGroup`).. \n"
+          },
+          {
+            "name": "name",
+            "description": "Name of the Vdc Group",
+            "required": false,
+            "example": "my-vdc-group",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `id` is null., "
+          },
+          {
+            "name": "force",
+            "description": "Force delete the Vdc Group. Value `true` means to forcefully delete the object that contains other objects even if those objects are in a state that does not allow removal. The default is `false` therefore, objects are not removed if they are not in a state that normally allows removal. Force also implies recursive delete where other contained objects are removed. Errors may be ignored. Invalid value (not true or false) are ignored. The VDC contains in the Vdc Group are not deleted.",
+            "required": false,
+            "example": "",
+            "type": "bool",
+            "validators_description": ""
+          }
+        ],
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": null
+      },
+      "Get": {
+        "namespace": "VdcGroup",
+        "resource": "",
+        "verb": "Get",
+        "short_documentation": "Get a Vdc Group",
+        "long_documentation": "Retrieve detailed information about a specific Vdc Group.",
+        "markdown_documentation": "",
+        "params": [
+          {
+            "name": "id",
+            "description": "ID of the Vdc Group to filter by",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`vdcGroup`).. \n"
+          },
+          {
+            "name": "name",
+            "description": "Name of the Vdc Group to filter by",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `id` is null., "
+          }
+        ],
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": [
+          {
+            "object": "id",
+            "type": "string",
+            "documentation": "ID of the Vdc Group"
+          },
+          {
+            "object": "name",
+            "type": "string",
+            "documentation": "Name of the Vdc Group"
+          },
+          {
+            "object": "description",
+            "type": "string",
+            "documentation": "Description of the Vdc Group"
+          },
+          {
+            "object": "number_of_vdcs",
+            "type": "int",
+            "documentation": "Number of Vdcs in the Vdc Group"
+          },
+          {
+            "object": "vdcs.{index}.id",
+            "type": "string",
+            "documentation": "ID of the Vdc"
+          },
+          {
+            "object": "vdcs.{index}.name",
+            "type": "string",
+            "documentation": "Name of the Vdc"
+          }
+        ]
+      },
+      "List": {
+        "namespace": "VdcGroup",
+        "resource": "",
+        "verb": "List",
+        "short_documentation": "List Vdc Groups",
+        "long_documentation": "List all Virtual Data Center Groups (Vdc Groups) available in your organization. If no filters are applied, it returns all Vdc Groups.",
+        "markdown_documentation": "",
+        "params": [
+          {
+            "name": "id",
+            "description": "ID of the Vdc Group to filter by",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "Validates that the value is a valid URN (`vdcGroup`).. \n"
+          },
+          {
+            "name": "name",
+            "description": "Name of the Vdc Group to filter by",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": ""
+          }
+        ],
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": [
+          {
+            "object": "vdc_groups.{index}.id",
+            "type": "string",
+            "documentation": "ID of the Vdc Group"
+          },
+          {
+            "object": "vdc_groups.{index}.name",
+            "type": "string",
+            "documentation": "Name of the Vdc Group"
+          },
+          {
+            "object": "vdc_groups.{index}.description",
+            "type": "string",
+            "documentation": "Description of the Vdc Group"
+          },
+          {
+            "object": "vdc_groups.{index}.number_of_vdcs",
+            "type": "int",
+            "documentation": "Number of Vdcs in the Vdc Group"
+          },
+          {
+            "object": "vdc_groups.{index}.vdcs.{index}.id",
+            "type": "string",
+            "documentation": "ID of the Vdc"
+          },
+          {
+            "object": "vdc_groups.{index}.vdcs.{index}.name",
+            "type": "string",
+            "documentation": "Name of the Vdc"
+          }
+        ]
+      },
+      "Update": {
+        "namespace": "VdcGroup",
+        "resource": "",
+        "verb": "Update",
+        "short_documentation": "Update a Vdc Group",
+        "long_documentation": "Update an existing Virtual Data Center Group (Vdc Group) in your organization.",
+        "markdown_documentation": "",
+        "params": [
+          {
+            "name": "id",
+            "description": "ID of the Vdc Group",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`vdcGroup`).. \n"
+          },
+          {
+            "name": "name",
+            "description": "Name of the Vdc Group",
+            "required": false,
+            "example": "my-vdc-group",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `id` is null., "
+          },
+          {
+            "name": "description",
+            "description": "Description of the Vdc Group",
+            "required": false,
+            "example": "",
+            "type": "string",
+            "validators_description": ""
+          }
+        ],
+        "deprecated": false,
+        "deprecated_message": "",
+        "model": [
+          {
+            "object": "id",
+            "type": "string",
+            "documentation": "ID of the Vdc Group"
+          },
+          {
+            "object": "name",
+            "type": "string",
+            "documentation": "Name of the Vdc Group"
+          },
+          {
+            "object": "description",
+            "type": "string",
+            "documentation": "Description of the Vdc Group"
+          },
+          {
+            "object": "number_of_vdcs",
+            "type": "int",
+            "documentation": "Number of Vdcs in the Vdc Group"
+          },
+          {
+            "object": "vdcs.{index}.id",
+            "type": "string",
+            "documentation": "ID of the Vdc"
+          },
+          {
+            "object": "vdcs.{index}.name",
+            "type": "string",
+            "documentation": "Name of the Vdc"
+          }
+        ]
+      }
+    },
+    "SubFunctionality": {}
   }
 }

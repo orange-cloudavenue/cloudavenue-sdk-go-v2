@@ -37,14 +37,14 @@ type (
 		// Name is the name of the storage profiles to filter by.
 		Name string `documentation:"Name of the storage profiles to filter by"`
 		// VDCID is the unique identifier of the VDC to get storage profiles from.
-		VdcId string `documentation:"ID of the VDC to get storage profiles from"` //nolint:revive
+		VdcID string `documentation:"ID of the VDC to get storage profiles from"` //nolint:revive
 		// Name is the name of the VDC to get storage profiles from.
 		VdcName string `documentation:"Name of the VDC to get storage profiles from"` //nolint:revive
 	}
 
 	ParamsAddStorageProfile struct {
 		// VdcId is the unique identifier of the VDC to add the storage profile to.
-		VdcId string //nolint:revive
+		VdcID string //nolint:revive
 		// VdcName is the name of the VDC to add the storage profile to.
 		VdcName string //nolint:revive
 
@@ -53,7 +53,7 @@ type (
 
 	ParamsDeleteStorageProfile struct {
 		// VdcId is the unique identifier of the VDC to delete the storage profile
-		VdcId string //nolint:revive
+		VdcID string //nolint:revive
 		// VdcName is the name of the VDC to delete the storage profile from
 		VdcName string //nolint:revive
 		// StorageProfile is the list of storage profiles to delete, in this case it is a single storage profile

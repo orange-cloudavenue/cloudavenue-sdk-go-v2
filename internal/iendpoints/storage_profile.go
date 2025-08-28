@@ -144,11 +144,11 @@ func init() {
 					r.StorageProfiles[i].ID = urn.Normalize(urn.VDCStorageProfile, id).String()
 
 					// Extract VDC ID from HREF
-					vdcID, err := extractor.ExtractUUID(strPro.VdcId)
+					vdcID, err := extractor.ExtractUUID(strPro.VdcID)
 					if err != nil {
 						return fmt.Errorf("failed to extract VDC ID from HREF: %w", err)
 					}
-					r.StorageProfiles[i].VdcId = urn.Normalize(urn.VDC, vdcID).String()
+					r.StorageProfiles[i].VdcID = urn.Normalize(urn.VDC, vdcID).String()
 				}
 
 				return nil
@@ -182,7 +182,7 @@ func init() {
 					return ""
 				}()
 
-				r.VdcId = func() string {
+				r.VdcID = func() string {
 					if filterParts[0] == "vdc" {
 						return urn.Normalize(urn.VDC, filterParts[1]).String()
 					}

@@ -29,7 +29,7 @@ type (
 		Used  int `json:"storageUsedMB" fake:"{number:10,500}"`    //nolint:tagliatelle
 
 		// Vdc information
-		VdcId   string `json:"vdc" fake:"{href_uuid}"` //nolint:revive
+		VdcID   string `json:"vdc" fake:"{href_uuid}"` //nolint:revive
 		VdcName string `json:"vdcName" fake:"{word}"`  //nolint:revive
 	}
 )
@@ -41,11 +41,11 @@ func (r *ApiResponseListStorageProfiles) ToModel() *types.ModelListStorageProfil
 	}
 	vdcMap := make(map[ModelVDCKey]*types.ModelListStorageProfilesVDC)
 	for _, apiSP := range r.StorageProfiles {
-		key := ModelVDCKey{ID: apiSP.VdcId, Name: apiSP.VdcName}
+		key := ModelVDCKey{ID: apiSP.VdcID, Name: apiSP.VdcName}
 		vdc, exists := vdcMap[key]
 		if !exists {
 			vdc = &types.ModelListStorageProfilesVDC{
-				ID:              apiSP.VdcId,
+				ID:              apiSP.VdcID,
 				Name:            apiSP.VdcName,
 				StorageProfiles: []types.ModelListStorageProfile{},
 			}

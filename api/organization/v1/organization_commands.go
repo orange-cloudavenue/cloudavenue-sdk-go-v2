@@ -114,7 +114,7 @@ func init() {
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "full_name",
-				Description: "The full name of the organization.",
+				Description: "The full name of the organization. Appears in the Cloud application as a human-readable name of the organization.",
 				Example:     "My Organization to update",
 			},
 			commands.ParamsSpec{
@@ -134,7 +134,7 @@ func init() {
 			commands.ParamsSpec{
 				Name:        "internet_billing_mode",
 				Description: "The internet billing mode for the organization. More information about billing modes can be found in the [documentation](https://cloud.orange-business.com/en/offres/infrastructure-iaas/cloud-avenue/wiki-cloud-avenue/services/internet-access/).",
-				Example:     "A valid internet billing mode",
+				Example:     "PAYG",
 				Validators: []commands.Validator{
 					commands.ValidatorOmitempty(),
 					commands.ValidatorOneOf("PAYG", "TRAFFIC_VOLUME"),
