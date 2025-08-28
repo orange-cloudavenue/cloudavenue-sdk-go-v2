@@ -16,7 +16,7 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 )
 
-//go:generate endpoint-generator -path org.go -output org
+//go:generate endpoint-generator -path organization.go -output org
 
 func init() {
 	// Get Organization from Vmware Cloud Director

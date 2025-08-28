@@ -47,27 +47,23 @@ func TestGetOrganization(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Mock endpoints
-			epOrg := endpoints.GetOrganization()
-			epOrgs := endpoints.GetOrganizationDetails()
-
 			// Mock from infraAPI
 			if tt.mockGetOrgResponse != nil || tt.mockGetOrgStatus != 0 {
 				// Clean all default mock responses
-				epOrg.CleanMockResponse()
-				epOrg.SetMockResponse(tt.mockGetOrgResponse, &tt.mockGetOrgStatus)
+				endpoints.GetOrganization().CleanMockResponse()
+				endpoints.GetOrganization().SetMockResponse(tt.mockGetOrgResponse, &tt.mockGetOrgStatus)
 			}
 
 			// Mock from VMware Cloud Director
 			if tt.mockGetOrgsResponse != nil || tt.mockGetOrgsStatus != 0 {
 				// Clean all default mock responses
-				epOrgs.CleanMockResponse()
-				epOrgs.SetMockResponse(tt.mockGetOrgsResponse, &tt.mockGetOrgsStatus)
+				endpoints.GetOrganizationDetails().CleanMockResponse()
+				endpoints.GetOrganizationDetails().SetMockResponse(tt.mockGetOrgsResponse, &tt.mockGetOrgsStatus)
 			}
 
 			client := newClient(t)
 
-			resp, err := client.GetORG(t.Context())
+			resp, err := client.GetOrganization(t.Context())
 			if tt.expectErr {
 				assert.NotNil(t, err, "expected an error but got nil")
 				return
@@ -106,6 +102,16 @@ func TestUpdateOrganization(t *testing.T) {
 				CustomerMail:        "user@email.com",
 				InternetBillingMode: "PAYG",
 			},
+		},
+		{
+			name: "Success Update Organization - Empty params",
+			params: &types.ParamsUpdateOrganization{
+				FullName:            "",
+				Description:         func(s string) *string { return &s }(""),
+				CustomerMail:        "",
+				InternetBillingMode: "",
+			},
+			expectErr: false,
 		},
 		{
 			name: "Fail - Do not retrieve Organization",
@@ -148,42 +154,36 @@ func TestUpdateOrganization(t *testing.T) {
 			params: &types.ParamsUpdateOrganization{
 				FullName: "New Org Name",
 			},
-			// mockUpdateOrgResponse: 200,
 			mockGetOrgsStatus: 404,
 			expectErr:         true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Mock endpoints
-			epUpdateOrg := endpoints.UpdateOrganization()
-
 			// Mock update
 			if tt.mockUpdateOrgResponse != nil || tt.mockUpdateOrgStatus != 0 {
 				// Clean all default mock responses
-				epUpdateOrg.CleanMockResponse()
-				epUpdateOrg.SetMockResponse(tt.mockUpdateOrgResponse, &tt.mockUpdateOrgStatus)
+				endpoints.UpdateOrganization().CleanMockResponse()
+				endpoints.UpdateOrganization().SetMockResponse(tt.mockUpdateOrgResponse, &tt.mockUpdateOrgStatus)
 			}
 
 			// Mock get values from infraAPI
-			epGetOrg := endpoints.GetOrganization()
 			if tt.mockGetOrgResponse != nil || tt.mockGetOrgStatus != 0 {
 				// Clean all default mock responses
-				epGetOrg.CleanMockResponse()
-				epGetOrg.SetMockResponse(tt.mockGetOrgResponse, &tt.mockGetOrgStatus)
+				endpoints.GetOrganization().CleanMockResponse()
+				endpoints.GetOrganization().SetMockResponse(tt.mockGetOrgResponse, &tt.mockGetOrgStatus)
 			}
 
 			// Mock get values from VMware Cloud Director
-			epGetOrgs := endpoints.GetOrganizationDetails()
 			if tt.mockGetOrgsResponse != nil || tt.mockGetOrgsStatus != 0 {
 				// Clean all default mock responses
-				epGetOrgs.CleanMockResponse()
-				epGetOrgs.SetMockResponse(tt.mockGetOrgsResponse, &tt.mockGetOrgsStatus)
+				endpoints.GetOrganizationDetails().CleanMockResponse()
+				endpoints.GetOrganizationDetails().SetMockResponse(tt.mockGetOrgsResponse, &tt.mockGetOrgsStatus)
 			}
 
 			client := newClient(t)
 
-			resp, err := client.UpdateORG(t.Context(), *tt.params)
+			resp, err := client.UpdateOrganization(t.Context(), *tt.params)
 			if tt.expectErr {
 				assert.NotNil(t, err, "expected an error but got nil")
 				return

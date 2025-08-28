@@ -22,18 +22,18 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
-//go:generate command-generator -path org_commands.go
+//go:generate command-generator -path organization_commands.go
 
 func init() {
-	// * ORG
+	// * ORGANIZATION
 	// This command is a high-level command that allows you to manage documentation for Orgs resources.
 	cmds.Register(commands.Command{
-		Namespace: "ORG",
+		Namespace: "Organization",
 	})
 
-	// * GetORG
+	// * GetOrganization
 	cmds.Register(commands.Command{
-		Namespace:          "ORG",
+		Namespace:          "Organization",
 		Verb:               "Get",
 		ShortDocumentation: "Get an organization information.",
 		LongDocumentation:  "Retrieve detailed information about your organization.",
@@ -42,7 +42,7 @@ func init() {
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
 
-			logger := cc.logger.WithGroup("GetORG")
+			logger := cc.logger.WithGroup("GetOrganization")
 
 			// ----------------------------------------------------------
 			// Parallelization of infraAPI and VMware Cloud Director calls
@@ -84,12 +84,11 @@ func init() {
 			logger.DebugContext(ctx, "Successfully retrieved organization information")
 
 			return &types.ModelGetOrganization{
-				ID:          orgDetails.ID,
-				Name:        org.Name,
-				DisplayName: org.DisplayName,
-				Description: org.Description,
-				IsEnabled:   org.IsEnabled,
-				// IsSuspended:         org.IsSuspended,
+				ID:                  orgDetails.ID,
+				Name:                org.Name,
+				DisplayName:         org.DisplayName,
+				Description:         org.Description,
+				IsEnabled:           org.IsEnabled,
 				CustomerMail:        org.CustomerMail,
 				InternetBillingMode: org.InternetBillingMode,
 				Resources: types.ModelGetOrganizationResources{
@@ -104,9 +103,9 @@ func init() {
 		},
 	})
 
-	// * UpdateORG
+	// * UpdateOrganization
 	cmds.Register(commands.Command{
-		Namespace:          "ORG",
+		Namespace:          "Organization",
 		Verb:               "Update",
 		ShortDocumentation: "Update an existing organization.",
 		LongDocumentation:  "Update the details of an existing organization.",
@@ -154,16 +153,16 @@ func init() {
 				return nil, fmt.Errorf("no parameters provided for organization update")
 			}
 
-			logger := cc.logger.WithGroup("UpdateORG")
+			logger := cc.logger.WithGroup("UpdateOrganization")
 
-			// Get Org to set common values from infraAPI
+			// Get Organization to set common values from infraAPI
 			orgDefault, err := cc.c.Do(ctx, endpoints.GetOrganization())
 			if err != nil {
 				return nil, fmt.Errorf("error retrieving current organization information: %w", err)
 			}
-
 			data := orgDefault.Result().(*itypes.ApiResponseGetOrg).ToModel()
 
+			// Set request body with provided parameters or keep existing values
 			reqBody := &itypes.ApiRequestUpdateOrg{
 				FullName: func() string {
 					if p.FullName != "" {
@@ -191,6 +190,7 @@ func init() {
 				}(),
 			}
 
+			// Update Organization
 			_, err = cc.c.Do(
 				ctx,
 				endpoints.UpdateOrganization(),
@@ -202,13 +202,8 @@ func init() {
 
 			logger.DebugContext(ctx, "Successfully initiated organization update")
 
-			// Get organization details after update
-			result, err := cc.GetORG(ctx)
-			if err != nil {
-				return nil, fmt.Errorf("error retrieving updated organization information: %w", err)
-			}
-
-			return result, nil
+			// return Get organization after update
+			return cc.GetOrganization(ctx)
 		},
 	})
 }

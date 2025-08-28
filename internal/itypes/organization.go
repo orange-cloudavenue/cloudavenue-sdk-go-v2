@@ -56,11 +56,10 @@ type (
 // From infraAPI
 func (r *ApiResponseGetOrg) ToModel() *types.ModelGetOrganization {
 	return &types.ModelGetOrganization{
-		Name:        r.Name,
-		DisplayName: r.FullName, // FullName is mapped to DisplayName
-		Description: r.Description,
-		IsEnabled:   r.IsEnabled,
-		// IsSuspended:         r.IsSuspended,
+		Name:                r.Name,
+		DisplayName:         r.FullName, // FullName is mapped to DisplayName
+		Description:         r.Description,
+		IsEnabled:           r.IsEnabled,
 		CustomerMail:        r.CustomerMail,
 		InternetBillingMode: r.InternetBillingMode,
 	}
@@ -86,14 +85,5 @@ func (r *ApiResponseGetOrgs) ToModel() *types.ModelGetOrganization {
 			User:      r.Organizations[0].UserCount,
 			Disk:      r.Organizations[0].DiskCount,
 		},
-	}
-}
-
-func (r *ApiRequestUpdateOrg) ToModel() *types.ModelUpdateOrganization {
-	return &types.ModelUpdateOrganization{
-		FullName:            r.FullName,
-		Description:         r.Description,
-		CustomerMail:        r.CustomerMail,
-		InternetBillingMode: r.InternetBillingMode,
 	}
 }

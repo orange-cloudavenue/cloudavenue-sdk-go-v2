@@ -16,8 +16,8 @@ import (
 )
 
 // Retrieve detailed information about your organization.
-func (c *Client) GetORG(ctx context.Context) (*types.ModelGetOrganization, error) {
-	x, err := cmds.Get("ORG", "", "Get").Run(ctx, c, nil)
+func (c *Client) GetOrganization(ctx context.Context) (*types.ModelGetOrganization, error) {
+	x, err := cmds.Get("Organization", "", "Get").Run(ctx, c, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -25,8 +25,8 @@ func (c *Client) GetORG(ctx context.Context) (*types.ModelGetOrganization, error
 }
 
 // Update the details of an existing organization.
-func (c *Client) UpdateORG(ctx context.Context, params types.ParamsUpdateOrganization) (*types.ModelGetOrganization, error) {
-	x, err := cmds.Get("ORG", "", "Update").Run(ctx, c, params)
+func (c *Client) UpdateOrganization(ctx context.Context, params types.ParamsUpdateOrganization) (*types.ModelGetOrganization, error) {
+	x, err := cmds.Get("Organization", "", "Update").Run(ctx, c, params)
 	if err != nil {
 		return nil, err
 	}
