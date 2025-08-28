@@ -424,7 +424,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:4bd78167-6850-4a7d-842c-c474a103d4e9",
+                "example": "urn:vcloud:gateway:96ac09c3-b5be-4443-b392-17c3b608ea4f",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -453,7 +453,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:1d9c015e-6a8b-4403-903d-9ca0b840c900",
+                "example": "urn:vcloud:gateway:4460a513-0825-4241-a683-12c721927b83",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -999,7 +999,7 @@
         "params": [
           {
             "name": "full_name",
-            "description": "The full name of the organization.",
+            "description": "The full name of the organization. Appears in the Cloud application as a human-readable name of the organization.",
             "required": false,
             "example": "My Organization to update",
             "type": "string",
@@ -1025,7 +1025,7 @@
             "name": "internet_billing_mode",
             "description": "The internet billing mode for the organization. More information about billing modes can be found in the [documentation](https://cloud.orange-business.com/en/offres/infrastructure-iaas/cloud-avenue/wiki-cloud-avenue/services/internet-access/).",
             "required": false,
-            "example": "A valid internet billing mode",
+            "example": "PAYG",
             "type": "string",
             "validators_description": "Validates that the value is one of: `PAYG`, `TRAFFIC_VOLUME`. \n"
           }
