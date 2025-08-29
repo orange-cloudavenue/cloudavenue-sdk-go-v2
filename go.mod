@@ -19,7 +19,7 @@ require (
 	github.com/orange-cloudavenue/common-go/utils v1.0.0
 	github.com/orange-cloudavenue/common-go/validators v1.1.3
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
-	github.com/stretchr/testify v1.11.0
+	github.com/stretchr/testify v1.11.1
 	golang.org/x/sync v0.16.0
 	resty.dev/v3 v3.0.0-beta.3
 )
