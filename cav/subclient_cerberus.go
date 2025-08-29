@@ -46,7 +46,7 @@ func (v *cerberus) getID() string {
 
 // NewClient creates a new request for the Cerberus subclient.
 func (v *cerberus) newHTTPClient(ctx context.Context) (*resty.Client, error) {
-	v.httpClient = httpclient.NewHTTPClient().
+	hC := httpclient.NewHTTPClient().
 		SetBaseURL(v.console.GetAPICerberusEndpoint()).
 		SetHeader("Accept", "application/json;version="+cerberusVCDVersion).
 		SetError(cerberusError{})
@@ -57,10 +57,10 @@ func (v *cerberus) newHTTPClient(ctx context.Context) (*resty.Client, error) {
 		}
 	}
 
-	v.httpClient.
+	hC.
 		SetHeaders(v.credential.Headers())
 
-	return v.httpClient, nil
+	return hC, nil
 }
 
 // setCredential sets the authentication credential for the Cerberus client.
@@ -75,10 +75,6 @@ func (v *cerberus) setConsole(c consoles.ConsoleName) {
 
 // Close closes the Cerberus client and releases any resources.
 func (v *cerberus) close() error {
-	// Close the HTTP client if it was created.
-	if v.httpClient != nil {
-		return v.httpClient.Close()
-	}
 	return nil
 }
 

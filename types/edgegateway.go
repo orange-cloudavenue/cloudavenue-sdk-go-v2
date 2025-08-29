@@ -41,15 +41,11 @@ type (
 
 type (
 	ParamsEdgeGateway struct {
-		ID   string `validate:"required_if_null=Name,omitempty,urn=edgegateway" fake:"{urn:edgegateway}"`
-		Name string `validate:"required_if_null=ID,omitempty,resource_name=edgegateway" fake:"{resource_name:edgegateway}"`
+		ID   string `fake:"{urn:edgegateway}"`
+		Name string `fake:"{resource_name:edgegateway}"`
 	}
 
 	ParamsCreateEdgeGateway struct {
-		// OwnerType is the type of the owner of the edge gateway.
-		// It can be either "vdc" or "vdcgroup".
-		OwnerType string `fake:"{randomstring:[vdc]}"`
-
 		// OwnerName is the VDC or VDC Group that this edge gateway belongs to.
 		OwnerName string `fake:"{vdc_name}"`
 

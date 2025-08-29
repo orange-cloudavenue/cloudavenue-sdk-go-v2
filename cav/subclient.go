@@ -32,7 +32,6 @@ const (
 )
 
 type subclient struct {
-	httpClient *resty.Client
 	credential auth
 	console    consoles.ConsoleName
 }

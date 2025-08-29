@@ -32,7 +32,7 @@ type (
 		mu sync.RWMutex
 
 		// Map is a nested map structure to hold endpoints.
-		// String keys is a sha256 encoded string of the API/Version/Name/Method.
+		// String keys is a endpoint.Name
 		// Map is capitalized to avoid confusion with the map golang.
 		Map map[string]*Endpoint
 	}
@@ -105,7 +105,7 @@ func GetEndpointsUncategorized() []*Endpoint {
 	return endpointsList
 }
 
-// MustGetEndpoint retrieves an endpoint from the Endpoints map based on the provided api, version, name, and method.
+// MustGetEndpoint retrieves an endpoint from the name.
 // It panics if the endpoint is not found.
 func MustGetEndpoint(name string) *Endpoint {
 	endpoint, err := GetEndpoint(name)
@@ -115,7 +115,7 @@ func MustGetEndpoint(name string) *Endpoint {
 	return endpoint
 }
 
-// GetEndpoint retrieves an endpoint from the Endpoints map based on the provided api, version, name, and method.
+// GetEndpoint retrieves an endpoint from the name.
 func GetEndpoint(name string) (*Endpoint, error) {
 	endpoints.mu.RLock()
 	defer endpoints.mu.RUnlock()

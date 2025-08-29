@@ -11,8 +11,11 @@ package edgegateway
 
 import (
 	"context"
+	"fmt"
 	"slices"
 
+	"github.com/kr/pretty"
+	"golang.org/x/sync/errgroup"
 	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
@@ -48,7 +51,7 @@ func init() {
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("Name"),
+					commands.ValidatorRequiredIfParamIsNull("name"),
 					commands.ValidatorOmitempty(),
 					commands.ValidatorURN("edgegateway"),
 				},
@@ -58,7 +61,7 @@ func init() {
 				Description: "The name of the edge gateway.",
 				Required:    false,
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("ID"),
+					commands.ValidatorRequiredIfParamIsNull("id"),
 					commands.ValidatorOmitempty(),
 					commands.ValidatorResourceName("edgegateway"),
 				},
@@ -134,14 +137,6 @@ func init() {
 		ParamsType:         types.ParamsCreateEdgeGateway{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
-				Name:        "owner_type",
-				Description: "The type of the owner of the edge gateway.",
-				Required:    true,
-				Validators: []commands.Validator{
-					commands.ValidatorOneOf("vdc", "vdcgroup"),
-				},
-			},
-			commands.ParamsSpec{
 				Name:        "owner_name",
 				Description: "The name of the VDC or VDC Group that this edge gateway belongs to.",
 				Example:     "my-vdc",
@@ -151,7 +146,7 @@ func init() {
 				Name:        "t0_name",
 				Description: "The name of the T0 router that this edge gateway will be connected to. If not provided and only if one T0 router is available, the first T0 router will be used.",
 				Required:    false,
-				Example:     "tn01e02ocb0001234spt101",
+				Example:     "prvrf01eocb0001234allsp01",
 				Validators: []commands.Validator{
 					commands.ValidatorOmitempty(),
 					commands.ValidatorResourceName("t0"),
@@ -174,18 +169,72 @@ func init() {
 
 			logger := cc.logger.WithGroup("CreateEdgeGateway")
 
-			// If T0Name is not provided, retrieve the first available T0 router.
-			t0s, err := cc.ListT0(ctx)
-			if err != nil {
+			// Here determine if the owner_name is a VDC or VDCGroup
+
+			var (
+				vdcs      *itypes.ApiResponseListVDC
+				vdcGroups *itypes.ApiResponseListVdcGroup
+
+				t0s *types.ModelT0s
+
+				errG = errgroup.Group{}
+			)
+
+			epListVdc := endpoints.ListVdc()
+			epListVdcGroup := endpoints.ListVdcGroup()
+
+			// * Call in parallel all API
+			errG.Go(func() error {
+				resp, err := cc.c.Do(
+					ctx,
+					epListVdcGroup,
+					cav.WithQueryParam(epListVdcGroup.QueryParams[0], "name=="+p.OwnerName),
+				)
+				if err != nil {
+					return fmt.Errorf("Failed to list VDC Groups: %w", err)
+				}
+
+				vdcGroups = resp.Result().(*itypes.ApiResponseListVdcGroup)
+				return nil
+			})
+
+			errG.Go(func() error {
+				resp, err := cc.c.Do(
+					ctx,
+					epListVdc,
+					cav.WithQueryParam(epListVdc.QueryParams[0], "name=="+p.OwnerName),
+				)
+				if err != nil {
+					return fmt.Errorf("Failed to list VDCs: %w", err)
+				}
+
+				vdcs = resp.Result().(*itypes.ApiResponseListVDC)
+				return nil
+			})
+
+			errG.Go(func() error {
+				var err error
+				t0s, err = cc.ListT0(ctx)
+				if err != nil {
+					return fmt.Errorf("Failed to list T0 routers: %w", err)
+				}
+
+				return nil
+			})
+
+			if err := errG.Wait(); err != nil {
 				return nil, err
 			}
+
+			var t0 types.ModelT0
+
+			// * T0s
 			if t0s.Count == 0 {
 				logger.Error("No T0 routers available to connect the edge gateway")
 				return nil, errors.New("No T0 routers available to connect the edge gateway")
 			}
 
-			var t0 types.ModelT0
-
+			// If T0Name is not provided, use the first available T0 router.
 			if p.T0Name == "" {
 				if t0s.Count > 1 {
 					logger.Warn("Multiple T0 routers found, using the first one", "count", t0s.Count)
@@ -207,13 +256,7 @@ func init() {
 			}
 
 			if len(t0.EdgeGateways) >= t0.MaxEdgeGateways {
-				logger.Error("Maximum number of edge gateways reached for T0", "t0Name", t0.Name, "maxEdgeGateways", t0.MaxEdgeGateways, "currentEdgeGateways", len(t0.EdgeGateways))
 				return nil, errors.New("Maximum number of edge gateways reached for T0: " + t0.Name)
-			}
-
-			// Prepare the request body
-			reqBody := itypes.ApiRequestEdgeGateway{
-				T0Name: t0.Name,
 			}
 
 			// If the T0 is SHARED, validate the bandwidth.
@@ -225,6 +268,37 @@ func init() {
 					logger.Error("Invalid bandwidth value for SHARED T0", "bandwidth", p.Bandwidth, "allowedValues", t0.Bandwidth.AllowedBandwidthValues, "remaining", t0.Bandwidth.Remaining)
 					return nil, errors.New("Invalid bandwidth value for SHARED T0")
 				}
+			}
+
+			// Prepare the request body
+			reqBody := itypes.ApiRequestEdgeGateway{
+				T0Name: t0.Name,
+			}
+
+			// * OwnerName (VDC Or VDCGroup)
+
+			if (vdcs == nil || len(vdcs.Records) == 0) && (vdcGroups == nil || len(vdcGroups.Values) == 0) {
+				return nil, errors.New("No VDCs or VDC Groups found for owner: " + p.OwnerName)
+			}
+
+			if (vdcs != nil && len(vdcs.Records) >= 1) && (vdcGroups != nil && len(vdcGroups.Values) >= 1) {
+				return nil, errors.New("Both VDCs and VDC Groups found for owner: " + p.OwnerName)
+			}
+
+			var ownerName, ownerType string
+
+			switch {
+			case vdcs != nil && len(vdcs.Records) == 1:
+				pretty.Print(vdcs.Records[0])
+
+				// Single VDC found
+				ownerName, ownerType = vdcs.Records[0].Name, "vdc"
+			case vdcGroups != nil && len(vdcGroups.Values) == 1:
+				pretty.Print(vdcGroups.Values[0])
+				// Single VDC Group found
+				ownerName, ownerType = vdcGroups.Values[0].Name, "vdcgroup"
+			default:
+				return nil, errors.New("Ambiguous owner: " + p.OwnerName)
 			}
 
 			// Job extractor to get the edge gateway name from the job response
@@ -247,12 +321,12 @@ func init() {
 				}
 			}))
 
-			// Create the edge gateway
-			_, err = cc.c.Do(
+			// * Create the edge gateway
+			_, err := cc.c.Do(
 				ctx,
 				ep,
-				cav.WithPathParam(ep.PathParams[0], p.OwnerType),
-				cav.WithPathParam(ep.PathParams[1], p.OwnerName),
+				cav.WithPathParam(ep.PathParams[0], ownerType),
+				cav.WithPathParam(ep.PathParams[1], ownerName),
 				cav.SetBody(reqBody),
 			)
 			if err != nil {
@@ -306,7 +380,7 @@ func init() {
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("Name"),
+					commands.ValidatorRequiredIfParamIsNull("name"),
 					commands.ValidatorOmitempty(),
 					commands.ValidatorURN("edgegateway"),
 				},
@@ -316,7 +390,7 @@ func init() {
 				Description: "The name of the edge gateway.",
 				Required:    false,
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("ID"),
+					commands.ValidatorRequiredIfParamIsNull("id"),
 					commands.ValidatorOmitempty(),
 				},
 			},
@@ -364,7 +438,7 @@ func init() {
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("Name"),
+					commands.ValidatorRequiredIfParamIsNull("name"),
 					commands.ValidatorOmitempty(),
 					commands.ValidatorURN("edgegateway"),
 				},
@@ -374,7 +448,7 @@ func init() {
 				Description: "The name of the edge gateway.",
 				Required:    false,
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("ID"),
+					commands.ValidatorRequiredIfParamIsNull("id"),
 					commands.ValidatorOmitempty(),
 				},
 			},
