@@ -14,7 +14,6 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/kr/pretty"
 	"golang.org/x/sync/errgroup"
 	"resty.dev/v3"
 
@@ -289,12 +288,9 @@ func init() {
 
 			switch {
 			case vdcs != nil && len(vdcs.Records) == 1:
-				pretty.Print(vdcs.Records[0])
-
 				// Single VDC found
 				ownerName, ownerType = vdcs.Records[0].Name, "vdc"
 			case vdcGroups != nil && len(vdcGroups.Values) == 1:
-				pretty.Print(vdcGroups.Values[0])
 				// Single VDC Group found
 				ownerName, ownerType = vdcGroups.Values[0].Name, "vdcgroup"
 			default:
