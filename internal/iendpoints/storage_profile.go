@@ -133,6 +133,7 @@ func init() {
 		// ResponseMiddlewares is used to extract the ID from the response and set it in the context
 		ResponseMiddlewares: []resty.ResponseMiddleware{
 			func(_ *resty.Client, resp *resty.Response) error {
+				// Extract ID and VDCID from HREF and set it in the context
 				r := resp.Result().(*itypes.ApiResponseListStorageProfiles)
 
 				for i, strPro := range r.StorageProfiles {
@@ -149,6 +150,17 @@ func init() {
 						return fmt.Errorf("failed to extract VDC ID from HREF: %w", err)
 					}
 					r.StorageProfiles[i].VdcID = urn.Normalize(urn.VDC, vdcID).String()
+				}
+
+				return nil
+			},
+			// modify response for limit and used fields to transform values in GiB instead of MiB
+			func(_ *resty.Client, resp *resty.Response) error {
+				r := resp.Result().(*itypes.ApiResponseListStorageProfiles)
+
+				for i, strPro := range r.StorageProfiles {
+					r.StorageProfiles[i].Limit = strPro.Limit / 1024
+					r.StorageProfiles[i].Used = strPro.Used / 1024
 				}
 
 				return nil

@@ -14,7 +14,7 @@ import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 type (
 	// * ListStorageProfiles
 	ApiResponseListStorageProfiles struct {
-		StorageProfiles []ApiResponseListStorageProfile `json:"record" fakesize:"2"`
+		StorageProfiles []ApiResponseListStorageProfile `json:"record" fakesize:"1"`
 	}
 
 	ApiResponseListStorageProfile struct {
@@ -25,8 +25,8 @@ type (
 		IsDefaultStorageProfile bool   `json:"isDefaultStorageProfile" fake:"true"`
 
 		// Values are in MB
-		Limit int `json:"storageLimitMB" fake:"{number:100,1000}"` //nolint:tagliatelle
-		Used  int `json:"storageUsedMB" fake:"{number:10,500}"`    //nolint:tagliatelle
+		Limit int `json:"storageLimitMB" fake:"{number:100000,81920000}"` //nolint:tagliatelle
+		Used  int `json:"storageUsedMB" fake:"{number:1000,100000}"`      //nolint:tagliatelle
 
 		// Vdc information
 		VdcID   string `json:"vdc" fake:"{href_uuid}"` //nolint:revive

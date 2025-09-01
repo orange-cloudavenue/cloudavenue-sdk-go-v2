@@ -89,14 +89,6 @@
         "markdown_documentation": "",
         "params": [
           {
-            "name": "owner_type",
-            "description": "The type of the owner of the edge gateway.",
-            "required": true,
-            "example": "",
-            "type": "string",
-            "validators_description": "Validates that the value is one of: `vdc`, `vdcgroup`. \n"
-          },
-          {
             "name": "owner_name",
             "description": "The name of the VDC or VDC Group that this edge gateway belongs to.",
             "required": true,
@@ -108,7 +100,7 @@
             "name": "t0_name",
             "description": "The name of the T0 router that this edge gateway will be connected to. If not provided and only if one T0 router is available, the first T0 router will be used.",
             "required": false,
-            "example": "tn01e02ocb0001234spt101",
+            "example": "prvrf01eocb0001234allsp01",
             "type": "string",
             "validators_description": "Validates that the value is a valid T0 name (pr01e02ocb0001234spt101).. \n"
           },
@@ -175,7 +167,7 @@
             "required": false,
             "example": "",
             "type": "string",
-            "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
+            "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
           },
           {
             "name": "name",
@@ -183,7 +175,7 @@
             "required": false,
             "example": "",
             "type": "string",
-            "validators_description": "The value is required if the parameter `ID` is null., "
+            "validators_description": "The value is required if the parameter `id` is null., "
           }
         ],
         "deprecated": false,
@@ -204,7 +196,7 @@
             "required": false,
             "example": "",
             "type": "string",
-            "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
+            "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
           },
           {
             "name": "name",
@@ -212,7 +204,7 @@
             "required": false,
             "example": "",
             "type": "string",
-            "validators_description": "The value is required if the parameter `ID` is null., Validates that the value is a valid Edge Gateway name (tn01e02ocb0001234spt101).. \n"
+            "validators_description": "The value is required if the parameter `id` is null., Validates that the value is a valid Edge Gateway name (tn01e02ocb0001234spt101).. \n"
           }
         ],
         "deprecated": false,
@@ -317,7 +309,7 @@
             "required": false,
             "example": "",
             "type": "string",
-            "validators_description": "The value is required if the parameter `Name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
+            "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
           },
           {
             "name": "name",
@@ -325,7 +317,7 @@
             "required": false,
             "example": "",
             "type": "string",
-            "validators_description": "The value is required if the parameter `ID` is null., "
+            "validators_description": "The value is required if the parameter `id` is null., "
           },
           {
             "name": "bandwidth",
@@ -424,7 +416,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:96ac09c3-b5be-4443-b392-17c3b608ea4f",
+                "example": "urn:vcloud:gateway:143f1a19-df5d-47a7-850c-d810e2949cbd",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -453,7 +445,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:4460a513-0825-4241-a683-12c721927b83",
+                "example": "urn:vcloud:gateway:aab95ae4-9226-4d54-88ec-9c291e90ae39",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -1306,7 +1298,7 @@
             "required": true,
             "example": "my-vdc",
             "type": "string",
-            "validators_description": ""
+            "validators_description": "Validates that the value is a valid VDC name (\u003calphanumeric\u003e with - _ character and with max length 27 and min length 2).. \n"
           },
           {
             "name": "description",
@@ -1774,7 +1766,7 @@
             "required": false,
             "example": "my-vdc",
             "type": "string",
-            "validators_description": "The value is required if the parameter `id` is null., "
+            "validators_description": "The value is required if the parameter `id` is null., Validates that the value is a valid VDC name (\u003calphanumeric\u003e with - _ character and with max length 27 and min length 2).. \n"
           }
         ],
         "deprecated": false,
@@ -1801,9 +1793,9 @@
             "name": "name",
             "description": "Name of the VDC to get",
             "required": false,
-            "example": "",
+            "example": "my-vdc",
             "type": "string",
-            "validators_description": "The value is required if the parameter `id` is null., "
+            "validators_description": "The value is required if the parameter `id` is null., Validates that the value is a valid VDC name (\u003calphanumeric\u003e with - _ character and with max length 27 and min length 2).. \n"
           }
         ],
         "deprecated": false,
@@ -1938,7 +1930,7 @@
             "required": false,
             "example": "",
             "type": "string",
-            "validators_description": ""
+            "validators_description": "Validates that the value is a valid VDC name (\u003calphanumeric\u003e with - _ character and with max length 27 and min length 2).. \n"
           }
         ],
         "deprecated": false,
@@ -2008,7 +2000,7 @@
             "required": false,
             "example": "my-vdc",
             "type": "string",
-            "validators_description": "The value is required if the parameter `id` is null., "
+            "validators_description": "The value is required if the parameter `id` is null., Validates that the value is a valid VDC name (\u003calphanumeric\u003e with - _ character and with max length 27 and min length 2).. \n"
           },
           {
             "name": "description",
@@ -2325,17 +2317,180 @@
               {
                 "object": "vdcs.{index}.storage_profiles.{index}.limit",
                 "type": "int",
-                "documentation": "Limit of the storage profile in MB"
+                "documentation": "Limit of the storage profile in GiB"
               },
               {
                 "object": "vdcs.{index}.storage_profiles.{index}.used",
                 "type": "int",
-                "documentation": "Used storage of the storage profile in MB"
+                "documentation": "Used storage of the storage profile in GiB"
               },
               {
                 "object": "vdcs.{index}.storage_profiles.{index}.default",
                 "type": "bool",
-                "documentation": "Is this storage profile the default one?"
+                "documentation": "Indicates if the storage profile is the default one"
+              }
+            ]
+          },
+          "Update": {
+            "namespace": "VDC",
+            "resource": "StorageProfile",
+            "verb": "Update",
+            "short_documentation": "Update a VDC Storage Profile",
+            "long_documentation": "Update one or multiple storage profiles in a given VDC. You can update the limit and/or set a storage profile as default. You cannot update the class name of a storage profile.",
+            "markdown_documentation": "",
+            "params": [
+              {
+                "name": "vdc_id",
+                "description": "ID of the VDC to update the storage profile from",
+                "required": false,
+                "example": "",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `vdc_name` is null., Validates that the value is a valid URN (`vdc`).. \n"
+              },
+              {
+                "name": "vdc_name",
+                "description": "Name of the VDC to update the storage profile from",
+                "required": false,
+                "example": "my-vdc",
+                "type": "string",
+                "validators_description": "The value is required if the parameter `vdc_id` is null., "
+              },
+              {
+                "name": "storage_profiles.{index}.class",
+                "description": "Class of the storage profile to update. This is the identifier of the storage profile to update. Refer to the Rules Table below for valid classes.",
+                "required": true,
+                "example": "gold",
+                "type": "string",
+                "validators_description": ""
+              },
+              {
+                "name": "storage_profiles.{index}.default",
+                "description": "Set the storage profile as default. There can be only one default storage profile per VDC.",
+                "required": false,
+                "example": "true",
+                "type": "bool",
+                "validators_description": ""
+              },
+              {
+                "name": "storage_profiles.{index}.limit",
+                "description": "Limit of the storage profile to update in GiB. This is the maximum amount of storage that can be used by the VDC. The new limit cannot be less than the current used storage. Warning: Decreasing the limit may lead to service disruption if the current usage exceeds the new limit.",
+                "required": false,
+                "example": "500",
+                "type": "int",
+                "validators_description": "Validates that the value is between 100 and 81920. \n"
+              }
+            ],
+            "deprecated": false,
+            "deprecated_message": "",
+            "model": [
+              {
+                "object": "id",
+                "type": "string",
+                "documentation": "ID of the VDC"
+              },
+              {
+                "object": "name",
+                "type": "string",
+                "documentation": "Name of the VDC"
+              },
+              {
+                "object": "storage_profiles.{index}.id",
+                "type": "string",
+                "documentation": "ID of the storage profile"
+              },
+              {
+                "object": "storage_profiles.{index}.class",
+                "type": "string",
+                "documentation": "Name of the storage profile"
+              },
+              {
+                "object": "storage_profiles.{index}.limit",
+                "type": "int",
+                "documentation": "Limit of the storage profile in GiB"
+              },
+              {
+                "object": "storage_profiles.{index}.used",
+                "type": "int",
+                "documentation": "Used storage of the storage profile in GiB"
+              },
+              {
+                "object": "storage_profiles.{index}.default",
+                "type": "bool",
+                "documentation": "Indicates if the storage profile is the default one"
+              }
+            ],
+            "rules": [
+              {
+                "consoles": null,
+                "whenHuman": "(disponibility_class = ONE-ROOM)",
+                "when": {
+                  "or": [
+                    {
+                      "field": "disponibility_class",
+                      "value": "ONE-ROOM"
+                    }
+                  ]
+                },
+                "target": "storage_profiles.{index}.class",
+                "enum": [
+                  "silver",
+                  "gold",
+                  "platinum3k",
+                  "platinum7k",
+                  "^(silver|gold|platinum[3|7]{1}k)_(ocb[0-9]{1,7})$"
+                ],
+                "description": "Storage profile class allowed for Disponibility Class ONE-ROOM"
+              },
+              {
+                "consoles": [
+                  "Console Externe VDR",
+                  "Console Interne VDR"
+                ],
+                "whenHuman": "(disponibility_class = DUAL-ROOM)",
+                "when": {
+                  "or": [
+                    {
+                      "field": "disponibility_class",
+                      "value": "DUAL-ROOM"
+                    }
+                  ]
+                },
+                "target": "storage_profiles.{index}.class",
+                "enum": [
+                  "silver_r1",
+                  "silver_r2",
+                  "gold_r1",
+                  "gold_r2",
+                  "platinum3k_r1",
+                  "platinum3k_r2",
+                  "platinum7k_r1",
+                  "platinum7k_r2",
+                  "^(silver|gold|platinum[3|7]{1}k)_(ocb[0-9]{1,7})_(r1|r2)$"
+                ],
+                "description": "Storage profile class allowed for Disponibility Class DUAL-ROOM"
+              },
+              {
+                "consoles": [
+                  "Console Externe VDR",
+                  "Console Interne VDR"
+                ],
+                "whenHuman": "(disponibility_class = HA-DUAL-ROOM)",
+                "when": {
+                  "or": [
+                    {
+                      "field": "disponibility_class",
+                      "value": "HA-DUAL-ROOM"
+                    }
+                  ]
+                },
+                "target": "storage_profiles.{index}.class",
+                "enum": [
+                  "gold_hm",
+                  "platinum3k_hm",
+                  "platinum7k_hm",
+                  "^(gold|platinum[3|7]{1}k)_(ocb[0-9]{1,7})_(hm)$"
+                ],
+                "description": "Storage profile class allowed for Disponibility Class HA-DUAL-ROOM"
               }
             ]
           }
