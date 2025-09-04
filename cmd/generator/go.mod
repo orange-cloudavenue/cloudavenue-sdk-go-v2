@@ -20,16 +20,17 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/orange-cloudavenue/common-go/generator v1.2.0 // indirect
-	github.com/orange-cloudavenue/common-go/internal/regex v0.0.0-20250718073934-40f61889caee // indirect
-	github.com/orange-cloudavenue/common-go/urn v1.0.1 // indirect
-	github.com/orange-cloudavenue/common-go/validators v1.0.0 // indirect
+	github.com/orange-cloudavenue/common-go/generator v1.3.4 // indirect
+	github.com/orange-cloudavenue/common-go/internal/regex v0.0.0-20250812201424-07c3423160b3 // indirect
+	github.com/orange-cloudavenue/common-go/regex v1.1.1 // indirect
+	github.com/orange-cloudavenue/common-go/strcase v1.0.0 // indirect
+	github.com/orange-cloudavenue/common-go/urn v1.2.0 // indirect
+	github.com/orange-cloudavenue/common-go/validators v1.1.3 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
-	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.34 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	golang.org/x/crypto v0.40.0 // indirect
 	golang.org/x/net v0.42.0 // indirect
 	golang.org/x/sys v0.34.0 // indirect
-	golang.org/x/text v0.27.0 // indirect
+	golang.org/x/text v0.28.0 // indirect
 	resty.dev/v3 v3.0.0-beta.3 // indirect
 )

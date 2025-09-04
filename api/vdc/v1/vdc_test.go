@@ -41,7 +41,7 @@ func TestListVDC(t *testing.T) {
 		{
 			name: "List VDCs with filter by Name",
 			params: types.ParamsListVDC{
-				Name: "test-name",
+				Name: generator.MustGenerate("{resource_name:vdc}"),
 			},
 			expectedErr: false,
 		},
@@ -109,7 +109,7 @@ func TestGetVDC(t *testing.T) {
 		{
 			name: "Get VDC by Name",
 			params: types.ParamsGetVDC{
-				Name: "test-name",
+				Name: generator.MustGenerate("{resource_name:vdc}"),
 			},
 			expectedErr: false,
 		},
@@ -201,7 +201,7 @@ func TestCreateVDC(t *testing.T) {
 		{
 			name: "Create VDC with valid parameters",
 			params: types.ParamsCreateVDC{
-				Name:                "test-vdc",
+				Name:                generator.MustGenerate("{resource_name:vdc}"),
 				Description:         "Test VDC",
 				ServiceClass:        "STD",
 				BillingModel:        "PAYG",
@@ -222,7 +222,7 @@ func TestCreateVDC(t *testing.T) {
 		{
 			name: "Create VDC with missing required parameters",
 			params: types.ParamsCreateVDC{
-				Name: "test-vdc",
+				Name: generator.MustGenerate("{resource_name:vdc}"),
 				// Missing other required fields
 			},
 			expectedErr: true,
@@ -230,7 +230,7 @@ func TestCreateVDC(t *testing.T) {
 		{
 			name: "Create VDC with no default storage profile",
 			params: types.ParamsCreateVDC{
-				Name:                "test-vdc",
+				Name:                generator.MustGenerate("{resource_name:vdc}"),
 				Description:         "Test VDC",
 				ServiceClass:        "STD",
 				BillingModel:        "PAYG",
@@ -250,7 +250,7 @@ func TestCreateVDC(t *testing.T) {
 		{
 			name: "Error 401 Unauthorized",
 			params: types.ParamsCreateVDC{
-				Name:                "test-vdc",
+				Name:                generator.MustGenerate("{resource_name:vdc}"),
 				Description:         "Test VDC",
 				ServiceClass:        "STD",
 				BillingModel:        "PAYG",
@@ -272,7 +272,7 @@ func TestCreateVDC(t *testing.T) {
 		{
 			name: "Failed to get VDC details after creation",
 			params: types.ParamsCreateVDC{
-				Name:                "test-vdc",
+				Name:                generator.MustGenerate("{resource_name:vdc}"),
 				Description:         "Test VDC",
 				ServiceClass:        "STD",
 				BillingModel:        "PAYG",
@@ -335,7 +335,7 @@ func TestUpdateVDC(t *testing.T) {
 		{
 			name: "Update VDC with valid parameters",
 			params: types.ParamsUpdateVDC{
-				Name:        "updated-vdc",
+				Name:        generator.MustGenerate("{resource_name:vdc}"),
 				Description: utils.ToPTR("Updated VDC"),
 			},
 			expectedErr: false,
@@ -343,7 +343,7 @@ func TestUpdateVDC(t *testing.T) {
 		{
 			name: "Failed to retrieve VDC with valid parameters VCPU",
 			params: types.ParamsUpdateVDC{
-				Name: "updated-vdc",
+				Name: generator.MustGenerate("{resource_name:vdc}"),
 				Vcpu: utils.ToPTR(10),
 			},
 			expectedErr:              true,
@@ -352,7 +352,7 @@ func TestUpdateVDC(t *testing.T) {
 		{
 			name: "Update VDC with valid parameters Memory",
 			params: types.ParamsUpdateVDC{
-				Name:   "updated-vdc",
+				Name:   generator.MustGenerate("{resource_name:vdc}"),
 				Memory: utils.ToPTR(16),
 			},
 			expectedErr: false,
@@ -367,7 +367,7 @@ func TestUpdateVDC(t *testing.T) {
 		{
 			name: "Update VDC with valid parameters VCPU",
 			params: types.ParamsUpdateVDC{
-				Name: "updated-vdc",
+				Name: generator.MustGenerate("{resource_name:vdc}"),
 				Vcpu: utils.ToPTR(10),
 			},
 			expectedErr: false,
@@ -375,7 +375,7 @@ func TestUpdateVDC(t *testing.T) {
 		{
 			name: "Error 404 Not Found",
 			params: types.ParamsUpdateVDC{
-				Name:        "updated-vdc",
+				Name:        generator.MustGenerate("{resource_name:vdc}"),
 				Description: utils.ToPTR("Updated VDC"),
 			},
 			mockResponseStatus: 404,
