@@ -17,7 +17,7 @@ require (
 	github.com/orange-cloudavenue/common-go/strcase v1.0.0
 	github.com/orange-cloudavenue/common-go/urn v1.2.0
 	github.com/orange-cloudavenue/common-go/utils v1.0.0
-	github.com/orange-cloudavenue/common-go/validators v1.1.3
+	github.com/orange-cloudavenue/common-go/validators v1.2.0
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
 	github.com/stretchr/testify v1.11.0
 	golang.org/x/sync v0.16.0
@@ -35,7 +35,7 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/orange-cloudavenue/common-go/internal/regex v0.0.0-20250812201424-07c3423160b3 // indirect
-	github.com/orange-cloudavenue/common-go/regex v1.1.1 // indirect
+	github.com/orange-cloudavenue/common-go/regex v1.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/crypto v0.40.0 // indirect
 	golang.org/x/net v0.42.0 // indirect
