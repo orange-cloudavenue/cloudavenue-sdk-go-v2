@@ -23,14 +23,15 @@ func (c *Client) ListStorageProfile(ctx context.Context, params types.ParamsList
 	}
 	return x.(*types.ModelListStorageProfiles), nil
 }
+
 // Add one or more storage profiles to a specific VDC.
 func (c *Client) AddStorageProfile(ctx context.Context, params types.ParamsAddStorageProfile) error {
 	_, err := cmds.Get("VDC", "StorageProfile", "Add").Run(ctx, c, params)
 	return err
 }
+
 // Delete a storage profile from a given VDC. You cannot delete the default storage profile, the last remaining profile, or a non-empty profile.
 func (c *Client) DeleteStorageProfile(ctx context.Context, params types.ParamsDeleteStorageProfile) error {
 	_, err := cmds.Get("VDC", "StorageProfile", "Delete").Run(ctx, c, params)
 	return err
 }
-

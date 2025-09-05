@@ -97,7 +97,7 @@ var commandCmd = &cobra.Command{
 
 			for paramName, paramValue := range commandParams {
 				if err := commands.StoreValueAtPath(rVal.Addr().Interface(), paramName, paramValue); err != nil {
-					log.Error("Error storing parameter value", "param", paramName, "error", err)
+					log.Error("Error storing parameter value", "param", paramName, "value", paramValue, "error", err)
 					return
 				}
 			}

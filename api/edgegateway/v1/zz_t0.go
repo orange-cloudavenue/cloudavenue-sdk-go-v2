@@ -23,7 +23,6 @@ func (c *Client) ListT0(ctx context.Context) (*types.ModelT0s, error) {
 	}
 	return x.(*types.ModelT0s), nil
 }
-
 // Retrieve a specific T0 directly by its name or by the edge gateway it is associated with. This command allows you to fetch detailed information about a specific T0.
 func (c *Client) GetT0(ctx context.Context, params types.ParamsGetT0) (*types.ModelT0, error) {
 	x, err := cmds.Get("T0", "", "Get").Run(ctx, c, params)
@@ -32,3 +31,4 @@ func (c *Client) GetT0(ctx context.Context, params types.ParamsGetT0) (*types.Mo
 	}
 	return x.(*types.ModelT0), nil
 }
+

@@ -57,6 +57,7 @@ func init() { //nolint:gocyclo
 				Required:    false,
 				Validators: []commands.Validator{
 					commands.ValidatorOmitempty(),
+					commands.ValidatorResourceName("vdc"),
 				},
 			},
 		},
@@ -115,9 +116,11 @@ func init() { //nolint:gocyclo
 				Name:        "name",
 				Description: "Name of the VDC to get",
 				Required:    false,
+				Example:     "my-vdc",
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("id"),
 					commands.ValidatorOmitempty(),
+					commands.ValidatorResourceName("vdc"),
 				},
 			},
 		},
@@ -247,6 +250,9 @@ func init() { //nolint:gocyclo
 				Description: "Name of the VDC to create",
 				Required:    true,
 				Example:     "my-vdc",
+				Validators: []commands.Validator{
+					commands.ValidatorResourceName("vdc"),
+				},
 			},
 			{
 				Name:        "description",
@@ -415,6 +421,7 @@ func init() { //nolint:gocyclo
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("id"),
 					commands.ValidatorOmitempty(),
+					commands.ValidatorResourceName("vdc"),
 				},
 			},
 			commands.ParamsSpec{
@@ -529,6 +536,7 @@ func init() { //nolint:gocyclo
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("id"),
 					commands.ValidatorOmitempty(),
+					commands.ValidatorResourceName("vdc"),
 				},
 			},
 		},

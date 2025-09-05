@@ -88,10 +88,10 @@ type (
 	// ParamsGetVDC is the parameters for the GetVDC command.
 	ParamsGetVDC struct {
 		// ID is the unique identifier of the VDC to get.
-		ID string `documentation:"ID of the VDC to get"`
+		ID string
 
 		// Name is the name of the VDC to get.
-		Name string `documentation:"Name of the VDC to get"`
+		Name string
 	}
 
 	// ParamsCreateVDC is the parameters for the CreateVDC command.
