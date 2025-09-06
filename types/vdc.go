@@ -117,6 +117,13 @@ type (
 		Default bool
 	}
 
+	// ParamsUpdateVDCStorageProfile defines the parameters for updating a storage profile in a VDC.
+	ParamsUpdateVDCStorageProfile struct {
+		Class   string
+		Limit   int
+		Default *bool
+	}
+
 	// ParamsDeleteVDCStorageProfile defines the parameters for deleting a storage profile from a VDC.
 	ParamsDeleteVDCStorageProfile struct {
 		Class string

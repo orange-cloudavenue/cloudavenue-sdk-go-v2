@@ -24,7 +24,7 @@ import (
 
 //go:generate command-generator -path storage_profile_commands.go
 
-func init() {
+func init() { //nolint:gocyclo
 	// * StorageProfiles
 	cmds.Register(commands.Command{
 		Namespace: "VDC",
@@ -336,7 +336,7 @@ func init() {
 
 			// Initialize the storage profiles slice in the API request
 			// This will be used to delete the storage profile
-			// Note: Only the storage profiles to delete will be treated
+			// Note: Only the storage profiles to delete will be processed
 			// We will set the Limit to 0 to delete the storage profile
 			// and Default to false.
 			// As we cannot delete a default storage profile
@@ -378,5 +378,181 @@ func init() {
 			logger.DebugContext(ctx, "Storage profile deleted successfully", "vdc_name", p.VdcName, "storage_profile_class", p.StorageProfiles[0].Class)
 			return nil, nil
 		},
+	})
+
+	// * UpdateStorageProfile
+	cmds.Register(commands.Command{
+		Namespace:          "VDC",
+		Resource:           "StorageProfile",
+		Verb:               "Update",
+		ShortDocumentation: "Update a VDC Storage Profile",
+		LongDocumentation:  "Update one or multiple storage profiles in a given VDC. You can update the limit and/or set a storage profile as default. You cannot update the class name of a storage profile.",
+		AutoGenerate:       true,
+		ParamsType:         types.ParamsUpdateStorageProfile{},
+		ParamsSpecs: commands.ParamsSpecs{
+			commands.ParamsSpec{
+				Name:        "vdc_id",
+				Description: "ID of the VDC to update the storage profile from",
+				Required:    false,
+				Validators: []commands.Validator{
+					commands.ValidatorRequiredIfParamIsNull("vdc_name"),
+					commands.ValidatorOmitempty(),
+					commands.ValidatorURN("vdc"),
+				},
+			},
+			commands.ParamsSpec{
+				Name:        "vdc_name",
+				Description: "Name of the VDC to update the storage profile from",
+				Required:    false,
+				Example:     "my-vdc",
+				Validators: []commands.Validator{
+					commands.ValidatorRequiredIfParamIsNull("vdc_id"),
+					commands.ValidatorOmitempty(),
+				},
+			},
+			{
+				Name:        "storage_profiles.{index}.class",
+				Description: "Class of the storage profile to update. This is the identifier of the storage profile to update. Refer to the Rules Table below for valid classes.",
+				Required:    true,
+				Example:     "gold",
+			},
+			{
+				Name:        "storage_profiles.{index}.default",
+				Description: "Set the storage profile as default. There can be only one default storage profile per VDC.",
+				Required:    false,
+				Validators: []commands.Validator{
+					commands.ValidatorOmitempty(),
+				},
+				Example: "true",
+			},
+			{
+				Name:        "storage_profiles.{index}.limit",
+				Description: "Storage profile limit to update in GiB. This is the maximum amount of storage the VDC can use. The new limit cannot be lower than the currently used storage capacity. Warning: Decreasing the limit may cause service interruption if usage has recently changed and exceeds the new limit.",
+				Required:    false,
+				Example:     "500",
+				Validators: []commands.Validator{
+					commands.ValidatorBetween(100, 81920),
+				},
+			},
+		},
+
+		// No additional rules are applied here.
+		// Explanation:
+		// - During an update, storage classes are already known.
+		// - Re-checking this information would only add complexity
+		//   without any benefit (the limit is the same for all classes).
+		// We decided to remove the rules to keep the code simpler and more readable.
+
+		ParamsRules: nil,
+
+		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
+			cc := client.(*Client)
+			p := params.(types.ParamsUpdateStorageProfile)
+
+			logger := cc.logger.WithGroup("UpdateStorageProfile")
+
+			ep := endpoints.UpdateVdc()
+
+			// Use FastFailure to ensure VDC ID or Name are provided and valid
+			listSP, err := cc.ListStorageProfile(ctx, types.ParamsListStorageProfile{
+				VdcName: p.VdcName,
+				VdcID:   p.VdcID,
+			})
+			if err != nil {
+				return nil, err
+			}
+			if len(listSP.VDCS) == 0 {
+				return nil, errors.New("no VDC found with the provided ID or Name")
+			}
+			if len(listSP.VDCS) > 1 {
+				return nil, errors.New("multiple VDCs found with the provided ID or Name, please specify a unique VDC")
+			}
+
+			// Set the VDC ID and Name from the list response
+			vdc := listSP.VDCS[0]
+			p.VdcID = vdc.ID
+			p.VdcName = vdc.Name
+
+			// Create api VDC request to update all storage profiles
+			apiR := itypes.ApiRequestUpdateVDC{
+				VDC: itypes.ApiRequestUpdateVDCVDC{
+					Name: p.VdcName,
+				},
+			}
+
+			// Initialize the storage profiles slice in the API request
+			// This will be used to update the storage profile
+			// Note: Only the storage profiles to update will be processed
+			apiR.VDC.StorageProfiles = make([]itypes.ApiRequestVDCStorageProfile, 0, len(p.StorageProfiles))
+			// Create a map of current storage profiles for easy lookup
+			currentStorageProfiles := make(map[string]types.ModelListStorageProfile, len(vdc.StorageProfiles))
+			for _, sp := range vdc.StorageProfiles {
+				currentStorageProfiles[sp.Class] = sp
+			}
+
+			// Track if a default storage profile is set in the update request
+			var defaultCount int
+			for _, sp := range p.StorageProfiles {
+				// Check if the storage profile to update exists in the current storage profiles
+				if _, ok := currentStorageProfiles[sp.Class]; !ok {
+					return nil, fmt.Errorf("storage profile class %s not found in VDC %s", sp.Class, p.VdcName)
+				}
+
+				// If limit is set, check if the new limit is not less than the current used storage
+				if sp.Limit < currentStorageProfiles[sp.Class].Used && sp.Limit > 0 {
+					return nil, fmt.Errorf("new limit for storage profile %s cannot be less than the current used (%d GiB)", sp.Class, currentStorageProfiles[sp.Class].Used)
+				}
+
+				// Set the storage profile in the API request
+				apiR.VDC.StorageProfiles = append(apiR.VDC.StorageProfiles, itypes.ApiRequestVDCStorageProfile{
+					Class: sp.Class,
+					Limit: func() int {
+						if sp.Limit > 0 {
+							return sp.Limit
+						}
+						return currentStorageProfiles[sp.Class].Limit
+					}(),
+					Default: func() bool {
+						// If sp.Default is set, use its value and increment the counter if it is true.
+						if sp.Default != nil {
+							if *sp.Default {
+								defaultCount++
+							}
+							return *sp.Default
+						}
+						// If Default is not specified, use the current value
+						if currentStorageProfiles[sp.Class].Default {
+							return true
+						}
+						return false
+					}(),
+				})
+			}
+
+			if defaultCount > 1 {
+				return nil, fmt.Errorf("multiple storage profiles have default=true, only one is allowed")
+			}
+
+			_, err = cc.c.Do(
+				ctx,
+				ep,
+				cav.WithPathParam(ep.PathParams[0], p.VdcName),
+				cav.SetBody(apiR),
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to update storage profile(s) in VDC %s: %w", p.VdcName, err)
+			}
+			logger.DebugContext(ctx, "Storage profile updated successfully", "vdc_name", p.VdcName, "storage_profile_class", p.StorageProfiles[0].Class)
+
+			x, err := cc.ListStorageProfile(ctx, types.ParamsListStorageProfile{
+				VdcID:   p.VdcID,
+				VdcName: p.VdcName,
+			})
+
+			// Return the updated storage profiles for the VDC,
+			// Only one VDC as we used VDC ID or Name in the request.
+			return &x.VDCS[0], err
+		},
+		ModelType: types.ModelListStorageProfilesVDC{},
 	})
 }

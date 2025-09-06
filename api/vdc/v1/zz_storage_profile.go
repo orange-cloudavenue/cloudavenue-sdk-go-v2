@@ -35,3 +35,12 @@ func (c *Client) DeleteStorageProfile(ctx context.Context, params types.ParamsDe
 	_, err := cmds.Get("VDC", "StorageProfile", "Delete").Run(ctx, c, params)
 	return err
 }
+
+// Update one or multiple storage profiles in a given VDC. You can update the limit and/or set a storage profile as default. You cannot update the class name of a storage profile.
+func (c *Client) UpdateStorageProfile(ctx context.Context, params types.ParamsUpdateStorageProfile) (*types.ModelListStorageProfilesVDC, error) {
+	x, err := cmds.Get("VDC", "StorageProfile", "Update").Run(ctx, c, params)
+	if err != nil {
+		return nil, err
+	}
+	return x.(*types.ModelListStorageProfilesVDC), nil
+}

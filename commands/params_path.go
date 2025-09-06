@@ -135,10 +135,16 @@ func StoreValueAtPath(params interface{}, path, value string) error {
 			if err != nil {
 				return fmt.Errorf("expected integer index for slice/array at '%s', got '%s'", strings.Join(parts[:i], "."), part)
 			}
-			if index < 0 || index >= val.Len() {
-				// Add init the slice
-				newElem := reflect.New(val.Type().Elem()).Elem()
-				val.Set(reflect.Append(val, newElem))
+			if index < 0 {
+				return fmt.Errorf("negative index for slice/array at '%s'", strings.Join(parts[:i], "."))
+			}
+			if index >= val.Len() {
+				// Expand the slice to the necessary size
+				sliceType := val.Type()
+				newLen := index + 1
+				newSlice := reflect.MakeSlice(sliceType, newLen, newLen)
+				reflect.Copy(newSlice, val)
+				val.Set(newSlice)
 			}
 			val = val.Index(index)
 		case reflect.Map:
