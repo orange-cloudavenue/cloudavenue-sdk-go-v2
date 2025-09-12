@@ -99,7 +99,7 @@ func TestUpdateOrganization(t *testing.T) {
 			params: &types.ParamsUpdateOrganization{
 				FullName:            "New Org Name",
 				Description:         func(s string) *string { return &s }("New Org Description"),
-				CustomerMail:        "user@email.com",
+				Email:               "user@email.com",
 				InternetBillingMode: "PAYG",
 			},
 		},
@@ -108,10 +108,24 @@ func TestUpdateOrganization(t *testing.T) {
 			params: &types.ParamsUpdateOrganization{
 				FullName:            "",
 				Description:         func(s string) *string { return &s }(""),
-				CustomerMail:        "",
+				Email:               "",
 				InternetBillingMode: "",
 			},
 			expectErr: false,
+		},
+		{
+			name: "Fail - parameters too long for FullName",
+			params: &types.ParamsUpdateOrganization{
+				FullName: "This organization name is way too long and exceeds the maximum length of 129 characters. This organization name is way too long and exceeds the maximum length of 129 characters.",
+			},
+			expectErr: true,
+		},
+		{
+			name: "Fail - parameters too long for Description",
+			params: &types.ParamsUpdateOrganization{
+				Description: func(s string) *string { return &s }("This description is way too long and exceeds the maximum length of 257 characters. This description is way too long and exceeds the maximum length of 257 characters. This description is way too long and exceeds the maximum length of 257 characters. This description is way too long and exceeds the maximum length of 257 characters."),
+			},
+			expectErr: true,
 		},
 		{
 			name: "Fail - Do not retrieve Organization",
@@ -126,7 +140,7 @@ func TestUpdateOrganization(t *testing.T) {
 			params: &types.ParamsUpdateOrganization{
 				FullName:            "",
 				Description:         nil,
-				CustomerMail:        "",
+				Email:               "",
 				InternetBillingMode: "",
 			},
 			expectErr: true,
@@ -143,7 +157,7 @@ func TestUpdateOrganization(t *testing.T) {
 			params: &types.ParamsUpdateOrganization{
 				FullName:            "New Org Name",
 				Description:         func(s string) *string { return &s }("New Org Description"),
-				CustomerMail:        "user@email.com",
+				Email:               "user@email.com",
 				InternetBillingMode: "PAYG",
 			},
 			mockUpdateOrgStatus: 404,
