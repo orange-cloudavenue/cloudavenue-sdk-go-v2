@@ -36,8 +36,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/gabriel-vasile/mimetype v1.4.8 h1:FfZ3gj38NjllZIeJAmMhr+qKL8Wu+nOoI3GqacKw1NM=
 github.com/gabriel-vasile/mimetype v1.4.8/go.mod h1:ByKUIKGjh1ODkGM1asKUbQZOLGrPjydw3hYPU2YU9t8=
-github.com/go-chi/chi/v5 v5.2.2 h1:CMwsvRVTbXVytCk1Wd72Zy1LAsAh9GxMmSNWLHCG618=
-github.com/go-chi/chi/v5 v5.2.2/go.mod h1:L2yAIGWB3H+phAw1NxKwWM+7eUH/lU8pOMm5hHcoops=
+github.com/go-chi/chi/v5 v5.2.3 h1:WQIt9uxdsAbgIYgid+BpYc+liqQZGMHRaUwp0JUcvdE=
+github.com/go-chi/chi/v5 v5.2.3/go.mod h1:L2yAIGWB3H+phAw1NxKwWM+7eUH/lU8pOMm5hHcoops=
 github.com/go-logfmt/logfmt v0.6.0 h1:wGYYu3uicYdqXVgoYbvnkrPVXkuLM1p1ifugDMEdRi4=
 github.com/go-logfmt/logfmt v0.6.0/go.mod h1:WYhtIu8zTZfxdn5+rREduYbwxfcBr/Vr6KEVveWlfTs=
 github.com/go-playground/assert/v2 v2.2.0 h1:JvknZsQTYeFEAhQwI4qEt9cyV5ONwRHC+lYKSsYSR8s=
@@ -94,8 +94,8 @@ github.com/orange-cloudavenue/common-go/regex v1.2.0 h1:mJLWYPL1wEllGx9h4YEvsV7Q
 github.com/orange-cloudavenue/common-go/regex v1.2.0/go.mod h1:A7DfA7aAObMJ7DQSBPtVxbr54x0G2WDh4qf40RhZF+0=
 github.com/orange-cloudavenue/common-go/strcase v1.0.0 h1:96+dUHYq91/hiXY/DKO9HGTP3FMsSLikcf/xsp7tqLw=
 github.com/orange-cloudavenue/common-go/strcase v1.0.0/go.mod h1:WGZdlDEE39Yar+OU9pgjMGXMlQWgJrgOOc4q72qNVGE=
-github.com/orange-cloudavenue/common-go/urn v1.2.0 h1:FWjMj4aiCJwTb6UAGavthmTTE/KSKGFc3bi2cbNk3r8=
-github.com/orange-cloudavenue/common-go/urn v1.2.0/go.mod h1:yXpk5u8KLhpCxmR6uugaKZB/YgsrGg08TZ5XQdybHKs=
+github.com/orange-cloudavenue/common-go/urn v1.4.0 h1:7z0yZuvxoZbebtk0U7WlbDlkBGh5Dj1mDyfxPP1klCA=
+github.com/orange-cloudavenue/common-go/urn v1.4.0/go.mod h1:yXpk5u8KLhpCxmR6uugaKZB/YgsrGg08TZ5XQdybHKs=
 github.com/orange-cloudavenue/common-go/utils v1.0.0 h1:9dUiS72eRXTrOFpomF3IexjfUF5USH9J49w7cUos+rI=
 github.com/orange-cloudavenue/common-go/utils v1.0.0/go.mod h1:LhE0UATOSRLoazdYuxvDAwKvTUuyVg4Ny+3XXdETU+0=
 github.com/orange-cloudavenue/common-go/validators v1.2.0 h1:Pn/X9lwC5mqn2LjeK+uBq+9RiO1BEvVXtCZlKTf+JK4=
@@ -124,8 +124,8 @@ golang.org/x/exp v0.0.0-20231006140011-7918f672742d h1:jtJma62tbqLibJ5sFQz8bKtEM
 golang.org/x/exp v0.0.0-20231006140011-7918f672742d/go.mod h1:ldy0pHrwJyGW56pPQzzkH36rKxoZW1tw7ZJpeKx+hdo=
 golang.org/x/net v0.42.0 h1:jzkYrhi3YQWD6MLBJcsklgQsoAcw89EcZbJw8Z614hs=
 golang.org/x/net v0.42.0/go.mod h1:FF1RA5d3u7nAYA4z2TkclSCKh68eSXtiFwcWQpPXdt8=
-golang.org/x/sync v0.16.0 h1:ycBJEhp9p4vXvUZNszeOq0kGTPghopOL8q0fq3vstxw=
-golang.org/x/sync v0.16.0/go.mod h1:1dzgHSNfp02xaA81J2MS99Qcpr2w7fw1gpm99rleRqA=
+golang.org/x/sync v0.17.0 h1:l60nONMj9l5drqw6jlhIELNv9I0A4OFgRsG9k2oT9Ug=
+golang.org/x/sync v0.17.0/go.mod h1:9KTHXmSnoGruLpwFjVSX0lNNA75CykiMECbovNTZqGI=
 golang.org/x/sys v0.6.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.34.0 h1:H5Y5sJ2L2JRdyv7ROF1he/lPdvFsd0mJHFw2ThKHxLA=
 golang.org/x/sys v0.34.0/go.mod h1:BJP2sWEmIv4KK5OTEluFJCKSidICx8ciO85XgH3Ak8k=

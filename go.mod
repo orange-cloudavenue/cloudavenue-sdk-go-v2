@@ -16,7 +16,7 @@ require (
 	github.com/orange-cloudavenue/common-go/extractor v1.0.1
 	github.com/orange-cloudavenue/common-go/generator v1.3.4
 	github.com/orange-cloudavenue/common-go/strcase v1.0.0
-	github.com/orange-cloudavenue/common-go/urn v1.2.0
+	github.com/orange-cloudavenue/common-go/urn v1.4.0
 	github.com/orange-cloudavenue/common-go/utils v1.0.0
 	github.com/orange-cloudavenue/common-go/validators v1.2.0
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22

@@ -25,5 +25,5 @@ func (v *validatorEmail) GetDescription() string {
 }
 
 func (v *validatorEmail) GetMarkdownDescription() string {
-	return "Validates that the value is a valid email address. (E.g. foo@bar.com)"
+	return "Validates that the value is a valid email address. (e.g., `foo@bar.com`)"
 }

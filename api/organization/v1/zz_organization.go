@@ -23,6 +23,7 @@ func (c *Client) GetOrganization(ctx context.Context) (*types.ModelGetOrganizati
 	}
 	return x.(*types.ModelGetOrganization), nil
 }
+
 // Update the details of an existing organization.
 func (c *Client) UpdateOrganization(ctx context.Context, params types.ParamsUpdateOrganization) (*types.ModelGetOrganization, error) {
 	x, err := cmds.Get("Organization", "", "Update").Run(ctx, c, params)
@@ -31,4 +32,3 @@ func (c *Client) UpdateOrganization(ctx context.Context, params types.ParamsUpda
 	}
 	return x.(*types.ModelGetOrganization), nil
 }
-

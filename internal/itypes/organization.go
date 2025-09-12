@@ -57,10 +57,9 @@ type (
 func (r *ApiResponseGetOrg) ToModel() *types.ModelGetOrganization {
 	return &types.ModelGetOrganization{
 		Name:                r.Name,
-		DisplayName:         r.FullName, // FullName is mapped to DisplayName
+		FullName:            r.FullName,
 		Description:         r.Description,
-		IsEnabled:           r.IsEnabled,
-		CustomerMail:        r.CustomerMail,
+		Email:               r.CustomerMail,
 		InternetBillingMode: r.InternetBillingMode,
 	}
 }
@@ -74,14 +73,14 @@ func (r *ApiResponseGetOrgs) ToModel() *types.ModelGetOrganization {
 	return &types.ModelGetOrganization{
 		ID:          r.Organizations[0].ID,
 		Name:        r.Organizations[0].Name,
-		DisplayName: r.Organizations[0].DisplayName,
+		FullName:    r.Organizations[0].DisplayName,
 		Description: r.Organizations[0].Description,
-		IsEnabled:   r.Organizations[0].IsEnabled,
+		Enabled:     r.Organizations[0].IsEnabled,
 		Resources: types.ModelGetOrganizationResources{
 			Vdc:       r.Organizations[0].OrgVdcCount,
 			Catalog:   r.Organizations[0].CatalogCount,
 			Vapp:      r.Organizations[0].VappCount,
-			RunningVM: r.Organizations[0].RunningVMCount,
+			VMRunning: r.Organizations[0].RunningVMCount,
 			User:      r.Organizations[0].UserCount,
 			Disk:      r.Organizations[0].DiskCount,
 		},

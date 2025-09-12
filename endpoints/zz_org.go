@@ -15,19 +15,21 @@ import (
 
 // GetOrganizationDetails - Get organizations details from VMware Cloud Director
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/orgs/get/ 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/orgs/get/
 func GetOrganizationDetails() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetOrganizationDetails")
 }
+
 // GetOrganization - Get your organization information
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Organizations/get_api_customers_v2_0_configurations 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Organizations/get_api_customers_v2_0_configurations
 func GetOrganization() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetOrganization")
 }
+
 // UpdateOrganization - Update an existing organization
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Organizations/put_api_customers_v2_0_configurations 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Organizations/put_api_customers_v2_0_configurations
 func UpdateOrganization() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateOrganization")
 }

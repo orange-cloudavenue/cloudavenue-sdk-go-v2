@@ -416,7 +416,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:143f1a19-df5d-47a7-850c-d810e2949cbd",
+                "example": "urn:vcloud:gateway:47b72773-46fd-4cbd-a9e6-e9b380dc0eeb",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -445,7 +445,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:aab95ae4-9226-4d54-88ec-9c291e90ae39",
+                "example": "urn:vcloud:gateway:39171da5-c913-453e-bb80-622ce0f46ce8",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -925,9 +925,9 @@
             "documentation": "Name of the organization"
           },
           {
-            "object": "display_name",
+            "object": "full_name",
             "type": "string",
-            "documentation": "Display name of the organization"
+            "documentation": "Long name of the organization"
           },
           {
             "object": "description",
@@ -935,14 +935,24 @@
             "documentation": "Description of the organization"
           },
           {
-            "object": "is_enabled",
+            "object": "enabled",
             "type": "bool",
             "documentation": "Indicates if the organization is enabled"
           },
           {
+            "object": "email",
+            "type": "string",
+            "documentation": "Contact email of the organization"
+          },
+          {
+            "object": "internet_billing_mode",
+            "type": "string",
+            "documentation": "Internet billing mode of the organization"
+          },
+          {
             "object": "resources.vdc",
             "type": "int",
-            "documentation": "Number of Org VDCs"
+            "documentation": "Number of VDC(s) in your organization"
           },
           {
             "object": "resources.catalog",
@@ -952,32 +962,22 @@
           {
             "object": "resources.vapp",
             "type": "int",
-            "documentation": "Number of vApps"
+            "documentation": "Number of vApp(s)"
           },
           {
-            "object": "resources.running_vm",
+            "object": "resources.vm_running",
             "type": "int",
-            "documentation": "Number of VM(s) in power on state"
+            "documentation": "Number of VM(s) in state power on"
           },
           {
             "object": "resources.user",
             "type": "int",
-            "documentation": "Number of users in the organization"
+            "documentation": "Number of user(s) in the organization"
           },
           {
             "object": "resources.disk",
             "type": "int",
-            "documentation": "Number of standalone disks in the organization"
-          },
-          {
-            "object": "customer_mail",
-            "type": "string",
-            "documentation": "Contact email of the organization"
-          },
-          {
-            "object": "internet_billing_mode",
-            "type": "string",
-            "documentation": "Internet billing mode of the organization"
+            "documentation": "Number of standalone disk(s) configured in the organization"
           }
         ]
       },
@@ -991,11 +991,11 @@
         "params": [
           {
             "name": "full_name",
-            "description": "The full name of the organization. Appears in the Cloud application as a human-readable name of the organization.",
+            "description": "The full name of the organization. It's a long format of your organization name. Appears in the Cloud application as a human-readable name of the organization.",
             "required": false,
             "example": "My Organization to update",
             "type": "string",
-            "validators_description": ""
+            "validators_description": "Ensures that the input value does not exceed a maximum length of `129` characters. \n"
           },
           {
             "name": "description",
@@ -1003,15 +1003,15 @@
             "required": false,
             "example": "This is my organization description to update",
             "type": "string",
-            "validators_description": ""
+            "validators_description": "Ensures that the input value does not exceed a maximum length of `257` characters. \n"
           },
           {
-            "name": "customer_mail",
+            "name": "email",
             "description": "The contact email for the organization.",
             "required": false,
             "example": "user@mail.com",
             "type": "string",
-            "validators_description": "Validates that the value is a valid email address. (E.g. foo@bar.com). \n"
+            "validators_description": "Validates that the value is a valid email address. (e.g., `foo@bar.com`). \n"
           },
           {
             "name": "internet_billing_mode",
@@ -1036,9 +1036,9 @@
             "documentation": "Name of the organization"
           },
           {
-            "object": "display_name",
+            "object": "full_name",
             "type": "string",
-            "documentation": "Display name of the organization"
+            "documentation": "Long name of the organization"
           },
           {
             "object": "description",
@@ -1046,14 +1046,24 @@
             "documentation": "Description of the organization"
           },
           {
-            "object": "is_enabled",
+            "object": "enabled",
             "type": "bool",
             "documentation": "Indicates if the organization is enabled"
           },
           {
+            "object": "email",
+            "type": "string",
+            "documentation": "Contact email of the organization"
+          },
+          {
+            "object": "internet_billing_mode",
+            "type": "string",
+            "documentation": "Internet billing mode of the organization"
+          },
+          {
             "object": "resources.vdc",
             "type": "int",
-            "documentation": "Number of Org VDCs"
+            "documentation": "Number of VDC(s) in your organization"
           },
           {
             "object": "resources.catalog",
@@ -1063,32 +1073,22 @@
           {
             "object": "resources.vapp",
             "type": "int",
-            "documentation": "Number of vApps"
+            "documentation": "Number of vApp(s)"
           },
           {
-            "object": "resources.running_vm",
+            "object": "resources.vm_running",
             "type": "int",
-            "documentation": "Number of VM(s) in power on state"
+            "documentation": "Number of VM(s) in state power on"
           },
           {
             "object": "resources.user",
             "type": "int",
-            "documentation": "Number of users in the organization"
+            "documentation": "Number of user(s) in the organization"
           },
           {
             "object": "resources.disk",
             "type": "int",
-            "documentation": "Number of standalone disks in the organization"
-          },
-          {
-            "object": "customer_mail",
-            "type": "string",
-            "documentation": "Contact email of the organization"
-          },
-          {
-            "object": "internet_billing_mode",
-            "type": "string",
-            "documentation": "Internet billing mode of the organization"
+            "documentation": "Number of standalone disk(s) configured in the organization"
           }
         ]
       }
@@ -2373,7 +2373,7 @@
               },
               {
                 "name": "storage_profiles.{index}.limit",
-                "description": "Limit of the storage profile to update in GiB. This is the maximum amount of storage that can be used by the VDC. The new limit cannot be less than the current used storage. Warning: Decreasing the limit may lead to service disruption if the current usage exceeds the new limit.",
+                "description": "Storage profile limit to update in GiB. This is the maximum amount of storage the VDC can use. The new limit cannot be lower than the currently used storage capacity. Warning: Decreasing the limit may cause service interruption if usage has recently changed and exceeds the new limit.",
                 "required": false,
                 "example": "500",
                 "type": "int",
@@ -2417,80 +2417,6 @@
                 "object": "storage_profiles.{index}.default",
                 "type": "bool",
                 "documentation": "Indicates if the storage profile is the default one"
-              }
-            ],
-            "rules": [
-              {
-                "consoles": null,
-                "whenHuman": "(disponibility_class = ONE-ROOM)",
-                "when": {
-                  "or": [
-                    {
-                      "field": "disponibility_class",
-                      "value": "ONE-ROOM"
-                    }
-                  ]
-                },
-                "target": "storage_profiles.{index}.class",
-                "enum": [
-                  "silver",
-                  "gold",
-                  "platinum3k",
-                  "platinum7k",
-                  "^(silver|gold|platinum[3|7]{1}k)_(ocb[0-9]{1,7})$"
-                ],
-                "description": "Storage profile class allowed for Disponibility Class ONE-ROOM"
-              },
-              {
-                "consoles": [
-                  "Console Externe VDR",
-                  "Console Interne VDR"
-                ],
-                "whenHuman": "(disponibility_class = DUAL-ROOM)",
-                "when": {
-                  "or": [
-                    {
-                      "field": "disponibility_class",
-                      "value": "DUAL-ROOM"
-                    }
-                  ]
-                },
-                "target": "storage_profiles.{index}.class",
-                "enum": [
-                  "silver_r1",
-                  "silver_r2",
-                  "gold_r1",
-                  "gold_r2",
-                  "platinum3k_r1",
-                  "platinum3k_r2",
-                  "platinum7k_r1",
-                  "platinum7k_r2",
-                  "^(silver|gold|platinum[3|7]{1}k)_(ocb[0-9]{1,7})_(r1|r2)$"
-                ],
-                "description": "Storage profile class allowed for Disponibility Class DUAL-ROOM"
-              },
-              {
-                "consoles": [
-                  "Console Externe VDR",
-                  "Console Interne VDR"
-                ],
-                "whenHuman": "(disponibility_class = HA-DUAL-ROOM)",
-                "when": {
-                  "or": [
-                    {
-                      "field": "disponibility_class",
-                      "value": "HA-DUAL-ROOM"
-                    }
-                  ]
-                },
-                "target": "storage_profiles.{index}.class",
-                "enum": [
-                  "gold_hm",
-                  "platinum3k_hm",
-                  "platinum7k_hm",
-                  "^(gold|platinum[3|7]{1}k)_(ocb[0-9]{1,7})_(hm)$"
-                ],
-                "description": "Storage profile class allowed for Disponibility Class HA-DUAL-ROOM"
               }
             ]
           }
