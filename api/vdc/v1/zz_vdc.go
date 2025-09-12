@@ -23,7 +23,6 @@ func (c *Client) ListVDC(ctx context.Context, params types.ParamsListVDC) (*type
 	}
 	return x.(*types.ModelListVDC), nil
 }
-
 // Retrieve detailed information about a specific Virtual Data Center (VDC) by its name.
 func (c *Client) GetVDC(ctx context.Context, params types.ParamsGetVDC) (*types.ModelGetVDC, error) {
 	x, err := cmds.Get("VDC", "", "Get").Run(ctx, c, params)
@@ -32,7 +31,6 @@ func (c *Client) GetVDC(ctx context.Context, params types.ParamsGetVDC) (*types.
 	}
 	return x.(*types.ModelGetVDC), nil
 }
-
 // Create a new Virtual Data Center (VDC) with the specified parameters.
 func (c *Client) CreateVDC(ctx context.Context, params types.ParamsCreateVDC) (*types.ModelGetVDC, error) {
 	x, err := cmds.Get("VDC", "", "Create").Run(ctx, c, params)
@@ -41,15 +39,14 @@ func (c *Client) CreateVDC(ctx context.Context, params types.ParamsCreateVDC) (*
 	}
 	return x.(*types.ModelGetVDC), nil
 }
-
 // Update VDC performs a PUT request to update an existing VDC. Enter only the fields you want to update.
 func (c *Client) UpdateVDC(ctx context.Context, params types.ParamsUpdateVDC) error {
 	_, err := cmds.Get("VDC", "", "Update").Run(ctx, c, params)
 	return err
 }
-
 // Delete VDC performs a DELETE request to delete an existing VDC.
 func (c *Client) DeleteVDC(ctx context.Context, params types.ParamsDeleteVDC) error {
 	_, err := cmds.Get("VDC", "", "Delete").Run(ctx, c, params)
 	return err
 }
+

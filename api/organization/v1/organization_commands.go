@@ -86,16 +86,16 @@ func init() {
 			return &types.ModelGetOrganization{
 				ID:                  orgDetails.ID,
 				Name:                org.Name,
-				DisplayName:         org.DisplayName,
+				FullName:            org.FullName,
 				Description:         org.Description,
-				IsEnabled:           org.IsEnabled,
-				CustomerMail:        org.CustomerMail,
+				Enabled:             org.Enabled,
+				Email:               org.Email,
 				InternetBillingMode: org.InternetBillingMode,
 				Resources: types.ModelGetOrganizationResources{
 					Vdc:       orgDetails.Resources.Vdc,
 					Catalog:   orgDetails.Resources.Catalog,
 					Vapp:      orgDetails.Resources.Vapp,
-					RunningVM: orgDetails.Resources.RunningVM,
+					VMRunning: orgDetails.Resources.VMRunning,
 					User:      orgDetails.Resources.User,
 					Disk:      orgDetails.Resources.Disk,
 				},
@@ -114,16 +114,24 @@ func init() {
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "full_name",
-				Description: "The full name of the organization. Appears in the Cloud application as a human-readable name of the organization.",
+				Description: "The full name of the organization. It's a long format of your organization name. Appears in the Cloud application as a human-readable name of the organization.",
 				Example:     "My Organization to update",
+				Validators: []commands.Validator{
+					commands.ValidatorOmitempty(),
+					commands.ValidatorMax(129),
+				},
 			},
 			commands.ParamsSpec{
 				Name:        "description",
 				Description: "A description for the organization.",
 				Example:     "This is my organization description to update",
+				Validators: []commands.Validator{
+					commands.ValidatorOmitempty(),
+					commands.ValidatorMax(257),
+				},
 			},
 			commands.ParamsSpec{
-				Name:        "customer_mail",
+				Name:        "email",
 				Description: "The contact email for the organization.",
 				Example:     "user@mail.com",
 				Validators: []commands.Validator{
@@ -149,7 +157,7 @@ func init() {
 			p := params.(types.ParamsUpdateOrganization)
 
 			// Check at least one parameter is provided
-			if p.FullName == "" && p.CustomerMail == "" && p.InternetBillingMode == "" && p.Description == nil {
+			if p.FullName == "" && p.Email == "" && p.InternetBillingMode == "" && p.Description == nil {
 				return nil, fmt.Errorf("no parameters provided for organization update")
 			}
 
@@ -168,7 +176,7 @@ func init() {
 					if p.FullName != "" {
 						return p.FullName
 					}
-					return data.DisplayName
+					return data.FullName
 				}(),
 				Description: func() string {
 					if p.Description != nil {
@@ -177,10 +185,10 @@ func init() {
 					return data.Description
 				}(),
 				CustomerMail: func() string {
-					if p.CustomerMail != "" {
-						return p.CustomerMail
+					if p.Email != "" {
+						return p.Email
 					}
-					return data.CustomerMail
+					return data.Email
 				}(),
 				InternetBillingMode: func() string {
 					if p.InternetBillingMode != "" {
