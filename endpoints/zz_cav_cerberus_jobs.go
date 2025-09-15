@@ -15,7 +15,7 @@ import (
 
 // GetJobCerberus - Get Cerberus Job
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Jobs/getJobById 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Jobs/getJobById
 func GetJobCerberus() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetJobCerberus")
 }
