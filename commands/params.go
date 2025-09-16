@@ -137,16 +137,60 @@ func getCavClientFromInterface(obj interface{}) (cav.Client, bool) {
 // Boilerplate: Recursive copy of values val -> dynVal
 // (to be completed to handle Map/Slice/Struct/Embedded)
 func copyValuesRecursive(dynVal, val reflect.Value) {
-	for i := 0; i < dynVal.NumField(); i++ {
-		origField := val.Field(i)
-		newField := dynVal.Field(i)
-		switch origField.Kind() {
-		case reflect.Struct:
-			copyValuesRecursive(newField, origField)
-		default:
-			if newField.CanSet() {
-				newField.Set(origField)
+	if !val.IsValid() || !dynVal.CanSet() {
+		return
+	}
+
+	switch dynVal.Kind() {
+	case reflect.Struct:
+		for i := 0; i < dynVal.NumField(); i++ {
+			origField := val.Field(i)
+			newField := dynVal.Field(i)
+			// Handle embedded fields (anonymous)
+			if dynVal.Type().Field(i).Anonymous {
+				copyValuesRecursive(newField, origField)
+				continue
 			}
+			switch origField.Kind() {
+			case reflect.Struct:
+				copyValuesRecursive(newField, origField)
+			case reflect.Slice:
+				copyValuesRecursive(newField, origField)
+			case reflect.Map:
+				copyValuesRecursive(newField, origField)
+			default:
+				if newField.CanSet() && origField.IsValid() {
+					newField.Set(origField)
+				}
+			}
+		}
+	case reflect.Slice:
+		if val.Kind() != reflect.Slice {
+			return
+		}
+		slice := reflect.MakeSlice(dynVal.Type(), val.Len(), val.Len())
+		for i := 0; i < val.Len(); i++ {
+			elemDst := reflect.New(dynVal.Type().Elem()).Elem()
+			copyValuesRecursive(elemDst, val.Index(i))
+			slice.Index(i).Set(elemDst)
+		}
+		dynVal.Set(slice)
+	case reflect.Map:
+		if val.Kind() != reflect.Map {
+			return
+		}
+		mapType := dynVal.Type()
+		newMap := reflect.MakeMapWithSize(mapType, val.Len())
+		for _, key := range val.MapKeys() {
+			valElem := val.MapIndex(key)
+			newElem := reflect.New(mapType.Elem()).Elem()
+			copyValuesRecursive(newElem, valElem)
+			newMap.SetMapIndex(key, newElem)
+		}
+		dynVal.Set(newMap)
+	default:
+		if dynVal.CanSet() && val.IsValid() {
+			dynVal.Set(val)
 		}
 	}
 }

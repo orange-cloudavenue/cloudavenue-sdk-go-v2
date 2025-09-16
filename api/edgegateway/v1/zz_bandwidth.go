@@ -23,4 +23,3 @@ func (c *Client) GetBandwidth(ctx context.Context, params types.ParamsEdgeGatewa
 	}
 	return x.(*types.ModelEdgeGatewayBandwidth), nil
 }
-

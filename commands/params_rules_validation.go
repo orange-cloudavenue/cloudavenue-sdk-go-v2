@@ -18,7 +18,6 @@ import (
 	"strings"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/xlog"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )
 
@@ -103,7 +102,6 @@ func (rules ParamsRules) validate(client cav.Client, params interface{}) error {
 	}
 
 	for _, rule := range rules {
-		xlog.GetGlobalLogger().Debug("Evaluating rule for target", "target", rule.Target, "val", val.Interface())
 		if len(rule.Consoles) > 0 {
 			// Check if the rule applies to the current console
 			if !slices.ContainsFunc(rule.Consoles, func(c consoles.ConsoleName) bool {
