@@ -54,9 +54,11 @@ type (
 	}
 
 	ModelGetVDCComputeCapacityCPU struct {
-		VCPU      int `documentation:"Number of VCPUs"`
-		Used      int `documentation:"Used VCPUs"`
-		Frequency int `documentation:"Frequency of the VCPUs in MHz"`
+		Limit          int `documentation:"Limit of VCPUs"`
+		Used           int `documentation:"Used VCPUs"`
+		FrequencyLimit int `documentation:"Frequency of all VCPUs in MHz"`
+		FrequencyUsed  int `documentation:"Used frequency of all VCPUs in MHz"`
+		VCPUFrequency  int `documentation:"Frequency of a single VCPU in MHz"`
 	}
 
 	ModelGetVDCComputeCapacityMemory struct {

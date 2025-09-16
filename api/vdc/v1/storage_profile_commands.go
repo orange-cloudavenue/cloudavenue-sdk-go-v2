@@ -181,13 +181,14 @@ func init() { //nolint:gocyclo
 		ParamsRules: func() commands.ParamsRules {
 			pR := make(commands.ParamsRules, 0)
 
-			searchField := []string{"storage_profiles.{index}.class"}
+			searchField := []string{"storage_profiles.{index}.class", "storage_profiles.{index}.limit"}
 
 			for _, spec := range vdcRules {
 				if slices.Contains(searchField, spec.Target) {
 					pR = append(pR, spec)
 				}
 			}
+
 			return pR
 		}(),
 
@@ -227,13 +228,21 @@ func init() { //nolint:gocyclo
 
 			ep := endpoints.UpdateVdc()
 
+			vdc, err := cc.GetVDC(ctx, types.ParamsGetVDC{
+				ID:   p.VdcID,
+				Name: p.VdcName,
+			})
+			if err != nil {
+				return nil, err
+			}
+
 			apiR := itypes.ApiRequestUpdateVDC{
 				VDC: itypes.ApiRequestUpdateVDCVDC{
-					Name: p.VdcName,
+					Name: vdc.Name,
 				},
 			}
 
-			logger.DebugContext(ctx, "Adding storage profiles to VDC", "vdc_name", p.VdcName, "storage_profiles", p.StorageProfiles)
+			logger.DebugContext(ctx, "Adding storage profiles to VDC", "vdc_name", vdc.Name, "storage_profiles", p.StorageProfiles)
 
 			for _, sp := range p.StorageProfiles {
 				apiR.VDC.StorageProfiles = append(apiR.VDC.StorageProfiles, itypes.ApiRequestVDCStorageProfile{
@@ -243,14 +252,14 @@ func init() { //nolint:gocyclo
 				})
 			}
 
-			_, err := cc.c.Do(
+			_, err = cc.c.Do(
 				ctx,
 				ep,
-				cav.WithPathParam(ep.PathParams[0], p.VdcName),
+				cav.WithPathParam(ep.PathParams[0], vdc.Name),
 				cav.SetBody(apiR),
 			)
 			if err != nil {
-				return nil, fmt.Errorf("failed to add storage profiles to VDC %s: %w", p.VdcName, err)
+				return nil, fmt.Errorf("failed to add storage profiles to VDC %s: %w", vdc.Name, err)
 			}
 
 			return nil, nil
@@ -542,7 +551,7 @@ func init() { //nolint:gocyclo
 			if err != nil {
 				return nil, fmt.Errorf("failed to update storage profile(s) in VDC %s: %w", p.VdcName, err)
 			}
-			logger.DebugContext(ctx, "Storage profile updated successfully", "vdc_name", p.VdcName, "storage_profile_class", p.StorageProfiles[0].Class)
+			logger.DebugContext(ctx, "Storage profile updated successfully", "vdc_name", p.VdcName)
 
 			x, err := cc.ListStorageProfile(ctx, types.ParamsListStorageProfile{
 				VdcID:   p.VdcID,

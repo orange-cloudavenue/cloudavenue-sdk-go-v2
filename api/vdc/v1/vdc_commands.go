@@ -131,33 +131,20 @@ func init() { //nolint:gocyclo
 
 			logger := cc.logger.WithGroup("GetVDC")
 
-			// First list all VDCs with filter to fast fail if no VDCs are found and retrieve the VDC ID
-			epListVDC := endpoints.ListVdc()
-			qP := ""
-			if p.Name != "" {
-				qP = fmt.Sprintf("name==%s", p.Name)
-			}
-			if p.ID != "" {
-				qP = fmt.Sprintf("id==%s", p.ID)
-			}
-
-			resp, err := cc.c.Do(
-				ctx,
-				epListVDC,
-				cav.WithQueryParam(epListVDC.QueryParams[0], qP),
-			)
+			results, err := cc.ListVDC(ctx, types.ParamsListVDC{
+				ID:   p.ID,
+				Name: p.Name,
+			})
 			if err != nil {
 				logger.ErrorContext(ctx, "Failed to list VDCs", "error", err)
 				return nil, err
 			}
 
-			results := resp.Result().(*itypes.ApiResponseListVDC)
-			if len(results.Records) == 0 {
-				logger.WarnContext(ctx, "No VDCs found")
-				return nil, fmt.Errorf("The VDC %s does not exist in your organization", p.Name)
+			if len(results.VDCS) == 0 {
+				logger.ErrorContext(ctx, "No VDC found with the provided parameters", "id", p.ID, "name", p.Name)
+				return nil, fmt.Errorf("no VDC found with the provided parameters")
 			}
-
-			vdc := results.Records[0]
+			vdc := results.VDCS[0]
 
 			var (
 				vdcMetadata *itypes.ApiResponseGetVDCMetadatas
@@ -170,15 +157,15 @@ func init() { //nolint:gocyclo
 			eg.Go(func() error {
 				// Get VDC Metadata
 				epGetVDCMetadata := endpoints.GetVdcMetadata()
-				logger.DebugContext(ctx, "Fetching VDC metadata", "vdcName", results.Records[0].Name, "vdcID", vdc.ID)
+				logger.DebugContext(ctx, "Fetching VDC metadata", "vdcName", vdc.Name, "vdcID", vdc.ID)
 				vdcMetadataResp, err := cc.c.Do(
 					egCtx,
 					epGetVDCMetadata,
-					cav.WithPathParam(epGetVDCMetadata.PathParams[0], results.Records[0].ID),
+					cav.WithPathParam(epGetVDCMetadata.PathParams[0], vdc.ID),
 				)
 				if err != nil {
-					logger.ErrorContext(ctx, "Failed to get VDC metadata", "error", err, "vdcName", results.Records[0].Name)
-					return fmt.Errorf("failed to get VDC metadata for %s: %w", results.Records[0].Name, err)
+					logger.ErrorContext(ctx, "Failed to get VDC metadata", "error", err, "vdcName", vdc.Name)
+					return fmt.Errorf("failed to get VDC metadata for %s: %w", vdc.Name, err)
 				}
 
 				vdcMetadata = vdcMetadataResp.Result().(*itypes.ApiResponseGetVDCMetadatas)

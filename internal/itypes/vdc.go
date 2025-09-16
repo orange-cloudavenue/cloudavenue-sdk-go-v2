@@ -135,24 +135,26 @@ func (r *ApiResponseGetVDC) ToModel() types.ModelGetVDC {
 		Description: r.Description,
 		ComputeCapacity: types.ModelGetVDCComputeCapacity{
 			CPU: types.ModelGetVDCComputeCapacityCPU{
-				VCPU: func() int {
+				Limit: func() int {
 					mhz := r.ComputeCapacity.CPU.Reserved
 					if mhz == 0 {
 						mhz = r.ComputeCapacity.CPU.Limit
 					}
 					return mhz / r.VCPUInMhz
 				}(),
-				Used:      r.ComputeCapacity.Memory.Used / r.VCPUInMhz,
-				Frequency: r.VCPUInMhz,
+				Used: r.ComputeCapacity.CPU.Used / r.VCPUInMhz,
+				FrequencyLimit: func() int {
+					if r.ComputeCapacity.CPU.Reserved != 0 {
+						return r.ComputeCapacity.CPU.Reserved
+					}
+					return r.ComputeCapacity.CPU.Limit
+				}(),
+				FrequencyUsed: r.ComputeCapacity.CPU.Used,
+				VCPUFrequency: r.VCPUInMhz,
 			},
 			Memory: types.ModelGetVDCComputeCapacityMemory{
-				Limit: func() int {
-					if r.ComputeCapacity.Memory.Limit == 0 {
-						return r.ComputeCapacity.Memory.Used
-					}
-					return r.ComputeCapacity.Memory.Limit
-				}(),
-				Used: r.ComputeCapacity.Memory.Used,
+				Limit: r.ComputeCapacity.Memory.Limit / 1024,
+				Used:  r.ComputeCapacity.Memory.Used / 1024,
 			},
 		},
 	}

@@ -189,6 +189,26 @@ func TestAddStorageProfile(t *testing.T) {
 			expectedErr: false,
 		},
 		{
+			name: "Add multiple Storage Profile",
+			params: types.ParamsAddStorageProfile{
+				VdcID:   generator.MustGenerate("{urn:vdc}"),
+				VdcName: "my-vdc",
+				StorageProfiles: []types.ParamsCreateVDCStorageProfile{
+					{
+						Class:   "gold",
+						Limit:   500,
+						Default: false,
+					},
+					{
+						Class:   "silver",
+						Limit:   100,
+						Default: true,
+					},
+				},
+			},
+			expectedErr: false,
+		},
+		{
 			name: "Error 401 Unauthorized",
 			params: types.ParamsAddStorageProfile{
 				VdcID:   generator.MustGenerate("{urn:vdc}"),

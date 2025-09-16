@@ -1400,9 +1400,9 @@
             "documentation": "Description of the VDC"
           },
           {
-            "object": "compute_capacity.cpu.vcpu",
+            "object": "compute_capacity.cpu.limit",
             "type": "int",
-            "documentation": "Number of VCPUs"
+            "documentation": "Limit of VCPUs"
           },
           {
             "object": "compute_capacity.cpu.used",
@@ -1410,9 +1410,19 @@
             "documentation": "Used VCPUs"
           },
           {
-            "object": "compute_capacity.cpu.frequency",
+            "object": "compute_capacity.cpu.frequency_limit",
             "type": "int",
-            "documentation": "Frequency of the VCPUs in MHz"
+            "documentation": "Frequency of all VCPUs in MHz"
+          },
+          {
+            "object": "compute_capacity.cpu.frequency_used",
+            "type": "int",
+            "documentation": "Used frequency of all VCPUs in MHz"
+          },
+          {
+            "object": "compute_capacity.cpu.vcpu_frequency",
+            "type": "int",
+            "documentation": "Frequency of a single VCPU in MHz"
           },
           {
             "object": "compute_capacity.memory.limit",
@@ -1817,9 +1827,9 @@
             "documentation": "Description of the VDC"
           },
           {
-            "object": "compute_capacity.cpu.vcpu",
+            "object": "compute_capacity.cpu.limit",
             "type": "int",
-            "documentation": "Number of VCPUs"
+            "documentation": "Limit of VCPUs"
           },
           {
             "object": "compute_capacity.cpu.used",
@@ -1827,9 +1837,19 @@
             "documentation": "Used VCPUs"
           },
           {
-            "object": "compute_capacity.cpu.frequency",
+            "object": "compute_capacity.cpu.frequency_limit",
             "type": "int",
-            "documentation": "Frequency of the VCPUs in MHz"
+            "documentation": "Frequency of all VCPUs in MHz"
+          },
+          {
+            "object": "compute_capacity.cpu.frequency_used",
+            "type": "int",
+            "documentation": "Used frequency of all VCPUs in MHz"
+          },
+          {
+            "object": "compute_capacity.cpu.vcpu_frequency",
+            "type": "int",
+            "documentation": "Frequency of a single VCPU in MHz"
           },
           {
             "object": "compute_capacity.memory.limit",
@@ -2046,9 +2066,9 @@
             "documentation": "Description of the VDC"
           },
           {
-            "object": "compute_capacity.cpu.vcpu",
+            "object": "compute_capacity.cpu.limit",
             "type": "int",
-            "documentation": "Number of VCPUs"
+            "documentation": "Limit of VCPUs"
           },
           {
             "object": "compute_capacity.cpu.used",
@@ -2056,9 +2076,19 @@
             "documentation": "Used VCPUs"
           },
           {
-            "object": "compute_capacity.cpu.frequency",
+            "object": "compute_capacity.cpu.frequency_limit",
             "type": "int",
-            "documentation": "Frequency of the VCPUs in MHz"
+            "documentation": "Frequency of all VCPUs in MHz"
+          },
+          {
+            "object": "compute_capacity.cpu.frequency_used",
+            "type": "int",
+            "documentation": "Used frequency of all VCPUs in MHz"
+          },
+          {
+            "object": "compute_capacity.cpu.vcpu_frequency",
+            "type": "int",
+            "documentation": "Frequency of a single VCPU in MHz"
           },
           {
             "object": "compute_capacity.memory.limit",
