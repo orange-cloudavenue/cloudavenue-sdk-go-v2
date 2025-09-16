@@ -186,8 +186,6 @@ func init() {
 			},
 		},
 
-		ModelType: nil, // No model type is returned for this command.
-
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
 			p := params.(types.ParamsEdgeGateway)
@@ -257,7 +255,6 @@ func init() {
 				},
 			},
 		},
-		ModelType: nil, // No model type is returned for this command.
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
 			p := params.(types.ParamsEdgeGateway)

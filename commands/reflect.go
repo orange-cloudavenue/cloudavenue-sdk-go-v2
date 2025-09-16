@@ -12,10 +12,8 @@ package commands
 import (
 	"fmt"
 	"reflect"
-	"sort"
 	"strings"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 	"github.com/orange-cloudavenue/common-go/strcase"
 )
 
@@ -80,87 +78,87 @@ func GetParamType(paramType reflect.Type, name string) (reflect.Type, error) {
 
 // getValuesForFieldByName recursively search for fields in a cmdArgs' value and returns its values if they exist.
 // The search is based on the name of the field.
-func getValuesForFieldByName(value reflect.Value, parts []string) (values []reflect.Value, err error) {
-	if len(parts) == 0 {
-		return []reflect.Value{value}, nil
-	}
-	switch value.Kind() {
-	case reflect.Ptr:
-		return getValuesForFieldByName(value.Elem(), parts)
+// func getValuesForFieldByName(value reflect.Value, parts []string) (values []reflect.Value, err error) {
+// 	if len(parts) == 0 {
+// 		return []reflect.Value{value}, nil
+// 	}
+// 	switch value.Kind() {
+// 	case reflect.Ptr:
+// 		return getValuesForFieldByName(value.Elem(), parts)
 
-	case reflect.Slice:
-		values := []reflect.Value(nil)
-		errs := []error(nil)
+// 	case reflect.Slice:
+// 		values := []reflect.Value(nil)
+// 		errs := []error(nil)
 
-		for i := range value.Len() {
-			newValues, err := getValuesForFieldByName(value.Index(i), parts[1:])
-			if err != nil {
-				errs = append(errs, err)
-			} else {
-				values = append(values, newValues...)
-			}
-		}
+// 		for i := range value.Len() {
+// 			newValues, err := getValuesForFieldByName(value.Index(i), parts[1:])
+// 			if err != nil {
+// 				errs = append(errs, err)
+// 			} else {
+// 				values = append(values, newValues...)
+// 			}
+// 		}
 
-		if len(values) == 0 && len(errs) != 0 {
-			return nil, errors.Join(errs...)
-		}
+// 		if len(values) == 0 && len(errs) != 0 {
+// 			return nil, errors.Join(errs...)
+// 		}
 
-		return values, nil
+// 		return values, nil
 
-	case reflect.Map:
-		if value.IsNil() {
-			return nil, nil
-		}
+// 	case reflect.Map:
+// 		if value.IsNil() {
+// 			return nil, nil
+// 		}
 
-		values := []reflect.Value(nil)
+// 		values := []reflect.Value(nil)
 
-		mapKeys := value.MapKeys()
-		sort.Slice(mapKeys, func(i, j int) bool {
-			return mapKeys[i].String() < mapKeys[j].String()
-		})
+// 		mapKeys := value.MapKeys()
+// 		sort.Slice(mapKeys, func(i, j int) bool {
+// 			return mapKeys[i].String() < mapKeys[j].String()
+// 		})
 
-		for _, mapKey := range mapKeys {
-			mapValue := value.MapIndex(mapKey)
-			newValues, err := getValuesForFieldByName(mapValue, parts[1:])
-			if err != nil {
-				return nil, err
-			}
-			values = append(values, newValues...)
-		}
+// 		for _, mapKey := range mapKeys {
+// 			mapValue := value.MapIndex(mapKey)
+// 			newValues, err := getValuesForFieldByName(mapValue, parts[1:])
+// 			if err != nil {
+// 				return nil, err
+// 			}
+// 			values = append(values, newValues...)
+// 		}
 
-		return values, nil
+// 		return values, nil
 
-	case reflect.Struct:
-		anonymousFieldIndexes := []int(nil)
-		fieldIndexByName := map[string]int{}
+// 	case reflect.Struct:
+// 		anonymousFieldIndexes := []int(nil)
+// 		fieldIndexByName := map[string]int{}
 
-		for i := range value.NumField() {
-			field := value.Type().Field(i)
-			if field.Anonymous {
-				anonymousFieldIndexes = append(anonymousFieldIndexes, i)
-			} else {
-				fieldIndexByName[field.Name] = i
-			}
-		}
+// 		for i := range value.NumField() {
+// 			field := value.Type().Field(i)
+// 			if field.Anonymous {
+// 				anonymousFieldIndexes = append(anonymousFieldIndexes, i)
+// 			} else {
+// 				fieldIndexByName[field.Name] = i
+// 			}
+// 		}
 
-		fieldName := strcase.ToPublicGoName(parts[0])
-		if fieldIndex, exist := fieldIndexByName[fieldName]; exist {
-			return getValuesForFieldByName(value.Field(fieldIndex), parts[1:])
-		}
+// 		fieldName := strcase.ToPublicGoName(parts[0])
+// 		if fieldIndex, exist := fieldIndexByName[fieldName]; exist {
+// 			return getValuesForFieldByName(value.Field(fieldIndex), parts[1:])
+// 		}
 
-		// If it does not exist we try to find it in nested anonymous field
-		for _, fieldIndex := range anonymousFieldIndexes {
-			newValues, err := getValuesForFieldByName(value.Field(fieldIndex), parts)
-			if err == nil {
-				return newValues, nil
-			}
-		}
+// 		// If it does not exist we try to find it in nested anonymous field
+// 		for _, fieldIndex := range anonymousFieldIndexes {
+// 			newValues, err := getValuesForFieldByName(value.Field(fieldIndex), parts)
+// 			if err == nil {
+// 				return newValues, nil
+// 			}
+// 		}
 
-		return nil, fmt.Errorf("field %v does not exist for %v", fieldName, value.Type().Name())
-	}
+// 		return nil, fmt.Errorf("field %v does not exist for %v", fieldName, value.Type().Name())
+// 	}
 
-	return nil, errors.New("case is not handled")
-}
+// 	return nil, errors.New("case is not handled")
+// }
 
 type DocModel struct {
 	Object        string `json:"object"`

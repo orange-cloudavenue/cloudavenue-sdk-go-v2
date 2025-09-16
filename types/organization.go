@@ -46,7 +46,7 @@ type ModelGetOrganization struct {
 
 type ModelGetOrganizationResources struct {
 	// Number of Org VDCs
-	Vdc int `documentation:"Number of VDC(s) in your organization"` //nolint:revive
+	Vdc int `documentation:"Number of VDC(s) in your organization"`
 
 	// Number of Catalog media(s)
 	Catalog int `documentation:"Number of Catalog media(s)"`

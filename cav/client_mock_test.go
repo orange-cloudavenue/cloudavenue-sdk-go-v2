@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
-	"strings"
 
 	"github.com/go-chi/chi/v5"
 
@@ -24,14 +23,6 @@ import (
 const (
 	mockOrg = "cav01ev01ocb0001234"
 )
-
-var pathPrefix = map[subClientName]string{
-	ClientVmware:         "",
-	ClientCerberus:       "",
-	ClientNetbackup:      "/netbackup",
-	subClientName("ihm"): "/ihm",
-	subClientName("s3"):  "/s3",
-}
 
 func newMockClient() (Client, error) {
 	// Mock implementation for testing purposes
@@ -114,13 +105,6 @@ func newMockClient() (Client, error) {
 	}
 
 	return nC, nil
-}
-
-func buildPath(subClient subClientName, path string) string {
-	if !strings.HasPrefix(path, pathPrefix[subClient]) {
-		return pathPrefix[subClient] + path
-	}
-	return path
 }
 
 // * Not used for the moment, but can be used to set mock responses for endpoints.

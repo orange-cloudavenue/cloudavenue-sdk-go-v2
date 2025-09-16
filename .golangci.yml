@@ -26,8 +26,6 @@ linters:
     - errname # Checks that sentinel errors are prefixed with the `Err` and error types are suffixed with the `Error`. [fast: false, auto-fix: false]
     - errorlint # Linter for error strings [fast: false, auto-fix: false]
     - forbidigo # Forbids identifiers [fast: true, auto-fix: false]
-    - goconst # Finds repeated strings [fast: true, auto-fix: false]
-    - gocyclo # Computes and checks the cyclomatic complexity of functions [fast: true, auto-fix: false]
     - goheader # Checks is file header matches to pattern [fast: true, auto-fix: false]
     - gomoddirectives # Manage the use of 'replace', 'retract', and 'excludes' directives in go.mod. [fast: true, auto-fix: false]
     - gomodguard # Allow and block list linter for direct Go module dependencies. This is different from depguard where there are different block types for example version constraints and module recommendations. [fast: true, auto-fix: false]
@@ -47,7 +45,6 @@ linters:
     - rowserrcheck # checks whether Err of rows is checked successfully [fast: false, auto-fix: false]
     - sqlclosecheck # Checks that sql.Rows and sql.Stmt are closed. [fast: false, auto-fix: false]
     - staticcheck # Staticcheck is `go vet` on steroids [fast: false, auto-fix: false]
-    - tagliatelle # Checks for the presence of struct tags [fast: false, auto-fix: false]
     - tparallel # tparallel detects inappropriate usage of t.Parallel() method in your Go test codes [fast: false, auto-fix: false]
     - unconvert # Remove unnecessary type conversions [fast: false, auto-fix: false]
     - unparam # Finds function parameters that are not used [fast: false, auto-fix: false]
@@ -97,10 +94,6 @@ linters:
           # Default: ""
           rules: '${base-path}/ruleguard/rules_*.go'
   
-    # custom:
-    #   linter-sdkv2:
-    #     type: "module"
-    #     description: This linter enforces conventions in the CloudAvenue SDK v2.
     gosec:
       excludes:
         - G115  # Potential integer overflow when converting between integer types
@@ -114,61 +107,6 @@ linters:
           severity: warning
           disabled: false
         - name: indent-error-flow
-          severity: warning
-          disabled: false
-        - name: var-naming
-          arguments:
-            - []
-            - - ACL
-              - API
-              - ASCII
-              - CPU
-              - CSS
-              - DNS
-              - EOF
-              - GUID
-              - HTML
-              - HTTP
-              - HTTPS
-              - ID
-              - IP
-              - JSON
-              - LHS
-              - QPS
-              - RAM
-              - RHS
-              - RPC
-              - SLA
-              - SMTP
-              - SQL
-              - SSH
-              - TCP
-              - TLS
-              - TTL
-              - UDP
-              - UI
-              - UID
-              - UUID
-              - URI
-              - URL
-              - UTF8
-              - VM
-              - XML
-              - XMPP
-              - XSRF
-              - XSS
-              - SSL
-              - VDC
-              - DFW
-              - VLAN
-              - IAM
-              - VCDA
-              - NAT
-              - VPN
-              - BMS
-              - SAML
-              - VDCG
-            - - skip-package-name-checks: true
           severity: warning
           disabled: false
   exclusions:

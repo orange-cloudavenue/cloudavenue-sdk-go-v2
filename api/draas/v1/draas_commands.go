@@ -17,6 +17,5 @@ func init() {
 	// * Draas
 	cmds.Register(commands.Command{
 		Namespace: "Draas",
-		Verb:      "",
 	})
 }
