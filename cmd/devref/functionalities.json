@@ -416,7 +416,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:47b72773-46fd-4cbd-a9e6-e9b380dc0eeb",
+                "example": "urn:vcloud:gateway:c48ad5e7-7b54-45c7-9bfa-856a52e1ca4f",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -445,7 +445,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:39171da5-c913-453e-bb80-622ce0f46ce8",
+                "example": "urn:vcloud:gateway:fcfdf060-939b-4660-8e5e-17ef7b1c026d",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -2029,7 +2029,113 @@
         ],
         "deprecated": false,
         "deprecated_message": "",
-        "model": null,
+        "model": [
+          {
+            "object": "id",
+            "type": "string",
+            "documentation": "ID of the VDC"
+          },
+          {
+            "object": "name",
+            "type": "string",
+            "documentation": "Name of the VDC"
+          },
+          {
+            "object": "description",
+            "type": "string",
+            "documentation": "Description of the VDC"
+          },
+          {
+            "object": "compute_capacity.cpu.vcpu",
+            "type": "int",
+            "documentation": "Number of VCPUs"
+          },
+          {
+            "object": "compute_capacity.cpu.used",
+            "type": "int",
+            "documentation": "Used VCPUs"
+          },
+          {
+            "object": "compute_capacity.cpu.frequency",
+            "type": "int",
+            "documentation": "Frequency of the VCPUs in MHz"
+          },
+          {
+            "object": "compute_capacity.memory.limit",
+            "type": "int",
+            "documentation": "Limit of memory in GB"
+          },
+          {
+            "object": "compute_capacity.memory.used",
+            "type": "int",
+            "documentation": "Used memory in GB"
+          },
+          {
+            "object": "networks.{index}.id",
+            "type": "string",
+            "documentation": "ID of the network"
+          },
+          {
+            "object": "networks.{index}.name",
+            "type": "string",
+            "documentation": "Name of the network"
+          },
+          {
+            "object": "storage_profiles.{index}.id",
+            "type": "string",
+            "documentation": "ID of the storage profile"
+          },
+          {
+            "object": "storage_profiles.{index}.name",
+            "type": "string",
+            "documentation": "Class name of the storage profile"
+          },
+          {
+            "object": "properties.service_class",
+            "type": "string",
+            "documentation": "Service class of the VDC"
+          },
+          {
+            "object": "properties.disponibility_class",
+            "type": "string",
+            "documentation": "Disponibility class of the VDC"
+          },
+          {
+            "object": "properties.billing_model",
+            "type": "string",
+            "documentation": "Billing model of the VDC compute"
+          },
+          {
+            "object": "properties.storage_billing_model",
+            "type": "string",
+            "documentation": "Billing model of the VDC storage"
+          },
+          {
+            "object": "number_of_vms",
+            "type": "int",
+            "documentation": "Number of VMs in the VDC"
+          },
+          {
+            "object": "number_of_running_vms",
+            "type": "int",
+            "documentation": "Number of running VMs in the VDC"
+          },
+          {
+            "object": "number_of_vapps",
+            "type": "int",
+            "documentation": "Number of deployed VApps in the VDC"
+          },
+          {
+            "object": "number_of_storage_profiles",
+            "type": "int",
+            "documentation": "Number of storage profiles in the VDC"
+          },
+          {
+            "object": "number_of_disks",
+            "type": "int",
+            "documentation": "Number of disks in the VDC"
+          }
+        ],
         "rules": [
           {
             "consoles": null,

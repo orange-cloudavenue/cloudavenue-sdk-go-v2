@@ -401,6 +401,7 @@ func init() { //nolint:gocyclo
 		Verb:               "Update",
 		ShortDocumentation: "UpdateVDC updates an existing VDC",
 		LongDocumentation:  "Update VDC performs a PUT request to update an existing VDC. Enter only the fields you want to update.",
+		ModelType:          types.ModelGetVDC{},
 		ParamsType:         types.ParamsUpdateVDC{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
@@ -496,7 +497,7 @@ func init() { //nolint:gocyclo
 			_, err := cc.c.Do(
 				ctx,
 				ep,
-				cav.WithPathParam(ep.PathParams[0], p.Name),
+				cav.WithPathParam(ep.PathParams[0], apiR.VDC.Name),
 				cav.SetBody(apiR),
 			)
 			if err != nil {
@@ -504,7 +505,10 @@ func init() { //nolint:gocyclo
 				return nil, err
 			}
 
-			return nil, nil
+			return cc.GetVDC(ctx, types.ParamsGetVDC{
+				ID:   p.ID,
+				Name: p.Name,
+			})
 		},
 		AutoGenerate: true,
 	})
