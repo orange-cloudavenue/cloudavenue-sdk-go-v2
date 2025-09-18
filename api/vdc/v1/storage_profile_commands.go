@@ -37,14 +37,14 @@ func init() { //nolint:gocyclo
 		Namespace:          "VDC",
 		Resource:           "StorageProfile",
 		Verb:               "List",
-		ShortDocumentation: "List VDC Storage Profiles",
-		LongDocumentation:  "List of storage profiles. If no filters are applied, all Storage Profiles for all VDCs are displayed. You can filter by either ID or Name of the storage profile, and you can also filter by either VDC ID or VDC Name. You can combine a storage profile filter (ID or Name) with a VDC filter (ID or Name). If both ID and Name are provided, they must refer to the same object; otherwise, the result will be empty.",
+		ShortDocumentation: "Retrieve VDC storage profiles",
+		LongDocumentation:  "Retrieves a comprehensive list of storage profiles. When no filters are specified, all storage profiles across all VDCs are returned. Filtering options include storage profile ID/name and VDC ID/name. Filters can be combined (e.g., profile filter + VDC filter). When both ID and name are provided for the same resource, they must reference the same object to return results.",
 		AutoGenerate:       true,
 		ParamsType:         types.ParamsListStorageProfile{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "id",
-				Description: "ID of the storage profile to list",
+				Description: "Unique identifier of the storage profile to retrieve",
 				Required:    false,
 				Validators: []commands.Validator{
 					commands.ValidatorOmitempty(),
@@ -53,7 +53,7 @@ func init() { //nolint:gocyclo
 			},
 			commands.ParamsSpec{
 				Name:        "vdc_id",
-				Description: "ID of the VDC to get the storage profile from",
+				Description: "Unique identifier of the VDC containing the storage profiles",
 				Required:    false,
 				Validators: []commands.Validator{
 					commands.ValidatorOmitempty(),
@@ -62,13 +62,13 @@ func init() { //nolint:gocyclo
 			},
 			commands.ParamsSpec{
 				Name:        "vdc_name",
-				Description: "Name of the VDC to get the storage profile from",
+				Description: "Name of the VDC containing the storage profiles",
 				Required:    false,
 				Example:     "my-vdc",
 			},
 			commands.ParamsSpec{
-				Name:        "name",
-				Description: "Name of the storage profile to list",
+				Name:        "class",
+				Description: "Storage class name of the profile to retrieve",
 				Required:    false,
 				Example:     "gold",
 			},
@@ -88,8 +88,8 @@ func init() { //nolint:gocyclo
 			if p.ID != "" {
 				filters = append(filters, "id=="+p.ID)
 			}
-			if p.Name != "" {
-				filters = append(filters, "name=="+p.Name)
+			if p.Class != "" {
+				filters = append(filters, "name=="+p.Class) // Corrected from 'name' to 'class'
 			}
 			if p.VdcID != "" {
 				filters = append(filters, "vdc=="+p.VdcID)
@@ -131,14 +131,14 @@ func init() { //nolint:gocyclo
 		Resource:  "StorageProfile",
 		Verb:      "Add",
 
-		ShortDocumentation: "Add a new VDC Storage Profile",
-		LongDocumentation:  "Add one or more storage profiles to a specific VDC.",
+		ShortDocumentation: "Create VDC storage profiles",
+		LongDocumentation:  "Creates one or more storage profiles within a specified VDC. Each profile requires a storage class and capacity limit, with an optional default designation.",
 		AutoGenerate:       true,
 		ParamsType:         types.ParamsAddStorageProfile{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "vdc_id",
-				Description: "ID of the VDC to add the storage profile to",
+				Description: "Unique identifier of the target VDC for the new storage profile",
 				Required:    false,
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("vdc_name"),
@@ -148,7 +148,7 @@ func init() { //nolint:gocyclo
 			},
 			commands.ParamsSpec{
 				Name:        "vdc_name",
-				Description: "Name of the VDC to add the storage profile to",
+				Description: "Name of the target VDC for the new storage profile",
 				Required:    false,
 				Example:     "my-vdc",
 				Validators: []commands.Validator{
@@ -158,13 +158,13 @@ func init() { //nolint:gocyclo
 			},
 			{
 				Name:        "storage_profiles.{index}.class",
-				Description: "Class of the storage profile to create. Predefined classes or dedicated storage classes can be used. See rules for more information.",
+				Description: "Storage class for the profile. Supports predefined and dedicated storage classes (see rules for available options)",
 				Required:    true,
 				Example:     "gold",
 			},
 			{
 				Name:        "storage_profiles.{index}.limit",
-				Description: "Limit of the storage profile to create. This is the maximum amount of storage that can be used by the VDC. This is in GiB.",
+				Description: "Storage capacity limit in GiB (maximum amount of storage available to the VDC)",
 				Required:    true,
 				Example:     "500",
 				Validators: []commands.Validator{
@@ -173,7 +173,7 @@ func init() { //nolint:gocyclo
 			},
 			{
 				Name:        "storage_profiles.{index}.default",
-				Description: "Default storage profile to create. This will be used if no specific profile is provided.",
+				Description: "Designates this storage profile as the default for the VDC when no specific profile is specified",
 				Required:    false,
 				Example:     "false",
 			},
@@ -271,14 +271,14 @@ func init() { //nolint:gocyclo
 		Namespace:          "VDC",
 		Resource:           "StorageProfile",
 		Verb:               "Delete",
-		ShortDocumentation: "Delete a VDC Storage Profile",
-		LongDocumentation:  "Delete a storage profile from a given VDC. You cannot delete the default storage profile, the last remaining profile, or a non-empty profile.",
+		ShortDocumentation: "Remove VDC storage profiles",
+		LongDocumentation:  "Removes a storage profile from the specified VDC. Deletion is restricted for default profiles, the last remaining profile, or profiles currently in use.",
 		AutoGenerate:       true,
 		ParamsType:         types.ParamsDeleteStorageProfile{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "vdc_id",
-				Description: "ID of the VDC to delete the storage profile from",
+				Description: "Unique identifier of the VDC containing the storage profile to remove",
 				Required:    false,
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("vdc_name"),
@@ -288,7 +288,7 @@ func init() { //nolint:gocyclo
 			},
 			commands.ParamsSpec{
 				Name:        "vdc_name",
-				Description: "Name of the VDC to delete the storage profile from",
+				Description: "Name of the VDC containing the storage profile to remove",
 				Required:    false,
 				Example:     "my-vdc",
 				Validators: []commands.Validator{
@@ -298,7 +298,7 @@ func init() { //nolint:gocyclo
 			},
 			{
 				Name:        "storage_profiles.{index}.class",
-				Description: "Class of the storage profile to delete. This is the unique identifier of the storage profile to delete.",
+				Description: "Storage class identifier of the profile to remove",
 				Required:    true,
 				Example:     "gold",
 			},
@@ -394,14 +394,14 @@ func init() { //nolint:gocyclo
 		Namespace:          "VDC",
 		Resource:           "StorageProfile",
 		Verb:               "Update",
-		ShortDocumentation: "Update a VDC Storage Profile",
-		LongDocumentation:  "Update one or multiple storage profiles in a given VDC. You can update the limit and/or set a storage profile as default. You cannot update the class name of a storage profile.",
+		ShortDocumentation: "Modify VDC storage profiles",
+		LongDocumentation:  "Modifies one or more storage profiles within a VDC. Supported updates include capacity limits and default profile designation. Storage class names cannot be modified.",
 		AutoGenerate:       true,
 		ParamsType:         types.ParamsUpdateStorageProfile{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "vdc_id",
-				Description: "ID of the VDC to update the storage profile from",
+				Description: "Unique identifier of the VDC containing the storage profile to modify",
 				Required:    false,
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("vdc_name"),
@@ -411,7 +411,7 @@ func init() { //nolint:gocyclo
 			},
 			commands.ParamsSpec{
 				Name:        "vdc_name",
-				Description: "Name of the VDC to update the storage profile from",
+				Description: "Name of the VDC containing the storage profile to modify",
 				Required:    false,
 				Example:     "my-vdc",
 				Validators: []commands.Validator{
@@ -421,13 +421,13 @@ func init() { //nolint:gocyclo
 			},
 			{
 				Name:        "storage_profiles.{index}.class",
-				Description: "Class of the storage profile to update. This is the identifier of the storage profile to update. Refer to the Rules Table below for valid classes.",
+				Description: "Storage class identifier of the profile to modify (see Rules Table for valid classes)",
 				Required:    true,
 				Example:     "gold",
 			},
 			{
 				Name:        "storage_profiles.{index}.default",
-				Description: "Set the storage profile as default. There can be only one default storage profile per VDC.",
+				Description: "Designates this storage profile as the default for the VDC (only one default profile allowed per VDC)",
 				Required:    false,
 				Validators: []commands.Validator{
 					commands.ValidatorOmitempty(),
@@ -436,7 +436,7 @@ func init() { //nolint:gocyclo
 			},
 			{
 				Name:        "storage_profiles.{index}.limit",
-				Description: "Storage profile limit to update in GiB. This is the maximum amount of storage the VDC can use. The new limit cannot be lower than the currently used storage capacity. Warning: Decreasing the limit may cause service interruption if usage has recently changed and exceeds the new limit.",
+				Description: "Updated storage capacity limit in GiB (cannot be lower than current usage; decreasing limits may cause service interruption)",
 				Required:    false,
 				Example:     "500",
 				Validators: []commands.Validator{

@@ -32,7 +32,7 @@ type (
 type (
 	ParamsListStorageProfile struct {
 		ID      string
-		Name    string
+		Class   string
 		VdcID   string
 		VdcName string
 	}
@@ -41,8 +41,6 @@ type (
 		VdcID           string
 		VdcName         string
 		StorageProfiles []ParamsCreateVDCStorageProfile
-
-		disponibilityClass string
 	}
 
 	ParamsUpdateStorageProfile struct {

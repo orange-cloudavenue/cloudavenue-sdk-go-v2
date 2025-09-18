@@ -38,7 +38,7 @@ func TestListStorageProfiles(t *testing.T) {
 		{
 			name: "List Storage Profiles by Storage Profile Name",
 			params: types.ParamsListStorageProfile{
-				Name: "gold",
+				Class: "gold",
 			},
 			expectedErr: false,
 		},
@@ -52,8 +52,8 @@ func TestListStorageProfiles(t *testing.T) {
 		{
 			name: "Error to combine Storage Profile ID and Name",
 			params: types.ParamsListStorageProfile{
-				ID:   generator.MustGenerate("{urn:vdcstorageProfile}"),
-				Name: "gold",
+				ID:    generator.MustGenerate("{urn:vdcstorageProfile}"),
+				Class: "gold",
 			},
 			expectedErr: false,
 		},
