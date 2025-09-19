@@ -38,7 +38,7 @@ func TestListStorageProfiles(t *testing.T) {
 		{
 			name: "List Storage Profiles by Storage Profile Name",
 			params: types.ParamsListStorageProfile{
-				Name: "gold",
+				Class: "gold",
 			},
 			expectedErr: false,
 		},
@@ -52,8 +52,8 @@ func TestListStorageProfiles(t *testing.T) {
 		{
 			name: "Error to combine Storage Profile ID and Name",
 			params: types.ParamsListStorageProfile{
-				ID:   generator.MustGenerate("{urn:vdcstorageProfile}"),
-				Name: "gold",
+				ID:    generator.MustGenerate("{urn:vdcstorageProfile}"),
+				Class: "gold",
 			},
 			expectedErr: false,
 		},
@@ -183,6 +183,26 @@ func TestAddStorageProfile(t *testing.T) {
 						Class:   "gold",
 						Limit:   500,
 						Default: false,
+					},
+				},
+			},
+			expectedErr: false,
+		},
+		{
+			name: "Add multiple Storage Profile",
+			params: types.ParamsAddStorageProfile{
+				VdcID:   generator.MustGenerate("{urn:vdc}"),
+				VdcName: "my-vdc",
+				StorageProfiles: []types.ParamsCreateVDCStorageProfile{
+					{
+						Class:   "gold",
+						Limit:   500,
+						Default: false,
+					},
+					{
+						Class:   "silver",
+						Limit:   100,
+						Default: true,
 					},
 				},
 			},

@@ -398,12 +398,13 @@ func TestUpdateVDC(t *testing.T) {
 
 			client := newClient(t)
 
-			err := client.UpdateVDC(t.Context(), tt.params)
+			data, err := client.UpdateVDC(t.Context(), tt.params)
 			if tt.expectedErr {
 				assert.NotNil(t, err, "Expected error but got none")
 				return
 			}
 			assert.Nil(t, err, "Unexpected error: %v", err)
+			assert.NotNil(t, data, "Expected response to be not nil")
 		})
 	}
 }

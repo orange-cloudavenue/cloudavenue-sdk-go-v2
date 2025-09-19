@@ -12,6 +12,9 @@ package commands
 import (
 	"fmt"
 	"reflect"
+	"strings"
+
+	"github.com/go-playground/validator/v10"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 	"github.com/orange-cloudavenue/common-go/strcase"
@@ -24,28 +27,7 @@ func (p *ParamsSpecs) validate(params any) error {
 		return err
 	}
 
-	var fields []reflect.StructField
-
-	// For each field in the struct
-	for i := 0; i < rT.NumField(); i++ {
-		field := rT.Field(i)
-		// Find the associated ParamSpec
-		paramSpec := p.findParamSpecByGoField(field.Name)
-		// Build the dynamic tag
-		tag := buildTagFromParamSpec(paramSpec)
-
-		// Copy the field and replace/add tag
-		newField := field
-		// Add or replace the "validate" tag
-		if tag != "" {
-			if newField.Tag == "" {
-				newField.Tag = reflect.StructTag(fmt.Sprintf(`validate:"%s"`, tag))
-			} else {
-				newField.Tag += reflect.StructTag(fmt.Sprintf(` validate:"%s"`, tag))
-			}
-		}
-		fields = append(fields, newField)
-	}
+	fields := p.buildFields(rT, "")
 
 	// Create the new dynamic structure
 	dynType := reflect.StructOf(fields)
@@ -57,16 +39,69 @@ func (p *ParamsSpecs) validate(params any) error {
 	// Validation
 	validate := validators.New()
 	if err := validate.Struct(dynValue.Addr().Interface()); err != nil {
+		var errs validator.ValidationErrors
+		if errors.As(err, &errs) {
+			validationErr := errors.New("validation error")
+
+			for _, fe := range errs {
+				validationErr = fmt.Errorf("%w: param '%s' failed on the '%s' property. Allowed values %v got %v.",
+					validationErr,
+					fe.Namespace(), // Field with struct name
+					fe.Tag(),
+					fe.Param(),
+					fe.Value(),
+				)
+			}
+
+			return validationErr
+		}
+
 		return errors.New(fmt.Sprintf("invalid params: %v", err.Error()))
 	}
 
 	return nil
 }
 
+func (p *ParamsSpecs) buildFields(rT reflect.Type, prefix string) []reflect.StructField {
+	var fields []reflect.StructField
+	for i := 0; i < rT.NumField(); i++ {
+		field := rT.Field(i)
+		fieldName := field.Name
+		paramSpec := p.findParamSpecByGoField(prefix + fieldName)
+		tag := buildTagFromParamSpec(paramSpec)
+
+		newField := field
+
+		// If the field is a struct or a slice of struct, we need to build its fields recursively
+		if field.Type.Kind() == reflect.Slice && field.Type.Elem().Kind() == reflect.Struct {
+			subFields := p.buildFields(field.Type.Elem(), prefix+fieldName+".{index}.")
+			tag = "dive"
+			newField.Type = reflect.SliceOf(reflect.StructOf(subFields))
+		} else if field.Type.Kind() == reflect.Struct && field.Anonymous == false {
+			subFields := p.buildFields(field.Type, prefix+fieldName+".")
+			newField.Type = reflect.StructOf(subFields)
+		}
+
+		if tag != "" {
+			if strings.Contains(tag, "{index}") || strings.Contains(tag, "{key}") {
+				tag = fmt.Sprintf("dive,%s", tag)
+			}
+			if newField.Tag == "" {
+				newField.Tag = reflect.StructTag(fmt.Sprintf(`validate:"%s"`, tag))
+			} else {
+				newField.Tag += reflect.StructTag(fmt.Sprintf(` validate:"%s"`, tag))
+			}
+		}
+		fields = append(fields, newField)
+	}
+
+	return fields
+}
+
 // Find the ParamSpec from the field name (conversion Go -> ParamSpecNameNotation)
 func (p ParamsSpecs) findParamSpecByGoField(goFieldName string) *ParamsSpec {
 	for _, ps := range p {
-		if strcase.ToPublicGoName(ps.Name) == goFieldName {
+		if strcase.ToPublicGoName(ps.Name) == strcase.ToPublicGoName(goFieldName) {
 			return &ps
 		}
 	}

@@ -10,7 +10,7 @@
 package commands
 
 import (
-	"strconv"
+	"fmt"
 )
 
 type validatorBetween struct {
@@ -23,14 +23,13 @@ func ValidatorBetween(minValue, maxValue int) Validator {
 }
 
 func (v *validatorBetween) GetKey() string {
-	// format values to between=value1 value2 value3
-	return "min=" + strconv.Itoa(v.min) + " max=" + strconv.Itoa(v.max)
+	return fmt.Sprintf("min=%d,max=%d", v.min, v.max)
 }
 
 func (v *validatorBetween) GetDescription() string {
-	return "Validates that the value is between " + strconv.Itoa(v.min) + " and " + strconv.Itoa(v.max)
+	return fmt.Sprintf("Validates that the value is between %d and %d", v.min, v.max)
 }
 
 func (v *validatorBetween) GetMarkdownDescription() string {
-	return "Validates that the value is between " + strconv.Itoa(v.min) + " and " + strconv.Itoa(v.max)
+	return fmt.Sprintf("Validates that the value is between `%d` and `%d`", v.min, v.max)
 }

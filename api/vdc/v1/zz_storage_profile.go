@@ -15,7 +15,7 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
-// List of storage profiles. If no filters are applied, all Storage Profiles for all VDCs are displayed. You can filter by either ID or Name of the storage profile, and you can also filter by either VDC ID or VDC Name. You can combine a storage profile filter (ID or Name) with a VDC filter (ID or Name). If both ID and Name are provided, they must refer to the same object; otherwise, the result will be empty.
+// Retrieves a comprehensive list of storage profiles. When no filters are specified, all storage profiles across all VDCs are returned. Filtering options include storage profile ID/name and VDC ID/name. Filters can be combined (e.g., profile filter + VDC filter). When both ID and name are provided for the same resource, they must reference the same object to return results.
 func (c *Client) ListStorageProfile(ctx context.Context, params types.ParamsListStorageProfile) (*types.ModelListStorageProfiles, error) {
 	x, err := cmds.Get("VDC", "StorageProfile", "List").Run(ctx, c, params)
 	if err != nil {
@@ -24,19 +24,19 @@ func (c *Client) ListStorageProfile(ctx context.Context, params types.ParamsList
 	return x.(*types.ModelListStorageProfiles), nil
 }
 
-// Add one or more storage profiles to a specific VDC.
+// Creates one or more storage profiles within a specified VDC. Each profile requires a storage class and capacity limit, with an optional default designation.
 func (c *Client) AddStorageProfile(ctx context.Context, params types.ParamsAddStorageProfile) error {
 	_, err := cmds.Get("VDC", "StorageProfile", "Add").Run(ctx, c, params)
 	return err
 }
 
-// Delete a storage profile from a given VDC. You cannot delete the default storage profile, the last remaining profile, or a non-empty profile.
+// Removes a storage profile from the specified VDC. Deletion is restricted for default profiles, the last remaining profile, or profiles currently in use.
 func (c *Client) DeleteStorageProfile(ctx context.Context, params types.ParamsDeleteStorageProfile) error {
 	_, err := cmds.Get("VDC", "StorageProfile", "Delete").Run(ctx, c, params)
 	return err
 }
 
-// Update one or multiple storage profiles in a given VDC. You can update the limit and/or set a storage profile as default. You cannot update the class name of a storage profile.
+// Modifies one or more storage profiles within a VDC. Supported updates include capacity limits and default profile designation. Storage class names cannot be modified.
 func (c *Client) UpdateStorageProfile(ctx context.Context, params types.ParamsUpdateStorageProfile) (*types.ModelListStorageProfilesVDC, error) {
 	x, err := cmds.Get("VDC", "StorageProfile", "Update").Run(ctx, c, params)
 	if err != nil {

@@ -43,9 +43,12 @@ func (c *Client) CreateVDC(ctx context.Context, params types.ParamsCreateVDC) (*
 }
 
 // Update VDC performs a PUT request to update an existing VDC. Enter only the fields you want to update.
-func (c *Client) UpdateVDC(ctx context.Context, params types.ParamsUpdateVDC) error {
-	_, err := cmds.Get("VDC", "", "Update").Run(ctx, c, params)
-	return err
+func (c *Client) UpdateVDC(ctx context.Context, params types.ParamsUpdateVDC) (*types.ModelGetVDC, error) {
+	x, err := cmds.Get("VDC", "", "Update").Run(ctx, c, params)
+	if err != nil {
+		return nil, err
+	}
+	return x.(*types.ModelGetVDC), nil
 }
 
 // Delete VDC performs a DELETE request to delete an existing VDC.

@@ -147,7 +147,7 @@ var vdcRules = commands.NewRules([]commands.ConditionalRule{
 			Unit:        "GB",
 			Min:         utils.ToPTR(1),
 			Max:         utils.ToPTR(5120),
-			Description: "Memory allowed for Service Class ECO",
+			Description: "Memory values allowed",
 		},
 	},
 
