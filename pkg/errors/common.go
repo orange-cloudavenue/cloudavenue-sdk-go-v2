@@ -9,7 +9,7 @@
 
 package errors
 
-func parseErrorType[errType any](err error) bool {
+func isErrorType[errType any](err error) bool {
 	if err == nil {
 		return false
 	}
@@ -19,9 +19,9 @@ func parseErrorType[errType any](err error) bool {
 }
 
 func IsAPIError(err error) bool {
-	return parseErrorType[*APIError](err)
+	return isErrorType[*APIError](err)
 }
 
 func IsClientError(err error) bool {
-	return parseErrorType[*ClientError](err)
+	return isErrorType[*ClientError](err)
 }

@@ -85,9 +85,9 @@ func TestConsoles(t *testing.T) {
 			}
 
 			if !tt.wantErr {
-				got := CheckOrganizationName(tt.orgName)
+				got := IsValidOrganizationName(tt.orgName)
 				if !got {
-					t.Errorf("CheckOrganizationName(%s) = %v, want %v", tt.orgName, got, !tt.wantErr)
+					t.Errorf("IsValidOrganizationName(%s) = %v, want %v", tt.orgName, got, !tt.wantErr)
 					return
 				}
 			}
@@ -260,9 +260,9 @@ func TestCheckOrganizationName(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := CheckOrganizationName(tt.org)
+			got := IsValidOrganizationName(tt.org)
 			if got != tt.want {
-				t.Errorf("CheckOrganizationName(%q) = %v, want %v", tt.org, got, tt.want)
+				t.Errorf("IsValidOrganizationName(%q) = %v, want %v", tt.org, got, tt.want)
 			}
 		})
 	}

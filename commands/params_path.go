@@ -54,7 +54,9 @@ func GetValueAtPath(params interface{}, path string) (interface{}, error) {
 				return nil, fmt.Errorf("nil pointer at '%s'", strings.Join(parts[:i], "."))
 			}
 			val = val.Elem()
-			i-- // retry this part with dereferenced value
+			// ! Waiting for validation that it works without it
+			// retry this part with dereferenced value
+			// i-- //nolint:ineffassign
 			continue
 		case reflect.Slice, reflect.Array:
 			index, err := strconv.Atoi(part)
@@ -128,7 +130,9 @@ func StoreValueAtPath(params interface{}, path, value string) error {
 				return fmt.Errorf("nil pointer at '%s'", strings.Join(parts[:i], "."))
 			}
 			val = val.Elem()
-			i-- // retry this part with dereferenced value
+			// ! Waiting for validation that it works without it
+			// retry this part with dereferenced value
+			// i-- //nolint:ineffassign
 			continue
 		case reflect.Slice, reflect.Array:
 			index, err := strconv.Atoi(part)

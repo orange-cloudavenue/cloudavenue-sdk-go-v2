@@ -25,12 +25,12 @@ type (
 		IsDefaultStorageProfile bool   `json:"isDefaultStorageProfile" fake:"true"`
 
 		// Values are in MB
-		Limit int `json:"storageLimitMB" fake:"{number:100000,81920000}"` //nolint:tagliatelle
-		Used  int `json:"storageUsedMB" fake:"{number:1000,100000}"`      //nolint:tagliatelle
+		Limit int `json:"storageLimitMB" fake:"{number:100000,81920000}"`
+		Used  int `json:"storageUsedMB" fake:"{number:1000,100000}"`
 
 		// Vdc information
-		VdcID   string `json:"vdc" fake:"{href_uuid}"` //nolint:revive
-		VdcName string `json:"vdcName" fake:"{word}"`  //nolint:revive
+		VdcID   string `json:"vdc" fake:"{href_uuid}"`
+		VdcName string `json:"vdcName" fake:"{word}"`
 	}
 )
 

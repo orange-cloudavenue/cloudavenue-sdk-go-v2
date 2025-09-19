@@ -33,25 +33,25 @@ type (
 	ParamsListStorageProfile struct {
 		ID      string
 		Name    string
-		VdcID   string //nolint:revive
-		VdcName string //nolint:revive
+		VdcID   string
+		VdcName string
 	}
 
 	ParamsAddStorageProfile struct {
-		VdcID           string //nolint:revive
-		VdcName         string //nolint:revive
+		VdcID           string
+		VdcName         string
 		StorageProfiles []ParamsCreateVDCStorageProfile
 	}
 
 	ParamsUpdateStorageProfile struct {
-		VdcID           string //nolint:revive
-		VdcName         string //nolint:revive
+		VdcID           string
+		VdcName         string
 		StorageProfiles []ParamsUpdateVDCStorageProfile
 	}
 
 	ParamsDeleteStorageProfile struct {
-		VdcID           string //nolint:revive
-		VdcName         string //nolint:revive
+		VdcID           string
+		VdcName         string
 		StorageProfiles []ParamsDeleteVDCStorageProfile
 	}
 )

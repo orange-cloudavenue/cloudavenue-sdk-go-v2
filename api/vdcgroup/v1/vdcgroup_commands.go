@@ -103,7 +103,7 @@ func init() {
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("name"),
 					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdcGroup"),
+					commands.ValidatorURN("VDCGroup"),
 				},
 			},
 			commands.ParamsSpec{

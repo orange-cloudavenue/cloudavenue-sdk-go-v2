@@ -65,7 +65,7 @@ func newCloudavenueCredential(c consoles.ConsoleName, organization, username, pa
 		return nil, err
 	}
 
-	if ok := consoles.CheckOrganizationName(organization); !ok {
+	if ok := consoles.IsValidOrganizationName(organization); !ok {
 		cc.logger.Error("Invalid organization name", "organization", organization)
 		return nil, errors.New("invalid organization name")
 	}

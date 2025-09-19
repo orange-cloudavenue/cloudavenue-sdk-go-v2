@@ -157,16 +157,6 @@ func toSnakeCase(str string) string {
 	return strings.ToLower(string(out))
 }
 
-func stringToLower(s string) string {
-	res := []rune(s)
-	for i, c := range res {
-		if c >= 'A' && c <= 'Z' {
-			res[i] = c + ('a' - 'A')
-		}
-	}
-	return string(res)
-}
-
 // applyRuleValues applies RuleValues validation logic to fieldVal
 // Now supports RuleValues.Enum values that can be regexp.Regexp or *regexp.Regexp
 func applyRuleValues(fieldVal reflect.Value, rule RuleValues, fieldName string) error {

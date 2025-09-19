@@ -575,13 +575,6 @@ func init() { //nolint:gocyclo
 	})
 }
 
-func vcpuToMhz(vcpu, frequency int) int {
-	if vcpu <= 0 || frequency <= 0 {
-		return 0
-	}
-	return vcpu * frequency
-}
-
 func serviceClassToCPUInMhz(serviceClass string) int {
 	switch serviceClass {
 	case "VOIP":

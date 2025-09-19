@@ -245,8 +245,8 @@ func FindByOrganizationName(organizationName string) (ConsoleName, bool) {
 	return "", false
 }
 
-// CheckOrganizationName - Returns true if the organization name is valid.
-func CheckOrganizationName(organizationName string) bool {
+// IsValidOrganizationName - Returns true if the organization name is valid.
+func IsValidOrganizationName(organizationName string) bool {
 	if organizationName == "" {
 		return false
 	}
