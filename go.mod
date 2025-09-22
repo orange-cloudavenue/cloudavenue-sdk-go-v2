@@ -15,9 +15,10 @@ go 1.24.5
 require (
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/go-playground/validator/v10 v10.27.0
+	github.com/kr/pretty v0.3.1
 	github.com/orange-cloudavenue/common-go/extractor v1.0.1
 	github.com/orange-cloudavenue/common-go/generator v1.3.4
-	github.com/orange-cloudavenue/common-go/strcase v1.0.1-0.20250917151320-7ed879abafc0
+	github.com/orange-cloudavenue/common-go/strcase v1.0.0
 	github.com/orange-cloudavenue/common-go/urn v1.4.0
 	github.com/orange-cloudavenue/common-go/utils v1.0.0
 	github.com/orange-cloudavenue/common-go/validators v1.2.0
@@ -34,7 +35,6 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/orange-cloudavenue/common-go/internal/regex v0.0.0-20250812201424-07c3423160b3 // indirect
