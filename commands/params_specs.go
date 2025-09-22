@@ -46,10 +46,20 @@ func (p *ParamsSpecs) buildAndValidateDynamicStruct(params any) error {
 			// Unique name for each field (ex: Users_0_Name)
 			fieldName := buildFieldNameFromPath(spec.Name, i)
 			tag := buildTagFromParamSpec(&spec)
+
+			// If the field is a slice or map with {index} or {key}, add "dive" to the tag
+			if strings.Contains(spec.Name, "{index}") || strings.Contains(spec.Name, "{key}") {
+				tag = fmt.Sprintf("dive,%s", tag)
+			}
 			sf := reflect.StructField{
 				Name: fieldName,
 				Type: reflect.TypeOf(val),
-				Tag:  reflect.StructTag(fmt.Sprintf(`validate:"%s"`, tag)),
+				Tag: func() reflect.StructTag {
+					if tag == "" {
+						return ""
+					}
+					return reflect.StructTag(fmt.Sprintf(`validate:"%s"`, tag))
+				}(),
 			}
 			fields = append(fields, fieldWithValue{Field: sf, Value: val})
 		}

@@ -32,9 +32,6 @@ func (c *Command) Run(ctx context.Context, client, params any) (any, error) {
 		if err := c.ParamsSpecs.buildAndValidateDynamicStruct(c.params); err != nil {
 			return nil, err
 		}
-		// if err := c.ParamsSpecs.validate(c.params); err != nil {
-		// 	return nil, err
-		// }
 	}
 
 	// If PreRulesRunnerFunc is defined, call it

@@ -176,6 +176,17 @@ func init() {
 				return nil
 			},
 		},
+		ResponseMiddlewares: []resty.ResponseMiddleware{
+			func(_ *resty.Client, resp *resty.Response) error {
+				r := resp.Result().(*itypes.ApiResponseGetVDC)
+
+				// Convert memory limit from MiB to GiB
+				r.ComputeCapacity.Memory.Limit = r.ComputeCapacity.Memory.Limit / 1024
+				r.ComputeCapacity.Memory.Used = r.ComputeCapacity.Memory.Used / 1024
+
+				return nil
+			},
+		},
 		MockResponseFunc: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			resp := &itypes.ApiResponseGetVDC{}
 

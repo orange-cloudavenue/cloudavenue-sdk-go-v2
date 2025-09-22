@@ -153,8 +153,8 @@ func (r *ApiResponseGetVDC) ToModel() types.ModelGetVDC {
 				VCPUFrequency: r.VCPUInMhz,
 			},
 			Memory: types.ModelGetVDCComputeCapacityMemory{
-				Limit: r.ComputeCapacity.Memory.Limit / 1024,
-				Used:  r.ComputeCapacity.Memory.Used / 1024,
+				Limit: r.ComputeCapacity.Memory.Limit,
+				Used:  r.ComputeCapacity.Memory.Used,
 			},
 		},
 	}

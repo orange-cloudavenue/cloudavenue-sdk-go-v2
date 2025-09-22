@@ -23,7 +23,7 @@ func ValidatorBetween(minValue, maxValue int) Validator {
 }
 
 func (v *validatorBetween) GetKey() string {
-	return fmt.Sprintf("min=%d,max=%d", v.min, v.max)
+	return fmt.Sprintf("min=%d max=%d", v.min, v.max)
 }
 
 func (v *validatorBetween) GetDescription() string {
