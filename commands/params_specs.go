@@ -98,7 +98,12 @@ func buildFieldNameFromPath(path string, idx int) string {
 		if p == "{index}" || p == "{key}" {
 			out = append(out, fmt.Sprintf("%d", idx))
 		} else {
-			out = append(out, strcase.ToPublicGoName(p))
+			name := strcase.ToPublicGoName(p)
+			// Force first letter uppercase (exported)
+			if len(name) > 0 {
+				name = strings.ToUpper(name[:1]) + name[1:]
+			}
+			out = append(out, name)
 		}
 	}
 	return strings.Join(out, "_")
