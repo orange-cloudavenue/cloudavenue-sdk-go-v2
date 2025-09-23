@@ -48,8 +48,12 @@ func (p *ParamsSpecs) buildAndValidateDynamicStruct(params any) error {
 			tag := buildTagFromParamSpec(&spec)
 
 			// If the field is a slice or map with {index} or {key}, add "dive" to the tag
-			if strings.Contains(spec.Name, "{index}") || strings.Contains(spec.Name, "{key}") {
-				tag = fmt.Sprintf("dive,%s", tag)
+			if strings.HasSuffix(spec.Name, "{index}") || strings.HasSuffix(spec.Name, "{key}") {
+				if tag == "" {
+					tag = "dive"
+				} else {
+					tag = fmt.Sprintf("dive,%s", tag)
+				}
 			}
 			sf := reflect.StructField{
 				Name: fieldName,
