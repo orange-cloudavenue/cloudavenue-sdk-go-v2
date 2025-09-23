@@ -75,7 +75,10 @@ type (
 		Name string
 
 		// Description is the new description of the Vdc Group.
-		Description string
+		Description *string
+
+		// Vdcs is the list of Vdcs to associate with the Vdc Group.
+		Vdcs []ParamsCreateVdcGroupVdc
 	}
 
 	ParamsDeleteVdcGroup struct {
