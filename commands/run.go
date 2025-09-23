@@ -12,6 +12,8 @@ package commands
 import (
 	"context"
 	"errors"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/xlog"
 )
 
 func (c *Command) Run(ctx context.Context, client, params any) (any, error) {
@@ -27,7 +29,7 @@ func (c *Command) Run(ctx context.Context, client, params any) (any, error) {
 	}
 
 	if len(c.ParamsSpecs) > 0 {
-		if err := c.ParamsSpecs.validate(c.params); err != nil {
+		if err := c.ParamsSpecs.buildAndValidateDynamicStruct(c.params); err != nil {
 			return nil, err
 		}
 	}
@@ -42,6 +44,7 @@ func (c *Command) Run(ctx context.Context, client, params any) (any, error) {
 	}
 
 	if c.ParamsRules != nil {
+		xlog.GetGlobalLogger().DebugContext(ctx, "Validating command params rules")
 		cavClient, ok := getCavClientFromInterface(client)
 		if !ok {
 			return nil, errors.New("client must implement cav.Client interface")

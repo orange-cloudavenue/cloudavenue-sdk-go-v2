@@ -112,6 +112,7 @@ func (rules ParamsRules) validate(client cav.Client, params interface{}) error {
 		}
 
 		if rule.When != nil && !rule.When.Eval(val) {
+			// Condition not met, skip this rule
 			continue
 		}
 

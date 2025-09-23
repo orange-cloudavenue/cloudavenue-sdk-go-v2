@@ -11,7 +11,6 @@ package commands
 
 import (
 	"fmt"
-	"strconv"
 )
 
 type validatorMax struct {
@@ -23,7 +22,7 @@ func ValidatorMax(maxValue int) Validator {
 }
 
 func (v *validatorMax) GetKey() string {
-	return "max=" + strconv.Itoa(v.max)
+	return fmt.Sprintf("max=%d", v.max)
 }
 
 func (v *validatorMax) GetDescription() string {

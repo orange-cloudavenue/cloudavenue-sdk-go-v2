@@ -416,7 +416,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:47b72773-46fd-4cbd-a9e6-e9b380dc0eeb",
+                "example": "urn:vcloud:gateway:fa536463-2436-47cf-aa26-62554176c8a7",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -445,7 +445,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:39171da5-c913-453e-bb80-622ce0f46ce8",
+                "example": "urn:vcloud:gateway:61b8a1bf-28d0-44fe-b25e-3cd180e074bb",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -1370,7 +1370,7 @@
             "required": true,
             "example": "500",
             "type": "int",
-            "validators_description": "Validates that the value is between 100 and 81920. \n"
+            "validators_description": "Validates that the value is between `100` and `81920`. \n"
           },
           {
             "name": "storage_profiles.{index}.default",
@@ -1400,19 +1400,29 @@
             "documentation": "Description of the VDC"
           },
           {
-            "object": "compute_capacity.cpu.vcpu",
+            "object": "compute_capacity.cpu.limit",
             "type": "int",
-            "documentation": "Number of VCPUs"
+            "documentation": "Maximum number of vCPUs that can be allocated in the VDC (CPU quota)."
           },
           {
             "object": "compute_capacity.cpu.used",
             "type": "int",
-            "documentation": "Used VCPUs"
+            "documentation": "Current number of vCPUs allocated in the VDC"
           },
           {
-            "object": "compute_capacity.cpu.frequency",
+            "object": "compute_capacity.cpu.frequency_limit",
             "type": "int",
-            "documentation": "Frequency of the VCPUs in MHz"
+            "documentation": "Frequency of all VCPUs in MHz"
+          },
+          {
+            "object": "compute_capacity.cpu.frequency_used",
+            "type": "int",
+            "documentation": "Used frequency of all VCPUs in MHz"
+          },
+          {
+            "object": "compute_capacity.cpu.vcpu_frequency",
+            "type": "int",
+            "documentation": "Frequency of a single VCPU in MHz"
           },
           {
             "object": "compute_capacity.memory.limit",
@@ -1667,7 +1677,7 @@
             "target": "memory",
             "min": 1,
             "max": 5120,
-            "description": "Memory allowed for Service Class ECO",
+            "description": "Memory values allowed",
             "unit": "GB"
           },
           {
@@ -1817,19 +1827,29 @@
             "documentation": "Description of the VDC"
           },
           {
-            "object": "compute_capacity.cpu.vcpu",
+            "object": "compute_capacity.cpu.limit",
             "type": "int",
-            "documentation": "Number of VCPUs"
+            "documentation": "Maximum number of vCPUs that can be allocated in the VDC (CPU quota)."
           },
           {
             "object": "compute_capacity.cpu.used",
             "type": "int",
-            "documentation": "Used VCPUs"
+            "documentation": "Current number of vCPUs allocated in the VDC"
           },
           {
-            "object": "compute_capacity.cpu.frequency",
+            "object": "compute_capacity.cpu.frequency_limit",
             "type": "int",
-            "documentation": "Frequency of the VCPUs in MHz"
+            "documentation": "Frequency of all VCPUs in MHz"
+          },
+          {
+            "object": "compute_capacity.cpu.frequency_used",
+            "type": "int",
+            "documentation": "Used frequency of all VCPUs in MHz"
+          },
+          {
+            "object": "compute_capacity.cpu.vcpu_frequency",
+            "type": "int",
+            "documentation": "Frequency of a single VCPU in MHz"
           },
           {
             "object": "compute_capacity.memory.limit",
@@ -2029,7 +2049,123 @@
         ],
         "deprecated": false,
         "deprecated_message": "",
-        "model": null,
+        "model": [
+          {
+            "object": "id",
+            "type": "string",
+            "documentation": "ID of the VDC"
+          },
+          {
+            "object": "name",
+            "type": "string",
+            "documentation": "Name of the VDC"
+          },
+          {
+            "object": "description",
+            "type": "string",
+            "documentation": "Description of the VDC"
+          },
+          {
+            "object": "compute_capacity.cpu.limit",
+            "type": "int",
+            "documentation": "Maximum number of vCPUs that can be allocated in the VDC (CPU quota)."
+          },
+          {
+            "object": "compute_capacity.cpu.used",
+            "type": "int",
+            "documentation": "Current number of vCPUs allocated in the VDC"
+          },
+          {
+            "object": "compute_capacity.cpu.frequency_limit",
+            "type": "int",
+            "documentation": "Frequency of all VCPUs in MHz"
+          },
+          {
+            "object": "compute_capacity.cpu.frequency_used",
+            "type": "int",
+            "documentation": "Used frequency of all VCPUs in MHz"
+          },
+          {
+            "object": "compute_capacity.cpu.vcpu_frequency",
+            "type": "int",
+            "documentation": "Frequency of a single VCPU in MHz"
+          },
+          {
+            "object": "compute_capacity.memory.limit",
+            "type": "int",
+            "documentation": "Limit of memory in GB"
+          },
+          {
+            "object": "compute_capacity.memory.used",
+            "type": "int",
+            "documentation": "Used memory in GB"
+          },
+          {
+            "object": "networks.{index}.id",
+            "type": "string",
+            "documentation": "ID of the network"
+          },
+          {
+            "object": "networks.{index}.name",
+            "type": "string",
+            "documentation": "Name of the network"
+          },
+          {
+            "object": "storage_profiles.{index}.id",
+            "type": "string",
+            "documentation": "ID of the storage profile"
+          },
+          {
+            "object": "storage_profiles.{index}.name",
+            "type": "string",
+            "documentation": "Class name of the storage profile"
+          },
+          {
+            "object": "properties.service_class",
+            "type": "string",
+            "documentation": "Service class of the VDC"
+          },
+          {
+            "object": "properties.disponibility_class",
+            "type": "string",
+            "documentation": "Disponibility class of the VDC"
+          },
+          {
+            "object": "properties.billing_model",
+            "type": "string",
+            "documentation": "Billing model of the VDC compute"
+          },
+          {
+            "object": "properties.storage_billing_model",
+            "type": "string",
+            "documentation": "Billing model of the VDC storage"
+          },
+          {
+            "object": "number_of_vms",
+            "type": "int",
+            "documentation": "Number of VMs in the VDC"
+          },
+          {
+            "object": "number_of_running_vms",
+            "type": "int",
+            "documentation": "Number of running VMs in the VDC"
+          },
+          {
+            "object": "number_of_vapps",
+            "type": "int",
+            "documentation": "Number of deployed VApps in the VDC"
+          },
+          {
+            "object": "number_of_storage_profiles",
+            "type": "int",
+            "documentation": "Number of storage profiles in the VDC"
+          },
+          {
+            "object": "number_of_disks",
+            "type": "int",
+            "documentation": "Number of disks in the VDC"
+          }
+        ],
         "rules": [
           {
             "consoles": null,
@@ -2074,7 +2210,7 @@
             "target": "memory",
             "min": 1,
             "max": 5120,
-            "description": "Memory allowed for Service Class ECO",
+            "description": "Memory values allowed",
             "unit": "GB"
           }
         ]
@@ -2090,13 +2226,13 @@
             "namespace": "VDC",
             "resource": "StorageProfile",
             "verb": "Add",
-            "short_documentation": "Add a new VDC Storage Profile",
-            "long_documentation": "Add one or more storage profiles to a specific VDC.",
+            "short_documentation": "Create VDC storage profiles",
+            "long_documentation": "Creates one or more storage profiles within a specified VDC. Each profile requires a storage class and capacity limit, with an optional default designation.",
             "markdown_documentation": "",
             "params": [
               {
                 "name": "vdc_id",
-                "description": "ID of the VDC to add the storage profile to",
+                "description": "Unique identifier of the target VDC for the new storage profile",
                 "required": false,
                 "example": "",
                 "type": "string",
@@ -2104,7 +2240,7 @@
               },
               {
                 "name": "vdc_name",
-                "description": "Name of the VDC to add the storage profile to",
+                "description": "Name of the target VDC for the new storage profile",
                 "required": false,
                 "example": "my-vdc",
                 "type": "string",
@@ -2112,7 +2248,7 @@
               },
               {
                 "name": "storage_profiles.{index}.class",
-                "description": "Class of the storage profile to create. Predefined classes or dedicated storage classes can be used. See rules for more information.",
+                "description": "Storage class for the profile. Supports predefined and dedicated storage classes (see rules for available options)",
                 "required": true,
                 "example": "gold",
                 "type": "string",
@@ -2120,15 +2256,15 @@
               },
               {
                 "name": "storage_profiles.{index}.limit",
-                "description": "Limit of the storage profile to create. This is the maximum amount of storage that can be used by the VDC. This is in GiB.",
+                "description": "Storage capacity limit in GiB (maximum amount of storage available to the VDC)",
                 "required": true,
                 "example": "500",
                 "type": "int",
-                "validators_description": "Validates that the value is between 100 and 81920. \n"
+                "validators_description": "Validates that the value is between `100` and `81920`. \n"
               },
               {
                 "name": "storage_profiles.{index}.default",
-                "description": "Default storage profile to create. This will be used if no specific profile is provided.",
+                "description": "Designates this storage profile as the default for the VDC when no specific profile is specified",
                 "required": false,
                 "example": "false",
                 "type": "bool",
@@ -2217,13 +2353,13 @@
             "namespace": "VDC",
             "resource": "StorageProfile",
             "verb": "Delete",
-            "short_documentation": "Delete a VDC Storage Profile",
-            "long_documentation": "Delete a storage profile from a given VDC. You cannot delete the default storage profile, the last remaining profile, or a non-empty profile.",
+            "short_documentation": "Remove VDC storage profiles",
+            "long_documentation": "Removes a storage profile from the specified VDC. Deletion is restricted for default profiles, the last remaining profile, or profiles currently in use.",
             "markdown_documentation": "",
             "params": [
               {
                 "name": "vdc_id",
-                "description": "ID of the VDC to delete the storage profile from",
+                "description": "Unique identifier of the VDC containing the storage profile to remove",
                 "required": false,
                 "example": "",
                 "type": "string",
@@ -2231,7 +2367,7 @@
               },
               {
                 "name": "vdc_name",
-                "description": "Name of the VDC to delete the storage profile from",
+                "description": "Name of the VDC containing the storage profile to remove",
                 "required": false,
                 "example": "my-vdc",
                 "type": "string",
@@ -2239,7 +2375,7 @@
               },
               {
                 "name": "storage_profiles.{index}.class",
-                "description": "Class of the storage profile to delete. This is the unique identifier of the storage profile to delete.",
+                "description": "Storage class identifier of the profile to remove",
                 "required": true,
                 "example": "gold",
                 "type": "string",
@@ -2254,13 +2390,13 @@
             "namespace": "VDC",
             "resource": "StorageProfile",
             "verb": "List",
-            "short_documentation": "List VDC Storage Profiles",
-            "long_documentation": "List of storage profiles. If no filters are applied, all Storage Profiles for all VDCs are displayed. You can filter by either ID or Name of the storage profile, and you can also filter by either VDC ID or VDC Name. You can combine a storage profile filter (ID or Name) with a VDC filter (ID or Name). If both ID and Name are provided, they must refer to the same object; otherwise, the result will be empty.",
+            "short_documentation": "Retrieve VDC storage profiles",
+            "long_documentation": "Retrieves a comprehensive list of storage profiles. When no filters are specified, all storage profiles across all VDCs are returned. Filtering options include storage profile ID/name and VDC ID/name. Filters can be combined (e.g., profile filter + VDC filter). When both ID and name are provided for the same resource, they must reference the same object to return results.",
             "markdown_documentation": "",
             "params": [
               {
                 "name": "id",
-                "description": "ID of the storage profile to list",
+                "description": "Unique identifier of the storage profile to retrieve",
                 "required": false,
                 "example": "",
                 "type": "string",
@@ -2268,7 +2404,7 @@
               },
               {
                 "name": "vdc_id",
-                "description": "ID of the VDC to get the storage profile from",
+                "description": "Unique identifier of the VDC containing the storage profiles",
                 "required": false,
                 "example": "",
                 "type": "string",
@@ -2276,15 +2412,15 @@
               },
               {
                 "name": "vdc_name",
-                "description": "Name of the VDC to get the storage profile from",
+                "description": "Name of the VDC containing the storage profiles",
                 "required": false,
                 "example": "my-vdc",
                 "type": "string",
                 "validators_description": ""
               },
               {
-                "name": "name",
-                "description": "Name of the storage profile to list",
+                "name": "class",
+                "description": "Storage class name of the profile to retrieve",
                 "required": false,
                 "example": "gold",
                 "type": "string",
@@ -2335,13 +2471,13 @@
             "namespace": "VDC",
             "resource": "StorageProfile",
             "verb": "Update",
-            "short_documentation": "Update a VDC Storage Profile",
-            "long_documentation": "Update one or multiple storage profiles in a given VDC. You can update the limit and/or set a storage profile as default. You cannot update the class name of a storage profile.",
+            "short_documentation": "Modify VDC storage profiles",
+            "long_documentation": "Modifies one or more storage profiles within a VDC. Supported updates include capacity limits and default profile designation. Storage class names cannot be modified.",
             "markdown_documentation": "",
             "params": [
               {
                 "name": "vdc_id",
-                "description": "ID of the VDC to update the storage profile from",
+                "description": "Unique identifier of the VDC containing the storage profile to modify",
                 "required": false,
                 "example": "",
                 "type": "string",
@@ -2349,7 +2485,7 @@
               },
               {
                 "name": "vdc_name",
-                "description": "Name of the VDC to update the storage profile from",
+                "description": "Name of the VDC containing the storage profile to modify",
                 "required": false,
                 "example": "my-vdc",
                 "type": "string",
@@ -2357,7 +2493,7 @@
               },
               {
                 "name": "storage_profiles.{index}.class",
-                "description": "Class of the storage profile to update. This is the identifier of the storage profile to update. Refer to the Rules Table below for valid classes.",
+                "description": "Storage class identifier of the profile to modify (see Rules Table for valid classes)",
                 "required": true,
                 "example": "gold",
                 "type": "string",
@@ -2365,7 +2501,7 @@
               },
               {
                 "name": "storage_profiles.{index}.default",
-                "description": "Set the storage profile as default. There can be only one default storage profile per VDC.",
+                "description": "Designates this storage profile as the default for the VDC (only one default profile allowed per VDC)",
                 "required": false,
                 "example": "true",
                 "type": "bool",
@@ -2373,11 +2509,11 @@
               },
               {
                 "name": "storage_profiles.{index}.limit",
-                "description": "Storage profile limit to update in GiB. This is the maximum amount of storage the VDC can use. The new limit cannot be lower than the currently used storage capacity. Warning: Decreasing the limit may cause service interruption if usage has recently changed and exceeds the new limit.",
+                "description": "Updated storage capacity limit in GiB (cannot be lower than current usage; decreasing limits may cause service interruption)",
                 "required": false,
                 "example": "500",
                 "type": "int",
-                "validators_description": "Validates that the value is between 100 and 81920. \n"
+                "validators_description": "Validates that the value is between `100` and `81920`. \n"
               }
             ],
             "deprecated": false,
@@ -2557,7 +2693,7 @@
             "required": false,
             "example": "",
             "type": "string",
-            "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`vdcGroup`).. \n"
+            "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`VDCGroup`).. \n"
           },
           {
             "name": "name",

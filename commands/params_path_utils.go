@@ -14,6 +14,8 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/orange-cloudavenue/common-go/strcase"
 )
 
 // derefValue returns the value after recursively dereferencing pointers (if not nil).
@@ -32,7 +34,7 @@ func fieldByLowerName(val reflect.Value, name string) reflect.Value {
 		// Support: CamelCase, lower, snake_case
 		goName := field.Name
 		if strings.EqualFold(goName, name) ||
-			strings.EqualFold(toSnakeCase(goName), name) ||
+			strings.EqualFold(strcase.ToSnake(goName), name) ||
 			strings.EqualFold(strings.ToLower(goName), name) {
 			return val.Field(i)
 		}

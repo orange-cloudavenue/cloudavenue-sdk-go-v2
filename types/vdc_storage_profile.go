@@ -32,7 +32,7 @@ type (
 type (
 	ParamsListStorageProfile struct {
 		ID      string
-		Name    string
+		Class   string
 		VdcID   string
 		VdcName string
 	}

@@ -68,10 +68,10 @@ type (
 	}
 
 	ApiResponseGetVDCComputeCapacityDetails struct {
-		Units    string `json:"units"`
-		Limit    int    `json:"limit"`
-		Reserved int    `json:"reserved"`
-		Used     int    `json:"used"`
+		Units     string `json:"units"`
+		Limit     int    `json:"limit"`
+		Allocated int    `json:"allocated"`
+		Used      int    `json:"used"`
 	}
 
 	// * GetVDCMetadata
@@ -135,24 +135,26 @@ func (r *ApiResponseGetVDC) ToModel() types.ModelGetVDC {
 		Description: r.Description,
 		ComputeCapacity: types.ModelGetVDCComputeCapacity{
 			CPU: types.ModelGetVDCComputeCapacityCPU{
-				VCPU: func() int {
-					mhz := r.ComputeCapacity.CPU.Reserved
+				Limit: func() int {
+					mhz := r.ComputeCapacity.CPU.Allocated
 					if mhz == 0 {
 						mhz = r.ComputeCapacity.CPU.Limit
 					}
 					return mhz / r.VCPUInMhz
 				}(),
-				Used:      r.ComputeCapacity.Memory.Used / r.VCPUInMhz,
-				Frequency: r.VCPUInMhz,
+				Used: r.ComputeCapacity.CPU.Used / r.VCPUInMhz,
+				FrequencyLimit: func() int {
+					if r.ComputeCapacity.CPU.Allocated != 0 {
+						return r.ComputeCapacity.CPU.Allocated
+					}
+					return r.ComputeCapacity.CPU.Limit
+				}(),
+				FrequencyUsed: r.ComputeCapacity.CPU.Used,
+				VCPUFrequency: r.VCPUInMhz,
 			},
 			Memory: types.ModelGetVDCComputeCapacityMemory{
-				Limit: func() int {
-					if r.ComputeCapacity.Memory.Limit == 0 {
-						return r.ComputeCapacity.Memory.Used
-					}
-					return r.ComputeCapacity.Memory.Limit
-				}(),
-				Used: r.ComputeCapacity.Memory.Used,
+				Limit: r.ComputeCapacity.Memory.Limit,
+				Used:  r.ComputeCapacity.Memory.Used,
 			},
 		},
 	}
