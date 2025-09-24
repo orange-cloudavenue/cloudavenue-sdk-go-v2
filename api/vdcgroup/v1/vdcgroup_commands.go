@@ -12,6 +12,7 @@ package vdcgroup
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
@@ -92,7 +93,7 @@ func init() {
 		Namespace:          "VdcGroup",
 		Verb:               "Get",
 		ShortDocumentation: "Get a Vdc Group",
-		LongDocumentation:  "Retrieve detailed information about a specific Vdc Group.",
+		LongDocumentation:  "Retrieve detailed information about a specific Vdc Group by its ID or name. This command returns all attributes and configuration details of the selected Vdc Group, helping you understand its current state and associated resources.",
 
 		ParamsType: types.ParamsGetVdcGroup{},
 		ParamsSpecs: commands.ParamsSpecs{
@@ -103,7 +104,7 @@ func init() {
 				Validators: []commands.Validator{
 					commands.ValidatorRequiredIfParamIsNull("name"),
 					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("VDCGroup"),
+					commands.ValidatorURN("vdcGroup"),
 				},
 			},
 			commands.ParamsSpec{
@@ -285,7 +286,7 @@ func init() {
 		Namespace:          "VdcGroup",
 		Verb:               "Update",
 		ShortDocumentation: "Update a Vdc Group",
-		LongDocumentation:  "Update an existing Virtual Data Center Group (Vdc Group) in your organization.",
+		LongDocumentation:  "Update an existing Virtual Data Center Group (Vdc Group) in your organization. You can modify attributes such as the name, description, and associated Vdcs. To add or remove Vdcs, use the dedicated commands. If you want to modify the Vdcs associated with the Vdc Group, refer all the Vdcs you want to have associated with the Vdc Group in the `vdcs` parameter. Vdcs not present in this list will be removed from the Vdc Group.",
 
 		ParamsType: types.ParamsUpdateVdcGroup{},
 		ParamsSpecs: commands.ParamsSpecs{
@@ -314,6 +315,25 @@ func init() {
 				Description: "Description of the Vdc Group",
 				Required:    false,
 			},
+			commands.ParamsSpec{
+				Name:        "vdcs.{index}.id",
+				Description: "ID of the Vdc to add",
+				Required:    true,
+				Validators: []commands.Validator{
+					commands.ValidatorRequiredIfParamIsNull("vdcs.{index}.name"),
+					commands.ValidatorOmitempty(),
+					commands.ValidatorURN("vdc"),
+				},
+			},
+			commands.ParamsSpec{
+				Name:        "vdcs.{index}.name",
+				Description: "Name of the Vdc to add",
+				Required:    true,
+				Validators: []commands.Validator{
+					commands.ValidatorRequiredIfParamIsNull("vdcs.{index}.id"),
+					commands.ValidatorOmitempty(),
+				},
+			},
 		},
 		ModelType: types.ModelGetVdcGroup{},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
@@ -338,6 +358,7 @@ func init() {
 				return nil, err
 			}
 
+			cd := cav.GetExtraDataFromContext(respList.Request.Context())
 			rL := respList.Result().(*itypes.ApiResponseListVdcGroup)
 
 			if len(rL.Values) == 0 || len(rL.Values) > 1 {
@@ -346,18 +367,70 @@ func init() {
 			}
 
 			p.ID = rL.Values[0].ID
-			p.Name = rL.Values[0].Name
 
 			body := itypes.ApiRequestUpdateVdcGroup{
-				Id:                  p.ID,
-				OrgID:               rL.Values[0].OrgID,
-				Name:                p.Name,
-				Description:         p.Description,
-				Vdcs:                rL.Values[0].Vdcs,
+				Id:    p.ID,
+				OrgID: rL.Values[0].OrgID,
+				Name: func() string {
+					if p.Name != "" {
+						return p.Name
+					}
+					return rL.Values[0].Name
+				}(),
+				Description: func() string {
+					if p.Description != nil {
+						return *p.Description
+					}
+					return rL.Values[0].Description
+				}(),
+				Vdcs:                rL.Values[0].Vdcs, // By default keep existing Vdcs.
 				NetworkProviderType: "NSX_T",
 				Type:                "LOCAL",
 			}
 
+			if len(p.Vdcs) != 0 {
+				body.Vdcs = make([]itypes.ApiResponseVdcGroupParticipatingVdc, 0)
+
+				// If at least one provided VDC has no ID, we must list all VDCs to resolve IDs from names
+				necessaryRequestVdcID := slices.ContainsFunc(p.Vdcs, func(vdc types.ParamsCreateVdcGroupVdc) bool {
+					return vdc.ID == ""
+				})
+
+				listVdc := make(map[string]string)
+				if necessaryRequestVdcID {
+					respListVdc, err := cc.c.Do(ctx, endpoints.ListVdc())
+					if err != nil {
+						cc.logger.Error("Failed to list Vdcs", "error", err)
+						return nil, err
+					}
+
+					// For each vdc
+					for _, vdc := range respListVdc.Result().(*itypes.ApiResponseListVDC).Records {
+						listVdc[vdc.Name] = vdc.ID
+					}
+				}
+
+				for _, vdc := range p.Vdcs {
+					x := itypes.ApiResponseVdcGroupParticipatingVdc{
+						Vdc: itypes.ApiResponseVdcGroupParticipatingVdcRef{
+							ID: func() string {
+								if vdc.ID != "" {
+									return vdc.ID
+								}
+								return listVdc[vdc.Name]
+							}(),
+							Name: vdc.Name,
+						},
+						Site: itypes.ApiResponseVdcGroupParticipatingSiteRef{
+							ID: cd.SiteID,
+						},
+						FaultDomainTag:       "AZ01",
+						NetworkProviderScope: "AZ01",
+					}
+
+					body.Vdcs = append(body.Vdcs, x)
+				}
+			}
 			_, err = cc.c.Do(
 				ctx,
 				endpoints.UpdateVdcGroup(),
@@ -494,96 +567,41 @@ func init() {
 			cc := client.(*Client)
 			p := params.(types.ParamsAddVdcToVdcGroup)
 
-			epList := endpoints.ListVdcGroup()
-
-			param := cav.WithQueryParam(epList.QueryParams[0], fmt.Sprintf("id==%s", p.ID))
-			if p.ID == "" {
-				param = cav.WithQueryParam(epList.QueryParams[0], fmt.Sprintf("name==%s", p.Name))
-			}
-
-			// List existing Vdc Groups to fast fail if VdcGroup already exist and get in the response context the orgID and the siteID
-			respList, err := cc.c.Do(
-				ctx,
-				epList,
-				param,
-			)
+			// Get the Vdc Group ID and Name from the context
+			vdcGroup, err := cc.GetVdcGroup(ctx, types.ParamsGetVdcGroup{
+				ID:   p.ID,
+				Name: p.Name,
+			})
 			if err != nil {
-				cc.logger.Error("Failed to list Vdc Groups", "error", err)
+				cc.logger.Error("Failed to get Vdc Group", "error", err)
 				return nil, err
 			}
 
-			cd := cav.GetExtraDataFromContext(respList.Request.Context())
-			rL := respList.Result().(*itypes.ApiResponseListVdcGroup)
+			_, err = cc.UpdateVdcGroup(ctx, types.ParamsUpdateVdcGroup{
+				ID:   vdcGroup.ID,
+				Name: vdcGroup.Name,
+				Description: func() *string {
+					if vdcGroup.Description != "" {
+						return &vdcGroup.Description
+					}
+					return nil
+				}(),
+				Vdcs: func() []types.ParamsCreateVdcGroupVdc {
+					vdcs := p.Vdcs
 
-			if len(rL.Values) == 0 || len(rL.Values) > 1 {
-				cc.logger.Error("Failed to get unique Vdc Group", "error", err)
-				return nil, fmt.Errorf("failed to get unique Vdc Group")
-			}
+					// Add existing Vdcs in the Vdc Group
+					for _, vdc := range vdcGroup.Vdcs {
+						vdcs = append(vdcs, types.ParamsCreateVdcGroupVdc{
+							ID:   vdc.ID,
+							Name: vdc.Name,
+						})
+					}
 
-			p.ID = rL.Values[0].ID
-			p.Name = rL.Values[0].Name
-
-			body := itypes.ApiRequestUpdateVdcGroup{
-				Id:                  p.ID,
-				OrgID:               rL.Values[0].OrgID,
-				Name:                p.Name,
-				Description:         rL.Values[0].Description,
-				Vdcs:                rL.Values[0].Vdcs,
-				NetworkProviderType: "NSX_T",
-				Type:                "LOCAL",
-			}
-
-			necessaryRequestVdcID := false
-			for _, vdc := range p.Vdcs {
-				if vdc.ID == "" {
-					necessaryRequestVdcID = true
-					break
-				}
-			}
-
-			listVdc := make(map[string]string)
-			if necessaryRequestVdcID {
-				respListVdc, err := cc.c.Do(ctx, endpoints.ListVdc())
-				if err != nil {
-					cc.logger.Error("Failed to list Vdcs", "error", err)
-					return nil, err
-				}
-
-				// For each vdc
-				for _, vdc := range respListVdc.Result().(*itypes.ApiResponseListVDC).Records {
-					listVdc[vdc.Name] = vdc.ID
-				}
-			}
-
-			for _, vdc := range p.Vdcs {
-				x := itypes.ApiResponseVdcGroupParticipatingVdc{
-					Vdc: itypes.ApiResponseVdcGroupParticipatingVdcRef{
-						ID: func() string {
-							if vdc.ID != "" {
-								return vdc.ID
-							}
-							return listVdc[vdc.Name]
-						}(),
-						Name: vdc.Name,
-					},
-					Site: itypes.ApiResponseVdcGroupParticipatingSiteRef{
-						ID: cd.SiteID,
-					},
-					FaultDomainTag:       "AZ01",
-					NetworkProviderScope: "AZ01",
-				}
-
-				body.Vdcs = append(body.Vdcs, x)
-			}
-
-			_, err = cc.c.Do(
-				ctx,
-				endpoints.UpdateVdcGroup(),
-				cav.WithPathParam(endpoints.UpdateVdcGroup().PathParams[0], p.ID),
-				cav.SetBody(body),
-			)
+					return vdcs
+				}(),
+			})
 			if err != nil {
-				cc.logger.Error("Failed to update Vdc Group", "error", err)
+				cc.logger.Error("Failed to add Vdc to Vdc Group", "error", err)
 				return nil, err
 			}
 
@@ -646,61 +664,44 @@ func init() {
 			cc := client.(*Client)
 			p := params.(types.ParamsRemoveVdcFromVdcGroup)
 
-			epList := endpoints.ListVdcGroup()
-
-			param := cav.WithQueryParam(epList.QueryParams[0], fmt.Sprintf("id==%s", p.ID))
-			if p.ID == "" {
-				param = cav.WithQueryParam(epList.QueryParams[0], fmt.Sprintf("name==%s", p.Name))
-			}
-
-			// List existing Vdc Groups to fast fail if VdcGroup already exist and get in the response context the orgID and the siteID
-			respList, err := cc.c.Do(
-				ctx,
-				epList,
-				param,
-			)
+			// Get the Vdc Group ID and Name from the context
+			vdcGroup, err := cc.GetVdcGroup(ctx, types.ParamsGetVdcGroup{
+				ID:   p.ID,
+				Name: p.Name,
+			})
 			if err != nil {
-				cc.logger.Error("Failed to list Vdc Groups", "error", err)
+				cc.logger.Error("Failed to get Vdc Group", "error", err)
 				return nil, err
 			}
 
-			rL := respList.Result().(*itypes.ApiResponseListVdcGroup)
-
-			if len(rL.Values) == 0 || len(rL.Values) > 1 {
-				cc.logger.Error("Failed to get unique Vdc Group", "error", err)
-				return nil, fmt.Errorf("failed to get unique Vdc Group")
-			}
-
-			p.ID = rL.Values[0].ID
-			p.Name = rL.Values[0].Name
-
-			body := itypes.ApiRequestUpdateVdcGroup{
-				Id:                  p.ID,
-				OrgID:               rL.Values[0].OrgID,
-				Name:                p.Name,
-				Description:         rL.Values[0].Description,
-				Vdcs:                rL.Values[0].Vdcs,
-				NetworkProviderType: "NSX_T",
-				Type:                "LOCAL",
-			}
-
 			for _, vdc := range p.Vdcs {
-				// Remove each vdc from the body
-				for i := len(body.Vdcs) - 1; i >= 0; i-- {
-					if body.Vdcs[i].Vdc.ID == vdc.ID || body.Vdcs[i].Vdc.Name == vdc.Name {
-						body.Vdcs = append(body.Vdcs[:i], body.Vdcs[i+1:]...)
-					}
-				}
+				vdcGroup.Vdcs = slices.DeleteFunc(vdcGroup.Vdcs, func(item types.ModelGetVdcGroupVdc) bool {
+					return (vdc.ID != "" && item.ID == vdc.ID) || (vdc.Name != "" && item.Name == vdc.Name)
+				})
 			}
 
-			_, err = cc.c.Do(
-				ctx,
-				endpoints.UpdateVdcGroup(),
-				cav.WithPathParam(endpoints.UpdateVdcGroup().PathParams[0], p.ID),
-				cav.SetBody(body),
-			)
+			_, err = cc.UpdateVdcGroup(ctx, types.ParamsUpdateVdcGroup{
+				ID:   vdcGroup.ID,
+				Name: vdcGroup.Name,
+				Description: func() *string {
+					if vdcGroup.Description != "" {
+						return &vdcGroup.Description
+					}
+					return nil
+				}(),
+				Vdcs: func() []types.ParamsCreateVdcGroupVdc {
+					vdcs := make([]types.ParamsCreateVdcGroupVdc, 0)
+					for _, vdc := range vdcGroup.Vdcs {
+						vdcs = append(vdcs, types.ParamsCreateVdcGroupVdc{
+							ID:   vdc.ID,
+							Name: vdc.Name,
+						})
+					}
+					return vdcs
+				}(),
+			})
 			if err != nil {
-				cc.logger.Error("Failed to update Vdc Group", "error", err)
+				cc.logger.Error("Failed to remove Vdc from Vdc Group", "error", err)
 				return nil, err
 			}
 

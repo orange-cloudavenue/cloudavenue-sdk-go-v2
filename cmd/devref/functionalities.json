@@ -416,7 +416,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:fa536463-2436-47cf-aa26-62554176c8a7",
+                "example": "urn:vcloud:gateway:18c91792-5370-4344-9f88-2c1d12de7ce5",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -445,7 +445,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:61b8a1bf-28d0-44fe-b25e-3cd180e074bb",
+                "example": "urn:vcloud:gateway:307c91c8-19c7-4a3d-81f1-d1b1231ddc4c",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -2684,7 +2684,7 @@
         "resource": "",
         "verb": "Get",
         "short_documentation": "Get a Vdc Group",
-        "long_documentation": "Retrieve detailed information about a specific Vdc Group.",
+        "long_documentation": "Retrieve detailed information about a specific Vdc Group by its ID or name. This command returns all attributes and configuration details of the selected Vdc Group, helping you understand its current state and associated resources.",
         "markdown_documentation": "",
         "params": [
           {
@@ -2804,7 +2804,7 @@
         "resource": "",
         "verb": "Update",
         "short_documentation": "Update a Vdc Group",
-        "long_documentation": "Update an existing Virtual Data Center Group (Vdc Group) in your organization.",
+        "long_documentation": "Update an existing Virtual Data Center Group (Vdc Group) in your organization. You can modify attributes such as the name, description, and associated Vdcs. To add or remove Vdcs, use the dedicated commands. If you want to modify the Vdcs associated with the Vdc Group, refer all the Vdcs you want to have associated with the Vdc Group in the `vdcs` parameter. Vdcs not present in this list will be removed from the Vdc Group.",
         "markdown_documentation": "",
         "params": [
           {
@@ -2830,6 +2830,22 @@
             "example": "",
             "type": "string",
             "validators_description": ""
+          },
+          {
+            "name": "vdcs.{index}.id",
+            "description": "ID of the Vdc to add",
+            "required": true,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `vdcs.{index}.name` is null., Validates that the value is a valid URN (`vdc`).. \n"
+          },
+          {
+            "name": "vdcs.{index}.name",
+            "description": "Name of the Vdc to add",
+            "required": true,
+            "example": "",
+            "type": "string",
+            "validators_description": "The value is required if the parameter `vdcs.{index}.id` is null., "
           }
         ],
         "deprecated": false,

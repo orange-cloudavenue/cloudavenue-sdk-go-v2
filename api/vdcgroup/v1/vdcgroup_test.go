@@ -18,6 +18,7 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 	"github.com/orange-cloudavenue/common-go/generator"
+	"github.com/orange-cloudavenue/common-go/utils"
 )
 
 func TestListVdcGroup(t *testing.T) {
@@ -631,7 +632,7 @@ func TestUpdateVdcGroup(t *testing.T) {
 			name: "Update VDC Group",
 			params: types.ParamsUpdateVdcGroup{
 				ID:          generator.MustGenerate("{urn:vdcGroup}"),
-				Description: "My updated VDC Group",
+				Description: utils.ToPTR("My updated VDC Group"),
 			},
 			expectedErr: false,
 		},
@@ -639,7 +640,7 @@ func TestUpdateVdcGroup(t *testing.T) {
 			name: "Update VDC Group with VDCGroup name",
 			params: types.ParamsUpdateVdcGroup{
 				Name:        "my-updated-vdc-group",
-				Description: "My updated VDC Group",
+				Description: utils.ToPTR("My updated VDC Group"),
 			},
 			expectedErr: false,
 		},
@@ -648,7 +649,7 @@ func TestUpdateVdcGroup(t *testing.T) {
 			params: types.ParamsUpdateVdcGroup{
 				ID:          generator.MustGenerate("{urn:vdcGroup}"),
 				Name:        "my-updated-vdc-group",
-				Description: "My updated VDC Group",
+				Description: utils.ToPTR("My updated VDC Group"),
 			},
 			mockResponseStatus: 400,
 			expectedErr:        true,
@@ -658,7 +659,7 @@ func TestUpdateVdcGroup(t *testing.T) {
 			params: types.ParamsUpdateVdcGroup{
 				ID:          generator.MustGenerate("{urn:vdcGroup}"),
 				Name:        "my-updated-vdc-group",
-				Description: "My updated VDC Group",
+				Description: utils.ToPTR("My updated VDC Group"),
 			},
 			mockListVdcGroupResponseStatus: 404,
 			expectedErr:                    true,
@@ -668,7 +669,7 @@ func TestUpdateVdcGroup(t *testing.T) {
 			params: types.ParamsUpdateVdcGroup{
 				ID:          generator.MustGenerate("{urn:vdcGroup}"),
 				Name:        "my-updated-vdc-group",
-				Description: "My updated VDC Group",
+				Description: utils.ToPTR("My updated VDC Group"),
 			},
 			mockListVdcGroupResponse:       itypes.ApiResponseListVdcGroup{Values: []itypes.ApiResponseListVdcGroupDetails{}},
 			mockListVdcGroupResponseStatus: 200,
