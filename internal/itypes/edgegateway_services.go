@@ -78,7 +78,7 @@ func (ap *ApiResponseNetworkServices) ToModel(params types.ParamsEdgeGateway) *t
 	}
 
 	data := &types.ModelEdgeGatewayServices{
-		Service:      nil,
+		Services:     nil,
 		LoadBalancer: nil,
 		PublicIP:     nil,
 	}
@@ -97,10 +97,8 @@ func (ap *ApiResponseNetworkServices) ToModel(params types.ParamsEdgeGateway) *t
 					case "load-balancer":
 						// Found load balancer service
 						data.LoadBalancer = &types.ModelEdgeGatewayServicesLoadBalancer{
-							ModelEdgeGatewayServicesSvc: types.ModelEdgeGatewayServicesSvc{
-								ID:   service.Name,        // The name is the ID
-								Name: service.DisplayName, // The display name is the name
-							},
+							ID:                 service.Name,        // The name is the ID
+							Name:               service.DisplayName, // The display name is the name
 							ClassOfService:     service.Properties.ClassOfService,
 							MaxVirtualServices: service.Properties.MaxVirtualServices,
 						}
@@ -110,11 +108,9 @@ func (ap *ApiResponseNetworkServices) ToModel(params types.ParamsEdgeGateway) *t
 						switch service.Name {
 						case "cav-services", "cav_services": // Match both cav-services and cav_services
 							// Found cav-services
-							data.Service = &types.ModelCloudavenueServices{
-								ModelEdgeGatewayServicesSvc: types.ModelEdgeGatewayServicesSvc{
-									ID:   service.ServiceID,   // The ServiceID is the ID
-									Name: service.DisplayName, // The display name is the name
-								},
+							data.Services = &types.ModelCloudavenueServices{
+								ID:   service.ServiceID,   // The ServiceID is the ID
+								Name: service.DisplayName, // The display name is the name
 								Network: func() string {
 									if len(service.Properties.Ranges) == 0 {
 										return ""
@@ -136,16 +132,14 @@ func (ap *ApiResponseNetworkServices) ToModel(params types.ParamsEdgeGateway) *t
 									}
 									return ip.String()
 								}(),
-								ServiceDetails: ListOfServices,
+								ServicesDetails: ListOfServices,
 							}
 
 						case "internet":
 							// Found internet service
 							publicIP := &types.ModelEdgeGatewayServicesPublicIP{
-								ModelEdgeGatewayServicesSvc: types.ModelEdgeGatewayServicesSvc{
-									ID:   service.ServiceID,     // The ServiceID is the ID
-									Name: service.Properties.IP, // The IP don't have a name use IP instead
-								},
+								ID:        service.ServiceID,     // The ServiceID is the ID
+								Name:      service.Properties.IP, // The IP don't have a name use IP instead
 								IP:        service.Properties.IP,
 								Announced: service.Properties.Announced,
 							}
@@ -171,13 +165,13 @@ var ListOfServices = []types.ModelCloudavenueServiceDetails{
 	{
 		Category: "administration",
 		Network:  "57.199.209.192/27",
-		Services: []types.ModelCloudavenueServiceDetail{
+		Services: []types.ModelCloudavenueServiceDetailService{
 			{
 				Name:        "linux-repository",
 				Description: "Linux (Debian, Ubuntu, CentOS) package repository",
 				IP:          []string{"57.199.209.214"},
 				FQDN:        []string{"repo.service.cav"},
-				Ports: []types.ModelNetworkServicesSvcServiceDetailsPorts{
+				Ports: []types.ModelCloudavenueServiceDetailServicePort{
 					{
 						Port:     3142,
 						Protocol: "tcp",
@@ -189,7 +183,7 @@ var ListOfServices = []types.ModelCloudavenueServiceDetails{
 				Description: "Red Hat (RHUI) package repository",
 				IP:          []string{"57.199.209.197"},
 				FQDN:        []string{"rhui.service.cav"},
-				Ports: []types.ModelNetworkServicesSvcServiceDetailsPorts{
+				Ports: []types.ModelCloudavenueServiceDetailServicePort{
 					{
 						Port:     8080,
 						Protocol: "tcp",
@@ -201,7 +195,7 @@ var ListOfServices = []types.ModelCloudavenueServiceDetails{
 				Description: "Windows (WSUS) package repository",
 				IP:          []string{"57.199.209.212"},
 				FQDN:        []string{"wsus.service.cav"},
-				Ports: []types.ModelNetworkServicesSvcServiceDetailsPorts{
+				Ports: []types.ModelCloudavenueServiceDetailServicePort{
 					{
 						Port:     8530,
 						Protocol: "tcp",
@@ -219,7 +213,7 @@ var ListOfServices = []types.ModelCloudavenueServiceDetails{
 					"57.199.209.210",
 				},
 				FQDN: []string{"kms.service.cav"},
-				Ports: []types.ModelNetworkServicesSvcServiceDetailsPorts{
+				Ports: []types.ModelCloudavenueServiceDetailServicePort{
 					{
 						Port:     1688,
 						Protocol: "tcp",
@@ -237,7 +231,7 @@ var ListOfServices = []types.ModelCloudavenueServiceDetails{
 					"ntp1.service.cav",
 					"ntp2.service.cav",
 				},
-				Ports: []types.ModelNetworkServicesSvcServiceDetailsPorts{
+				Ports: []types.ModelCloudavenueServiceDetailServicePort{
 					{
 						Port:     123,
 						Protocol: "udp",
@@ -253,7 +247,7 @@ var ListOfServices = []types.ModelCloudavenueServiceDetails{
 					"57.199.209.208",
 				},
 				FQDN: nil,
-				Ports: []types.ModelNetworkServicesSvcServiceDetailsPorts{
+				Ports: []types.ModelCloudavenueServiceDetailServicePort{
 					{
 						Port:     53,
 						Protocol: "tcp",
@@ -273,7 +267,7 @@ var ListOfServices = []types.ModelCloudavenueServiceDetails{
 					"57.199.209.221",
 				},
 				FQDN: nil,
-				Ports: []types.ModelNetworkServicesSvcServiceDetailsPorts{
+				Ports: []types.ModelCloudavenueServiceDetailServicePort{
 					{
 						Port:     53,
 						Protocol: "tcp",
@@ -292,7 +286,7 @@ var ListOfServices = []types.ModelCloudavenueServiceDetails{
 					"57.199.209.206",
 				},
 				FQDN: []string{"smtp.service.cav"},
-				Ports: []types.ModelNetworkServicesSvcServiceDetailsPorts{
+				Ports: []types.ModelCloudavenueServiceDetailServicePort{
 					{
 						Port:     25,
 						Protocol: "tcp",
@@ -304,7 +298,7 @@ var ListOfServices = []types.ModelCloudavenueServiceDetails{
 	{
 		Category: "s3",
 		Network:  "194.206.55.5/32",
-		Services: []types.ModelCloudavenueServiceDetail{
+		Services: []types.ModelCloudavenueServiceDetailService{
 			{
 				Name:             "s3-internal",
 				Description:      "S3 internal service. Use for accessing S3 directly from the organization",
@@ -313,7 +307,7 @@ var ListOfServices = []types.ModelCloudavenueServiceDetails{
 					"194.206.55.5",
 				},
 				FQDN: []string{"s3-region01-priv.cloudavenue.orange-business.com"},
-				Ports: []types.ModelNetworkServicesSvcServiceDetailsPorts{
+				Ports: []types.ModelCloudavenueServiceDetailServicePort{
 					{
 						Port:     443,
 						Protocol: "tcp",

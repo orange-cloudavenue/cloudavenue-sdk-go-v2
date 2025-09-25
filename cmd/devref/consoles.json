@@ -162,15 +162,15 @@
   "Console specific VDR": {
     "SiteName": "Console specific VDR",
     "LocationCode": "vdr",
-    "SiteID": "console8",
+    "SiteID": "console7",
     "Services": {
       "IHM": {
         "Enabled": true,
-        "Endpoint": "https://console8.cloudavenue-vdr.itn.intraorange"
+        "Endpoint": "https://console7.cloudavenue-vdr.itn.intraorange"
       },
       "APIVCD": {
         "Enabled": true,
-        "Endpoint": "https://console8.cloudavenue-vdr.itn.intraorange"
+        "Endpoint": "https://console7.cloudavenue-vdr.itn.intraorange"
       },
       "APICerberus": {
         "Enabled": false,
@@ -186,9 +186,9 @@
       },
       "Netbackup": {
         "Enabled": true,
-        "Endpoint": "https://backup8.cloudavenue-vdr.itn.intraorange"
+        "Endpoint": "https://backup7.cloudavenue-vdr.itn.intraorange"
       }
     },
-    "OrganizationPattern": "^cav01iv08ocb\\d{7}$"
+    "OrganizationPattern": "^cav01iv07ocb\\d{7}$"
   }
 }

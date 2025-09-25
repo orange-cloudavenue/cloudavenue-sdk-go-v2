@@ -149,7 +149,7 @@ func init() {
 				return nil, err
 			}
 
-			return svcs.Service, nil
+			return svcs.Services, nil
 		},
 	})
 
@@ -271,7 +271,7 @@ func init() {
 			_, err = cc.c.Do(
 				ctx,
 				ep,
-				cav.WithPathParam(ep.PathParams[0], nSvc.Service.ID),
+				cav.WithPathParam(ep.PathParams[0], nSvc.Services.ID),
 			)
 			if err != nil {
 				return nil, fmt.Errorf("error disabling network services: %w", err)
