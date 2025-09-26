@@ -21,7 +21,7 @@ require (
 	github.com/orange-cloudavenue/common-go/urn v1.4.0
 	github.com/orange-cloudavenue/common-go/utils v1.0.0
 	github.com/orange-cloudavenue/common-go/validators v1.2.0
-	github.com/quasilyte/go-ruleguard/dsl v0.3.22
+	github.com/quasilyte/go-ruleguard/dsl v0.3.23
 	github.com/stretchr/testify v1.11.0
 	golang.org/x/sync v0.17.0
 	resty.dev/v3 v3.0.0-beta.3
