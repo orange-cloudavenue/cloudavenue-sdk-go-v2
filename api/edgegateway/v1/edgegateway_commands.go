@@ -254,7 +254,7 @@ func init() {
 				}
 			}
 
-			if len(t0.EdgeGateways) >= t0.MaxEdgeGateways {
+			if len(t0.EdgeGateways) >= t0.Summary.MaxEdgeGateways {
 				return nil, errors.New("Maximum number of edge gateways reached for T0: " + t0.Name)
 			}
 

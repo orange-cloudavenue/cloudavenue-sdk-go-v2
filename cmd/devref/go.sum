@@ -1,6 +1,5 @@
 github.com/brianvoe/gofakeit/v7 v7.3.0 h1:TWStf7/lLpAjKw+bqwzeORo9jvrxToWEwp9b1J2vApQ=
 github.com/brianvoe/gofakeit/v7 v7.3.0/go.mod h1:QXuPeBw164PJCzCUZVmgpgHJ3Llj49jSLVkKPMtxtxA=
-github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/creasty/defaults v1.8.0 h1:z27FJxCAa0JKt3utc0sCImAEb+spPucmKoOdLHvHYKk=
 github.com/creasty/defaults v1.8.0/go.mod h1:iGzKe6pbEHnpMPtfDXZEr0NVxWnPTjb1bbDy08fPzYM=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
@@ -17,16 +16,12 @@ github.com/go-playground/universal-translator v0.18.1 h1:Bcnm0ZwsGyWbCzImXv+pAJn
 github.com/go-playground/universal-translator v0.18.1/go.mod h1:xekY+UJKNuX9WP91TpwSH2VMlDf28Uj24BCp08ZFTUY=
 github.com/go-playground/validator/v10 v10.27.0 h1:w8+XrWVMhGkxOaaowyKH35gFydVHOvC0/uWoy2Fzwn4=
 github.com/go-playground/validator/v10 v10.27.0/go.mod h1:I5QpIEbmr8On7W0TktmJAumgzX4CA1XNl4ZmDuVHKKo=
-github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
-github.com/kr/pretty v0.3.1/go.mod h1:hoEshYVHaxMs3cyo3Yncou5ZscifuDolrwPKZanG3xk=
-github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
-github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
 github.com/leodido/go-urn v1.4.0 h1:WT9HwE9SGECu3lg4d/dIA+jxlljEa1/ffXKmRjqdmIQ=
 github.com/leodido/go-urn v1.4.0/go.mod h1:bvxc+MVxLKB4z00jd1z+Dvzr47oO32F/QSNjSBOlFxI=
 github.com/orange-cloudavenue/common-go/extractor v1.0.1 h1:NJ1KINgzLfXBFkgloLbNpYvh5E6bmBF2EEs1d2Wp6A0=
 github.com/orange-cloudavenue/common-go/extractor v1.0.1/go.mod h1:+vYlSmaZE5uOHO5m5+vtVPa2OmAXukU0+5FE7hMMu04=
-github.com/orange-cloudavenue/common-go/generator v1.3.4 h1:AFsosY54L69rSpomcFt2K6po6w3M9R6jmpWAzHMkC1o=
-github.com/orange-cloudavenue/common-go/generator v1.3.4/go.mod h1:t2twRGIC+pgneyUEb3Cf8EN0l+oFHl4E5bkLn/mF8Bo=
+github.com/orange-cloudavenue/common-go/generator v1.4.0 h1:45BQvF/IdZQYhYCPlHuM1mjvVxN8i87A7k0lsB1kLZM=
+github.com/orange-cloudavenue/common-go/generator v1.4.0/go.mod h1:t2twRGIC+pgneyUEb3Cf8EN0l+oFHl4E5bkLn/mF8Bo=
 github.com/orange-cloudavenue/common-go/internal/regex v0.0.0-20250812201424-07c3423160b3 h1:LvDc/VwHDkB9IfEdYf6y1m7GMnwV2bTw/P4BkO+wxY8=
 github.com/orange-cloudavenue/common-go/internal/regex v0.0.0-20250812201424-07c3423160b3/go.mod h1:T7OxerHaO1q+P6ue/Ka93aoUQK8syveiYhfZaJBMfP0=
 github.com/orange-cloudavenue/common-go/regex v1.2.0 h1:mJLWYPL1wEllGx9h4YEvsV7Q3X+igSWOzt6NIiYLxV8=
@@ -37,11 +32,8 @@ github.com/orange-cloudavenue/common-go/urn v1.4.0 h1:7z0yZuvxoZbebtk0U7WlbDlkBG
 github.com/orange-cloudavenue/common-go/urn v1.4.0/go.mod h1:yXpk5u8KLhpCxmR6uugaKZB/YgsrGg08TZ5XQdybHKs=
 github.com/orange-cloudavenue/common-go/utils v1.0.0 h1:9dUiS72eRXTrOFpomF3IexjfUF5USH9J49w7cUos+rI=
 github.com/orange-cloudavenue/common-go/utils v1.0.0/go.mod h1:LhE0UATOSRLoazdYuxvDAwKvTUuyVg4Ny+3XXdETU+0=
-github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e/go.mod h1:pJLUxLENpZxwdsKMEsNbx1VGcRFpLqf3715MtcvvzbA=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/rogpeppe/go-internal v1.9.0 h1:73kH8U+JUqXU8lRuOHeVHaa/SZPifC7BkcraZVejAe8=
-github.com/rogpeppe/go-internal v1.9.0/go.mod h1:WtVeX8xhTBvf0smdhujwtBcq4Qrzq/fJaraNFVN+nFs=
 github.com/stretchr/testify v1.11.0 h1:ib4sjIrwZKxE5u/Japgo/7SJV3PvgjGiRNAvTVGqQl8=
 github.com/stretchr/testify v1.11.0/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 golang.org/x/crypto v0.40.0 h1:r4x+VvoG5Fm+eJcxMaY8CQM7Lb0l1lsmjGBQ6s8BfKM=

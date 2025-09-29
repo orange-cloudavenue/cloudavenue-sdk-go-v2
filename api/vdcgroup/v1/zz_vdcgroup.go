@@ -24,7 +24,7 @@ func (c *Client) ListVdcGroup(ctx context.Context, params types.ParamsListVdcGro
 	return x.(*types.ModelListVdcGroup), nil
 }
 
-// Retrieve detailed information about a specific Vdc Group.
+// Retrieve detailed information about a specific Vdc Group by its ID or name. This command returns all attributes and configuration details of the selected Vdc Group, helping you understand its current state and associated resources.
 func (c *Client) GetVdcGroup(ctx context.Context, params types.ParamsGetVdcGroup) (*types.ModelGetVdcGroup, error) {
 	x, err := cmds.Get("VdcGroup", "", "Get").Run(ctx, c, params)
 	if err != nil {
@@ -42,7 +42,7 @@ func (c *Client) CreateVdcGroup(ctx context.Context, params types.ParamsCreateVd
 	return x.(*types.ModelGetVdcGroup), nil
 }
 
-// Update an existing Virtual Data Center Group (Vdc Group) in your organization.
+// Update an existing Virtual Data Center Group (Vdc Group) in your organization. You can modify attributes such as the name, description, and associated Vdcs. To add or remove Vdcs, use the dedicated commands. If you want to modify the Vdcs associated with the Vdc Group, refer all the Vdcs you want to have associated with the Vdc Group in the `vdcs` parameter. Vdcs not present in this list will be removed from the Vdc Group.
 func (c *Client) UpdateVdcGroup(ctx context.Context, params types.ParamsUpdateVdcGroup) (*types.ModelGetVdcGroup, error) {
 	x, err := cmds.Get("VdcGroup", "", "Update").Run(ctx, c, params)
 	if err != nil {

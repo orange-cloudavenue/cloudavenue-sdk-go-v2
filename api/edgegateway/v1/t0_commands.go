@@ -65,34 +65,35 @@ func init() {
 		ParamsType: types.ParamsGetT0{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
-				Name:        "t0_name",
+				Name:        "name",
 				Description: "The name of the T0 to retrieve.",
 				Required:    false,
 				Example:     "prvrf01eocb0001234allsp01",
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("edgegateway_id", "edgegateway_name"),
+					commands.ValidatorRequiredIfParamIsNull("edge_gateway_id", "edgegateway_name"),
 					commands.ValidatorOmitempty(),
 					commands.ValidatorResourceName("t0"),
 				},
 			},
 			commands.ParamsSpec{
-				Name:        "edgegateway_id",
+				Name:        "edge_gateway_id",
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("t0_name", "edgegateway_name"),
+					commands.ValidatorRequiredIfParamIsNull("t0_name", "edge_gateway_name"),
 					commands.ValidatorOmitempty(),
 					commands.ValidatorURN("edgegateway"),
 				},
 			},
 			commands.ParamsSpec{
-				Name:        "edgegateway_name",
+				Name:        "edge_gateway_name",
 				Description: "The name of the edge gateway.",
 				Required:    false,
 				Example:     "tn01e02ocb0001234spt101",
 				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("edgegateway_id", "t0_name"),
+					commands.ValidatorRequiredIfParamIsNull("edge_gateway_id", "t0_name"),
 					commands.ValidatorOmitempty(),
+					commands.ValidatorResourceName("edgegateway"),
 				},
 			},
 		},
@@ -106,9 +107,9 @@ func init() {
 			resp, err := cc.c.Do(
 				ctx,
 				ep,
-				cav.WithQueryParam(ep.QueryParams[0], p.T0Name),          // Only for mock response
-				cav.WithQueryParam(ep.QueryParams[1], p.EdgegatewayName), // Only for mock response
-				cav.WithQueryParam(ep.QueryParams[2], p.EdgegatewayID),   // Only for mock response
+				cav.WithQueryParam(ep.QueryParams[0], p.Name),            // Only for mock response
+				cav.WithQueryParam(ep.QueryParams[1], p.EdgeGatewayName), // Only for mock response
+				cav.WithQueryParam(ep.QueryParams[2], p.EdgeGatewayID),   // Only for mock response
 			)
 			if err != nil {
 				return nil, fmt.Errorf("error getting T0: %w", err)
@@ -118,13 +119,13 @@ func init() {
 			var t0 *types.ModelT0
 
 			for _, t := range t0s.T0s {
-				if p.T0Name != "" && t.Name == p.T0Name {
+				if p.Name != "" && t.Name == p.Name {
 					t0 = &t
 					break
 				}
-				if p.EdgegatewayID != "" || p.EdgegatewayName != "" {
+				if p.EdgeGatewayID != "" || p.EdgeGatewayName != "" {
 					for _, edgeGateway := range t.EdgeGateways {
-						if p.EdgegatewayID == edgeGateway.ID || p.EdgegatewayName == edgeGateway.Name {
+						if p.EdgeGatewayID == edgeGateway.ID || p.EdgeGatewayName == edgeGateway.Name {
 							t0 = &t
 							break
 						}
@@ -138,13 +139,13 @@ func init() {
 					StatusCode:    http.StatusNotFound,
 					StatusMessage: http.StatusText(http.StatusNotFound),
 					Message: func() string {
-						if p.T0Name != "" {
-							return fmt.Sprintf("T0 with name %s not found", p.T0Name)
+						if p.Name != "" {
+							return fmt.Sprintf("T0 with name %s not found", p.Name)
 						}
-						if p.EdgegatewayID != "" {
-							return fmt.Sprintf("T0 for edge gateway with ID %s not found", p.EdgegatewayID)
+						if p.EdgeGatewayID != "" {
+							return fmt.Sprintf("T0 for edge gateway with ID %s not found", p.EdgeGatewayID)
 						}
-						return fmt.Sprintf("T0 for edge gateway with name %s not found", p.EdgegatewayName)
+						return fmt.Sprintf("T0 for edge gateway with name %s not found", p.EdgeGatewayName)
 					}(),
 					Duration: resp.Duration(),
 					Endpoint: resp.Request.URL,

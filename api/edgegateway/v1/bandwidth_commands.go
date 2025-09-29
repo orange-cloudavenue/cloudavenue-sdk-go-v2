@@ -58,8 +58,8 @@ func init() {
 			p := params.(types.ParamsEdgeGateway)
 
 			pT0 := types.ParamsGetT0{
-				EdgegatewayID:   p.ID,
-				EdgegatewayName: p.Name,
+				EdgeGatewayID:   p.ID,
+				EdgeGatewayName: p.Name,
 			}
 
 			t0, err := cc.GetT0(ctx, pT0)

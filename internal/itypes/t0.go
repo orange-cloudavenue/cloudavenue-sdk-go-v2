@@ -74,11 +74,15 @@ func (t0s ApiResponseT0s) ToModel() *types.ModelT0s {
 					return false
 				}(),
 			},
-			MaxEdgeGateways: func() int {
-				if cof, ok := classOfServices[t0.Properties.ClassOfService]; ok {
-					return cof.MaxEdgeGateways
+			Summary: func() types.ModelT0Summary {
+				t0s := types.ModelT0Summary{}
+				if t0.Children != nil {
+					t0s.EdgeGateways = len(t0.Children)
 				}
-				return 0
+				if cof, ok := classOfServices[t0.Properties.ClassOfService]; ok {
+					t0s.MaxEdgeGateways = cof.MaxEdgeGateways
+				}
+				return t0s
 			}(),
 			EdgeGateways: func() []types.ModelT0EdgeGateway {
 				var edgeGateways []types.ModelT0EdgeGateway

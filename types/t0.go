@@ -13,9 +13,9 @@ type (
 	// * Params
 
 	ParamsGetT0 struct {
-		T0Name          string
-		EdgegatewayID   string
-		EdgegatewayName string
+		Name            string
+		EdgeGatewayID   string
+		EdgeGatewayName string
 	}
 
 	//* Model
@@ -27,7 +27,7 @@ type (
 	}
 
 	// ModelT0 represents a T0 router model.
-	// It contains the name, class of service, bandwidth, maximum edge gateways,
+	// It contains the name, class of service, bandwidth, summary, and associated edge gateways.
 	ModelT0 struct {
 		// Name defines the name of the T0 router.
 		Name string `documentation:"Name of the T0 router"`
@@ -38,12 +38,17 @@ type (
 		// Bandwidth defines the bandwidth for the T0 router.
 		Bandwidth ModelT0Bandwidth `documentation:"Bandwidth for the T0 router in Mbps."`
 
-		// MaxEdgeGateways defines the maximum number of edge gateways for the T0 router.
-		// This is a limit imposed by the Class of Service.
-		MaxEdgeGateways int `documentation:"Maximum number of edge gateways for the T0 router."`
+		// Summary provides a summary of the T0 router.
+		Summary ModelT0Summary `documentation:"Summary of the T0 router."`
 
 		// EdgeGateways contains the list of edge gateways associated with the T0 router.
 		EdgeGateways []ModelT0EdgeGateway `documentation:"List of edge gateways associated with the T0 router."`
+	}
+
+	// ModelT0Summary represents a summary of a T0 router.
+	ModelT0Summary struct {
+		EdgeGateways    int `documentation:"Number of edge gateways associated with the T0 router."`
+		MaxEdgeGateways int `documentation:"Maximum number of edge gateways allowed for the T0 router."`
 	}
 
 	// ModelT0Bandwidth represents the bandwidth model for a T0 router.

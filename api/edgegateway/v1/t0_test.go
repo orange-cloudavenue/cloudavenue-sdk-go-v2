@@ -93,21 +93,21 @@ func Test_GetT0(t *testing.T) {
 		{
 			name: "Valid T0",
 			params: types.ParamsGetT0{
-				T0Name: generator.MustGenerate("{resource_name:t0}"),
+				Name: generator.MustGenerate("{resource_name:t0}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Invalid TO name",
 			params: types.ParamsGetT0{
-				T0Name: "invalid_t0_name",
+				Name: "invalid_t0_name",
 			},
 			expectedErr: true,
 		},
 		{
 			name: "Error 500",
 			params: types.ParamsGetT0{
-				T0Name: generator.MustGenerate("{resource_name:t0}"),
+				Name: generator.MustGenerate("{resource_name:t0}"),
 			},
 			mockResponseStatus: http.StatusInternalServerError,
 			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
@@ -115,7 +115,7 @@ func Test_GetT0(t *testing.T) {
 		{
 			name: "Simulate empty response",
 			params: types.ParamsGetT0{
-				T0Name: generator.MustGenerate("{resource_name:t0}"),
+				Name: generator.MustGenerate("{resource_name:t0}"),
 			},
 			mockResponse:       &itypes.ApiResponseT0s{},
 			mockResponseStatus: http.StatusOK,
@@ -124,7 +124,7 @@ func Test_GetT0(t *testing.T) {
 		{
 			name: "Simulate empty response EdgeGateway Name",
 			params: types.ParamsGetT0{
-				EdgegatewayName: generator.MustGenerate("{resource_name:edgegateway}"),
+				EdgeGatewayName: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			mockResponse:       &itypes.ApiResponseT0s{},
 			mockResponseStatus: http.StatusOK,
@@ -133,7 +133,7 @@ func Test_GetT0(t *testing.T) {
 		{
 			name: "Simulate empty response EdgeGateway ID",
 			params: types.ParamsGetT0{
-				EdgegatewayID: generator.MustGenerate("{urn:edgegateway}"),
+				EdgeGatewayID: generator.MustGenerate("{urn:edgegateway}"),
 			},
 			mockResponse:       &itypes.ApiResponseT0s{},
 			mockResponseStatus: http.StatusOK,
@@ -142,7 +142,7 @@ func Test_GetT0(t *testing.T) {
 		{
 			name: "Error 404",
 			params: types.ParamsGetT0{
-				T0Name: generator.MustGenerate("{resource_name:t0}"),
+				Name: generator.MustGenerate("{resource_name:t0}"),
 			},
 			mockResponseStatus: http.StatusNotFound,
 			expectedErr:        true, // Error HTTP 404 should return an error.
@@ -167,10 +167,10 @@ func Test_GetT0(t *testing.T) {
 			} else {
 				assert.Nil(t, err, "Unexpected error while getting T0")
 				assert.NotNil(t, t0, "Expected non-nil T0 response")
-				if tt.params.T0Name != "" {
-					assert.Equal(t, tt.params.T0Name, t0.Name, "Expected T0 name to match the requested name")
+				if tt.params.Name != "" {
+					assert.Equal(t, tt.params.Name, t0.Name, "Expected T0 name to match the requested name")
 				}
-				if tt.params.EdgegatewayID != "" || tt.params.EdgegatewayName != "" {
+				if tt.params.EdgeGatewayID != "" || tt.params.EdgeGatewayName != "" {
 					assert.NotEmpty(t, t0.EdgeGateways, "Expected T0 to have edge gateways")
 				}
 			}
