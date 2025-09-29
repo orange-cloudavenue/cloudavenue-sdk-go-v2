@@ -416,7 +416,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:18c91792-5370-4344-9f88-2c1d12de7ce5",
+                "example": "urn:vcloud:gateway:946de874-d557-442d-8787-e94f813b3b39",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -445,7 +445,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:307c91c8-19c7-4a3d-81f1-d1b1231ddc4c",
+                "example": "urn:vcloud:gateway:3db9de81-f36d-44d4-ba40-a3a446707f98",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -464,67 +464,67 @@
               {
                 "object": "id",
                 "type": "string",
-                "documentation": "Identifier of the network service"
+                "documentation": "Unique identifier of the Cloud Avenue services configuration"
               },
               {
                 "object": "name",
                 "type": "string",
-                "documentation": "Name of the network service"
+                "documentation": "Services configuration name"
               },
               {
                 "object": "network",
                 "type": "string",
-                "documentation": "Network of the service in IP/CIDR format"
+                "documentation": "Service network in CIDR notation"
               },
               {
-                "object": "dedicated_ip_for_service",
+                "object": "ip_address",
                 "type": "string",
-                "documentation": "Dedicated IP for the service in IP format (Used for the NAT to connect to the service)"
+                "documentation": "Dedicated IPv4 used as NAT entrypoint for the services"
               },
               {
-                "object": "service_details.{index}.category",
+                "object": "services.{index}.category",
                 "type": "string",
-                "documentation": ""
+                "documentation": "Service category grouping related endpoints"
               },
               {
-                "object": "service_details.{index}.network",
+                "object": "services.{index}.network",
                 "type": "string",
-                "documentation": ""
+                "documentation": "Category network in CIDR notation"
               },
               {
-                "object": "service_details.{index}.services.{index}.name",
+                "object": "services.{index}.services.{index}.name",
                 "type": "string",
-                "documentation": ""
+                "documentation": "Service name"
               },
               {
-                "object": "service_details.{index}.services.{index}.description",
+                "object": "services.{index}.services.{index}.description",
                 "type": "string",
-                "documentation": ""
+                "documentation": "Human-readable description"
               },
               {
-                "object": "service_details.{index}.services.{index}.documentation_url",
+                "object": "services.{index}.services.{index}.documentation_url",
                 "type": "string",
-                "documentation": ""
+                "documentation": "Reference documentation URL"
               },
               {
-                "object": "service_details.{index}.services.{index}.ip.{index}",
+                "object": "services.{index}.services.{index}.i_ps.{index}",
                 "type": "string",
-                "documentation": ""
+                "documentation": "One or more IPv4 addresses used by the service"
               },
               {
-                "object": "service_details.{index}.services.{index}.fqdn.{index}",
+                "object": "services.{index}.services.{index}.fqd_ns.{index}",
                 "type": "string",
-                "documentation": ""
+                "documentation": "Fully qualified domain names for the service"
               },
               {
-                "object": "service_details.{index}.services.{index}.ports.{index}.port",
+                "object": "services.{index}.services.{index}.ports.{index}.port",
                 "type": "int",
-                "documentation": "Port of the service"
+                "documentation": "TCP/UDP port number"
               },
               {
-                "object": "service_details.{index}.services.{index}.ports.{index}.protocol",
+                "object": "services.{index}.services.{index}.ports.{index}.protocol",
                 "type": "string",
-                "documentation": "Protocol of the service"
+                "documentation": "Layer 4 protocol (e.g. TCP, UDP)"
               }
             ]
           }
@@ -577,22 +577,22 @@
               {
                 "object": "id",
                 "type": "string",
-                "documentation": "Identifier of the network service"
+                "documentation": "Unique identifier of the public IP"
               },
               {
                 "object": "name",
                 "type": "string",
-                "documentation": "Name of the network service"
+                "documentation": "Public IP logical name"
               },
               {
                 "object": "ip",
                 "type": "string",
-                "documentation": "Public IP address"
+                "documentation": "Public IPv4 address"
               },
               {
                 "object": "announced",
                 "type": "bool",
-                "documentation": "Indicates if the public IP address is announced"
+                "documentation": "True if the public IP is advertised via BGP"
               }
             ]
           },
@@ -666,22 +666,22 @@
               {
                 "object": "id",
                 "type": "string",
-                "documentation": "Identifier of the network service"
+                "documentation": "Unique identifier of the public IP"
               },
               {
                 "object": "name",
                 "type": "string",
-                "documentation": "Name of the network service"
+                "documentation": "Public IP logical name"
               },
               {
                 "object": "ip",
                 "type": "string",
-                "documentation": "Public IP address"
+                "documentation": "Public IPv4 address"
               },
               {
                 "object": "announced",
                 "type": "bool",
-                "documentation": "Indicates if the public IP address is announced"
+                "documentation": "True if the public IP is advertised via BGP"
               }
             ]
           },
@@ -736,22 +736,22 @@
               {
                 "object": "public_i_ps.{index}.id",
                 "type": "string",
-                "documentation": "Identifier of the network service"
+                "documentation": "Unique identifier of the public IP"
               },
               {
                 "object": "public_i_ps.{index}.name",
                 "type": "string",
-                "documentation": "Name of the network service"
+                "documentation": "Public IP logical name"
               },
               {
                 "object": "public_i_ps.{index}.ip",
                 "type": "string",
-                "documentation": "Public IP address"
+                "documentation": "Public IPv4 address"
               },
               {
                 "object": "public_i_ps.{index}.announced",
                 "type": "bool",
-                "documentation": "Indicates if the public IP address is announced"
+                "documentation": "True if the public IP is advertised via BGP"
               }
             ]
           }
@@ -794,102 +794,102 @@
               {
                 "object": "id",
                 "type": "string",
-                "documentation": "Identifier of the edge gateway"
+                "documentation": "Unique identifier of the edge gateway"
               },
               {
                 "object": "name",
                 "type": "string",
-                "documentation": "Name of the edge gateway"
+                "documentation": "Edge gateway name"
               },
               {
                 "object": "load_balancer.id",
                 "type": "string",
-                "documentation": "Identifier of the network service"
+                "documentation": "Unique identifier of the load balancer"
               },
               {
                 "object": "load_balancer.name",
                 "type": "string",
-                "documentation": "Name of the network service"
+                "documentation": "Load balancer name"
               },
               {
                 "object": "load_balancer.class_of_service",
                 "type": "string",
-                "documentation": "Class of service for the load balancer"
+                "documentation": "Service class (tier) applied to the load balancer"
               },
               {
                 "object": "load_balancer.max_virtual_services",
                 "type": "int",
-                "documentation": "Maximum number of virtual services"
+                "documentation": "Maximum number of virtual services supported"
               },
               {
                 "object": "public_ip.{index}",
                 "type": "*types.ModelEdgeGatewayServicesPublicIP",
-                "documentation": ""
+                "documentation": "List of allocated public IP addresses"
               },
               {
-                "object": "service.id",
+                "object": "services.id",
                 "type": "string",
-                "documentation": "Identifier of the network service"
+                "documentation": "Unique identifier of the Cloud Avenue services configuration"
               },
               {
-                "object": "service.name",
+                "object": "services.name",
                 "type": "string",
-                "documentation": "Name of the network service"
+                "documentation": "Services configuration name"
               },
               {
-                "object": "service.network",
+                "object": "services.network",
                 "type": "string",
-                "documentation": "Network of the service in IP/CIDR format"
+                "documentation": "Service network in CIDR notation"
               },
               {
-                "object": "service.dedicated_ip_for_service",
+                "object": "services.ip_address",
                 "type": "string",
-                "documentation": "Dedicated IP for the service in IP format (Used for the NAT to connect to the service)"
+                "documentation": "Dedicated IPv4 used as NAT entrypoint for the services"
               },
               {
-                "object": "service.service_details.{index}.category",
+                "object": "services.services.{index}.category",
                 "type": "string",
-                "documentation": ""
+                "documentation": "Service category grouping related endpoints"
               },
               {
-                "object": "service.service_details.{index}.network",
+                "object": "services.services.{index}.network",
                 "type": "string",
-                "documentation": ""
+                "documentation": "Category network in CIDR notation"
               },
               {
-                "object": "service.service_details.{index}.services.{index}.name",
+                "object": "services.services.{index}.services.{index}.name",
                 "type": "string",
-                "documentation": ""
+                "documentation": "Service name"
               },
               {
-                "object": "service.service_details.{index}.services.{index}.description",
+                "object": "services.services.{index}.services.{index}.description",
                 "type": "string",
-                "documentation": ""
+                "documentation": "Human-readable description"
               },
               {
-                "object": "service.service_details.{index}.services.{index}.documentation_url",
+                "object": "services.services.{index}.services.{index}.documentation_url",
                 "type": "string",
-                "documentation": ""
+                "documentation": "Reference documentation URL"
               },
               {
-                "object": "service.service_details.{index}.services.{index}.ip.{index}",
+                "object": "services.services.{index}.services.{index}.i_ps.{index}",
                 "type": "string",
-                "documentation": ""
+                "documentation": "One or more IPv4 addresses used by the service"
               },
               {
-                "object": "service.service_details.{index}.services.{index}.fqdn.{index}",
+                "object": "services.services.{index}.services.{index}.fqd_ns.{index}",
                 "type": "string",
-                "documentation": ""
+                "documentation": "Fully qualified domain names for the service"
               },
               {
-                "object": "service.service_details.{index}.services.{index}.ports.{index}.port",
+                "object": "services.services.{index}.services.{index}.ports.{index}.port",
                 "type": "int",
-                "documentation": "Port of the service"
+                "documentation": "TCP/UDP port number"
               },
               {
-                "object": "service.service_details.{index}.services.{index}.ports.{index}.protocol",
+                "object": "services.services.{index}.services.{index}.ports.{index}.protocol",
                 "type": "string",
-                "documentation": "Protocol of the service"
+                "documentation": "Layer 4 protocol (e.g. TCP, UDP)"
               }
             ]
           }
@@ -2693,7 +2693,7 @@
             "required": false,
             "example": "",
             "type": "string",
-            "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`VDCGroup`).. \n"
+            "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`vdcGroup`).. \n"
           },
           {
             "name": "name",

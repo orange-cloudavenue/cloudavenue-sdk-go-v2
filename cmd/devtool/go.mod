@@ -36,7 +36,6 @@ require (
 	github.com/go-playground/validator/v10 v10.27.0 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
@@ -50,7 +49,7 @@ require (
 	github.com/muesli/roff v0.1.0 // indirect
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/orange-cloudavenue/common-go/extractor v1.0.1 // indirect
-	github.com/orange-cloudavenue/common-go/generator v1.3.4 // indirect
+	github.com/orange-cloudavenue/common-go/generator v1.4.0 // indirect
 	github.com/orange-cloudavenue/common-go/internal/regex v0.0.0-20250812201424-07c3423160b3 // indirect
 	github.com/orange-cloudavenue/common-go/regex v1.2.0 // indirect
 	github.com/orange-cloudavenue/common-go/strcase v1.0.0 // indirect
@@ -58,7 +57,6 @@ require (
 	github.com/orange-cloudavenue/common-go/utils v1.0.0 // indirect
 	github.com/orange-cloudavenue/common-go/validators v1.2.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	golang.org/x/crypto v0.40.0 // indirect
