@@ -416,7 +416,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:e69ac2a9-f59a-42e7-bbff-0e52a36f05a9",
+                "example": "urn:vcloud:gateway:946de874-d557-442d-8787-e94f813b3b39",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -445,7 +445,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:8566144c-a1c5-468f-913b-2f99c03e1c48",
+                "example": "urn:vcloud:gateway:3db9de81-f36d-44d4-ba40-a3a446707f98",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -477,52 +477,52 @@
                 "documentation": "Service network in CIDR notation"
               },
               {
-                "object": "dedicated_ip_for_service",
+                "object": "ip_address",
                 "type": "string",
                 "documentation": "Dedicated IPv4 used as NAT entrypoint for the services"
               },
               {
-                "object": "services_details.{index}.category",
+                "object": "services.{index}.category",
                 "type": "string",
                 "documentation": "Service category grouping related endpoints"
               },
               {
-                "object": "services_details.{index}.network",
+                "object": "services.{index}.network",
                 "type": "string",
-                "documentation": "Category network in CIDR notation (may override parent)"
+                "documentation": "Category network in CIDR notation"
               },
               {
-                "object": "services_details.{index}.services.{index}.name",
+                "object": "services.{index}.services.{index}.name",
                 "type": "string",
                 "documentation": "Service name"
               },
               {
-                "object": "services_details.{index}.services.{index}.description",
+                "object": "services.{index}.services.{index}.description",
                 "type": "string",
                 "documentation": "Human-readable description"
               },
               {
-                "object": "services_details.{index}.services.{index}.documentation_url",
+                "object": "services.{index}.services.{index}.documentation_url",
                 "type": "string",
                 "documentation": "Reference documentation URL"
               },
               {
-                "object": "services_details.{index}.services.{index}.ip.{index}",
+                "object": "services.{index}.services.{index}.i_ps.{index}",
                 "type": "string",
                 "documentation": "One or more IPv4 addresses used by the service"
               },
               {
-                "object": "services_details.{index}.services.{index}.fqdn.{index}",
+                "object": "services.{index}.services.{index}.fqd_ns.{index}",
                 "type": "string",
                 "documentation": "Fully qualified domain names for the service"
               },
               {
-                "object": "services_details.{index}.services.{index}.ports.{index}.port",
+                "object": "services.{index}.services.{index}.ports.{index}.port",
                 "type": "int",
                 "documentation": "TCP/UDP port number"
               },
               {
-                "object": "services_details.{index}.services.{index}.ports.{index}.protocol",
+                "object": "services.{index}.services.{index}.ports.{index}.protocol",
                 "type": "string",
                 "documentation": "Layer 4 protocol (e.g. TCP, UDP)"
               }
@@ -842,52 +842,52 @@
                 "documentation": "Service network in CIDR notation"
               },
               {
-                "object": "services.dedicated_ip_for_service",
+                "object": "services.ip_address",
                 "type": "string",
                 "documentation": "Dedicated IPv4 used as NAT entrypoint for the services"
               },
               {
-                "object": "services.services_details.{index}.category",
+                "object": "services.services.{index}.category",
                 "type": "string",
                 "documentation": "Service category grouping related endpoints"
               },
               {
-                "object": "services.services_details.{index}.network",
+                "object": "services.services.{index}.network",
                 "type": "string",
-                "documentation": "Category network in CIDR notation (may override parent)"
+                "documentation": "Category network in CIDR notation"
               },
               {
-                "object": "services.services_details.{index}.services.{index}.name",
+                "object": "services.services.{index}.services.{index}.name",
                 "type": "string",
                 "documentation": "Service name"
               },
               {
-                "object": "services.services_details.{index}.services.{index}.description",
+                "object": "services.services.{index}.services.{index}.description",
                 "type": "string",
                 "documentation": "Human-readable description"
               },
               {
-                "object": "services.services_details.{index}.services.{index}.documentation_url",
+                "object": "services.services.{index}.services.{index}.documentation_url",
                 "type": "string",
                 "documentation": "Reference documentation URL"
               },
               {
-                "object": "services.services_details.{index}.services.{index}.ip.{index}",
+                "object": "services.services.{index}.services.{index}.i_ps.{index}",
                 "type": "string",
                 "documentation": "One or more IPv4 addresses used by the service"
               },
               {
-                "object": "services.services_details.{index}.services.{index}.fqdn.{index}",
+                "object": "services.services.{index}.services.{index}.fqd_ns.{index}",
                 "type": "string",
                 "documentation": "Fully qualified domain names for the service"
               },
               {
-                "object": "services.services_details.{index}.services.{index}.ports.{index}.port",
+                "object": "services.services.{index}.services.{index}.ports.{index}.port",
                 "type": "int",
                 "documentation": "TCP/UDP port number"
               },
               {
-                "object": "services.services_details.{index}.services.{index}.ports.{index}.protocol",
+                "object": "services.services.{index}.services.{index}.ports.{index}.protocol",
                 "type": "string",
                 "documentation": "Layer 4 protocol (e.g. TCP, UDP)"
               }

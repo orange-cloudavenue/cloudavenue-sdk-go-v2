@@ -12,6 +12,7 @@ package edgegateway
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
@@ -218,7 +219,11 @@ func init() {
 				cav.SetBody(requestBody),
 			)
 			if err != nil {
-				return nil, fmt.Errorf("error enabling network services: %w", err)
+				// Check if the error is due to a service already enabled
+				// The API returns a 400 Bad Request with a specific message in this case
+				if !strings.Contains(err.Error(), "subnet not fully consumed") {
+					return nil, fmt.Errorf("error enabling network services: %w", err)
+				}
 			}
 			return nil, nil // No response is expected for this command.
 		},
