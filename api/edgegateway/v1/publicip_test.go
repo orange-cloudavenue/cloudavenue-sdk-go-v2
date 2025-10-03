@@ -75,8 +75,8 @@ func TestListEdgegatewayPublicIP(t *testing.T) {
 			}
 			assert.NoError(t, err, "Unexpected error: %v", err)
 			assert.NotNil(t, resp, "Response should not be nil")
-			assert.NotEmpty(t, resp.PublicIPs, "Public IPs should not be empty")
-			for _, ip := range resp.PublicIPs {
+			assert.NotEmpty(t, resp.PublicIps, "Public IPs should not be empty")
+			for _, ip := range resp.PublicIps {
 				assert.NotEmpty(t, ip.ID, "Public IP ID should not be empty")
 				assert.NotEmpty(t, ip.IP, "Public IP Address should not be empty")
 			}
@@ -101,24 +101,24 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 		{
 			name: "Valid request",
 			params: types.ParamsGetEdgeGatewayPublicIP{
-				ID: generator.MustGenerate("{urn:edgegateway}"),
-				IP: generator.MustGenerate("{ipv4address}"),
+				EdgeGatewayID: generator.MustGenerate("{urn:edgegateway}"),
+				IP:            generator.MustGenerate("{ipv4address}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Valid request by name",
 			params: types.ParamsGetEdgeGatewayPublicIP{
-				IP:   generator.MustGenerate("{ipv4address}"),
-				Name: generator.MustGenerate("{resource_name:edgegateway}"),
+				IP:              generator.MustGenerate("{ipv4address}"),
+				EdgeGatewayName: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Failed request by name",
 			params: types.ParamsGetEdgeGatewayPublicIP{
-				IP:   generator.MustGenerate("{ipv4address}"),
-				Name: generator.MustGenerate("{resource_name:edgegateway}"),
+				IP:              generator.MustGenerate("{ipv4address}"),
+				EdgeGatewayName: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			mockListResponseStatus: 404,
 			expectedErr:            true,
@@ -126,16 +126,16 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 		{
 			name: "Invalid request",
 			params: types.ParamsGetEdgeGatewayPublicIP{
-				ID:   "invalid-id",
-				Name: "invalid-name",
+				EdgeGatewayID:   "invalid-id",
+				EdgeGatewayName: "invalid-name",
 			},
 			expectedErr: true,
 		},
 		{
 			name: "Error 404 Not Found",
 			params: types.ParamsGetEdgeGatewayPublicIP{
-				ID: generator.MustGenerate("{urn:edgegateway}"),
-				IP: generator.MustGenerate("{ipv4address}"),
+				EdgeGatewayID: generator.MustGenerate("{urn:edgegateway}"),
+				IP:            generator.MustGenerate("{ipv4address}"),
 			},
 			mockResponseStatus: 404,
 			expectedErr:        true,
@@ -143,8 +143,8 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 		{
 			name: "Simulate empty response",
 			params: types.ParamsGetEdgeGatewayPublicIP{
-				ID: generator.MustGenerate("{urn:edgegateway}"),
-				IP: generator.MustGenerate("{ipv4address}"),
+				EdgeGatewayID: generator.MustGenerate("{urn:edgegateway}"),
+				IP:            generator.MustGenerate("{ipv4address}"),
 			},
 			mockResponse:       &itypes.ApiResponseNetworkServices{},
 			mockResponseStatus: http.StatusOK,
