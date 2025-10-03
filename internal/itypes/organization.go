@@ -76,13 +76,5 @@ func (r *ApiResponseGetOrgs) ToModel() *types.ModelGetOrganization {
 		FullName:    r.Organizations[0].DisplayName,
 		Description: r.Organizations[0].Description,
 		Enabled:     r.Organizations[0].IsEnabled,
-		Resources: types.ModelGetOrganizationResources{
-			Vdc:       r.Organizations[0].OrgVdcCount,
-			Catalog:   r.Organizations[0].CatalogCount,
-			Vapp:      r.Organizations[0].VappCount,
-			VMRunning: r.Organizations[0].RunningVMCount,
-			User:      r.Organizations[0].UserCount,
-			Disk:      r.Organizations[0].DiskCount,
-		},
 	}
 }

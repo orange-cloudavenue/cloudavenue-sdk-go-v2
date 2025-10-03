@@ -416,7 +416,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:946de874-d557-442d-8787-e94f813b3b39",
+                "example": "urn:vcloud:gateway:526791cf-cfe8-481d-8432-b552113e1a57",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -445,7 +445,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:3db9de81-f36d-44d4-ba40-a3a446707f98",
+                "example": "urn:vcloud:gateway:b18ef775-edb9-4aac-a07c-0cf1a5d125c7",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -917,7 +917,7 @@
           {
             "object": "id",
             "type": "string",
-            "documentation": "URN of the organization in the format urn:vcloud:org:\u003cUUID\u003e"
+            "documentation": "Uniq organization Identifier in the format urn:vcloud:org:\u003cUUID\u003e"
           },
           {
             "object": "name",
@@ -927,57 +927,27 @@
           {
             "object": "full_name",
             "type": "string",
-            "documentation": "Long name of the organization"
+            "documentation": "Display name of the organization as shown in VMware Cloud Director."
           },
           {
             "object": "description",
             "type": "string",
-            "documentation": "Description of the organization"
+            "documentation": "Human-readable description of the organization."
           },
           {
             "object": "enabled",
             "type": "bool",
-            "documentation": "Indicates if the organization is enabled"
+            "documentation": "Indicates whether the organization is enabled. When false, access and resource operations are suspended."
           },
           {
             "object": "email",
             "type": "string",
-            "documentation": "Contact email of the organization"
+            "documentation": "Primary contact email for the organization."
           },
           {
             "object": "internet_billing_mode",
             "type": "string",
-            "documentation": "Internet billing mode of the organization"
-          },
-          {
-            "object": "resources.vdc",
-            "type": "int",
-            "documentation": "Number of VDC(s) in your organization"
-          },
-          {
-            "object": "resources.catalog",
-            "type": "int",
-            "documentation": "Number of Catalog media(s)"
-          },
-          {
-            "object": "resources.vapp",
-            "type": "int",
-            "documentation": "Number of vApp(s)"
-          },
-          {
-            "object": "resources.vm_running",
-            "type": "int",
-            "documentation": "Number of VM(s) in state power on"
-          },
-          {
-            "object": "resources.user",
-            "type": "int",
-            "documentation": "Number of user(s) in the organization"
-          },
-          {
-            "object": "resources.disk",
-            "type": "int",
-            "documentation": "Number of standalone disk(s) configured in the organization"
+            "documentation": "Internet bandwidth billing method for the organization (for example, PAYG or TRAFFIC_VOLUME). Choose the model that best matches your traffic profile."
           }
         ]
       },
@@ -991,7 +961,7 @@
         "params": [
           {
             "name": "full_name",
-            "description": "The full name of the organization. It's a long format of your organization name. Appears in the Cloud application as a human-readable name of the organization.",
+            "description": "The full name of the organization. It's a long format of your organization name. Appears in the VMware Cloud Director application as a human-readable name of the organization.",
             "required": false,
             "example": "My Organization to update",
             "type": "string",
@@ -999,7 +969,7 @@
           },
           {
             "name": "description",
-            "description": "A description for the organization.",
+            "description": "Human-readable description of the organization.",
             "required": false,
             "example": "This is my organization description to update",
             "type": "string",
@@ -1007,7 +977,7 @@
           },
           {
             "name": "email",
-            "description": "The contact email for the organization.",
+            "description": "Primary contact email for the organization.",
             "required": false,
             "example": "user@mail.com",
             "type": "string",
@@ -1028,7 +998,7 @@
           {
             "object": "id",
             "type": "string",
-            "documentation": "URN of the organization in the format urn:vcloud:org:\u003cUUID\u003e"
+            "documentation": "Uniq organization Identifier in the format urn:vcloud:org:\u003cUUID\u003e"
           },
           {
             "object": "name",
@@ -1038,57 +1008,27 @@
           {
             "object": "full_name",
             "type": "string",
-            "documentation": "Long name of the organization"
+            "documentation": "Display name of the organization as shown in VMware Cloud Director."
           },
           {
             "object": "description",
             "type": "string",
-            "documentation": "Description of the organization"
+            "documentation": "Human-readable description of the organization."
           },
           {
             "object": "enabled",
             "type": "bool",
-            "documentation": "Indicates if the organization is enabled"
+            "documentation": "Indicates whether the organization is enabled. When false, access and resource operations are suspended."
           },
           {
             "object": "email",
             "type": "string",
-            "documentation": "Contact email of the organization"
+            "documentation": "Primary contact email for the organization."
           },
           {
             "object": "internet_billing_mode",
             "type": "string",
-            "documentation": "Internet billing mode of the organization"
-          },
-          {
-            "object": "resources.vdc",
-            "type": "int",
-            "documentation": "Number of VDC(s) in your organization"
-          },
-          {
-            "object": "resources.catalog",
-            "type": "int",
-            "documentation": "Number of Catalog media(s)"
-          },
-          {
-            "object": "resources.vapp",
-            "type": "int",
-            "documentation": "Number of vApp(s)"
-          },
-          {
-            "object": "resources.vm_running",
-            "type": "int",
-            "documentation": "Number of VM(s) in state power on"
-          },
-          {
-            "object": "resources.user",
-            "type": "int",
-            "documentation": "Number of user(s) in the organization"
-          },
-          {
-            "object": "resources.disk",
-            "type": "int",
-            "documentation": "Number of standalone disk(s) configured in the organization"
+            "documentation": "Internet bandwidth billing method for the organization (for example, PAYG or TRAFFIC_VOLUME). Choose the model that best matches your traffic profile."
           }
         ]
       }
