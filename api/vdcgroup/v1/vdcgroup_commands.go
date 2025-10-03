@@ -512,6 +512,13 @@ func init() {
 		AutoGenerate: true,
 	})
 
+	// * VdcGroup - VDC
+	cmds.Register(commands.Command{
+		Namespace: "VdcGroup",
+		Resource:  "Vdc",
+		Verb:      "",
+	})
+
 	// * AddVdcToVdcGroup
 	cmds.Register(commands.Command{
 		Namespace:                  "VdcGroup",
