@@ -416,7 +416,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:946de874-d557-442d-8787-e94f813b3b39",
+                "example": "urn:vcloud:gateway:f6f857be-a59c-4d9d-a61a-51497c3bc684",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -445,7 +445,7 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:3db9de81-f36d-44d4-ba40-a3a446707f98",
+                "example": "urn:vcloud:gateway:772bd4b0-4f12-404c-a58e-4f11daa8aa91",
                 "type": "string",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
@@ -541,11 +541,11 @@
             "resource": "PublicIP",
             "verb": "Create",
             "short_documentation": "Create a new Public IP",
-            "long_documentation": "This command allows you to create a new Public IP on the specified Edge Gateway.",
+            "long_documentation": "This command allows you to create a new Public IP (IPv4) on the specified Edge Gateway.",
             "markdown_documentation": "",
             "params": [
               {
-                "name": "id",
+                "name": "edge_gateway_id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
                 "example": "",
@@ -553,7 +553,7 @@
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
-                "name": "name",
+                "name": "edge_gateway_name",
                 "description": "The name of the edge gateway.",
                 "required": false,
                 "example": "tn01e02ocb0001234spt101",
@@ -565,24 +565,19 @@
             "deprecated_message": "",
             "model": [
               {
-                "object": "edgegateway_id",
-                "type": "string",
-                "documentation": "ID of the edge gateway"
-              },
-              {
-                "object": "edgegateway_name",
-                "type": "string",
-                "documentation": "Name of the edge gateway"
-              },
-              {
                 "object": "id",
                 "type": "string",
                 "documentation": "Unique identifier of the public IP"
               },
               {
-                "object": "name",
+                "object": "edge_gateway_id",
                 "type": "string",
-                "documentation": "Public IP logical name"
+                "documentation": "Unique identifier of the edge gateway"
+              },
+              {
+                "object": "edge_gateway_name",
+                "type": "string",
+                "documentation": "Name of the edge gateway"
               },
               {
                 "object": "ip",
@@ -634,7 +629,7 @@
                 "validators_description": "Validates that the value is a valid IPv4 address. (E.g. 192.168.1.1 or 203.0.113.0). \n"
               },
               {
-                "name": "id",
+                "name": "edge_gateway_id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
                 "example": "",
@@ -642,7 +637,7 @@
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
-                "name": "name",
+                "name": "edge_gateway_name",
                 "description": "The name of the edge gateway.",
                 "required": false,
                 "example": "tn01e02ocb0001234spt101",
@@ -654,24 +649,19 @@
             "deprecated_message": "",
             "model": [
               {
-                "object": "edgegateway_id",
-                "type": "string",
-                "documentation": "ID of the edge gateway"
-              },
-              {
-                "object": "edgegateway_name",
-                "type": "string",
-                "documentation": "Name of the edge gateway"
-              },
-              {
                 "object": "id",
                 "type": "string",
                 "documentation": "Unique identifier of the public IP"
               },
               {
-                "object": "name",
+                "object": "edge_gateway_id",
                 "type": "string",
-                "documentation": "Public IP logical name"
+                "documentation": "Unique identifier of the edge gateway"
+              },
+              {
+                "object": "edge_gateway_name",
+                "type": "string",
+                "documentation": "Name of the edge gateway"
               },
               {
                 "object": "ip",
@@ -694,7 +684,7 @@
             "markdown_documentation": "",
             "params": [
               {
-                "name": "id",
+                "name": "edge_gateway_id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
                 "example": "",
@@ -702,7 +692,7 @@
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
-                "name": "name",
+                "name": "edge_gateway_name",
                 "description": "The name of the edge gateway.",
                 "required": false,
                 "example": "tn01e02ocb0001234spt101",
@@ -714,42 +704,27 @@
             "deprecated_message": "",
             "model": [
               {
-                "object": "edgegateway_id",
-                "type": "string",
-                "documentation": "ID of the edge gateway"
-              },
-              {
-                "object": "edgegateway_name",
-                "type": "string",
-                "documentation": "Name of the edge gateway"
-              },
-              {
-                "object": "public_i_ps.{index}.edgegateway_id",
-                "type": "string",
-                "documentation": "ID of the edge gateway"
-              },
-              {
-                "object": "public_i_ps.{index}.edgegateway_name",
-                "type": "string",
-                "documentation": "Name of the edge gateway"
-              },
-              {
-                "object": "public_i_ps.{index}.id",
+                "object": "public_ips.{index}.id",
                 "type": "string",
                 "documentation": "Unique identifier of the public IP"
               },
               {
-                "object": "public_i_ps.{index}.name",
+                "object": "public_ips.{index}.edge_gateway_id",
                 "type": "string",
-                "documentation": "Public IP logical name"
+                "documentation": "Unique identifier of the edge gateway"
               },
               {
-                "object": "public_i_ps.{index}.ip",
+                "object": "public_ips.{index}.edge_gateway_name",
+                "type": "string",
+                "documentation": "Name of the edge gateway"
+              },
+              {
+                "object": "public_ips.{index}.ip",
                 "type": "string",
                 "documentation": "Public IPv4 address"
               },
               {
-                "object": "public_i_ps.{index}.announced",
+                "object": "public_ips.{index}.announced",
                 "type": "bool",
                 "documentation": "True if the public IP is advertised via BGP"
               }

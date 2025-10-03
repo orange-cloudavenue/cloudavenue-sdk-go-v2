@@ -28,6 +28,8 @@ github.com/orange-cloudavenue/common-go/regex v1.2.0 h1:mJLWYPL1wEllGx9h4YEvsV7Q
 github.com/orange-cloudavenue/common-go/regex v1.2.0/go.mod h1:A7DfA7aAObMJ7DQSBPtVxbr54x0G2WDh4qf40RhZF+0=
 github.com/orange-cloudavenue/common-go/strcase v1.0.0 h1:96+dUHYq91/hiXY/DKO9HGTP3FMsSLikcf/xsp7tqLw=
 github.com/orange-cloudavenue/common-go/strcase v1.0.0/go.mod h1:WGZdlDEE39Yar+OU9pgjMGXMlQWgJrgOOc4q72qNVGE=
+github.com/orange-cloudavenue/common-go/strcase v1.0.1-0.20251003122717-704b635acd44 h1:fb4SHTNHIoSHxfOsYKpGTjx/zcarkY5sJVYwBxpPaX4=
+github.com/orange-cloudavenue/common-go/strcase v1.0.1-0.20251003122717-704b635acd44/go.mod h1:c55s1iokXrqYbtadBTJQvJZpVnFuScxa1B2nM7wdyAM=
 github.com/orange-cloudavenue/common-go/urn v1.4.0 h1:7z0yZuvxoZbebtk0U7WlbDlkBGh5Dj1mDyfxPP1klCA=
 github.com/orange-cloudavenue/common-go/urn v1.4.0/go.mod h1:yXpk5u8KLhpCxmR6uugaKZB/YgsrGg08TZ5XQdybHKs=
 github.com/orange-cloudavenue/common-go/utils v1.0.0 h1:9dUiS72eRXTrOFpomF3IexjfUF5USH9J49w7cUos+rI=

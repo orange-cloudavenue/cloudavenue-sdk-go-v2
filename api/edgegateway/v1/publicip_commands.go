@@ -40,14 +40,14 @@ func init() {
 		Verb:      "Create",
 
 		ShortDocumentation: "Create a new Public IP",
-		LongDocumentation:  "This command allows you to create a new Public IP on the specified Edge Gateway.",
+		LongDocumentation:  "This command allows you to create a new Public IP (IPv4) on the specified Edge Gateway.",
 		AutoGenerate:       true,
 
 		ModelType:  types.ModelEdgeGatewayPublicIP{},
-		ParamsType: types.ParamsEdgeGateway{},
+		ParamsType: types.ParamsCreateEdgeGatewayPublicIP{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
-				Name:        "id",
+				Name:        "edge_gateway_id",
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
 				Validators: []commands.Validator{
@@ -57,7 +57,7 @@ func init() {
 				},
 			},
 			commands.ParamsSpec{
-				Name:        "name",
+				Name:        "edge_gateway_name",
 				Description: "The name of the edge gateway.",
 				Required:    false,
 				Example:     "tn01e02ocb0001234spt101",
@@ -70,14 +70,14 @@ func init() {
 		},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(types.ParamsEdgeGateway)
+			p := params.(types.ParamsCreateEdgeGatewayPublicIP)
 			ep := endpoints.CreatePublicIp()
 			logger := cc.logger.WithGroup("CreatePublicIP")
 
 			// ID is required to request the API.
-			if p.ID == "" {
+			if p.EdgeGatewayID == "" {
 				var err error
-				p.ID, err = cc.retrieveEdgeGatewayIDByName(ctx, p.Name)
+				p.EdgeGatewayID, err = cc.retrieveEdgeGatewayIDByName(ctx, p.EdgeGatewayName)
 				if err != nil {
 					return nil, err
 				}
@@ -113,7 +113,7 @@ func init() {
 				}
 			}))
 
-			edgeId, err := extractor.ExtractUUID(p.ID)
+			edgeId, err := extractor.ExtractUUID(p.EdgeGatewayID)
 			if err != nil {
 				return nil, err
 			}
@@ -136,9 +136,9 @@ func init() {
 			}
 
 			return cc.GetPublicIP(ctx, types.ParamsGetEdgeGatewayPublicIP{
-				ID:   p.ID,
-				Name: p.Name,
-				IP:   publicipCreated,
+				EdgeGatewayID:   p.EdgeGatewayID,
+				EdgeGatewayName: p.EdgeGatewayName,
+				IP:              publicipCreated,
 			})
 		},
 	})
@@ -154,10 +154,10 @@ func init() {
 		AutoGenerate:       true,
 
 		ModelType:  types.ModelEdgeGatewayPublicIPs{},
-		ParamsType: types.ParamsEdgeGateway{},
+		ParamsType: types.ParamsListEdgeGatewayPublicIP{},
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
-				Name:        "id",
+				Name:        "edge_gateway_id",
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
 				Validators: []commands.Validator{
@@ -167,7 +167,7 @@ func init() {
 				},
 			},
 			commands.ParamsSpec{
-				Name:        "name",
+				Name:        "edge_gateway_name",
 				Description: "The name of the edge gateway.",
 				Required:    false,
 				Example:     "tn01e02ocb0001234spt101",
@@ -180,24 +180,27 @@ func init() {
 		},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
 			cc := client.(*Client)
-			p := params.(types.ParamsEdgeGateway)
+			p := params.(types.ParamsListEdgeGatewayPublicIP)
 
-			services, err := cc.GetServices(ctx, p)
+			services, err := cc.GetServices(ctx, types.ParamsEdgeGateway{
+				ID:   p.EdgeGatewayID,
+				Name: p.EdgeGatewayName,
+			})
 			if err != nil {
 				return nil, err
 			}
 
 			ips := &types.ModelEdgeGatewayPublicIPs{
-				EdgegatewayID:   services.ID,
-				EdgegatewayName: services.Name,
-				PublicIPs:       make([]types.ModelEdgeGatewayPublicIP, 0, len(services.PublicIP)),
+				PublicIps: make([]types.ModelEdgeGatewayPublicIP, 0, len(services.PublicIP)),
 			}
 
 			for _, publicip := range services.PublicIP {
-				ips.PublicIPs = append(ips.PublicIPs, types.ModelEdgeGatewayPublicIP{
-					EdgegatewayID:                    services.ID,
-					EdgegatewayName:                  services.Name,
-					ModelEdgeGatewayServicesPublicIP: *publicip,
+				ips.PublicIps = append(ips.PublicIps, types.ModelEdgeGatewayPublicIP{
+					ID:              publicip.ID,
+					EdgeGatewayID:   services.ID,
+					EdgeGatewayName: services.Name,
+					IP:              publicip.IP,
+					Announced:       publicip.Announced,
 				})
 			}
 
@@ -228,7 +231,7 @@ func init() {
 				},
 			},
 			commands.ParamsSpec{
-				Name:        "id",
+				Name:        "edge_gateway_id",
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
 				Validators: []commands.Validator{
@@ -238,7 +241,7 @@ func init() {
 				},
 			},
 			commands.ParamsSpec{
-				Name:        "name",
+				Name:        "edge_gateway_name",
 				Description: "The name of the edge gateway.",
 				Required:    false,
 				Example:     "tn01e02ocb0001234spt101",
@@ -254,9 +257,9 @@ func init() {
 			p := params.(types.ParamsGetEdgeGatewayPublicIP)
 
 			// ID is required to request the API.
-			if p.ID == "" {
+			if p.EdgeGatewayID == "" {
 				var err error
-				p.ID, err = cc.retrieveEdgeGatewayIDByName(ctx, p.Name)
+				p.EdgeGatewayID, err = cc.retrieveEdgeGatewayIDByName(ctx, p.EdgeGatewayName)
 				if err != nil {
 					return nil, err
 				}
@@ -266,33 +269,35 @@ func init() {
 			resp, err := cc.c.Do(
 				ctx,
 				ep,
-				cav.WithQueryParam(ep.QueryParams[0], p.ID),   // Only for filtering the response
-				cav.WithQueryParam(ep.QueryParams[1], p.Name), // Only for filtering the response
-				cav.WithQueryParam(ep.QueryParams[2], p.IP),   // Only for filtering the response
+				cav.WithQueryParam(ep.QueryParams[0], p.EdgeGatewayID),   // Only for filtering the response
+				cav.WithQueryParam(ep.QueryParams[1], p.EdgeGatewayName), // Only for filtering the response
+				cav.WithQueryParam(ep.QueryParams[2], p.IP),              // Only for filtering the response
 			)
 			if err != nil {
-				return nil, fmt.Errorf("error retrieving network services for edge gateway %s: %w", p.ID, err)
+				return nil, fmt.Errorf("error retrieving network services for edge gateway %s(%s): %w", p.EdgeGatewayName, p.EdgeGatewayID, err)
 			}
 
 			data := resp.Result().(*itypes.ApiResponseNetworkServices).ToModel(types.ParamsEdgeGateway{
-				ID:   p.ID,
-				Name: p.Name,
+				ID:   p.EdgeGatewayID,
+				Name: p.EdgeGatewayName,
 			})
 			if data == nil || len(data.PublicIP) == 0 {
-				return nil, fmt.Errorf("no public IPs found for edge gateway %s", p.ID)
+				return nil, fmt.Errorf("no public IPs found for edge gateway %s(%s)", p.EdgeGatewayName, p.EdgeGatewayID)
 			}
 
 			for _, publicip := range data.PublicIP {
 				if publicip.IP == p.IP {
 					return &types.ModelEdgeGatewayPublicIP{
-						EdgegatewayID:                    data.ID,
-						EdgegatewayName:                  data.Name,
-						ModelEdgeGatewayServicesPublicIP: *publicip,
+						ID:              publicip.ID,
+						EdgeGatewayID:   data.ID,
+						EdgeGatewayName: data.Name,
+						IP:              publicip.IP,
+						Announced:       publicip.Announced,
 					}, nil
 				}
 			}
 
-			return nil, fmt.Errorf("public IP %s not found in edge gateway %s", p.IP, p.ID)
+			return nil, fmt.Errorf("public IP %s not found in edge gateway %s(%s)", p.IP, data.Name, data.ID)
 		},
 	})
 

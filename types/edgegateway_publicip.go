@@ -11,22 +11,32 @@ package types
 
 type (
 	ModelEdgeGatewayPublicIPs struct {
-		EdgegatewayID   string `documentation:"ID of the edge gateway"`
-		EdgegatewayName string `documentation:"Name of the edge gateway"`
-
-		PublicIPs []ModelEdgeGatewayPublicIP `documentation:"List of public IPs"`
+		PublicIps []ModelEdgeGatewayPublicIP `documentation:"List of public IPs"`
 	}
 
 	ModelEdgeGatewayPublicIP struct {
-		EdgegatewayID   string `documentation:"ID of the edge gateway"`
-		EdgegatewayName string `documentation:"Name of the edge gateway"`
+		ID string `documentation:"Unique identifier of the public IP"`
 
-		ModelEdgeGatewayServicesPublicIP
+		EdgeGatewayID   string `documentation:"Unique identifier of the edge gateway"`
+		EdgeGatewayName string `documentation:"Name of the edge gateway"`
+
+		IP        string `documentation:"Public IPv4 address"`
+		Announced bool   `documentation:"True if the public IP is advertised via BGP"`
+	}
+
+	ParamsListEdgeGatewayPublicIP struct {
+		EdgeGatewayID   string `fake:"{urn:edgegateway}"`
+		EdgeGatewayName string `fake:"{resource_name:edgegateway}"`
+	}
+
+	ParamsCreateEdgeGatewayPublicIP struct {
+		EdgeGatewayID   string `fake:"{urn:edgegateway}"`
+		EdgeGatewayName string `fake:"{resource_name:edgegateway}"`
 	}
 
 	ParamsGetEdgeGatewayPublicIP struct {
-		ID   string `fake:"{urn:edgegateway}"`
-		Name string `fake:"{resource_name:edgegateway}"`
+		EdgeGatewayID   string `fake:"{urn:edgegateway}"`
+		EdgeGatewayName string `fake:"{resource_name:edgegateway}"`
 
 		IP string `validate:"ipv4" fake:"{IPv4Address}"`
 	}
