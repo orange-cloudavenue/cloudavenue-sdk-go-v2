@@ -25,20 +25,20 @@ import (
 //go:generate command-generator -path storage_profile_commands.go
 
 func init() { //nolint:gocyclo
-	// * StorageProfiles
+	// * StorageProfile
 	cmds.Register(commands.Command{
 		Namespace: "VDC",
 		Resource:  "StorageProfile",
 		Verb:      "",
 	})
 
-	// * ListStorageProfiles
+	// * ListStorageProfile
 	cmds.Register(commands.Command{
 		Namespace:          "VDC",
 		Resource:           "StorageProfile",
 		Verb:               "List",
 		ShortDocumentation: "Retrieve VDC storage profiles",
-		LongDocumentation:  "Retrieves a comprehensive list of storage profiles. When no filters are specified, all storage profiles across all VDCs are returned. Filtering options include storage profile ID/name and VDC ID/name. Filters can be combined (e.g., profile filter + VDC filter). When both ID and name are provided for the same resource, they must reference the same object to return results.",
+		LongDocumentation:  "Retrieves a comprehensive list of storage profiles for a specific VDC.",
 		AutoGenerate:       true,
 		ParamsType:         types.ParamsListStorageProfile{},
 		ParamsSpecs: commands.ParamsSpecs{
@@ -56,6 +56,7 @@ func init() { //nolint:gocyclo
 				Description: "Unique identifier of the VDC containing the storage profiles",
 				Required:    false,
 				Validators: []commands.Validator{
+					commands.ValidatorRequiredIfParamIsNull("vdc_name"),
 					commands.ValidatorOmitempty(),
 					commands.ValidatorURN("vdc"),
 				},
@@ -65,12 +66,17 @@ func init() { //nolint:gocyclo
 				Description: "Name of the VDC containing the storage profiles",
 				Required:    false,
 				Example:     "my-vdc",
+				Validators: []commands.Validator{
+					commands.ValidatorRequiredIfParamIsNull("vdc_id"),
+					commands.ValidatorOmitempty(),
+					commands.ValidatorResourceName("vdc"),
+				},
 			},
 			commands.ParamsSpec{
-				Name:        "class",
-				Description: "Storage class name of the profile to retrieve",
+				Name:        "classes",
+				Description: "A filtering matches storage class name of the profile to retrieve",
 				Required:    false,
-				Example:     "gold",
+				Example:     "gold*",
 			},
 		},
 		ModelType: types.ModelListStorageProfiles{},
@@ -88,8 +94,8 @@ func init() { //nolint:gocyclo
 			if p.ID != "" {
 				filters = append(filters, "id=="+p.ID)
 			}
-			if p.Class != "" {
-				filters = append(filters, "name=="+p.Class) // Corrected from 'name' to 'class'
+			if p.Classes != "" {
+				filters = append(filters, "classes=="+p.Classes)
 			}
 			if p.VdcID != "" {
 				filters = append(filters, "vdc=="+p.VdcID)
@@ -125,13 +131,124 @@ func init() { //nolint:gocyclo
 		},
 	})
 
+	// * GetStorageProfile
+	cmds.Register(commands.Command{
+		Namespace:          "VDC",
+		Resource:           "StorageProfile",
+		Verb:               "Get",
+		ShortDocumentation: "Retrieve a specific VDC storage profile",
+		LongDocumentation:  "Retrieves details of a specific storage profile within a VDC, identified by its unique ID or class name.",
+		AutoGenerate:       true,
+		ParamsType:         types.ParamsGetStorageProfile{},
+		ParamsSpecs: commands.ParamsSpecs{
+			commands.ParamsSpec{
+				Name:        "id",
+				Description: "Unique identifier of the storage profile to retrieve",
+				Required:    false,
+				Validators: []commands.Validator{
+					commands.ValidatorRequiredIfParamIsNull("class"),
+					commands.ValidatorOmitempty(),
+					commands.ValidatorURN("vdcstorageProfile"),
+				},
+			},
+			commands.ParamsSpec{
+				Name:        "vdc_id",
+				Description: "Unique identifier of the VDC containing the storage profile",
+				Required:    false,
+				Validators: []commands.Validator{
+					commands.ValidatorRequiredIfParamIsNull("vdc_name"),
+					commands.ValidatorOmitempty(),
+					commands.ValidatorURN("vdc"),
+				},
+			},
+			commands.ParamsSpec{
+				Name:        "vdc_name",
+				Description: "Name of the VDC containing the storage profile",
+				Required:    false,
+				Example:     "my-vdc",
+				Validators: []commands.Validator{
+					commands.ValidatorRequiredIfParamIsNull("vdc_id"),
+					commands.ValidatorOmitempty(),
+					commands.ValidatorResourceName("vdc"),
+				},
+			},
+			commands.ParamsSpec{
+				Name:        "class",
+				Description: "Storage class name of the profile to retrieve",
+				Required:    false,
+				Example:     "gold",
+				Validators: []commands.Validator{
+					commands.ValidatorRequiredIfParamIsNull("id"),
+					commands.ValidatorOmitempty(),
+				},
+			},
+		},
+		ModelType: types.ModelGetStorageProfile{},
+		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
+			cc := client.(*Client)
+			p := params.(types.ParamsGetStorageProfile)
+			var sp *types.ModelGetStorageProfile
+			var err error
+			// If ID is provided, use it to get the storage profile directly
+			if p.ID != "" {
+				sp, err = cc.GetStorageProfile(ctx, p)
+				if err != nil {
+					return nil, err
+				}
+				return sp.ToGetModel(), nil
+			}
+			// Otherwise, list storage profiles with the provided VDC ID/Name and Class
+			listSP, err := cc.ListStorageProfile(ctx, types.ParamsListStorageProfile{
+				VdcID:   p.VdcID,
+				VdcName: p.VdcName,
+				Classes: p.Class,
+			})
+			if err != nil {
+				return nil, err
+			}
+			if len(listSP.VDCS) == 0 {
+				return nil, errors.New("no VDC found with the provided ID or Name")
+			}
+			if len(listSP.VDCS) > 1 {
+				return nil, errors.New("multiple VDCs found with the provided ID or Name, please specify a unique VDC")
+			}
+			vdc := listSP.VDCS[0]
+			if len(vdc.StorageProfiles) == 0 {
+				return nil, errors.New("no storage profiles found in the specified VDC")
+			}
+			if len(vdc.StorageProfiles) > 1 && p.Class == "" {
+				return nil, errors.New("multiple storage profiles found in the specified VDC, please specify a unique class")
+			}
+			// If Class is provided, find the matching storage profile
+			if p.Class != "" {
+
+				for _, profile := range vdc.StorageProfiles {
+					if profile.Class == p.Class {
+						sp = &profile
+						break
+					}
+				}
+				if sp == nil {
+					return nil, fmt.Errorf("no storage profile found with class %s in VDC %s", p.Class, vdc.Name)
+				}
+				return sp.ToGetModel(), nil
+			}
+			// If only one storage profile exists in the VDC, return it
+			if len(vdc.StorageProfiles) == 1 {
+				sp = &vdc.StorageProfiles[0]
+				return sp.ToGetModel(), nil
+			}
+			return nil, errors.New("unable to determine the storage profile to retrieve")
+		},
+	})
+
 	// * AddStorageProfile
 	cmds.Register(commands.Command{
 		Namespace: "VDC",
 		Resource:  "StorageProfile",
 		Verb:      "Add",
 
-		ShortDocumentation: "Create VDC storage profiles",
+		ShortDocumentation: "Create VDC storage profile",
 		LongDocumentation:  "Creates one or more storage profiles within a specified VDC. Each profile requires a storage class and capacity limit, with an optional default designation.",
 		AutoGenerate:       true,
 		ParamsType:         types.ParamsAddStorageProfile{},
@@ -158,7 +275,7 @@ func init() { //nolint:gocyclo
 			},
 			{
 				Name:        "storage_profiles.{index}.class",
-				Description: "Storage class for the profile. Supports predefined and dedicated storage classes (see rules for available options)",
+				Description: "Storage class for the profile. Supports predefined and dedicated storage classes.",
 				Required:    true,
 				Example:     "gold",
 			},

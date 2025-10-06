@@ -27,10 +27,25 @@ type (
 		Used    int    `documentation:"Used storage of the storage profile in GiB"`
 		Default bool   `documentation:"Indicates if the storage profile is the default one"`
 	}
+
+	ModelGetStorageProfile struct {
+		ID      string `documentation:"ID of the storage profile"`
+		Class   string `documentation:"Name of the storage profile"`
+		Limit   int    `documentation:"Limit of the storage profile in GiB"`
+		Used    int    `documentation:"Used storage of the storage profile in GiB"`
+		Default bool   `documentation:"Indicates if the storage profile is the default one"`
+	}
 )
 
 type (
 	ParamsListStorageProfile struct {
+		ID      string
+		Classes string
+		VdcID   string
+		VdcName string
+	}
+
+	ParamsGetStorageProfile struct {
 		ID      string
 		Class   string
 		VdcID   string

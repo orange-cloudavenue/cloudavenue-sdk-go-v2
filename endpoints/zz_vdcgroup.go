@@ -15,28 +15,25 @@ import (
 
 // ListVdcGroup - List Vdc Groups
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/vdcGroups/get/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/vdcGroups/get/ 
 func ListVdcGroup() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListVdcGroup")
 }
-
 // CreateVdcGroup - Create a Vdc Group
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/vdcGroups/post/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/vdcGroups/post/ 
 func CreateVdcGroup() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreateVdcGroup")
 }
-
 // UpdateVdcGroup - Update a Vdc Group
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/put/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/put/ 
 func UpdateVdcGroup() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateVdcGroup")
 }
-
 // DeleteVdcGroup - Delete a Vdc Group
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/delete/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/delete/ 
 func DeleteVdcGroup() *cav.Endpoint {
 	return cav.MustGetEndpoint("DeleteVdcGroup")
 }
