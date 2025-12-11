@@ -16,6 +16,8 @@ import (
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/pspecs"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/validator"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
@@ -41,32 +43,32 @@ func init() { //nolint:gocyclo
 		LongDocumentation:  "Retrieves a comprehensive list of storage profiles. When no filters are specified, all storage profiles across all VDCs are returned. Filtering options include storage profile ID/name and VDC ID/name. Filters can be combined (e.g., profile filter + VDC filter). When both ID and name are provided for the same resource, they must reference the same object to return results.",
 		AutoGenerate:       true,
 		ParamsType:         types.ParamsListStorageProfile{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "id",
 				Description: "Unique identifier of the storage profile to retrieve",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdcstorageProfile"),
+				Validators: []validator.Validator{
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("vdcstorageProfile"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "vdc_id",
 				Description: "Unique identifier of the VDC containing the storage profiles",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdc"),
+				Validators: []validator.Validator{
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("vdc"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "vdc_name",
 				Description: "Name of the VDC containing the storage profiles",
 				Required:    false,
 				Example:     "my-vdc",
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "class",
 				Description: "Storage class name of the profile to retrieve",
 				Required:    false,
@@ -135,47 +137,53 @@ func init() { //nolint:gocyclo
 		LongDocumentation:  "Creates one or more storage profiles within a specified VDC. Each profile requires a storage class and capacity limit, with an optional default designation.",
 		AutoGenerate:       true,
 		ParamsType:         types.ParamsAddStorageProfile{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "vdc_id",
 				Description: "Unique identifier of the target VDC for the new storage profile",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("vdc_name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdc"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("vdc_name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("vdc"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "vdc_name",
 				Description: "Name of the target VDC for the new storage profile",
 				Required:    false,
 				Example:     "my-vdc",
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("vdc_id"),
-					commands.ValidatorOmitempty(),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("vdc_id"),
+					validator.ValidatorOmitempty(),
 				},
 			},
-			{
-				Name:        "storage_profiles.{index}.class",
-				Description: "Storage class for the profile. Supports predefined and dedicated storage classes (see rules for available options)",
+			&pspecs.ListNested{
+				Name:        "storage_profiles",
+				Description: "List of storage profiles to create within the specified VDC",
 				Required:    true,
-				Example:     "gold",
-			},
-			{
-				Name:        "storage_profiles.{index}.limit",
-				Description: "Storage capacity limit in GiB (maximum amount of storage available to the VDC)",
-				Required:    true,
-				Example:     "500",
-				Validators: []commands.Validator{
-					commands.ValidatorBetween(100, 81920),
+				ItemsSpec: []pspecs.ParamSpec{
+					&pspecs.String{
+						Name:        "class",
+						Description: "Storage class for the profile. Supports predefined and dedicated storage classes (see rules for available options)",
+						Required:    true,
+					},
+					&pspecs.Int{
+						Name:        "limit",
+						Description: "Storage capacity limit in GiB (maximum amount of storage available to the VDC)",
+						Required:    true,
+						Example:     500,
+						Validators: []validator.Validator{
+							validator.ValidatorBetween(100, 81920),
+						},
+					},
+					&pspecs.Bool{
+						Name:        "default",
+						Description: "Designates this storage profile as the default for the VDC when no specific profile is specified",
+						Required:    false,
+						Example:     false,
+					},
 				},
-			},
-			{
-				Name:        "storage_profiles.{index}.default",
-				Description: "Designates this storage profile as the default for the VDC when no specific profile is specified",
-				Required:    false,
-				Example:     "false",
 			},
 		},
 		ParamsRules: func() commands.ParamsRules {
@@ -275,32 +283,38 @@ func init() { //nolint:gocyclo
 		LongDocumentation:  "Removes a storage profile from the specified VDC. Deletion is restricted for default profiles, the last remaining profile, or profiles currently in use.",
 		AutoGenerate:       true,
 		ParamsType:         types.ParamsDeleteStorageProfile{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "vdc_id",
 				Description: "Unique identifier of the VDC containing the storage profile to remove",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("vdc_name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdc"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("vdc_name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("vdc"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "vdc_name",
 				Description: "Name of the VDC containing the storage profile to remove",
 				Required:    false,
 				Example:     "my-vdc",
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("vdc_id"),
-					commands.ValidatorOmitempty(),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("vdc_id"),
+					validator.ValidatorOmitempty(),
 				},
 			},
-			{
-				Name:        "storage_profiles.{index}.class",
-				Description: "Storage class identifier of the profile to remove",
+			&pspecs.ListNested{
+				Name:        "storage_profiles",
+				Description: "List of storage profiles to create within the specified VDC",
 				Required:    true,
-				Example:     "gold",
+				ItemsSpec: []pspecs.ParamSpec{
+					&pspecs.String{
+						Name:        "class",
+						Description: "Storage class for the profile. Supports predefined and dedicated storage classes (see rules for available options)",
+						Required:    true,
+					},
+				},
 			},
 		},
 		RunnerFunc: func(ctx context.Context, cmd *commands.Command, client, params any) (any, error) {
@@ -398,49 +412,53 @@ func init() { //nolint:gocyclo
 		LongDocumentation:  "Modifies one or more storage profiles within a VDC. Supported updates include capacity limits and default profile designation. Storage class names cannot be modified.",
 		AutoGenerate:       true,
 		ParamsType:         types.ParamsUpdateStorageProfile{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "vdc_id",
 				Description: "Unique identifier of the VDC containing the storage profile to modify",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("vdc_name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdc"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("vdc_name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("vdc"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "vdc_name",
 				Description: "Name of the VDC containing the storage profile to modify",
 				Required:    false,
 				Example:     "my-vdc",
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("vdc_id"),
-					commands.ValidatorOmitempty(),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("vdc_id"),
+					validator.ValidatorOmitempty(),
 				},
 			},
-			{
-				Name:        "storage_profiles.{index}.class",
-				Description: "Storage class identifier of the profile to modify (see Rules Table for valid classes)",
+			&pspecs.ListNested{
+				Name:        "storage_profiles",
+				Description: "List of storage profiles to create within the specified VDC",
 				Required:    true,
-				Example:     "gold",
-			},
-			{
-				Name:        "storage_profiles.{index}.default",
-				Description: "Designates this storage profile as the default for the VDC (only one default profile allowed per VDC)",
-				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorOmitempty(),
-				},
-				Example: "true",
-			},
-			{
-				Name:        "storage_profiles.{index}.limit",
-				Description: "Updated storage capacity limit in GiB (cannot be lower than current usage; decreasing limits may cause service interruption)",
-				Required:    false,
-				Example:     "500",
-				Validators: []commands.Validator{
-					commands.ValidatorBetween(100, 81920),
+				ItemsSpec: []pspecs.ParamSpec{
+					&pspecs.String{
+						Name:        "class",
+						Description: "Storage class for the profile. Supports predefined and dedicated storage classes (see rules for available options)",
+						Required:    true,
+					},
+					&pspecs.Int{
+						Name:        "limit",
+						Description: "Storage capacity limit in GiB (maximum amount of storage available to the VDC)",
+						Required:    false,
+						Example:     500,
+						Validators: []validator.Validator{
+							validator.ValidatorOmitempty(),
+							validator.ValidatorBetween(100, 81920),
+						},
+					},
+					&pspecs.Bool{
+						Name:        "default",
+						Description: "Designates this storage profile as the default for the VDC when no specific profile is specified",
+						Required:    false,
+						Example:     false,
+					},
 				},
 			},
 		},

@@ -13,6 +13,8 @@ import (
 	"context"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/pspecs"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/validator"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
@@ -29,24 +31,24 @@ func init() {
 		AutoGenerate:       true,
 
 		ParamsType: types.ParamsEdgeGateway{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "id",
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("edgegateway"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("edgegateway"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "name",
 				Description: "The name of the edge gateway.",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("id"),
-					commands.ValidatorOmitempty(),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("id"),
+					validator.ValidatorOmitempty(),
 				},
 			},
 		},

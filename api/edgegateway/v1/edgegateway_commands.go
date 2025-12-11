@@ -19,6 +19,8 @@ import (
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/pspecs"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/validator"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
@@ -44,25 +46,25 @@ func init() {
 		LongDocumentation:  "Get EdgeGateway performs a GET request to retrieve an edge gateway",
 
 		ParamsType: types.ParamsEdgeGateway{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "id",
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("edgegateway"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("edgegateway"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "name",
 				Description: "The name of the edge gateway.",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("id"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorResourceName("edgegateway"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("id"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorResourceName("edgegateway"),
 				},
 			},
 		},
@@ -134,29 +136,29 @@ func init() {
 		LongDocumentation:  "Create EdgeGateway performs a POST request to create a new edge gateway",
 		AutoGenerate:       true,
 		ParamsType:         types.ParamsCreateEdgeGateway{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "owner_name",
 				Description: "The name of the VDC or VDC Group that this edge gateway belongs to.",
 				Example:     "my-vdc",
 				Required:    true,
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "t0_name",
 				Description: "The name of the T0 router that this edge gateway will be connected to. If not provided and only if one T0 router is available, the first T0 router will be used.",
 				Required:    false,
 				Example:     "prvrf01eocb0001234allsp01",
-				Validators: []commands.Validator{
-					commands.ValidatorOmitempty(),
-					commands.ValidatorResourceName("t0"),
+				Validators: []validator.Validator{
+					validator.ValidatorOmitempty(),
+					validator.ValidatorResourceName("t0"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.Int{
 				Name:        "bandwidth",
 				Description: "The bandwidth limit in Mbps for the edge gateway. If t0 is SHARED, it must be one of the available values for the T0 router (Default value:  5Mbps). If t0 is DEDICATED, unlimited bandwidth is allowed.",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorOmitempty(),
+				Validators: []validator.Validator{
+					validator.ValidatorOmitempty(),
 				},
 			},
 		},
@@ -370,24 +372,24 @@ func init() {
 		LongDocumentation:  "Delete EdgeGateway performs a DELETE request to delete an edge gateway",
 		AutoGenerate:       true,
 		ParamsType:         types.ParamsEdgeGateway{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "id",
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("edgegateway"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("edgegateway"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "name",
 				Description: "The name of the edge gateway.",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("id"),
-					commands.ValidatorOmitempty(),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("id"),
+					validator.ValidatorOmitempty(),
 				},
 			},
 		},
@@ -428,27 +430,27 @@ func init() {
 		LongDocumentation:  "Update EdgeGateway performs a PUT request to update an edge gateway",
 		AutoGenerate:       true,
 		ParamsType:         types.ParamsUpdateEdgeGateway{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "id",
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("edgegateway"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("edgegateway"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "name",
 				Description: "The name of the edge gateway.",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("id"),
-					commands.ValidatorOmitempty(),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("id"),
+					validator.ValidatorOmitempty(),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.Int{
 				Name:        "bandwidth",
 				Description: "The new bandwidth limit in Mbps for the edge gateway. If t0 is SHARED, it must be one of the available values for the T0 router (Default value: 5Mbps). If t0 is DEDICATED, unlimited bandwidth is allowed.",
 				Required:    true,

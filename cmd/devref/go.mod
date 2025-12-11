@@ -19,6 +19,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.27.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
+	github.com/ompluscator/dynamic-struct v1.4.0 // indirect
 	github.com/orange-cloudavenue/common-go/extractor v1.0.1 // indirect
 	github.com/orange-cloudavenue/common-go/generator v1.4.0 // indirect
 	github.com/orange-cloudavenue/common-go/internal/regex v0.0.0-20250812201424-07c3423160b3 // indirect

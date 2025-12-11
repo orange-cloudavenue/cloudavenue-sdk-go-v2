@@ -18,6 +18,8 @@ import (
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/pspecs"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/validator"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
@@ -41,23 +43,23 @@ func init() { //nolint:gocyclo
 		LongDocumentation:  "List all Virtual Data Centers (VDCs) available in your organization. If no filters are applied, it returns all VDCs.",
 
 		ParamsType: types.ParamsListVDC{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "id",
 				Description: "ID of the VDC to filter by",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdc"),
+				Validators: []validator.Validator{
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("vdc"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "name",
 				Description: "Name of the VDC to filter by",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorOmitempty(),
-					commands.ValidatorResourceName("vdc"),
+				Validators: []validator.Validator{
+					validator.ValidatorOmitempty(),
+					validator.ValidatorResourceName("vdc"),
 				},
 			},
 		},
@@ -101,26 +103,26 @@ func init() { //nolint:gocyclo
 		LongDocumentation:  "Retrieve detailed information about a specific Virtual Data Center (VDC) by its name.",
 
 		ParamsType: types.ParamsGetVDC{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "id",
 				Description: "ID of the VDC to get",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdc"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("vdc"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "name",
 				Description: "Name of the VDC to get",
 				Required:    false,
 				Example:     "my-vdc",
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("id"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorResourceName("vdc"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("id"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorResourceName("vdc"),
 				},
 			},
 		},
@@ -231,89 +233,95 @@ func init() { //nolint:gocyclo
 		LongDocumentation:  "Create a new Virtual Data Center (VDC) with the specified parameters.",
 
 		ParamsType: types.ParamsCreateVDC{},
-		ParamsSpecs: commands.ParamsSpecs{
-			{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "name",
 				Description: "Name of the VDC to create",
 				Required:    true,
 				Example:     "my-vdc",
-				Validators: []commands.Validator{
-					commands.ValidatorResourceName("vdc"),
+				Validators: []validator.Validator{
+					validator.ValidatorResourceName("vdc"),
 				},
 			},
-			{
+			&pspecs.String{
 				Name:        "description",
 				Description: "Description of the VDC to create",
 				Required:    false,
 			},
-			{
+			&pspecs.String{
 				Name:        "service_class",
 				Description: "Service class of the VDC to create",
 				Required:    true,
 				Example:     "STD",
-				Validators: []commands.Validator{
-					commands.ValidatorOneOf("ECO", "STD", "HP", "VOIP"),
+				Validators: []validator.Validator{
+					validator.ValidatorOneOf("ECO", "STD", "HP", "VOIP"),
 				},
 			},
-			{
+			&pspecs.String{
 				Name:        "disponibility_class",
 				Description: "Disponibility class of the VDC to create",
 				Required:    true,
 				Example:     "ONE-ROOM",
-				Validators: []commands.Validator{
-					commands.ValidatorOneOf("ONE-ROOM", "DUAL-ROOM", "HA-DUAL-ROOM"),
+				Validators: []validator.Validator{
+					validator.ValidatorOneOf("ONE-ROOM", "DUAL-ROOM", "HA-DUAL-ROOM"),
 				},
 			},
-			{
+			&pspecs.String{
 				Name:        "billing_model",
 				Description: "Billing model of the VDC to create",
 				Required:    true,
 				Example:     "PAYG",
-				Validators: []commands.Validator{
-					commands.ValidatorOneOf("PAYG", "DRAAS", "RESERVED"),
+				Validators: []validator.Validator{
+					validator.ValidatorOneOf("PAYG", "DRAAS", "RESERVED"),
 				},
 			},
-			{
+			&pspecs.String{
 				Name:        "storage_billing_model",
 				Description: "Storage billing model of the VDC to create",
 				Required:    true,
 				Example:     "PAYG",
-				Validators: []commands.Validator{
-					commands.ValidatorOneOf("PAYG", "RESERVED"),
+				Validators: []validator.Validator{
+					validator.ValidatorOneOf("PAYG", "RESERVED"),
 				},
 			},
-			{
+			&pspecs.Int{
 				Name:        "vcpu",
 				Description: "Number of vCPUs to allocate to the VDC.",
 				Required:    true,
-				Example:     "50",
+				Example:     50,
 			},
-			{
+			&pspecs.Int{
 				Name:        "memory",
 				Description: "Amount of memory (in GB) to allocate to the VDC.",
 				Required:    true,
-				Example:     "500",
+				Example:     500,
 			},
-			{
-				Name:        "storage_profiles.{index}.class",
-				Description: "Class of the storage profile to create. Predefined classes or dedicated storage classes can be used. For predefined classes you have different properties (`_r1`, `_r2` and `_hm`) that can be used to define the storage profile.",
+			&pspecs.ListNested{
+				Name:        "storage_profiles",
+				Description: "List of storage profiles to create within the specified VDC",
 				Required:    true,
-				Example:     "gold",
-			},
-			{
-				Name:        "storage_profiles.{index}.limit",
-				Description: "Limit of the storage profile to create. This is the maximum amount of storage that can be used by the VDC. This is in GiB.",
-				Required:    true,
-				Example:     "500",
-				Validators: []commands.Validator{
-					commands.ValidatorBetween(100, 81920),
+				ItemsSpec: []pspecs.ParamSpec{
+					&pspecs.String{
+						Name:        "class",
+						Description: "Storage class for the profile. Supports predefined and dedicated storage classes (see rules for available options)",
+						Required:    true,
+					},
+					&pspecs.Int{
+						Name:        "limit",
+						Description: "Storage capacity limit in GiB (maximum amount of storage available to the VDC)",
+						Required:    true,
+						Example:     500,
+						Validators: []validator.Validator{
+							validator.ValidatorBetween(100, 81920),
+						},
+					},
+					&pspecs.Bool{
+						Name:        "default",
+						Description: "Designates this storage profile as the default for the VDC when no specific profile is specified",
+						Required:    false,
+						Example:     false,
+					},
 				},
-			},
-			{
-				Name:        "storage_profiles.{index}.default",
-				Description: "Default storage profile to create. This will be used if no specific profile is provided.",
-				Required:    false,
-				Example:     "true",
 			},
 		},
 		ParamsRules: vdcRules,
@@ -390,44 +398,44 @@ func init() { //nolint:gocyclo
 		LongDocumentation:  "Update VDC performs a PUT request to update an existing VDC. Enter only the fields you want to update.",
 		ModelType:          types.ModelGetVDC{},
 		ParamsType:         types.ParamsUpdateVDC{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "id",
 				Description: "ID of the VDC to get",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdc"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("vdc"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "name",
 				Description: "Name of the VDC to get",
 				Required:    false,
 				Example:     "my-vdc",
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("id"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorResourceName("vdc"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("id"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorResourceName("vdc"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "description",
 				Description: "The description of the VDC.",
 				Required:    false,
 			},
-			commands.ParamsSpec{
+			&pspecs.Int{
 				Name:        "vcpu",
 				Description: "The number of virtual CPUs for the VDC.",
 				Required:    false,
-				Example:     "50",
+				Example:     50,
 			},
-			commands.ParamsSpec{
+			&pspecs.Int{
 				Name:        "memory",
 				Description: "The amount of memory for the VDC.",
 				Required:    false,
-				Example:     "500",
+				Example:     500,
 			},
 		},
 		ParamsRules: func() commands.ParamsRules {
@@ -508,26 +516,26 @@ func init() { //nolint:gocyclo
 		LongDocumentation:  "Delete VDC performs a DELETE request to delete an existing VDC.",
 		AutoGenerate:       true,
 		ParamsType:         types.ParamsDeleteVDC{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "id",
 				Description: "ID of the VDC to delete",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdc"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("vdc"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "name",
 				Description: "Name of the VDC to delete",
 				Required:    false,
 				Example:     "my-vdc",
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("id"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorResourceName("vdc"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("id"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorResourceName("vdc"),
 				},
 			},
 		},

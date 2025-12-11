@@ -14,6 +14,7 @@ import (
 	"reflect"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/pspecs"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 
 	// Force import of all commands to register them
@@ -64,7 +65,7 @@ func main() {
 
 func loopNamespace(ns string) Functionality {
 	funct := Functionality{
-		Title:            ns,
+		Namespace:        ns,
 		Commands:         make(map[string]Func),
 		SubFunctionality: make(map[string]Functionality),
 	}
@@ -79,6 +80,8 @@ func loopNamespace(ns string) Functionality {
 	}
 
 	funct.MarkdownDocumentation = nsCmd[0].MarkdownDocumentation
+	funct.Documentation = nsCmd[0].LongDocumentation
+	funct.AliasNamespace = nsCmd[0].GetAliasNamespace()
 
 	// Get all commands for the namespace
 	commandsByNamespace := reg.GetCommandsByFilter(func(cmd commands.Command) bool {
@@ -97,7 +100,7 @@ func loopNamespace(ns string) Functionality {
 	for _, cmd := range subCommands {
 		log.Default().Println("Adding sub-command:", cmd.GetNamespace(), cmd.GetResource(), cmd.GetVerb())
 		sc := loopSubCommand(cmd)
-		funct.SubFunctionality[sc.Title] = sc
+		funct.SubFunctionality[sc.Namespace] = sc
 	}
 
 	return funct
@@ -105,7 +108,7 @@ func loopNamespace(ns string) Functionality {
 
 func loopSubCommand(cmd commands.Command) Functionality {
 	funct := Functionality{
-		Title:            cmd.GetResource(),
+		Namespace:        cmd.GetResource(),
 		Commands:         make(map[string]Func),
 		SubFunctionality: make(map[string]Functionality),
 	}
@@ -126,9 +129,10 @@ func loopSubCommand(cmd commands.Command) Functionality {
 
 func commandToFunc(cmd commands.Command) Func {
 	f := Func{
-		Namespace: cmd.GetNamespace(),
-		Resource:  cmd.GetResource(),
-		Verb:      cmd.GetVerb(),
+		Namespace:      cmd.GetNamespace(),
+		AliasNamespace: cmd.GetAliasNamespace(),
+		Resource:       cmd.GetResource(),
+		Verb:           cmd.GetVerb(),
 
 		ShortDocumentation:    cmd.ShortDocumentation,
 		LongDocumentation:     cmd.LongDocumentation,
@@ -139,23 +143,17 @@ func commandToFunc(cmd commands.Command) Func {
 	if cmd.ParamsType != nil {
 		f.Params = make([]FuncParam, 0)
 
-		for _, spec := range cmd.ParamsSpecs {
-			fType, err := commands.GetParamType(reflect.TypeOf(cmd.ParamsType), spec.Name)
-			if err != nil {
-				log.Default().Println("Error getting param type for", cmd.GetNamespace(), cmd.GetResource(), cmd.GetVerb(), ":", err)
-				continue
-			}
-
+		paramIterator := func(spec pspecs.ParamSpec) {
 			fValidatorsDescription := ""
-			if spec.Validators != nil {
+			if spec.GetValidators() != nil {
 				// If the spec has validators, we can use them to generate the description
 				// e.g. "Must be a valid email address"
-				for i, v := range spec.Validators {
+				for i, v := range spec.GetValidators() {
 					if v.GetMarkdownDescription() == "" {
 						continue
 					}
 					fValidatorsDescription += v.GetMarkdownDescription()
-					if i != len(spec.Validators)-1 {
+					if i != len(spec.GetValidators())-1 {
 						fValidatorsDescription += ", "
 					} else {
 						fValidatorsDescription += ". \n"
@@ -164,14 +162,27 @@ func commandToFunc(cmd commands.Command) Func {
 			}
 
 			f.Params = append(f.Params, FuncParam{
-				Name:                  spec.Name,
-				Description:           spec.Description,
-				Type:                  fType.String(),
-				Required:              spec.Required,
-				Example:               spec.Example,
+				Name:                  spec.GetName(),
+				Description:           spec.GetDescription(),
+				Type:                  spec.GetType().String(),
+				Required:              spec.IsRequired(),
+				Example:               spec.GetExample(),
 				ValidatorsDescription: fValidatorsDescription,
 			})
 		}
+
+		for _, spec := range cmd.ParamsSpecs {
+			// If the spec is a nested list, we need to iterate over its items
+			if nested, ok := spec.(*pspecs.ListNested); ok {
+				paramIterator(nested)
+				for _, item := range nested.GetItemsSpec() {
+					paramIterator(item)
+				}
+			} else {
+				paramIterator(spec)
+			}
+		}
+
 	}
 
 	// * Model

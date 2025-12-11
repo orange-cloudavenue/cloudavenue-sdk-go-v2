@@ -48,6 +48,7 @@ require (
 	github.com/muesli/mango-pflag v0.1.0 // indirect
 	github.com/muesli/roff v0.1.0 // indirect
 	github.com/muesli/termenv v0.16.0 // indirect
+	github.com/ompluscator/dynamic-struct v1.4.0 // indirect
 	github.com/orange-cloudavenue/common-go/extractor v1.0.1 // indirect
 	github.com/orange-cloudavenue/common-go/generator v1.4.0 // indirect
 	github.com/orange-cloudavenue/common-go/internal/regex v0.0.0-20250812201424-07c3423160b3 // indirect

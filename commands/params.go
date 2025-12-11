@@ -14,15 +14,16 @@ import (
 	"unsafe"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/pspecs"
 )
 
 // Boilerplate to generate a tag from a paramSpec
-func buildTagFromParamSpec(spec *ParamsSpec) string {
-	if spec == nil || len(spec.Validators) == 0 {
+func buildTagFromParamSpec(spec pspecs.ParamSpec) string {
+	if spec == nil || len(spec.GetValidators()) == 0 {
 		return ""
 	}
 	tag := ""
-	for _, validator := range spec.Validators {
+	for _, validator := range spec.GetValidators() {
 		if tag != "" {
 			tag += ","
 		}

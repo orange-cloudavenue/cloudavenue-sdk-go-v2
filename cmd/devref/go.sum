@@ -18,6 +18,8 @@ github.com/go-playground/validator/v10 v10.27.0 h1:w8+XrWVMhGkxOaaowyKH35gFydVHO
 github.com/go-playground/validator/v10 v10.27.0/go.mod h1:I5QpIEbmr8On7W0TktmJAumgzX4CA1XNl4ZmDuVHKKo=
 github.com/leodido/go-urn v1.4.0 h1:WT9HwE9SGECu3lg4d/dIA+jxlljEa1/ffXKmRjqdmIQ=
 github.com/leodido/go-urn v1.4.0/go.mod h1:bvxc+MVxLKB4z00jd1z+Dvzr47oO32F/QSNjSBOlFxI=
+github.com/ompluscator/dynamic-struct v1.4.0 h1:I/Si9LZtItSwiTMe7vosEuIu2TKdOvWbE3R/lokpN4Q=
+github.com/ompluscator/dynamic-struct v1.4.0/go.mod h1:ADQ1+6Ox1D+ntuNwTHyl1NvpAqY2lBXPSPbcO4CJdeA=
 github.com/orange-cloudavenue/common-go/extractor v1.0.1 h1:NJ1KINgzLfXBFkgloLbNpYvh5E6bmBF2EEs1d2Wp6A0=
 github.com/orange-cloudavenue/common-go/extractor v1.0.1/go.mod h1:+vYlSmaZE5uOHO5m5+vtVPa2OmAXukU0+5FE7hMMu04=
 github.com/orange-cloudavenue/common-go/generator v1.4.0 h1:45BQvF/IdZQYhYCPlHuM1mjvVxN8i87A7k0lsB1kLZM=

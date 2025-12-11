@@ -13,18 +13,23 @@ import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
 
 type (
 	Functionality struct {
-		Title                 string
-		Documentation         string
-		MarkdownDocumentation string
+		Namespace             string   `json:"namespace"`
+		AliasNamespace        []string `json:"alias_namespace,omitempty"`
+		Resource              string   `json:"resource,omitempty"`
+		Documentation         string   `json:"documentation"`
+		MarkdownDocumentation string   `json:"markdown_documentation,omitempty"`
 
-		Commands         map[string]Func          // E.g Get, List, Create, Update, Delete
-		SubFunctionality map[string]Functionality //E.g FirewallRule
+		// E.g Get, List, Create, Update, Delete
+		Commands map[string]Func `json:"commands,omitempty"`
+		//E.g FirewallRule
+		SubFunctionality map[string]Functionality `json:"sub_functionality,omitempty"` //E.g FirewallRule
 	}
 
 	Func struct {
-		Namespace string `json:"namespace"`
-		Resource  string `json:"resource"`
-		Verb      string `json:"verb"`
+		Namespace      string   `json:"namespace"`
+		AliasNamespace []string `json:"alias_namespace,omitempty"`
+		Resource       string   `json:"resource"`
+		Verb           string   `json:"verb"`
 
 		// Documentation is the documentation of the command.
 		ShortDocumentation string `json:"short_documentation"`
@@ -44,11 +49,12 @@ type (
 	}
 
 	FuncParam struct {
-		Name                  string `json:"name"`
-		Description           string `json:"description"`
-		Required              bool   `json:"required"`
-		Example               string `json:"example"`
-		Type                  string `json:"type"`
-		ValidatorsDescription string `json:"validators_description"`
+		Name                  string      `json:"name"`
+		Description           string      `json:"description"`
+		Required              bool        `json:"required"`
+		Example               any         `json:"example"`
+		Type                  string      `json:"type"`
+		ValidatorsDescription string      `json:"validators_description"`
+		Params                []FuncParam `json:"params,omitempty"`
 	}
 )
