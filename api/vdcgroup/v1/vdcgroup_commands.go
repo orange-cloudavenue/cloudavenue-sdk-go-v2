@@ -16,6 +16,8 @@ import (
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/pspecs"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/validator"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
@@ -27,6 +29,7 @@ func init() {
 	// * VdcGroup
 	cmds.Register(commands.Command{
 		Namespace:         "VdcGroup",
+		AliasNamespace:    []string{"vdcg"},
 		LongDocumentation: "This command allows you to manage VDC Groups.",
 	})
 
@@ -38,22 +41,22 @@ func init() {
 		LongDocumentation:  "List all Virtual Data Center Groups (Vdc Groups) available in your organization. If no filters are applied, it returns all Vdc Groups.",
 
 		ParamsType: types.ParamsListVdcGroup{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "id",
 				Description: "ID of the Vdc Group to filter by",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdcGroup"),
+				Validators: []validator.Validator{
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("vdcGroup"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "name",
 				Description: "Name of the Vdc Group to filter by",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorOmitempty(),
+				Validators: []validator.Validator{
+					validator.ValidatorOmitempty(),
 				},
 			},
 		},
@@ -96,24 +99,24 @@ func init() {
 		LongDocumentation:  "Retrieve detailed information about a specific Vdc Group by its ID or name. This command returns all attributes and configuration details of the selected Vdc Group, helping you understand its current state and associated resources.",
 
 		ParamsType: types.ParamsGetVdcGroup{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "id",
 				Description: "ID of the Vdc Group to filter by",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdcGroup"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("vdcGroup"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "name",
 				Description: "Name of the Vdc Group to filter by",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("id"),
-					commands.ValidatorOmitempty(),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("id"),
+					validator.ValidatorOmitempty(),
 				},
 			},
 		},
@@ -152,35 +155,42 @@ func init() {
 		LongDocumentation:  "Create a new Virtual Data Center Group (Vdc Group) in your organization.",
 
 		ParamsType: types.ParamsCreateVdcGroup{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "name",
 				Description: "Name of the Vdc Group",
 				Example:     "my-vdc-group",
 				Required:    true,
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "description",
 				Description: "Description of the Vdc Group",
 				Required:    false,
 			},
-			commands.ParamsSpec{
-				Name:        "vdcs.{index}.id",
-				Description: "ID of the Vdc to associate with the Vdc Group",
-				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("vdcs.{index}.name"),
-					commands.ValidatorOmitempty(),
-				},
-			},
-			commands.ParamsSpec{
-				Name:        "vdcs.{index}.name",
-				Description: "Name of the Vdc to associate with the Vdc Group",
-				Required:    false,
-				Example:     "my-vdc",
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("vdcs.{index}.id"),
-					commands.ValidatorOmitempty(),
+			&pspecs.ListNested{
+				Name:        "vdcs",
+				Description: "List of Vdc to remove from the Vdc Group",
+				Required:    true,
+				ItemsSpec: []pspecs.ParamSpec{
+					&pspecs.String{
+						Name:        "id",
+						Description: "ID of the Vdc to remove",
+						Required:    false,
+						Validators: []validator.Validator{
+							validator.ValidatorRequiredIfParamIsNull("name"),
+							validator.ValidatorOmitempty(),
+							validator.ValidatorURN("vdc"),
+						},
+					},
+					&pspecs.String{
+						Name:        "name",
+						Description: "Name of the Vdc to remove",
+						Required:    false,
+						Validators: []validator.Validator{
+							validator.ValidatorRequiredIfParamIsNull("id"),
+							validator.ValidatorOmitempty(),
+						},
+					},
 				},
 			},
 		},
@@ -289,49 +299,56 @@ func init() {
 		LongDocumentation:  "Update an existing Virtual Data Center Group (Vdc Group) in your organization. You can modify attributes such as the name, description, and associated Vdcs. To add or remove Vdcs, use the dedicated commands. If you want to modify the Vdcs associated with the Vdc Group, refer all the Vdcs you want to have associated with the Vdc Group in the `vdcs` parameter. Vdcs not present in this list will be removed from the Vdc Group.",
 
 		ParamsType: types.ParamsUpdateVdcGroup{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "id",
 				Description: "ID of the Vdc Group",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdcGroup"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("vdcGroup"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "name",
 				Description: "Name of the Vdc Group",
 				Example:     "my-vdc-group",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("id"),
-					commands.ValidatorOmitempty(),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("id"),
+					validator.ValidatorOmitempty(),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "description",
 				Description: "Description of the Vdc Group",
 				Required:    false,
 			},
-			commands.ParamsSpec{
-				Name:        "vdcs.{index}.id",
-				Description: "ID of the Vdc to add",
-				Required:    true,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("vdcs.{index}.name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdc"),
-				},
-			},
-			commands.ParamsSpec{
-				Name:        "vdcs.{index}.name",
-				Description: "Name of the Vdc to add",
-				Required:    true,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("vdcs.{index}.id"),
-					commands.ValidatorOmitempty(),
+			&pspecs.ListNested{
+				Name:        "vdcs",
+				Description: "List of Vdc to remove from the Vdc Group",
+				Required:    false,
+				ItemsSpec: []pspecs.ParamSpec{
+					&pspecs.String{
+						Name:        "id",
+						Description: "ID of the Vdc to remove",
+						Required:    false,
+						Validators: []validator.Validator{
+							validator.ValidatorRequiredIfParamIsNull("name"),
+							validator.ValidatorOmitempty(),
+							validator.ValidatorURN("vdc"),
+						},
+					},
+					&pspecs.String{
+						Name:        "name",
+						Description: "Name of the Vdc to remove",
+						Required:    false,
+						Validators: []validator.Validator{
+							validator.ValidatorRequiredIfParamIsNull("id"),
+							validator.ValidatorOmitempty(),
+						},
+					},
 				},
 			},
 		},
@@ -458,28 +475,28 @@ func init() {
 		LongDocumentation:  "Delete an existing Virtual Data Center Group (Vdc Group) from your organization.",
 
 		ParamsType: types.ParamsDeleteVdcGroup{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "id",
 				Description: "ID of the Vdc Group",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdcGroup"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("vdcGroup"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "name",
 				Description: "Name of the Vdc Group",
 				Example:     "my-vdc-group",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("id"),
-					commands.ValidatorOmitempty(),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("id"),
+					validator.ValidatorOmitempty(),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.Bool{
 				Name:        "force",
 				Description: "Force delete the Vdc Group. Value `true` means to forcefully delete the object that contains other objects even if those objects are in a state that does not allow removal. The default is `false` therefore, objects are not removed if they are not in a state that normally allows removal. Force also implies recursive delete where other contained objects are removed. Errors may be ignored. Invalid value (not true or false) are ignored. The VDC contains in the Vdc Group are not deleted.",
 				Required:    false,
@@ -522,44 +539,51 @@ func init() {
 		LongDocumentation:          "Add an existing Virtual Data Center (Vdc) to a Virtual Data Center Group (Vdc Group) in your organization.",
 
 		ParamsType: types.ParamsAddVdcToVdcGroup{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "id",
 				Description: "ID of the Vdc Group",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdcGroup"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("vdcGroup"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "name",
 				Description: "Name of the Vdc Group",
 				Example:     "my-vdc-group",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("id"),
-					commands.ValidatorOmitempty(),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("id"),
+					validator.ValidatorOmitempty(),
 				},
 			},
-			commands.ParamsSpec{
-				Name:        "vdcs.{index}.id",
-				Description: "ID of the Vdc to add",
-				Required:    true,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("vdcs.{index}.name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdc"),
-				},
-			},
-			commands.ParamsSpec{
-				Name:        "vdcs.{index}.name",
-				Description: "Name of the Vdc to add",
-				Required:    true,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("vdcs.{index}.id"),
-					commands.ValidatorOmitempty(),
+			&pspecs.ListNested{
+				Name:        "vdcs",
+				Description: "List of Vdc to add from the Vdc Group",
+				Required:    false,
+				ItemsSpec: []pspecs.ParamSpec{
+					&pspecs.String{
+						Name:        "id",
+						Description: "ID of the Vdc to add",
+						Required:    false,
+						Validators: []validator.Validator{
+							validator.ValidatorRequiredIfParamIsNull("name"),
+							validator.ValidatorOmitempty(),
+							validator.ValidatorURN("vdc"),
+						},
+					},
+					&pspecs.String{
+						Name:        "name",
+						Description: "Name of the Vdc to add",
+						Required:    false,
+						Validators: []validator.Validator{
+							validator.ValidatorRequiredIfParamIsNull("id"),
+							validator.ValidatorOmitempty(),
+						},
+					},
 				},
 			},
 		},
@@ -620,43 +644,50 @@ func init() {
 		LongDocumentation:          "Remove one or more Vdc from a Vdc Group. This action will disassociate the specified Vdc(s) from the Vdc Group.",
 
 		ParamsType: types.ParamsRemoveVdcFromVdcGroup{},
-		ParamsSpecs: []commands.ParamsSpec{
-			{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "id",
 				Description: "ID of the VDC Group",
-				Required:    true,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdcGroup"),
+				Required:    false,
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("vdcGroup"),
 				},
 			},
-			{
+			&pspecs.String{
 				Name:        "name",
 				Description: "Name of the VDC Group",
-				Required:    true,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("id"),
-					commands.ValidatorOmitempty(),
+				Required:    false,
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("id"),
+					validator.ValidatorOmitempty(),
 				},
 			},
-			{
-				Name:        "vdcs.{index}.id",
-				Description: "ID of the Vdc to remove",
+			&pspecs.ListNested{
+				Name:        "vdcs",
+				Description: "List of Vdc to remove from the Vdc Group",
 				Required:    true,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("vdcs.{index}.name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("vdc"),
-				},
-			},
-			{
-				Name:        "vdcs.{index}.name",
-				Description: "Name of the Vdc to remove",
-				Required:    true,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("vdcs.{index}.id"),
-					commands.ValidatorOmitempty(),
+				ItemsSpec: []pspecs.ParamSpec{
+					&pspecs.String{
+						Name:        "id",
+						Description: "ID of the Vdc to remove",
+						Required:    false,
+						Validators: []validator.Validator{
+							validator.ValidatorRequiredIfParamIsNull("name"),
+							validator.ValidatorOmitempty(),
+							validator.ValidatorURN("vdc"),
+						},
+					},
+					&pspecs.String{
+						Name:        "name",
+						Description: "Name of the Vdc to remove",
+						Required:    false,
+						Validators: []validator.Validator{
+							validator.ValidatorRequiredIfParamIsNull("id"),
+							validator.ValidatorOmitempty(),
+						},
+					},
 				},
 			},
 		},

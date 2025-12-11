@@ -29,7 +29,7 @@ func (c *Command) Run(ctx context.Context, client, params any) (any, error) {
 	}
 
 	if len(c.ParamsSpecs) > 0 {
-		if err := c.ParamsSpecs.buildAndValidateDynamicStruct(c.params); err != nil {
+		if err := buildAndValidateDynamicStruct(c.ParamsSpecs, c.params); err != nil {
 			return nil, err
 		}
 	}

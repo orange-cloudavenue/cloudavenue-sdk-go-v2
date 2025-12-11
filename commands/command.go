@@ -12,7 +12,7 @@ package commands
 import (
 	"context"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/pspecs"
 )
 
 type Command struct {
@@ -20,6 +20,9 @@ type Command struct {
 	// It is used to group commands together and to define the endpoint for the command.
 	// If no resource is defined, the namespace is used as the resource.
 	Namespace string `validate:"required"`
+
+	// Alias Namespace is an alias for the namespace of the command. e.g. "vdcg" for "VdcGroup".
+	AliasNamespace []string `validate:"omitempty"`
 
 	// Resource is the resource of the command, e.g. "firewall-rule, "security-group", etc.
 	Resource string `validate:"omitempty"`
@@ -35,7 +38,7 @@ type Command struct {
 	MarkdownDocumentation string `validate:"omitempty"`
 
 	// Paramspec defines specifications for arguments.
-	ParamsSpecs ParamsSpecs
+	ParamsSpecs pspecs.Params
 
 	// ParamsRules refers to the rules that apply to the parameters.
 	ParamsRules ParamsRules
@@ -72,31 +75,31 @@ type Command struct {
 	params any
 }
 
-// Func
-type (
-	RunnerFunc          func(ctx context.Context, ep *cav.Endpoint, client, params any) (any, error)
-	ParamsValidatorFunc func(ctx context.Context, value any, paramsSpecs ParamsSpecs, params any) error
-)
+// // Func
+// type (
+// 	RunnerFunc          func(ctx context.Context, ep *cav.Endpoint, client, params any) (any, error)
+// 	ParamsValidatorFunc func(ctx context.Context, value any, paramsSpecs ParamsSpecs, params any) error
+// )
 
-// * Parameters
+// // * Parameters
 
-type (
-	ParamsSpecs []ParamsSpec
+// type (
+// 	ParamsSpecs []ParamsSpec
 
-	ParamsSpec struct {
-		// Name is the name of the argument.
-		Name string `validate:"required"`
+// 	ParamsSpec struct {
+// 		// Name is the name of the argument.
+// 		Name string `validate:"required"`
 
-		// Description is the description of the argument.
-		Description string `validate:"required"`
+// 		// Description is the description of the argument.
+// 		Description string `validate:"required"`
 
-		// Example is an example value for the argument.
-		Example string
+// 		// Example is an example value for the argument.
+// 		Example string
 
-		// Required defines whether the argument is required.
-		Required bool
+// 		// Required defines whether the argument is required.
+// 		Required bool
 
-		// Validator is a function that validates the argument value.
-		Validators []Validator
-	}
-)
+// 		// Validator is a function that validates the argument value.
+// 		Validators []validator.Validator
+// 	}
+// )

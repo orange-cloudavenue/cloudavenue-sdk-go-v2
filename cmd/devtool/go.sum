@@ -84,6 +84,8 @@ github.com/muesli/termenv v0.16.0 h1:S5AlUN9dENB57rsbnkPyfdGuWIlkmzJjbFf0Tf5FWUc
 github.com/muesli/termenv v0.16.0/go.mod h1:ZRfOIKPFDYQoDFF4Olj7/QJbW60Ol/kL1pU3VfY/Cnk=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
+github.com/ompluscator/dynamic-struct v1.4.0 h1:I/Si9LZtItSwiTMe7vosEuIu2TKdOvWbE3R/lokpN4Q=
+github.com/ompluscator/dynamic-struct v1.4.0/go.mod h1:ADQ1+6Ox1D+ntuNwTHyl1NvpAqY2lBXPSPbcO4CJdeA=
 github.com/orange-cloudavenue/common-go/extractor v1.0.1 h1:NJ1KINgzLfXBFkgloLbNpYvh5E6bmBF2EEs1d2Wp6A0=
 github.com/orange-cloudavenue/common-go/extractor v1.0.1/go.mod h1:+vYlSmaZE5uOHO5m5+vtVPa2OmAXukU0+5FE7hMMu04=
 github.com/orange-cloudavenue/common-go/generator v1.4.0 h1:45BQvF/IdZQYhYCPlHuM1mjvVxN8i87A7k0lsB1kLZM=

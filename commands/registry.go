@@ -11,6 +11,7 @@ package commands
 
 import (
 	"slices"
+	"strings"
 	"sync"
 )
 
@@ -42,7 +43,7 @@ func (r *Registry) Get(namespace, resource, verb string) *Command {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	for _, cmd := range r.Commands {
-		if cmd.GetNamespace() == namespace && cmd.GetResource() == resource && cmd.GetVerb() == verb {
+		if cmd.GetNamespace() == namespace && cmd.GetResource() == resource && cmd.GetVerb() == strings.ToLower(verb) {
 			return &cmd
 		}
 	}
@@ -77,10 +78,14 @@ func (c *Command) GetNamespace() string {
 	return c.Namespace
 }
 
+func (c *Command) GetAliasNamespace() []string {
+	return c.AliasNamespace
+}
+
 func (c *Command) GetResource() string {
 	return c.Resource
 }
 
 func (c *Command) GetVerb() string {
-	return c.Verb
+	return strings.ToLower(c.Verb)
 }

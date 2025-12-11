@@ -15,6 +15,8 @@ import (
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/pspecs"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/validator"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
@@ -65,14 +67,14 @@ func init() {
 		LongDocumentation:  "Add a new OnPremise IP (only IPV4) address to this organization's draas offer",
 		AutoGenerate:       true,
 		ParamsType:         types.ParamsAddDraasOnPremiseIP{},
-		ParamsSpecs: commands.ParamsSpecs{
-			{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "ip",
 				Required:    true,
 				Description: "Your OnPremise IP address to authorize to the DRaaS offer",
 				Example:     "195.25.13.4",
-				Validators: []commands.Validator{
-					commands.ValidatorIPV4(),
+				Validators: []validator.Validator{
+					validator.ValidatorIPV4(),
 				},
 			},
 		},
@@ -103,14 +105,14 @@ func init() {
 		LongDocumentation:  "Remove an existing OnPremise IP address from this organization's draas offer",
 		AutoGenerate:       true,
 		ParamsType:         types.ParamsRemoveDraasOnPremiseIP{},
-		ParamsSpecs: commands.ParamsSpecs{
-			{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "ip",
 				Required:    true,
 				Description: "Your OnPremise IP address to remove from the DRaaS offer",
 				Example:     "195.25.13.4",
-				Validators: []commands.Validator{
-					commands.ValidatorIPV4(),
+				Validators: []validator.Validator{
+					validator.ValidatorIPV4(),
 				},
 			},
 		},

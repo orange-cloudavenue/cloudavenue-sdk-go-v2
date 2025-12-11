@@ -17,6 +17,8 @@ import (
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/pspecs"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/validator"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
@@ -111,41 +113,41 @@ func init() {
 		LongDocumentation:  "Update the details of an existing organization.",
 		AutoGenerate:       true,
 		ParamsType:         types.ParamsUpdateOrganization{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "full_name",
 				Description: "The full name of the organization. It's a long format of your organization name. Appears in the Cloud application as a human-readable name of the organization.",
 				Example:     "My Organization to update",
-				Validators: []commands.Validator{
-					commands.ValidatorOmitempty(),
-					commands.ValidatorMax(129),
+				Validators: []validator.Validator{
+					validator.ValidatorOmitempty(),
+					validator.ValidatorMax(129),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "description",
 				Description: "A description for the organization.",
 				Example:     "This is my organization description to update",
-				Validators: []commands.Validator{
-					commands.ValidatorOmitempty(),
-					commands.ValidatorMax(257),
+				Validators: []validator.Validator{
+					validator.ValidatorOmitempty(),
+					validator.ValidatorMax(257),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "email",
 				Description: "The contact email for the organization.",
 				Example:     "user@mail.com",
-				Validators: []commands.Validator{
-					commands.ValidatorOmitempty(),
-					commands.ValidatorEmail(),
+				Validators: []validator.Validator{
+					validator.ValidatorOmitempty(),
+					validator.ValidatorEmail(),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "internet_billing_mode",
 				Description: "The internet billing mode for the organization. More information about billing modes can be found in the [documentation](https://cloud.orange-business.com/en/offres/infrastructure-iaas/cloud-avenue/wiki-cloud-avenue/services/internet-access/).",
 				Example:     "PAYG",
-				Validators: []commands.Validator{
-					commands.ValidatorOmitempty(),
-					commands.ValidatorOneOf("PAYG", "TRAFFIC_VOLUME"),
+				Validators: []validator.Validator{
+					validator.ValidatorOmitempty(),
+					validator.ValidatorOneOf("PAYG", "TRAFFIC_VOLUME"),
 				},
 			},
 		},

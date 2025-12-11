@@ -7,7 +7,7 @@
  * or see the "LICENSE" file for more details.
  */
 
-package commands
+package validator
 
 type validatorOmitempty struct{}
 

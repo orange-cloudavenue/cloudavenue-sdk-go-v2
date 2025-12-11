@@ -1,19 +1,16 @@
 {
   "Draas": {
-    "Title": "Draas",
-    "Documentation": "",
-    "MarkdownDocumentation": "",
-    "Commands": {},
-    "SubFunctionality": {
+    "namespace": "Draas",
+    "documentation": "",
+    "sub_functionality": {
       "OnPremiseIp": {
-        "Title": "OnPremiseIp",
-        "Documentation": "",
-        "MarkdownDocumentation": "",
-        "Commands": {
-          "Add": {
+        "namespace": "OnPremiseIp",
+        "documentation": "",
+        "commands": {
+          "add": {
             "namespace": "Draas",
             "resource": "OnPremiseIp",
-            "verb": "Add",
+            "verb": "add",
             "short_documentation": "Add a new OnPremise IP",
             "long_documentation": "Add a new OnPremise IP (only IPV4) address to this organization's draas offer",
             "markdown_documentation": "",
@@ -23,7 +20,7 @@
                 "description": "Your OnPremise IP address to authorize to the DRaaS offer",
                 "required": true,
                 "example": "195.25.13.4",
-                "type": "string",
+                "type": "",
                 "validators_description": "Validates that the value is a valid IPv4 address. (E.g. 192.168.1.1 or 203.0.113.0). \n"
               }
             ],
@@ -31,10 +28,10 @@
             "deprecated_message": "",
             "model": null
           },
-          "List": {
+          "list": {
             "namespace": "Draas",
             "resource": "OnPremiseIp",
-            "verb": "List",
+            "verb": "list",
             "short_documentation": "List all OnPremise IPs allowed",
             "long_documentation": "List all OnPremise IPs allowed allowed for this organization's draas offer",
             "markdown_documentation": "",
@@ -49,10 +46,10 @@
               }
             ]
           },
-          "Remove": {
+          "remove": {
             "namespace": "Draas",
             "resource": "OnPremiseIp",
-            "verb": "Remove",
+            "verb": "remove",
             "short_documentation": "Remove an existing OnPremise IP",
             "long_documentation": "Remove an existing OnPremise IP address from this organization's draas offer",
             "markdown_documentation": "",
@@ -62,7 +59,7 @@
                 "description": "Your OnPremise IP address to remove from the DRaaS offer",
                 "required": true,
                 "example": "195.25.13.4",
-                "type": "string",
+                "type": "",
                 "validators_description": "Validates that the value is a valid IPv4 address. (E.g. 192.168.1.1 or 203.0.113.0). \n"
               }
             ],
@@ -70,20 +67,18 @@
             "deprecated_message": "",
             "model": null
           }
-        },
-        "SubFunctionality": {}
+        }
       }
     }
   },
   "EdgeGateway": {
-    "Title": "EdgeGateway",
-    "Documentation": "",
-    "MarkdownDocumentation": "",
-    "Commands": {
-      "Create": {
+    "namespace": "EdgeGateway",
+    "documentation": "",
+    "commands": {
+      "create": {
         "namespace": "EdgeGateway",
         "resource": "",
-        "verb": "Create",
+        "verb": "create",
         "short_documentation": "CreateEdgeGateway creates a new edge gateway",
         "long_documentation": "Create EdgeGateway performs a POST request to create a new edge gateway",
         "markdown_documentation": "",
@@ -93,7 +88,7 @@
             "description": "The name of the VDC or VDC Group that this edge gateway belongs to.",
             "required": true,
             "example": "my-vdc",
-            "type": "string",
+            "type": "",
             "validators_description": ""
           },
           {
@@ -101,15 +96,15 @@
             "description": "The name of the T0 router that this edge gateway will be connected to. If not provided and only if one T0 router is available, the first T0 router will be used.",
             "required": false,
             "example": "prvrf01eocb0001234allsp01",
-            "type": "string",
+            "type": "",
             "validators_description": "Validates that the value is a valid T0 name (pr01e02ocb0001234spt101).. \n"
           },
           {
             "name": "bandwidth",
             "description": "The bandwidth limit in Mbps for the edge gateway. If t0 is SHARED, it must be one of the available values for the T0 router (Default value:  5Mbps). If t0 is DEDICATED, unlimited bandwidth is allowed.",
             "required": false,
-            "example": "",
-            "type": "int",
+            "example": null,
+            "type": "\u003cint Value\u003e",
             "validators_description": ""
           }
         ],
@@ -153,10 +148,10 @@
           }
         ]
       },
-      "Delete": {
+      "delete": {
         "namespace": "EdgeGateway",
         "resource": "",
-        "verb": "Delete",
+        "verb": "delete",
         "short_documentation": "DeleteEdgeGateway deletes an edge gateway",
         "long_documentation": "Delete EdgeGateway performs a DELETE request to delete an edge gateway",
         "markdown_documentation": "",
@@ -165,16 +160,16 @@
             "name": "id",
             "description": "The unique identifier of the edge gateway.",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
           },
           {
             "name": "name",
             "description": "The name of the edge gateway.",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": "The value is required if the parameter `id` is null., "
           }
         ],
@@ -182,10 +177,10 @@
         "deprecated_message": "",
         "model": null
       },
-      "Get": {
+      "get": {
         "namespace": "EdgeGateway",
         "resource": "",
-        "verb": "Get",
+        "verb": "get",
         "short_documentation": "GetEdgeGateway retrieves an edge gateway",
         "long_documentation": "Get EdgeGateway performs a GET request to retrieve an edge gateway",
         "markdown_documentation": "",
@@ -194,16 +189,16 @@
             "name": "id",
             "description": "The unique identifier of the edge gateway.",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
           },
           {
             "name": "name",
             "description": "The name of the edge gateway.",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": "The value is required if the parameter `id` is null., Validates that the value is a valid Edge Gateway name (tn01e02ocb0001234spt101).. \n"
           }
         ],
@@ -247,10 +242,10 @@
           }
         ]
       },
-      "List": {
+      "list": {
         "namespace": "EdgeGateway",
         "resource": "",
-        "verb": "List",
+        "verb": "list",
         "short_documentation": "ListEdgeGateways retrieves a list of edge gateways",
         "long_documentation": "List EdgeGateways performs a GET request to retrieve a list of edge gateways",
         "markdown_documentation": "",
@@ -258,6 +253,11 @@
         "deprecated": false,
         "deprecated_message": "",
         "model": [
+          {
+            "object": "edge_gateways.{index}",
+            "type": "types.ModelEdgeGateway",
+            "documentation": ""
+          },
           {
             "object": "edge_gateways.{index}.id",
             "type": "string",
@@ -295,10 +295,10 @@
           }
         ]
       },
-      "Update": {
+      "update": {
         "namespace": "EdgeGateway",
         "resource": "",
-        "verb": "Update",
+        "verb": "update",
         "short_documentation": "UpdateEdgeGateway updates an edge gateway",
         "long_documentation": "Update EdgeGateway performs a PUT request to update an edge gateway",
         "markdown_documentation": "",
@@ -307,24 +307,24 @@
             "name": "id",
             "description": "The unique identifier of the edge gateway.",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
           },
           {
             "name": "name",
             "description": "The name of the edge gateway.",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": "The value is required if the parameter `id` is null., "
           },
           {
             "name": "bandwidth",
             "description": "The new bandwidth limit in Mbps for the edge gateway. If t0 is SHARED, it must be one of the available values for the T0 router (Default value: 5Mbps). If t0 is DEDICATED, unlimited bandwidth is allowed.",
             "required": true,
-            "example": "",
-            "type": "int",
+            "example": null,
+            "type": "\u003cint Value\u003e",
             "validators_description": ""
           }
         ],
@@ -369,16 +369,16 @@
         ]
       }
     },
-    "SubFunctionality": {
+    "sub_functionality": {
       "CloudavenueServices": {
-        "Title": "CloudavenueServices",
-        "Documentation": "",
-        "MarkdownDocumentation": "Manage Cloud Avenue services on an EdgeGateway. Cloudavenue services is a network setting that allows the EdgeGateway to connect to the mutualized Cloud Avenue services (DNS, DHCP, etc.).",
-        "Commands": {
-          "Disable": {
+        "namespace": "CloudavenueServices",
+        "documentation": "",
+        "markdown_documentation": "Manage Cloud Avenue services on an EdgeGateway. Cloudavenue services is a network setting that allows the EdgeGateway to connect to the mutualized Cloud Avenue services (DNS, DHCP, etc.).",
+        "commands": {
+          "disable": {
             "namespace": "EdgeGateway",
             "resource": "CloudavenueServices",
-            "verb": "Disable",
+            "verb": "disable",
             "short_documentation": "Disable Cloud Avenue services on an EdgeGateway.",
             "long_documentation": "Disable Cloud Avenue services on an EdgeGateway. Cloudavenue services is a network setting that allows the EdgeGateway to connect to the mutualized Cloud Avenue services (DNS, DHCP, etc.).",
             "markdown_documentation": "",
@@ -387,16 +387,16 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "",
-                "type": "string",
+                "example": null,
+                "type": "",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
                 "name": "name",
                 "description": "The name of the edge gateway.",
                 "required": false,
-                "example": "",
-                "type": "string",
+                "example": null,
+                "type": "",
                 "validators_description": "The value is required if the parameter `id` is null., "
               }
             ],
@@ -404,10 +404,10 @@
             "deprecated_message": "",
             "model": null
           },
-          "Enable": {
+          "enable": {
             "namespace": "EdgeGateway",
             "resource": "CloudavenueServices",
-            "verb": "Enable",
+            "verb": "enable",
             "short_documentation": "Enable Cloud Avenue services on an EdgeGateway.",
             "long_documentation": "Enable Cloud Avenue services on an EdgeGateway. ",
             "markdown_documentation": "",
@@ -416,16 +416,16 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:946de874-d557-442d-8787-e94f813b3b39",
-                "type": "string",
+                "example": "urn:vcloud:gateway:f57795d7-ff1b-4538-b79b-6c9dd0a1390f",
+                "type": "",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
                 "name": "name",
                 "description": "The name of the edge gateway.",
                 "required": false,
-                "example": "",
-                "type": "string",
+                "example": null,
+                "type": "",
                 "validators_description": "The value is required if the parameter `id` is null., "
               }
             ],
@@ -433,10 +433,10 @@
             "deprecated_message": "",
             "model": null
           },
-          "Get": {
+          "get": {
             "namespace": "EdgeGateway",
             "resource": "CloudavenueServices",
-            "verb": "Get",
+            "verb": "get",
             "short_documentation": "Retrieve Cloud Avenue services on an EdgeGateway.",
             "long_documentation": "Retrieve Cloud Avenue services on an EdgeGateway. This command returns the Cloud Avenue services available on the EdgeGateway, such as DNS, DHCP, and others.",
             "markdown_documentation": "",
@@ -445,16 +445,16 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "urn:vcloud:gateway:3db9de81-f36d-44d4-ba40-a3a446707f98",
-                "type": "string",
+                "example": "urn:vcloud:gateway:25dfa844-b578-4d57-82ca-636bc1b179d9",
+                "type": "",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
                 "name": "name",
                 "description": "The name of the edge gateway.",
                 "required": false,
-                "example": "",
-                "type": "string",
+                "example": null,
+                "type": "",
                 "validators_description": "The value is required if the parameter `id` is null., "
               }
             ],
@@ -482,6 +482,11 @@
                 "documentation": "Dedicated IPv4 used as NAT entrypoint for the services"
               },
               {
+                "object": "services.{index}",
+                "type": "types.ModelCloudavenueServicesCatalog",
+                "documentation": "Catalog of Cloud Avenue Service categories and their services"
+              },
+              {
                 "object": "services.{index}.category",
                 "type": "string",
                 "documentation": "Service category grouping related endpoints"
@@ -490,6 +495,11 @@
                 "object": "services.{index}.network",
                 "type": "string",
                 "documentation": "Category network in CIDR notation"
+              },
+              {
+                "object": "services.{index}.services.{index}",
+                "type": "types.ModelCloudavenueServicesCatalogService",
+                "documentation": "Service instances within the category"
               },
               {
                 "object": "services.{index}.services.{index}.name",
@@ -517,6 +527,11 @@
                 "documentation": "Fully qualified domain names for the service"
               },
               {
+                "object": "services.{index}.services.{index}.ports.{index}",
+                "type": "types.ModelCloudavenueServicesCatalogServicePort",
+                "documentation": "Exposed service ports"
+              },
+              {
                 "object": "services.{index}.services.{index}.ports.{index}.port",
                 "type": "int",
                 "documentation": "TCP/UDP port number"
@@ -528,18 +543,16 @@
               }
             ]
           }
-        },
-        "SubFunctionality": {}
+        }
       },
       "PublicIP": {
-        "Title": "PublicIP",
-        "Documentation": "",
-        "MarkdownDocumentation": "",
-        "Commands": {
-          "Create": {
+        "namespace": "PublicIP",
+        "documentation": "",
+        "commands": {
+          "create": {
             "namespace": "EdgeGateway",
             "resource": "PublicIP",
-            "verb": "Create",
+            "verb": "create",
             "short_documentation": "Create a new Public IP",
             "long_documentation": "This command allows you to create a new Public IP on the specified Edge Gateway.",
             "markdown_documentation": "",
@@ -548,8 +561,8 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "",
-                "type": "string",
+                "example": null,
+                "type": "",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
@@ -557,7 +570,7 @@
                 "description": "The name of the edge gateway.",
                 "required": false,
                 "example": "tn01e02ocb0001234spt101",
-                "type": "string",
+                "type": "",
                 "validators_description": "The value is required if the parameter `id` is null., Validates that the value is a valid Edge Gateway name (tn01e02ocb0001234spt101).. \n"
               }
             ],
@@ -596,10 +609,10 @@
               }
             ]
           },
-          "Delete": {
+          "delete": {
             "namespace": "EdgeGateway",
             "resource": "PublicIP",
-            "verb": "Delete",
+            "verb": "delete",
             "short_documentation": "Delete a Public IP",
             "long_documentation": "This command allows you to delete a Public IP in the Edge Gateway.",
             "markdown_documentation": "",
@@ -609,7 +622,7 @@
                 "description": "The public IP address.",
                 "required": true,
                 "example": "195.25.13.4",
-                "type": "string",
+                "type": "",
                 "validators_description": "Validates that the value is a valid IPv4 address. (E.g. 192.168.1.1 or 203.0.113.0). \n"
               }
             ],
@@ -617,10 +630,10 @@
             "deprecated_message": "",
             "model": null
           },
-          "Get": {
+          "get": {
             "namespace": "EdgeGateway",
             "resource": "PublicIP",
-            "verb": "Get",
+            "verb": "get",
             "short_documentation": "Get a Public IP",
             "long_documentation": "This command allows you to retrieve information about a Public IP in the Edge Gateway.",
             "markdown_documentation": "",
@@ -630,15 +643,15 @@
                 "description": "The public IP address.",
                 "required": true,
                 "example": "195.25.13.4",
-                "type": "string",
+                "type": "",
                 "validators_description": "Validates that the value is a valid IPv4 address. (E.g. 192.168.1.1 or 203.0.113.0). \n"
               },
               {
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "",
-                "type": "string",
+                "example": null,
+                "type": "",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
@@ -646,7 +659,7 @@
                 "description": "The name of the edge gateway.",
                 "required": false,
                 "example": "tn01e02ocb0001234spt101",
-                "type": "string",
+                "type": "",
                 "validators_description": "The value is required if the parameter `id` is null., Validates that the value is a valid Edge Gateway name (tn01e02ocb0001234spt101).. \n"
               }
             ],
@@ -685,10 +698,10 @@
               }
             ]
           },
-          "List": {
+          "list": {
             "namespace": "EdgeGateway",
             "resource": "PublicIP",
-            "verb": "List",
+            "verb": "list",
             "short_documentation": "List Public IPs",
             "long_documentation": "This command allows you to list all Public IPs in the Edge Gateway.",
             "markdown_documentation": "",
@@ -697,8 +710,8 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "",
-                "type": "string",
+                "example": null,
+                "type": "",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
@@ -706,7 +719,7 @@
                 "description": "The name of the edge gateway.",
                 "required": false,
                 "example": "tn01e02ocb0001234spt101",
-                "type": "string",
+                "type": "",
                 "validators_description": "The value is required if the parameter `id` is null., Validates that the value is a valid Edge Gateway name (tn01e02ocb0001234spt101).. \n"
               }
             ],
@@ -722,6 +735,11 @@
                 "object": "edgegateway_name",
                 "type": "string",
                 "documentation": "Name of the edge gateway"
+              },
+              {
+                "object": "public_i_ps.{index}",
+                "type": "types.ModelEdgeGatewayPublicIP",
+                "documentation": "List of public IPs"
               },
               {
                 "object": "public_i_ps.{index}.edgegateway_id",
@@ -755,18 +773,16 @@
               }
             ]
           }
-        },
-        "SubFunctionality": {}
+        }
       },
       "Services": {
-        "Title": "Services",
-        "Documentation": "",
-        "MarkdownDocumentation": "",
-        "Commands": {
-          "Get": {
+        "namespace": "Services",
+        "documentation": "",
+        "commands": {
+          "get": {
             "namespace": "EdgeGateway",
             "resource": "Services",
-            "verb": "Get",
+            "verb": "get",
             "short_documentation": "Retrieve services information about a specific EdgeGateway.",
             "long_documentation": "Retrieve services information about a specific EdgeGateway. This command retrieves the network services available on the EdgeGateway, such as load balancers, public IPs, and Cloud Avenue services.",
             "markdown_documentation": "",
@@ -775,16 +791,16 @@
                 "name": "id",
                 "description": "The unique identifier of the edge gateway.",
                 "required": false,
-                "example": "",
-                "type": "string",
+                "example": null,
+                "type": "",
                 "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
               },
               {
                 "name": "name",
                 "description": "The name of the edge gateway.",
                 "required": false,
-                "example": "",
-                "type": "string",
+                "example": null,
+                "type": "",
                 "validators_description": "The value is required if the parameter `id` is null., "
               }
             ],
@@ -847,6 +863,11 @@
                 "documentation": "Dedicated IPv4 used as NAT entrypoint for the services"
               },
               {
+                "object": "services.services.{index}",
+                "type": "types.ModelCloudavenueServicesCatalog",
+                "documentation": "Catalog of Cloud Avenue Service categories and their services"
+              },
+              {
                 "object": "services.services.{index}.category",
                 "type": "string",
                 "documentation": "Service category grouping related endpoints"
@@ -855,6 +876,11 @@
                 "object": "services.services.{index}.network",
                 "type": "string",
                 "documentation": "Category network in CIDR notation"
+              },
+              {
+                "object": "services.services.{index}.services.{index}",
+                "type": "types.ModelCloudavenueServicesCatalogService",
+                "documentation": "Service instances within the category"
               },
               {
                 "object": "services.services.{index}.services.{index}.name",
@@ -882,6 +908,11 @@
                 "documentation": "Fully qualified domain names for the service"
               },
               {
+                "object": "services.services.{index}.services.{index}.ports.{index}",
+                "type": "types.ModelCloudavenueServicesCatalogServicePort",
+                "documentation": "Exposed service ports"
+              },
+              {
                 "object": "services.services.{index}.services.{index}.ports.{index}.port",
                 "type": "int",
                 "documentation": "TCP/UDP port number"
@@ -893,20 +924,18 @@
               }
             ]
           }
-        },
-        "SubFunctionality": {}
+        }
       }
     }
   },
   "Organization": {
-    "Title": "Organization",
-    "Documentation": "",
-    "MarkdownDocumentation": "",
-    "Commands": {
-      "Get": {
+    "namespace": "Organization",
+    "documentation": "",
+    "commands": {
+      "get": {
         "namespace": "Organization",
         "resource": "",
-        "verb": "Get",
+        "verb": "get",
         "short_documentation": "Get an organization information.",
         "long_documentation": "Retrieve detailed information about your organization.",
         "markdown_documentation": "",
@@ -981,10 +1010,10 @@
           }
         ]
       },
-      "Update": {
+      "update": {
         "namespace": "Organization",
         "resource": "",
-        "verb": "Update",
+        "verb": "update",
         "short_documentation": "Update an existing organization.",
         "long_documentation": "Update the details of an existing organization.",
         "markdown_documentation": "",
@@ -994,7 +1023,7 @@
             "description": "The full name of the organization. It's a long format of your organization name. Appears in the Cloud application as a human-readable name of the organization.",
             "required": false,
             "example": "My Organization to update",
-            "type": "string",
+            "type": "",
             "validators_description": "Ensures that the input value does not exceed a maximum length of `129` characters. \n"
           },
           {
@@ -1002,7 +1031,7 @@
             "description": "A description for the organization.",
             "required": false,
             "example": "This is my organization description to update",
-            "type": "string",
+            "type": "",
             "validators_description": "Ensures that the input value does not exceed a maximum length of `257` characters. \n"
           },
           {
@@ -1010,7 +1039,7 @@
             "description": "The contact email for the organization.",
             "required": false,
             "example": "user@mail.com",
-            "type": "string",
+            "type": "",
             "validators_description": "Validates that the value is a valid email address. (e.g., `foo@bar.com`). \n"
           },
           {
@@ -1018,7 +1047,7 @@
             "description": "The internet billing mode for the organization. More information about billing modes can be found in the [documentation](https://cloud.orange-business.com/en/offres/infrastructure-iaas/cloud-avenue/wiki-cloud-avenue/services/internet-access/).",
             "required": false,
             "example": "PAYG",
-            "type": "string",
+            "type": "",
             "validators_description": "Validates that the value is one of: `PAYG`, `TRAFFIC_VOLUME`. \n"
           }
         ],
@@ -1092,18 +1121,16 @@
           }
         ]
       }
-    },
-    "SubFunctionality": {}
+    }
   },
   "T0": {
-    "Title": "T0",
-    "Documentation": "",
-    "MarkdownDocumentation": "",
-    "Commands": {
-      "Get": {
+    "namespace": "T0",
+    "documentation": "",
+    "commands": {
+      "get": {
         "namespace": "T0",
         "resource": "",
-        "verb": "Get",
+        "verb": "get",
         "short_documentation": "Get a specific T0 by name.",
         "long_documentation": "Retrieve a specific T0 directly by its name or by the edge gateway it is associated with. This command allows you to fetch detailed information about a specific T0.",
         "markdown_documentation": "",
@@ -1113,15 +1140,15 @@
             "description": "The name of the T0 to retrieve.",
             "required": false,
             "example": "prvrf01eocb0001234allsp01",
-            "type": "string",
+            "type": "",
             "validators_description": "The value is required if one of the parameters `edgegateway_id`, `edgegateway_name` is null., Validates that the value is a valid T0 name (pr01e02ocb0001234spt101).. \n"
           },
           {
             "name": "edgegateway_id",
             "description": "The unique identifier of the edge gateway.",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": "The value is required if one of the parameters `t0_name`, `edgegateway_name` is null., Validates that the value is a valid URN (`edgegateway`).. \n"
           },
           {
@@ -1129,7 +1156,7 @@
             "description": "The name of the edge gateway.",
             "required": false,
             "example": "tn01e02ocb0001234spt101",
-            "type": "string",
+            "type": "",
             "validators_description": "The value is required if one of the parameters `edgegateway_id`, `t0_name` is null., "
           }
         ],
@@ -1177,6 +1204,11 @@
             "documentation": "Maximum number of edge gateways for the T0 router."
           },
           {
+            "object": "edge_gateways.{index}",
+            "type": "types.ModelT0EdgeGateway",
+            "documentation": "List of edge gateways associated with the T0 router."
+          },
+          {
             "object": "edge_gateways.{index}.id",
             "type": "string",
             "documentation": "Unique identifier of the edge gateway. It is a URN that uniquely identifies the edge gateway."
@@ -1198,10 +1230,10 @@
           }
         ]
       },
-      "List": {
+      "list": {
         "namespace": "T0",
         "resource": "",
-        "verb": "List",
+        "verb": "list",
         "short_documentation": "List all T0s available in the organization.",
         "long_documentation": "List all T0s available in the organization. This command retrieves a list of all T0s, which are the top-level network services in the Edge Gateway architecture.",
         "markdown_documentation": "",
@@ -1212,6 +1244,11 @@
           {
             "object": "count",
             "type": "int",
+            "documentation": ""
+          },
+          {
+            "object": "t0s.{index}",
+            "type": "types.ModelT0",
             "documentation": ""
           },
           {
@@ -1255,6 +1292,11 @@
             "documentation": "Maximum number of edge gateways for the T0 router."
           },
           {
+            "object": "t0s.{index}.edge_gateways.{index}",
+            "type": "types.ModelT0EdgeGateway",
+            "documentation": "List of edge gateways associated with the T0 router."
+          },
+          {
             "object": "t0s.{index}.edge_gateways.{index}.id",
             "type": "string",
             "documentation": "Unique identifier of the edge gateway. It is a URN that uniquely identifies the edge gateway."
@@ -1276,18 +1318,16 @@
           }
         ]
       }
-    },
-    "SubFunctionality": {}
+    }
   },
   "VDC": {
-    "Title": "VDC",
-    "Documentation": "",
-    "MarkdownDocumentation": "",
-    "Commands": {
-      "Create": {
+    "namespace": "VDC",
+    "documentation": "",
+    "commands": {
+      "create": {
         "namespace": "VDC",
         "resource": "",
-        "verb": "Create",
+        "verb": "create",
         "short_documentation": "Create a new VDC",
         "long_documentation": "Create a new Virtual Data Center (VDC) with the specified parameters.",
         "markdown_documentation": "",
@@ -1297,15 +1337,15 @@
             "description": "Name of the VDC to create",
             "required": true,
             "example": "my-vdc",
-            "type": "string",
+            "type": "",
             "validators_description": "Validates that the value is a valid VDC name (\u003calphanumeric\u003e with - _ character and with max length 27 and min length 2).. \n"
           },
           {
             "name": "description",
             "description": "Description of the VDC to create",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": ""
           },
           {
@@ -1313,7 +1353,7 @@
             "description": "Service class of the VDC to create",
             "required": true,
             "example": "STD",
-            "type": "string",
+            "type": "",
             "validators_description": "Validates that the value is one of: `ECO`, `STD`, `HP`, `VOIP`. \n"
           },
           {
@@ -1321,7 +1361,7 @@
             "description": "Disponibility class of the VDC to create",
             "required": true,
             "example": "ONE-ROOM",
-            "type": "string",
+            "type": "",
             "validators_description": "Validates that the value is one of: `ONE-ROOM`, `DUAL-ROOM`, `HA-DUAL-ROOM`. \n"
           },
           {
@@ -1329,7 +1369,7 @@
             "description": "Billing model of the VDC to create",
             "required": true,
             "example": "PAYG",
-            "type": "string",
+            "type": "",
             "validators_description": "Validates that the value is one of: `PAYG`, `DRAAS`, `RESERVED`. \n"
           },
           {
@@ -1337,47 +1377,55 @@
             "description": "Storage billing model of the VDC to create",
             "required": true,
             "example": "PAYG",
-            "type": "string",
+            "type": "",
             "validators_description": "Validates that the value is one of: `PAYG`, `RESERVED`. \n"
           },
           {
             "name": "vcpu",
             "description": "Number of vCPUs to allocate to the VDC.",
             "required": true,
-            "example": "50",
-            "type": "int",
+            "example": 50,
+            "type": "\u003cint Value\u003e",
             "validators_description": ""
           },
           {
             "name": "memory",
             "description": "Amount of memory (in GB) to allocate to the VDC.",
             "required": true,
-            "example": "500",
-            "type": "int",
+            "example": 500,
+            "type": "\u003cint Value\u003e",
             "validators_description": ""
           },
           {
-            "name": "storage_profiles.{index}.class",
-            "description": "Class of the storage profile to create. Predefined classes or dedicated storage classes can be used. For predefined classes you have different properties (`_r1`, `_r2` and `_hm`) that can be used to define the storage profile.",
+            "name": "storage_profiles",
+            "description": "List of storage profiles to create within the specified VDC",
             "required": true,
-            "example": "gold",
-            "type": "string",
+            "example": "",
+            "type": "\u003c[]interface {} Value\u003e",
             "validators_description": ""
           },
           {
-            "name": "storage_profiles.{index}.limit",
-            "description": "Limit of the storage profile to create. This is the maximum amount of storage that can be used by the VDC. This is in GiB.",
+            "name": "class",
+            "description": "Storage class for the profile. Supports predefined and dedicated storage classes (see rules for available options)",
             "required": true,
-            "example": "500",
-            "type": "int",
+            "example": null,
+            "type": "",
+            "validators_description": ""
+          },
+          {
+            "name": "limit",
+            "description": "Storage capacity limit in GiB (maximum amount of storage available to the VDC)",
+            "required": true,
+            "example": 500,
+            "type": "",
             "validators_description": "Validates that the value is between `100` and `81920`. \n"
           },
           {
-            "name": "storage_profiles.{index}.default",
-            "description": "Default storage profile to create. This will be used if no specific profile is provided.",
+            "name": "default",
+            "description": "Designates this storage profile as the default for the VDC when no specific profile is specified",
             "required": false,
-            "example": "true",
-            "type": "bool",
+            "example": false,
+            "type": "",
             "validators_description": ""
           }
         ],
@@ -1435,6 +1483,11 @@
             "documentation": "Used memory in GB"
           },
           {
+            "object": "networks.{index}",
+            "type": "types.ModelGetVDCNetwork",
+            "documentation": "Available networks in the VDC"
+          },
+          {
             "object": "networks.{index}.id",
             "type": "string",
             "documentation": "ID of the network"
@@ -1443,6 +1496,11 @@
             "object": "networks.{index}.name",
             "type": "string",
             "documentation": "Name of the network"
+          },
+          {
+            "object": "storage_profiles.{index}",
+            "type": "types.ModelGetVDCStorageProfile",
+            "documentation": "Storage profiles available in the VDC"
           },
           {
             "object": "storage_profiles.{index}.id",
@@ -1754,10 +1812,10 @@
           }
         ]
       },
-      "Delete": {
+      "delete": {
         "namespace": "VDC",
         "resource": "",
-        "verb": "Delete",
+        "verb": "delete",
         "short_documentation": "DeleteVDC deletes an existing VDC",
         "long_documentation": "Delete VDC performs a DELETE request to delete an existing VDC.",
         "markdown_documentation": "",
@@ -1766,8 +1824,8 @@
             "name": "id",
             "description": "ID of the VDC to delete",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`vdc`).. \n"
           },
           {
@@ -1775,7 +1833,7 @@
             "description": "Name of the VDC to delete",
             "required": false,
             "example": "my-vdc",
-            "type": "string",
+            "type": "",
             "validators_description": "The value is required if the parameter `id` is null., Validates that the value is a valid VDC name (\u003calphanumeric\u003e with - _ character and with max length 27 and min length 2).. \n"
           }
         ],
@@ -1783,10 +1841,10 @@
         "deprecated_message": "",
         "model": null
       },
-      "Get": {
+      "get": {
         "namespace": "VDC",
         "resource": "",
-        "verb": "Get",
+        "verb": "get",
         "short_documentation": "Get VDC details",
         "long_documentation": "Retrieve detailed information about a specific Virtual Data Center (VDC) by its name.",
         "markdown_documentation": "",
@@ -1795,8 +1853,8 @@
             "name": "id",
             "description": "ID of the VDC to get",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`vdc`).. \n"
           },
           {
@@ -1804,7 +1862,7 @@
             "description": "Name of the VDC to get",
             "required": false,
             "example": "my-vdc",
-            "type": "string",
+            "type": "",
             "validators_description": "The value is required if the parameter `id` is null., Validates that the value is a valid VDC name (\u003calphanumeric\u003e with - _ character and with max length 27 and min length 2).. \n"
           }
         ],
@@ -1862,6 +1920,11 @@
             "documentation": "Used memory in GB"
           },
           {
+            "object": "networks.{index}",
+            "type": "types.ModelGetVDCNetwork",
+            "documentation": "Available networks in the VDC"
+          },
+          {
             "object": "networks.{index}.id",
             "type": "string",
             "documentation": "ID of the network"
@@ -1870,6 +1933,11 @@
             "object": "networks.{index}.name",
             "type": "string",
             "documentation": "Name of the network"
+          },
+          {
+            "object": "storage_profiles.{index}",
+            "type": "types.ModelGetVDCStorageProfile",
+            "documentation": "Storage profiles available in the VDC"
           },
           {
             "object": "storage_profiles.{index}.id",
@@ -1928,10 +1996,10 @@
           }
         ]
       },
-      "List": {
+      "list": {
         "namespace": "VDC",
         "resource": "",
-        "verb": "List",
+        "verb": "list",
         "short_documentation": "List VDCs",
         "long_documentation": "List all Virtual Data Centers (VDCs) available in your organization. If no filters are applied, it returns all VDCs.",
         "markdown_documentation": "",
@@ -1940,22 +2008,27 @@
             "name": "id",
             "description": "ID of the VDC to filter by",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": "Validates that the value is a valid URN (`vdc`).. \n"
           },
           {
             "name": "name",
             "description": "Name of the VDC to filter by",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": "Validates that the value is a valid VDC name (\u003calphanumeric\u003e with - _ character and with max length 27 and min length 2).. \n"
           }
         ],
         "deprecated": false,
         "deprecated_message": "",
         "model": [
+          {
+            "object": "vdcs.{index}",
+            "type": "types.ModelListVDCDetails",
+            "documentation": "List of VDCs"
+          },
           {
             "object": "vdcs.{index}.id",
             "type": "string",
@@ -1998,10 +2071,10 @@
           }
         ]
       },
-      "Update": {
+      "update": {
         "namespace": "VDC",
         "resource": "",
-        "verb": "Update",
+        "verb": "update",
         "short_documentation": "UpdateVDC updates an existing VDC",
         "long_documentation": "Update VDC performs a PUT request to update an existing VDC. Enter only the fields you want to update.",
         "markdown_documentation": "",
@@ -2010,8 +2083,8 @@
             "name": "id",
             "description": "ID of the VDC to get",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`vdc`).. \n"
           },
           {
@@ -2019,31 +2092,31 @@
             "description": "Name of the VDC to get",
             "required": false,
             "example": "my-vdc",
-            "type": "string",
+            "type": "",
             "validators_description": "The value is required if the parameter `id` is null., Validates that the value is a valid VDC name (\u003calphanumeric\u003e with - _ character and with max length 27 and min length 2).. \n"
           },
           {
             "name": "description",
             "description": "The description of the VDC.",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": ""
           },
           {
             "name": "vcpu",
             "description": "The number of virtual CPUs for the VDC.",
             "required": false,
-            "example": "50",
-            "type": "int",
+            "example": 50,
+            "type": "\u003cint Value\u003e",
             "validators_description": ""
           },
           {
             "name": "memory",
             "description": "The amount of memory for the VDC.",
             "required": false,
-            "example": "500",
-            "type": "int",
+            "example": 500,
+            "type": "\u003cint Value\u003e",
             "validators_description": ""
           }
         ],
@@ -2101,6 +2174,11 @@
             "documentation": "Used memory in GB"
           },
           {
+            "object": "networks.{index}",
+            "type": "types.ModelGetVDCNetwork",
+            "documentation": "Available networks in the VDC"
+          },
+          {
             "object": "networks.{index}.id",
             "type": "string",
             "documentation": "ID of the network"
@@ -2109,6 +2187,11 @@
             "object": "networks.{index}.name",
             "type": "string",
             "documentation": "Name of the network"
+          },
+          {
+            "object": "storage_profiles.{index}",
+            "type": "types.ModelGetVDCStorageProfile",
+            "documentation": "Storage profiles available in the VDC"
           },
           {
             "object": "storage_profiles.{index}.id",
@@ -2216,16 +2299,15 @@
         ]
       }
     },
-    "SubFunctionality": {
+    "sub_functionality": {
       "StorageProfile": {
-        "Title": "StorageProfile",
-        "Documentation": "",
-        "MarkdownDocumentation": "",
-        "Commands": {
-          "Add": {
+        "namespace": "StorageProfile",
+        "documentation": "",
+        "commands": {
+          "add": {
             "namespace": "VDC",
             "resource": "StorageProfile",
-            "verb": "Add",
+            "verb": "add",
             "short_documentation": "Create VDC storage profiles",
             "long_documentation": "Creates one or more storage profiles within a specified VDC. Each profile requires a storage class and capacity limit, with an optional default designation.",
             "markdown_documentation": "",
@@ -2234,8 +2316,8 @@
                 "name": "vdc_id",
                 "description": "Unique identifier of the target VDC for the new storage profile",
                 "required": false,
-                "example": "",
-                "type": "string",
+                "example": null,
+                "type": "",
                 "validators_description": "The value is required if the parameter `vdc_name` is null., Validates that the value is a valid URN (`vdc`).. \n"
               },
               {
@@ -2243,31 +2325,39 @@
                 "description": "Name of the target VDC for the new storage profile",
                 "required": false,
                 "example": "my-vdc",
-                "type": "string",
+                "type": "",
                 "validators_description": "The value is required if the parameter `vdc_id` is null., "
               },
               {
-                "name": "storage_profiles.{index}.class",
-                "description": "Storage class for the profile. Supports predefined and dedicated storage classes (see rules for available options)",
+                "name": "storage_profiles",
+                "description": "List of storage profiles to create within the specified VDC",
                 "required": true,
-                "example": "gold",
-                "type": "string",
+                "example": "",
+                "type": "\u003c[]interface {} Value\u003e",
                 "validators_description": ""
               },
               {
-                "name": "storage_profiles.{index}.limit",
+                "name": "class",
+                "description": "Storage class for the profile. Supports predefined and dedicated storage classes (see rules for available options)",
+                "required": true,
+                "example": null,
+                "type": "",
+                "validators_description": ""
+              },
+              {
+                "name": "limit",
                 "description": "Storage capacity limit in GiB (maximum amount of storage available to the VDC)",
                 "required": true,
-                "example": "500",
-                "type": "int",
+                "example": 500,
+                "type": "",
                 "validators_description": "Validates that the value is between `100` and `81920`. \n"
               },
               {
-                "name": "storage_profiles.{index}.default",
+                "name": "default",
                 "description": "Designates this storage profile as the default for the VDC when no specific profile is specified",
                 "required": false,
-                "example": "false",
-                "type": "bool",
+                "example": false,
+                "type": "",
                 "validators_description": ""
               }
             ],
@@ -2349,10 +2439,10 @@
               }
             ]
           },
-          "Delete": {
+          "delete": {
             "namespace": "VDC",
             "resource": "StorageProfile",
-            "verb": "Delete",
+            "verb": "delete",
             "short_documentation": "Remove VDC storage profiles",
             "long_documentation": "Removes a storage profile from the specified VDC. Deletion is restricted for default profiles, the last remaining profile, or profiles currently in use.",
             "markdown_documentation": "",
@@ -2361,8 +2451,8 @@
                 "name": "vdc_id",
                 "description": "Unique identifier of the VDC containing the storage profile to remove",
                 "required": false,
-                "example": "",
-                "type": "string",
+                "example": null,
+                "type": "",
                 "validators_description": "The value is required if the parameter `vdc_name` is null., Validates that the value is a valid URN (`vdc`).. \n"
               },
               {
@@ -2370,15 +2460,23 @@
                 "description": "Name of the VDC containing the storage profile to remove",
                 "required": false,
                 "example": "my-vdc",
-                "type": "string",
+                "type": "",
                 "validators_description": "The value is required if the parameter `vdc_id` is null., "
               },
               {
-                "name": "storage_profiles.{index}.class",
-                "description": "Storage class identifier of the profile to remove",
+                "name": "storage_profiles",
+                "description": "List of storage profiles to create within the specified VDC",
                 "required": true,
-                "example": "gold",
-                "type": "string",
+                "example": "",
+                "type": "\u003c[]interface {} Value\u003e",
+                "validators_description": ""
+              },
+              {
+                "name": "class",
+                "description": "Storage class for the profile. Supports predefined and dedicated storage classes (see rules for available options)",
+                "required": true,
+                "example": null,
+                "type": "",
                 "validators_description": ""
               }
             ],
@@ -2386,10 +2484,10 @@
             "deprecated_message": "",
             "model": null
           },
-          "List": {
+          "list": {
             "namespace": "VDC",
             "resource": "StorageProfile",
-            "verb": "List",
+            "verb": "list",
             "short_documentation": "Retrieve VDC storage profiles",
             "long_documentation": "Retrieves a comprehensive list of storage profiles. When no filters are specified, all storage profiles across all VDCs are returned. Filtering options include storage profile ID/name and VDC ID/name. Filters can be combined (e.g., profile filter + VDC filter). When both ID and name are provided for the same resource, they must reference the same object to return results.",
             "markdown_documentation": "",
@@ -2398,16 +2496,16 @@
                 "name": "id",
                 "description": "Unique identifier of the storage profile to retrieve",
                 "required": false,
-                "example": "",
-                "type": "string",
+                "example": null,
+                "type": "",
                 "validators_description": "Validates that the value is a valid URN (`vdcstorageProfile`).. \n"
               },
               {
                 "name": "vdc_id",
                 "description": "Unique identifier of the VDC containing the storage profiles",
                 "required": false,
-                "example": "",
-                "type": "string",
+                "example": null,
+                "type": "",
                 "validators_description": "Validates that the value is a valid URN (`vdc`).. \n"
               },
               {
@@ -2415,7 +2513,7 @@
                 "description": "Name of the VDC containing the storage profiles",
                 "required": false,
                 "example": "my-vdc",
-                "type": "string",
+                "type": "",
                 "validators_description": ""
               },
               {
@@ -2423,13 +2521,18 @@
                 "description": "Storage class name of the profile to retrieve",
                 "required": false,
                 "example": "gold",
-                "type": "string",
+                "type": "",
                 "validators_description": ""
               }
             ],
             "deprecated": false,
             "deprecated_message": "",
             "model": [
+              {
+                "object": "vdcs.{index}",
+                "type": "types.ModelListStorageProfilesVDC",
+                "documentation": "List of VDCs to list storage profiles for"
+              },
               {
                 "object": "vdcs.{index}.id",
                 "type": "string",
@@ -2439,6 +2542,11 @@
                 "object": "vdcs.{index}.name",
                 "type": "string",
                 "documentation": "Name of the VDC"
+              },
+              {
+                "object": "vdcs.{index}.storage_profiles.{index}",
+                "type": "types.ModelListStorageProfile",
+                "documentation": "List of storage profiles in the VDC"
               },
               {
                 "object": "vdcs.{index}.storage_profiles.{index}.id",
@@ -2467,10 +2575,10 @@
               }
             ]
           },
-          "Update": {
+          "update": {
             "namespace": "VDC",
             "resource": "StorageProfile",
-            "verb": "Update",
+            "verb": "update",
             "short_documentation": "Modify VDC storage profiles",
             "long_documentation": "Modifies one or more storage profiles within a VDC. Supported updates include capacity limits and default profile designation. Storage class names cannot be modified.",
             "markdown_documentation": "",
@@ -2479,8 +2587,8 @@
                 "name": "vdc_id",
                 "description": "Unique identifier of the VDC containing the storage profile to modify",
                 "required": false,
-                "example": "",
-                "type": "string",
+                "example": null,
+                "type": "",
                 "validators_description": "The value is required if the parameter `vdc_name` is null., Validates that the value is a valid URN (`vdc`).. \n"
               },
               {
@@ -2488,32 +2596,40 @@
                 "description": "Name of the VDC containing the storage profile to modify",
                 "required": false,
                 "example": "my-vdc",
-                "type": "string",
+                "type": "",
                 "validators_description": "The value is required if the parameter `vdc_id` is null., "
               },
               {
-                "name": "storage_profiles.{index}.class",
-                "description": "Storage class identifier of the profile to modify (see Rules Table for valid classes)",
+                "name": "storage_profiles",
+                "description": "List of storage profiles to create within the specified VDC",
                 "required": true,
-                "example": "gold",
-                "type": "string",
+                "example": "",
+                "type": "\u003c[]interface {} Value\u003e",
                 "validators_description": ""
               },
               {
-                "name": "storage_profiles.{index}.default",
-                "description": "Designates this storage profile as the default for the VDC (only one default profile allowed per VDC)",
-                "required": false,
-                "example": "true",
-                "type": "bool",
+                "name": "class",
+                "description": "Storage class for the profile. Supports predefined and dedicated storage classes (see rules for available options)",
+                "required": true,
+                "example": null,
+                "type": "",
                 "validators_description": ""
               },
               {
-                "name": "storage_profiles.{index}.limit",
-                "description": "Updated storage capacity limit in GiB (cannot be lower than current usage; decreasing limits may cause service interruption)",
-                "required": false,
-                "example": "500",
-                "type": "int",
+                "name": "limit",
+                "description": "Storage capacity limit in GiB (maximum amount of storage available to the VDC)",
+                "required": true,
+                "example": 500,
+                "type": "",
                 "validators_description": "Validates that the value is between `100` and `81920`. \n"
+              },
+              {
+                "name": "default",
+                "description": "Designates this storage profile as the default for the VDC when no specific profile is specified",
+                "required": false,
+                "example": false,
+                "type": "",
+                "validators_description": ""
               }
             ],
             "deprecated": false,
@@ -2528,6 +2644,11 @@
                 "object": "name",
                 "type": "string",
                 "documentation": "Name of the VDC"
+              },
+              {
+                "object": "storage_profiles.{index}",
+                "type": "types.ModelListStorageProfile",
+                "documentation": "List of storage profiles in the VDC"
               },
               {
                 "object": "storage_profiles.{index}.id",
@@ -2556,20 +2677,21 @@
               }
             ]
           }
-        },
-        "SubFunctionality": {}
+        }
       }
     }
   },
   "VdcGroup": {
-    "Title": "VdcGroup",
-    "Documentation": "",
-    "MarkdownDocumentation": "",
-    "Commands": {
-      "Create": {
+    "namespace": "VdcGroup",
+    "alias_namespace": [
+      "vdcg"
+    ],
+    "documentation": "This command allows you to manage VDC Groups.",
+    "commands": {
+      "create": {
         "namespace": "VdcGroup",
         "resource": "",
-        "verb": "Create",
+        "verb": "create",
         "short_documentation": "Create a Vdc Group",
         "long_documentation": "Create a new Virtual Data Center Group (Vdc Group) in your organization.",
         "markdown_documentation": "",
@@ -2579,32 +2701,40 @@
             "description": "Name of the Vdc Group",
             "required": true,
             "example": "my-vdc-group",
-            "type": "string",
+            "type": "",
             "validators_description": ""
           },
           {
             "name": "description",
             "description": "Description of the Vdc Group",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": ""
           },
           {
-            "name": "vdcs.{index}.id",
-            "description": "ID of the Vdc to associate with the Vdc Group",
-            "required": false,
+            "name": "vdcs",
+            "description": "List of Vdc to remove from the Vdc Group",
+            "required": true,
             "example": "",
-            "type": "string",
-            "validators_description": "The value is required if the parameter `vdcs.{index}.name` is null., "
+            "type": "\u003c[]interface {} Value\u003e",
+            "validators_description": ""
           },
           {
-            "name": "vdcs.{index}.name",
-            "description": "Name of the Vdc to associate with the Vdc Group",
-            "required": false,
-            "example": "my-vdc",
-            "type": "string",
-            "validators_description": "The value is required if the parameter `vdcs.{index}.id` is null., "
+            "name": "id",
+            "description": "ID of the Vdc to remove",
+            "required": true,
+            "example": null,
+            "type": "",
+            "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`vdc`).. \n"
+          },
+          {
+            "name": "name",
+            "description": "Name of the Vdc to remove",
+            "required": true,
+            "example": null,
+            "type": "",
+            "validators_description": "The value is required if the parameter `id` is null., "
           }
         ],
         "deprecated": false,
@@ -2631,6 +2761,11 @@
             "documentation": "Number of Vdcs in the Vdc Group"
           },
           {
+            "object": "vdcs.{index}",
+            "type": "types.ModelGetVdcGroupVdc",
+            "documentation": "List of Vdcs in the Vdc Group"
+          },
+          {
             "object": "vdcs.{index}.id",
             "type": "string",
             "documentation": "ID of the Vdc"
@@ -2642,10 +2777,10 @@
           }
         ]
       },
-      "Delete": {
+      "delete": {
         "namespace": "VdcGroup",
         "resource": "",
-        "verb": "Delete",
+        "verb": "delete",
         "short_documentation": "Delete a Vdc Group",
         "long_documentation": "Delete an existing Virtual Data Center Group (Vdc Group) from your organization.",
         "markdown_documentation": "",
@@ -2654,8 +2789,8 @@
             "name": "id",
             "description": "ID of the Vdc Group",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`vdcGroup`).. \n"
           },
           {
@@ -2663,15 +2798,15 @@
             "description": "Name of the Vdc Group",
             "required": false,
             "example": "my-vdc-group",
-            "type": "string",
+            "type": "",
             "validators_description": "The value is required if the parameter `id` is null., "
           },
           {
             "name": "force",
             "description": "Force delete the Vdc Group. Value `true` means to forcefully delete the object that contains other objects even if those objects are in a state that does not allow removal. The default is `false` therefore, objects are not removed if they are not in a state that normally allows removal. Force also implies recursive delete where other contained objects are removed. Errors may be ignored. Invalid value (not true or false) are ignored. The VDC contains in the Vdc Group are not deleted.",
             "required": false,
-            "example": "",
-            "type": "bool",
+            "example": null,
+            "type": "",
             "validators_description": ""
           }
         ],
@@ -2679,10 +2814,10 @@
         "deprecated_message": "",
         "model": null
       },
-      "Get": {
+      "get": {
         "namespace": "VdcGroup",
         "resource": "",
-        "verb": "Get",
+        "verb": "get",
         "short_documentation": "Get a Vdc Group",
         "long_documentation": "Retrieve detailed information about a specific Vdc Group by its ID or name. This command returns all attributes and configuration details of the selected Vdc Group, helping you understand its current state and associated resources.",
         "markdown_documentation": "",
@@ -2691,16 +2826,16 @@
             "name": "id",
             "description": "ID of the Vdc Group to filter by",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`vdcGroup`).. \n"
           },
           {
             "name": "name",
             "description": "Name of the Vdc Group to filter by",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": "The value is required if the parameter `id` is null., "
           }
         ],
@@ -2728,6 +2863,11 @@
             "documentation": "Number of Vdcs in the Vdc Group"
           },
           {
+            "object": "vdcs.{index}",
+            "type": "types.ModelGetVdcGroupVdc",
+            "documentation": "List of Vdcs in the Vdc Group"
+          },
+          {
             "object": "vdcs.{index}.id",
             "type": "string",
             "documentation": "ID of the Vdc"
@@ -2739,10 +2879,10 @@
           }
         ]
       },
-      "List": {
+      "list": {
         "namespace": "VdcGroup",
         "resource": "",
-        "verb": "List",
+        "verb": "list",
         "short_documentation": "List Vdc Groups",
         "long_documentation": "List all Virtual Data Center Groups (Vdc Groups) available in your organization. If no filters are applied, it returns all Vdc Groups.",
         "markdown_documentation": "",
@@ -2751,22 +2891,27 @@
             "name": "id",
             "description": "ID of the Vdc Group to filter by",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": "Validates that the value is a valid URN (`vdcGroup`).. \n"
           },
           {
             "name": "name",
             "description": "Name of the Vdc Group to filter by",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": ""
           }
         ],
         "deprecated": false,
         "deprecated_message": "",
         "model": [
+          {
+            "object": "vdc_groups.{index}",
+            "type": "types.ModelGetVdcGroup",
+            "documentation": "List of Vdc Groups"
+          },
           {
             "object": "vdc_groups.{index}.id",
             "type": "string",
@@ -2788,6 +2933,11 @@
             "documentation": "Number of Vdcs in the Vdc Group"
           },
           {
+            "object": "vdc_groups.{index}.vdcs.{index}",
+            "type": "types.ModelGetVdcGroupVdc",
+            "documentation": "List of Vdcs in the Vdc Group"
+          },
+          {
             "object": "vdc_groups.{index}.vdcs.{index}.id",
             "type": "string",
             "documentation": "ID of the Vdc"
@@ -2799,10 +2949,10 @@
           }
         ]
       },
-      "Update": {
+      "update": {
         "namespace": "VdcGroup",
         "resource": "",
-        "verb": "Update",
+        "verb": "update",
         "short_documentation": "Update a Vdc Group",
         "long_documentation": "Update an existing Virtual Data Center Group (Vdc Group) in your organization. You can modify attributes such as the name, description, and associated Vdcs. To add or remove Vdcs, use the dedicated commands. If you want to modify the Vdcs associated with the Vdc Group, refer all the Vdcs you want to have associated with the Vdc Group in the `vdcs` parameter. Vdcs not present in this list will be removed from the Vdc Group.",
         "markdown_documentation": "",
@@ -2811,8 +2961,8 @@
             "name": "id",
             "description": "ID of the Vdc Group",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`vdcGroup`).. \n"
           },
           {
@@ -2820,32 +2970,40 @@
             "description": "Name of the Vdc Group",
             "required": false,
             "example": "my-vdc-group",
-            "type": "string",
+            "type": "",
             "validators_description": "The value is required if the parameter `id` is null., "
           },
           {
             "name": "description",
             "description": "Description of the Vdc Group",
             "required": false,
-            "example": "",
-            "type": "string",
+            "example": null,
+            "type": "",
             "validators_description": ""
           },
           {
-            "name": "vdcs.{index}.id",
-            "description": "ID of the Vdc to add",
+            "name": "vdcs",
+            "description": "List of Vdc to remove from the Vdc Group",
             "required": true,
             "example": "",
-            "type": "string",
-            "validators_description": "The value is required if the parameter `vdcs.{index}.name` is null., Validates that the value is a valid URN (`vdc`).. \n"
+            "type": "\u003c[]interface {} Value\u003e",
+            "validators_description": ""
           },
           {
-            "name": "vdcs.{index}.name",
-            "description": "Name of the Vdc to add",
+            "name": "id",
+            "description": "ID of the Vdc to remove",
             "required": true,
-            "example": "",
-            "type": "string",
-            "validators_description": "The value is required if the parameter `vdcs.{index}.id` is null., "
+            "example": null,
+            "type": "",
+            "validators_description": "The value is required if the parameter `name` is null., Validates that the value is a valid URN (`vdc`).. \n"
+          },
+          {
+            "name": "name",
+            "description": "Name of the Vdc to remove",
+            "required": true,
+            "example": null,
+            "type": "",
+            "validators_description": "The value is required if the parameter `id` is null., "
           }
         ],
         "deprecated": false,
@@ -2872,6 +3030,11 @@
             "documentation": "Number of Vdcs in the Vdc Group"
           },
           {
+            "object": "vdcs.{index}",
+            "type": "types.ModelGetVdcGroupVdc",
+            "documentation": "List of Vdcs in the Vdc Group"
+          },
+          {
             "object": "vdcs.{index}.id",
             "type": "string",
             "documentation": "ID of the Vdc"
@@ -2883,7 +3046,6 @@
           }
         ]
       }
-    },
-    "SubFunctionality": {}
+    }
   }
 }

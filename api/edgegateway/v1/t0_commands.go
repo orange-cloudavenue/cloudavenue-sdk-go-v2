@@ -16,6 +16,8 @@ import (
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/pspecs"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/validator"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
@@ -63,36 +65,36 @@ func init() {
 		AutoGenerate:       true,
 
 		ParamsType: types.ParamsGetT0{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "t0_name",
 				Description: "The name of the T0 to retrieve.",
 				Required:    false,
 				Example:     "prvrf01eocb0001234allsp01",
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("edgegateway_id", "edgegateway_name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorResourceName("t0"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("edgegateway_id", "edgegateway_name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorResourceName("t0"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "edgegateway_id",
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("t0_name", "edgegateway_name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("edgegateway"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("t0_name", "edgegateway_name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("edgegateway"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "edgegateway_name",
 				Description: "The name of the edge gateway.",
 				Required:    false,
 				Example:     "tn01e02ocb0001234spt101",
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("edgegateway_id", "t0_name"),
-					commands.ValidatorOmitempty(),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("edgegateway_id", "t0_name"),
+					validator.ValidatorOmitempty(),
 				},
 			},
 		},

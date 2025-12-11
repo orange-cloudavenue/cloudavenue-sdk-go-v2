@@ -18,6 +18,8 @@ import (
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/pspecs"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/validator"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
@@ -45,26 +47,26 @@ func init() {
 
 		ModelType:  types.ModelEdgeGatewayPublicIP{},
 		ParamsType: types.ParamsEdgeGateway{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "id",
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("edgegateway"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("edgegateway"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "name",
 				Description: "The name of the edge gateway.",
 				Required:    false,
 				Example:     "tn01e02ocb0001234spt101",
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("id"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorResourceName("edgegateway"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("id"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorResourceName("edgegateway"),
 				},
 			},
 		},
@@ -155,26 +157,26 @@ func init() {
 
 		ModelType:  types.ModelEdgeGatewayPublicIPs{},
 		ParamsType: types.ParamsEdgeGateway{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "id",
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("edgegateway"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("edgegateway"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "name",
 				Description: "The name of the edge gateway.",
 				Required:    false,
 				Example:     "tn01e02ocb0001234spt101",
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("id"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorResourceName("edgegateway"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("id"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorResourceName("edgegateway"),
 				},
 			},
 		},
@@ -217,35 +219,35 @@ func init() {
 
 		ModelType:  types.ModelEdgeGatewayPublicIP{},
 		ParamsType: types.ParamsGetEdgeGatewayPublicIP{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "ip",
 				Description: "The public IP address.",
 				Required:    true,
 				Example:     "195.25.13.4",
-				Validators: []commands.Validator{
-					commands.ValidatorIPV4(),
+				Validators: []validator.Validator{
+					validator.ValidatorIPV4(),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "id",
 				Description: "The unique identifier of the edge gateway.",
 				Required:    false,
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("name"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorURN("edgegateway"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("name"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorURN("edgegateway"),
 				},
 			},
-			commands.ParamsSpec{
+			&pspecs.String{
 				Name:        "name",
 				Description: "The name of the edge gateway.",
 				Required:    false,
 				Example:     "tn01e02ocb0001234spt101",
-				Validators: []commands.Validator{
-					commands.ValidatorRequiredIfParamIsNull("id"),
-					commands.ValidatorOmitempty(),
-					commands.ValidatorResourceName("edgegateway"),
+				Validators: []validator.Validator{
+					validator.ValidatorRequiredIfParamIsNull("id"),
+					validator.ValidatorOmitempty(),
+					validator.ValidatorResourceName("edgegateway"),
 				},
 			},
 		},
@@ -307,14 +309,14 @@ func init() {
 		AutoGenerate:       true,
 
 		ParamsType: types.ParamsDeleteEdgeGatewayPublicIP{},
-		ParamsSpecs: commands.ParamsSpecs{
-			commands.ParamsSpec{
+		ParamsSpecs: pspecs.Params{
+			&pspecs.String{
 				Name:        "ip",
 				Description: "The public IP address.",
 				Required:    true,
 				Example:     "195.25.13.4",
-				Validators: []commands.Validator{
-					commands.ValidatorIPV4(),
+				Validators: []validator.Validator{
+					validator.ValidatorIPV4(),
 				},
 			},
 		},

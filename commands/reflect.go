@@ -231,12 +231,13 @@ func GetModelTypes(modelType reflect.Type) ([]DocModel, error) {
 				return nil // can't have slice at root
 			}
 			// If the slice is not a struct we cannot recurse into it
+			result = append(result, DocModel{
+				Object:        prefix + "." + sliceSchema,
+				Type:          t.Elem().String(),
+				Documentation: doc,
+			})
+
 			if t.Elem().Kind() != reflect.Struct {
-				result = append(result, DocModel{
-					Object:        prefix + "." + sliceSchema,
-					Type:          t.Elem().String(),
-					Documentation: doc,
-				})
 				return nil
 			}
 
@@ -246,6 +247,17 @@ func GetModelTypes(modelType reflect.Type) ([]DocModel, error) {
 			if prefix == "" {
 				return nil // can't have map at root
 			}
+
+			result = append(result, DocModel{
+				Object:        prefix + "." + mapSchema,
+				Type:          t.Elem().String(),
+				Documentation: doc,
+			})
+
+			if t.Elem().Kind() != reflect.Struct {
+				return nil
+			}
+
 			return walk(t.Elem(), prefix+"."+mapSchema, "")
 		default:
 			// Leaf field
