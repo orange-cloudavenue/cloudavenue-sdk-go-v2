@@ -91,14 +91,6 @@ func init() {
 				Enabled:             org.Enabled,
 				Email:               org.Email,
 				InternetBillingMode: org.InternetBillingMode,
-				Resources: types.ModelGetOrganizationResources{
-					Vdc:       orgDetails.Resources.Vdc,
-					Catalog:   orgDetails.Resources.Catalog,
-					Vapp:      orgDetails.Resources.Vapp,
-					VMRunning: orgDetails.Resources.VMRunning,
-					User:      orgDetails.Resources.User,
-					Disk:      orgDetails.Resources.Disk,
-				},
 			}, nil
 		},
 	})
@@ -114,7 +106,7 @@ func init() {
 		ParamsSpecs: commands.ParamsSpecs{
 			commands.ParamsSpec{
 				Name:        "full_name",
-				Description: "The full name of the organization. It's a long format of your organization name. Appears in the Cloud application as a human-readable name of the organization.",
+				Description: "The full name of the organization. It's a long format of your organization name. Appears in the VMware Cloud Director application as a human-readable name of the organization.",
 				Example:     "My Organization to update",
 				Validators: []commands.Validator{
 					commands.ValidatorOmitempty(),
@@ -123,7 +115,7 @@ func init() {
 			},
 			commands.ParamsSpec{
 				Name:        "description",
-				Description: "A description for the organization.",
+				Description: "Human-readable description of the organization.",
 				Example:     "This is my organization description to update",
 				Validators: []commands.Validator{
 					commands.ValidatorOmitempty(),
@@ -132,7 +124,7 @@ func init() {
 			},
 			commands.ParamsSpec{
 				Name:        "email",
-				Description: "The contact email for the organization.",
+				Description: "Primary contact email for the organization.",
 				Example:     "user@mail.com",
 				Validators: []commands.Validator{
 					commands.ValidatorOmitempty(),
