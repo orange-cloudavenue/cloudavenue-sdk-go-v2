@@ -1,21 +1,17 @@
-/*
- * SPDX-FileCopyrightText: Copyright (c) 2025 Orange
- * SPDX-License-Identifier: Mozilla Public License 2.0
- *
- * This software is distributed under the MPL-2.0 license.
- * the text of which is available at https://www.mozilla.org/en-US/MPL/2.0/
- * or see the "LICENSE" file for more details.
- */
-
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
+	"os"
 	"reflect"
+	"strings"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/pspecs"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
+	"github.com/orange-cloudavenue/devflow-sdk-go/models"
+	"github.com/orange-cloudavenue/devflow-sdk-go/sdk"
 
 	// Force import of all commands to register them
 	_ "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/draas/v1"
@@ -29,200 +25,306 @@ import (
 var reg = commands.NewRegistry()
 
 func main() {
-
-	// * Commands
-	var funcs = make(map[string]Functionality)
-
-	for _, ns := range reg.GetNamespaces() {
-		funcs[ns] = loopNamespace(ns)
+	// Get configuration from environment
+	baseURL := os.Getenv("DEVFLOW_API_URL")
+	if baseURL == "" {
+		baseURL = "https://devflow.cav007.myaddr.tools"
 	}
 
-	log.Default().Println("Found", len(funcs), "functionalities")
+	if len(os.Args) != 2 {
+		log.Fatal("code argument is required (e.g., '123')")
+	}
 
-	// Output the functionalities to a JSON file
-	err := writeJSONFile("functionalities.json", funcs)
+	inputArg := os.Args[1]
+	if inputArg == "" {
+		log.Fatal("code argument is required (e.g., '123')")
+	}
+
+	var branch string
+
+	// Create the client with OAuth Device Flow authentication
+	client, err := sdk.NewClient(
+		baseURL,
+		sdk.WithInsecure(),
+		sdk.WithAutoRefresh(true),
+	)
 	if err != nil {
-		log.Default().Println("Error writing functionalities to JSON file:", err)
-		return
+		log.Fatal(err)
 	}
 
-	// * Consoles
-
-	var cs = make(map[string]consoles.Console)
-
-	for _, console := range consoles.GetConsoles() {
-		cs[console.SiteName] = console
-	}
-
-	// Output the functionalities to a JSON file
-	err = writeJSONFile("consoles.json", cs)
-	if err != nil {
-		log.Default().Println("Error writing functionalities to JSON file:", err)
-		return
-	}
-
-}
-
-func loopNamespace(ns string) Functionality {
-	funct := Functionality{
-		Namespace:        ns,
-		Commands:         make(map[string]Func),
-		SubFunctionality: make(map[string]Functionality),
-	}
-
-	nsCmd := reg.GetCommandsByFilter(func(cmd commands.Command) bool {
-		return cmd.GetNamespace() == ns && cmd.GetResource() == "" && cmd.GetVerb() == ""
-	})
-
-	if len(nsCmd) == 0 {
-		log.Default().Println("No main commands reference found for namespace:", ns)
-		return funct
-	}
-
-	funct.MarkdownDocumentation = nsCmd[0].MarkdownDocumentation
-	funct.Documentation = nsCmd[0].LongDocumentation
-	funct.AliasNamespace = nsCmd[0].GetAliasNamespace()
-
-	// Get all commands for the namespace
-	commandsByNamespace := reg.GetCommandsByFilter(func(cmd commands.Command) bool {
-		return cmd.GetNamespace() == ns && cmd.GetResource() == "" && cmd.GetVerb() != ""
-	})
-
-	for _, cmd := range commandsByNamespace {
-		funct.Commands[cmd.GetVerb()] = commandToFunc(cmd)
-	}
-
-	// Get all sub-commands for the namespace
-	subCommands := reg.GetCommandsByFilter(func(cmd commands.Command) bool {
-		return cmd.GetNamespace() == ns && cmd.GetResource() != "" && cmd.GetVerb() == ""
-	})
-
-	for _, cmd := range subCommands {
-		log.Default().Println("Adding sub-command:", cmd.GetNamespace(), cmd.GetResource(), cmd.GetVerb())
-		sc := loopSubCommand(cmd)
-		funct.SubFunctionality[sc.Namespace] = sc
-	}
-
-	return funct
-}
-
-func loopSubCommand(cmd commands.Command) Functionality {
-	funct := Functionality{
-		Namespace:        cmd.GetResource(),
-		Commands:         make(map[string]Func),
-		SubFunctionality: make(map[string]Functionality),
-	}
-
-	funct.MarkdownDocumentation = cmd.MarkdownDocumentation
-
-	// Get all commands for the sub-command
-	commandsBySubCommand := reg.GetCommandsByFilter(func(c commands.Command) bool {
-		return c.GetNamespace() == cmd.GetNamespace() && c.GetResource() == cmd.GetResource() && c.GetVerb() != ""
-	})
-
-	for _, c := range commandsBySubCommand {
-		funct.Commands[c.GetVerb()] = commandToFunc(c)
-	}
-
-	return funct
-}
-
-func commandToFunc(cmd commands.Command) Func {
-	f := Func{
-		Namespace:      cmd.GetNamespace(),
-		AliasNamespace: cmd.GetAliasNamespace(),
-		Resource:       cmd.GetResource(),
-		Verb:           cmd.GetVerb(),
-
-		ShortDocumentation:    cmd.ShortDocumentation,
-		LongDocumentation:     cmd.LongDocumentation,
-		MarkdownDocumentation: cmd.MarkdownDocumentation,
-	}
-
-	// * Param
-	if cmd.ParamsType != nil {
-		f.Params = make([]FuncParam, 0)
-
-		paramIterator := func(spec pspecs.ParamSpec) {
-			fValidatorsDescription := ""
-			if spec.GetValidators() != nil {
-				// If the spec has validators, we can use them to generate the description
-				// e.g. "Must be a valid email address"
-				for i, v := range spec.GetValidators() {
-					if v.GetMarkdownDescription() == "" {
-						continue
-					}
-					fValidatorsDescription += v.GetMarkdownDescription()
-					if i != len(spec.GetValidators())-1 {
-						fValidatorsDescription += ", "
-					} else {
-						fValidatorsDescription += ". \n"
-					}
-				}
-			}
-
-			f.Params = append(f.Params, FuncParam{
-				Name:                  spec.GetName(),
-				Description:           spec.GetDescription(),
-				Type:                  spec.GetType().String(),
-				Required:              spec.IsRequired(),
-				Example:               spec.GetExample(),
-				ValidatorsDescription: fValidatorsDescription,
-			})
-		}
-
-		for _, spec := range cmd.ParamsSpecs {
-			// If the spec is a nested list, we need to iterate over its items
-			if nested, ok := spec.(*pspecs.ListNested); ok {
-				paramIterator(nested)
-				for _, item := range nested.GetItemsSpec() {
-					paramIterator(item)
-				}
-			} else {
-				paramIterator(spec)
-			}
-		}
-
-	}
-
-	// * Model
-	if cmd.ModelType != nil {
-		fType := reflect.TypeOf(cmd.ModelType)
-		if fType.Kind() == reflect.Ptr {
-			fType = fType.Elem()
-		}
-
-		docs, err := commands.GetModelTypes(fType)
+	// Authenticate if not already authenticated
+	if !client.IsAuthenticated() {
+		fmt.Println("No authentication token found. Starting device flow...")
+		err := client.Authenticate(context.Background(), "devref-v2", func(userCode, verificationURI string) {
+			fmt.Printf("\n🔐 Authentication required\n")
+			fmt.Printf("   Visit: %s\n", verificationURI)
+			fmt.Printf("   Enter code: %s\n", userCode)
+			fmt.Println("   Waiting for authorization...")
+		})
 		if err != nil {
-			log.Default().Println("Error getting model type for", cmd.GetNamespace(), cmd.GetResource(), cmd.GetVerb(), ":", err)
-			return f
+			log.Fatal("Authentication failed:", err)
 		}
-
-		f.Model = docs
+		fmt.Println("✅ Authentication successful!")
 	}
 
-	// * Rules
-	if cmd.ParamsRules != nil {
-		exported := make([]RuleExport, 0, len(cmd.ParamsRules))
-		for _, r := range cmd.ParamsRules {
-			exported = append(exported, RuleExport{
-				Consoles:    getConsoleNames(r.Consoles),
-				WhenHuman:   ConditionToString(r.When),
-				When:        ExportCondition(r.When),
-				Target:      r.Target,
-				Min:         r.Rule.Min,
-				Max:         r.Rule.Max,
-				Enum:        r.Rule.Enum,
-				Pattern:     r.Rule.Pattern,
-				Description: r.Rule.Description,
-				Unit:        r.Rule.Unit,
+	ctx := context.Background()
+
+	var code int
+	fmt.Sscanf(inputArg, "%d", &code)
+	resourceInfo, err := client.GetResourceByCode(ctx, code)
+	if err != nil {
+		log.Fatalf("❌ Error resolving code %03d: %v", code, err)
+	}
+	fmt.Printf("✅ Code %03d resolved to: %s/%s on branch %s\n", code, resourceInfo.NamespaceName, resourceInfo.ResourceName, resourceInfo.Branch)
+	namespaceName := resourceInfo.NamespaceName
+	resourceName := resourceInfo.ResourceName
+	branch = resourceInfo.Branch
+
+	// // Allocate a unique code for this namespace/resource/branch combination
+	// code, err = client.AllocateCode(ctx, namespaceID, resourceName, branch)
+	// if err != nil {
+	// 	log.Fatal("❌ Error allocating code:", err)
+	// }
+
+	// if code != nil {
+	// 	fmt.Printf("✅ Code alloué : %03d pour %s/%s\n", *code, resourceName, branch)
+	// } else {
+	// 	fmt.Println("✅ Aucun code alloué (branche main)")
+	// }
+
+	x := reg.GetCommandsByFilter(func(cmd commands.Command) bool {
+		if namespaceName == resourceName {
+			return cmd.GetNamespace() == namespaceName && cmd.GetResource() == "" && cmd.GetVerb() != ""
+		}
+
+		return cmd.GetNamespace() == namespaceName && cmd.GetResource() == resourceName && cmd.GetVerb() != ""
+	})
+
+	if len(x) == 0 {
+		log.Fatalf("No commands found for namespace '%s' and resource '%s'", namespaceName, resourceName)
+	}
+
+	// Define the SDK configuration with required resource identifiers
+	config := &models.SDKConfig{
+		ResourceID:  resourceInfo.ResourceID,
+		NamespaceID: resourceInfo.NamespaceID,
+		Branch:      branch,
+		Language:    models.LanguageGo,
+		PackageName: "cloudavenue",
+	}
+
+	for _, cmd := range x {
+		config.Commands = append(config.Commands, models.SDKCommandMapping{
+			Verb:          cmd.GetVerb(),
+			SDKMethodName: cmd.AutoGenerateCustomFuncName,
+			Params:        convertParams(cmd.ParamsSpecs),
+			Response:      convertModel(cmd.ModelType),
+		})
+	}
+
+	resp, err := client.Upload(ctx, config)
+	if err != nil {
+		log.Fatal("Error uploading SDK config:", err)
+	}
+
+	// Display results including code
+	fmt.Println("\n✅ SDK upload réussi !")
+	fmt.Printf("   Resource : %s\n", resp.Resource.Name)
+	fmt.Printf("   Branch   : %s\n", resp.Resource.Branch)
+	if resp.Resource.Code != nil {
+		fmt.Printf("   Code     : %03d\n", *resp.Resource.Code)
+	}
+}
+
+func convertParams(params pspecs.Params) []models.SDKAttribute {
+	if params == nil {
+		return nil
+	}
+
+	return convertParamsSpecs(params)
+}
+
+func convertParamsSpecs(paramsSpecs pspecs.Params) []models.SDKAttribute {
+	if paramsSpecs == nil {
+		return nil
+	}
+
+	var attrs []models.SDKAttribute
+
+	for _, p := range paramsSpecs {
+		attr := models.SDKAttribute{
+			Name:        p.GetName(),
+			Description: p.GetDescription(),
+			Type:        getTypeString(p.GetType().Type()),
+			Validations: make([]models.SDKValidation, 0),
+		}
+
+		// Handle nested structs, slices, and maps
+		if nested, ok := p.(pspecs.ParamSpecNested); ok {
+			children := convertParamsSpecs(nested.GetItemsSpec())
+			if len(children) > 0 {
+				attr.Children = children
+			}
+		}
+
+		// Special case required
+		if p.IsRequired() {
+			attr.Validations = append(attr.Validations, models.SDKValidation{
+				Type: models.ValidationRequired,
 			})
 		}
 
-		if len(exported) > 0 {
-			f.Rules = exported
+		// Add validations
+		for _, v := range p.GetValidators() {
+			switch v.(type) {
+			default:
+				attr.Validations = append(attr.Validations, models.SDKValidation{
+					Type:    models.ValidationCustom,
+					Message: v.GetMarkdownDescription(),
+					Value:   v.GetKey(),
+				})
+			}
+		}
+
+		attrs = append(attrs, attr)
+	}
+
+	return attrs
+}
+
+func convertModel(modelType any) []models.SDKAttribute {
+	if modelType == nil {
+		return nil
+	}
+
+	t := reflect.TypeOf(modelType)
+	// Dereference pointer
+	for t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+
+	if t.Kind() != reflect.Struct {
+		return nil
+	}
+
+	return walkStruct(t)
+}
+
+func walkStruct(t reflect.Type) []models.SDKAttribute {
+	var attrs []models.SDKAttribute
+
+	// Dereference pointer
+	for t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+
+		// Skip unexported fields
+		if field.PkgPath != "" {
+			continue
+		}
+
+		// Get json tag or fallback to field name
+		fieldName := field.Tag.Get("json")
+		if fieldName == "" {
+			fieldName = field.Name
+		} else {
+			// Remove omitempty or other tag options
+			if idx := strings.Index(fieldName, ","); idx != -1 {
+				fieldName = fieldName[:idx]
+			}
+		}
+
+		// Skip fields with json:"-"
+		if fieldName == "-" {
+			continue
+		}
+
+		// Handle anonymous (embedded) fields - merge their fields into parent
+		if field.Anonymous {
+			embeddedAttrs := walkType(field.Type)
+			attrs = append(attrs, embeddedAttrs...)
+			continue
+		}
+
+		// Get documentation from tag
+		description := field.Tag.Get("documentation")
+
+		attr := models.SDKAttribute{
+			Name:        fieldName,
+			Description: description,
+			Type:        getTypeString(field.Type),
+			Validations: make([]models.SDKValidation, 0),
+		}
+
+		// Handle nested structs, slices, and maps
+		children := walkType(field.Type)
+		if len(children) > 0 {
+			attr.Children = children
+		}
+
+		attrs = append(attrs, attr)
+	}
+
+	return attrs
+}
+
+func walkType(t reflect.Type) []models.SDKAttribute {
+	// Dereference pointer
+	for t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+
+	switch t.Kind() {
+	case reflect.Struct:
+		return walkStruct(t)
+	case reflect.Slice, reflect.Array:
+		elemType := t.Elem()
+		for elemType.Kind() == reflect.Ptr {
+			elemType = elemType.Elem()
+		}
+		if elemType.Kind() == reflect.Struct {
+			return walkStruct(elemType)
+		}
+	case reflect.Map:
+		elemType := t.Elem()
+		for elemType.Kind() == reflect.Ptr {
+			elemType = elemType.Elem()
+		}
+		if elemType.Kind() == reflect.Struct {
+			return walkStruct(elemType)
 		}
 	}
 
-	return f
+	return nil
+}
+
+func getTypeString(t reflect.Type) string {
+	// Dereference pointer
+	for t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+
+	switch t.Kind() {
+	case reflect.String:
+		return "string"
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return "int"
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return "int"
+	case reflect.Float32, reflect.Float64:
+		return "float"
+	case reflect.Bool:
+		return "bool"
+	case reflect.Slice, reflect.Array:
+		return "array"
+	case reflect.Map:
+		return "object"
+	case reflect.Struct:
+		return "object"
+	default:
+		return t.String()
+	}
 }

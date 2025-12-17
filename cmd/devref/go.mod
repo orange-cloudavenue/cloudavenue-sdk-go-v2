@@ -1,23 +1,27 @@
-module github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cmd/devref
+module github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cmd/devref/v2
 
-go 1.24.5
+go 1.25.4
 
 replace (
-	github.com/orange-cloudavenue/cloudavenue-sdk-go-v2 => ../..
-	github.com/orange-cloudavenue/common-go => ../../../common-go
-	github.com/orange-cloudavenue/common-go/print => ../../../common-go/print
-	github.com/orange-cloudavenue/common-go/validators => ../../../common-go/validators
+	github.com/orange-cloudavenue/cloudavenue-sdk-go-v2 => ../../../cloudavenue-sdk-go-v2
+	github.com/orange-cloudavenue/devflow-sdk-go => ../../../devflow-sdk-go
 )
 
-require github.com/orange-cloudavenue/cloudavenue-sdk-go-v2 v0.0.0-00010101000000-000000000000
+require (
+	github.com/orange-cloudavenue/cloudavenue-sdk-go-v2 v0.0.0-20251211151114-5f28881007c5
+	github.com/orange-cloudavenue/devflow-sdk-go v0.0.0-20251217143245-5c33ec0d853e
+)
 
 require (
+	al.essio.dev/pkg/shellescape v1.5.1 // indirect
 	github.com/brianvoe/gofakeit/v7 v7.3.0 // indirect
 	github.com/creasty/defaults v1.8.0 // indirect
+	github.com/danieljoos/wincred v1.2.2 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.27.0 // indirect
+	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
@@ -31,6 +35,7 @@ require (
 	github.com/orange-cloudavenue/common-go/utils v1.0.0 // indirect
 	github.com/orange-cloudavenue/common-go/validators v1.2.0 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
+	github.com/zalando/go-keyring v0.2.6 // indirect
 	golang.org/x/crypto v0.40.0 // indirect
 	golang.org/x/net v0.42.0 // indirect
 	golang.org/x/sync v0.17.0 // indirect
