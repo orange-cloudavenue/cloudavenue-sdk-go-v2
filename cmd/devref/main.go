@@ -8,10 +8,12 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/pspecs"
+	"github.com/orange-cloudavenue/common-go/strcase"
 	"github.com/orange-cloudavenue/devflow-sdk-go/models"
 	"github.com/orange-cloudavenue/devflow-sdk-go/sdk"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands/pspecs"
 
 	// Force import of all commands to register them
 	_ "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/draas/v1"
@@ -25,6 +27,8 @@ import (
 var reg = commands.NewRegistry()
 
 func main() {
+	ctx := context.Background()
+
 	// Get configuration from environment
 	baseURL := os.Getenv("DEVFLOW_API_URL")
 	if baseURL == "" {
@@ -53,9 +57,9 @@ func main() {
 	}
 
 	// Authenticate if not already authenticated
-	if !client.IsAuthenticated() {
+	if connected, _ := client.EnsureAuthenticated(ctx); !connected {
 		fmt.Println("No authentication token found. Starting device flow...")
-		err := client.Authenticate(context.Background(), "devref-v2", func(userCode, verificationURI string) {
+		err := client.Authenticate(ctx, "devref-v2", func(userCode, verificationURI string) {
 			fmt.Printf("\n🔐 Authentication required\n")
 			fmt.Printf("   Visit: %s\n", verificationURI)
 			fmt.Printf("   Enter code: %s\n", userCode)
@@ -65,9 +69,8 @@ func main() {
 			log.Fatal("Authentication failed:", err)
 		}
 		fmt.Println("✅ Authentication successful!")
-	}
+	} 
 
-	ctx := context.Background()
 
 	var code int
 	fmt.Sscanf(inputArg, "%d", &code)
@@ -79,18 +82,6 @@ func main() {
 	namespaceName := resourceInfo.NamespaceName
 	resourceName := resourceInfo.ResourceName
 	branch = resourceInfo.Branch
-
-	// // Allocate a unique code for this namespace/resource/branch combination
-	// code, err = client.AllocateCode(ctx, namespaceID, resourceName, branch)
-	// if err != nil {
-	// 	log.Fatal("❌ Error allocating code:", err)
-	// }
-
-	// if code != nil {
-	// 	fmt.Printf("✅ Code alloué : %03d pour %s/%s\n", *code, resourceName, branch)
-	// } else {
-	// 	fmt.Println("✅ Aucun code alloué (branche main)")
-	// }
 
 	x := reg.GetCommandsByFilter(func(cmd commands.Command) bool {
 		if namespaceName == resourceName {
@@ -229,7 +220,7 @@ func walkStruct(t reflect.Type) []models.SDKAttribute {
 		// Get json tag or fallback to field name
 		fieldName := field.Tag.Get("json")
 		if fieldName == "" {
-			fieldName = field.Name
+			fieldName = strcase.ToSnake(field.Name)
 		} else {
 			// Remove omitempty or other tag options
 			if idx := strings.Index(fieldName, ","); idx != -1 {
