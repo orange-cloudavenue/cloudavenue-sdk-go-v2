@@ -8,8 +8,9 @@
         "ui.semanticTokens": true,
         "formatting.local": "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2",
     },
-    "go.lintTool": "golangci-lint-v2",
+    "go.lintTool": "golangci-lint",
     "go.lintFlags": [
+        "--fast",
         "--fix"
     ],
     "go.lintOnSave": "package",
