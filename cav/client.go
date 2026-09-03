@@ -216,7 +216,21 @@ func (c *client) DoWithBackend(ctx context.Context, backend BackendTarget, endpo
 		}
 	}
 
-	return req.SetResult(endpoint.ResponseType).Execute(endpoint.Method.String(), endpoint.PathTemplate)
+	resp, err := req.SetResult(endpoint.ResponseType).Execute(endpoint.Method.String(), endpoint.PathTemplate)
+	if err != nil {
+		return nil, err
+	}
+
+	sc, err := c.identifyClient(ctx, backend)
+	if err != nil {
+		return nil, err
+	}
+
+	if errAPI := sc.parseAPIError(endpoint.Description, resp); errAPI != nil {
+		return nil, errAPI
+	}
+
+	return resp, nil
 }
 
 // Do executes endpoint request.
