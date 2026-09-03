@@ -10,21 +10,20 @@
 package cav
 
 import (
-	"context"
 	"errors"
 	"log/slog"
+	"sync"
 
+	"github.com/orange-cloudavenue/common-go/validators"
 	"resty.dev/v3"
 
-	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/httpClient"
+	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/http-client"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
-	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 var _ auth = (*cloudavenueCredential)(nil)
 
-// cloudavenueCredential implements the auth interface
-// for Cloudavenue authentication using a username and password.
+// cloudavenueCredential implements auth for username/password login.
 type cloudavenueCredential struct {
 	logger         *slog.Logger
 	httpC          *resty.Client
@@ -35,9 +34,10 @@ type cloudavenueCredential struct {
 	organizationID string
 	siteID         string
 	console        consoles.ConsoleName
+	mu             sync.RWMutex
 }
 
-// cloudavenueCredentialXVmwareAccessToken is the header used to retrieve the Bearer token in the authentication process.
+// cloudavenueCredentialXVmwareAccessToken carries VMware access token.
 const cloudavenueCredentialXVmwareAccessToken = "X-VMWARE-VCLOUD-ACCESS-TOKEN" // #nosec G101
 
 func newCloudavenueCredential(c consoles.ConsoleName, organization, username, password string) (auth, error) {
@@ -49,7 +49,6 @@ func newCloudavenueCredential(c consoles.ConsoleName, organization, username, pa
 		password:     password,
 	}
 
-	// Validator struct doesn't work because the struct is not exported.
 	if err := validators.New().Var(cc.username, "required"); err != nil {
 		cc.logger.Error("Failed to validate username", "error", err)
 		return nil, err
@@ -70,108 +69,24 @@ func newCloudavenueCredential(c consoles.ConsoleName, organization, username, pa
 		return nil, errors.New("invalid organization name")
 	}
 
-	// Set the logger with the organization name for better context in logs.
 	cc.logger = cc.logger.With("organization", cc.organization)
 	cc.httpC = httpclient.NewHTTPClient().SetBaseURL(c.GetAPIVCDEndpoint())
 
 	return cc, nil
 }
 
-// Headers returns the HTTP headers required for authentication
-// using the CloudavenueCredential.
+// Headers returns authorization headers for authenticated requests.
 func (c *cloudavenueCredential) Headers() map[string]string {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 	headers := make(map[string]string)
 	headers["Authorization"] = "Bearer " + c.bearer
 	return headers
 }
 
-// Refresh is a placeholder method for refreshing the authentication token.
-func (c *cloudavenueCredential) Refresh(ctx context.Context) error {
-	logger := c.logger.WithGroup("refresh")
-	ep, err := GetEndpoint("SessionVmware")
-	if err != nil {
-		logger.ErrorContext(ctx, "Failed to get endpoint for CreateSessionVmware", "error", err)
-		return errors.New("failed to get endpoint for CreateSessionVmware: " + err.Error())
-	}
-
-	opts := []EndpointRequestOption{}
-	if c.bearer != "" {
-		logger.DebugContext(ctx, "Using existing bearer token for authentication")
-		opts = append(opts, SetCustomRestyOption(func(r *resty.Request) {
-			r.SetAuthToken(c.bearer)
-		}))
-	} else {
-		logger.DebugContext(ctx, "Using username and password for authentication")
-		opts = append(opts, SetCustomRestyOption(func(r *resty.Request) {
-			r.SetBasicAuth(c.username+"@"+c.organization, c.password)
-		}))
-	}
-
-	opts = append(
-		opts,
-		SetCustomRestyOption(func(r *resty.Request) { r.SetError(&vmwareError{}) }),
-		SetCustomRestyOption(func(r *resty.Request) { r.SetURL(c.console.GetAPIVCDEndpoint()) }),
-	)
-
-	resp, err := ep.requestInternalFunc(ctx, c.httpC, ep, opts...)
-	if err != nil {
-		logger.ErrorContext(ctx, "Failed to refresh session", "error", err)
-		return err
-	}
-
-	if err := (&vmware{}).parseAPIError("SessionVmware", resp); err != nil {
-		c.bearer = ""
-		logger.ErrorContext(ctx, "Failed to refresh session", "error", err)
-		return err
-	}
-
-	logger.DebugContext(ctx, "Successfully refreshed session",
-		"endpoint", ep.PathTemplate,
-		"method", ep.Method,
-		"status", resp.StatusCode(),
-	)
-	c.bearer = resp.Header().Get(cloudavenueCredentialXVmwareAccessToken)
-
-	session := resp.Result().(*apiResponseSessionVmware)
-	c.organizationID = session.Org.ID
-	c.siteID = session.Site.ID
-
-	return nil
-}
-
-// IsInitialized checks if the CloudavenueCredential is initialized.
+// IsInitialized reports whether bearer token is available.
 func (c *cloudavenueCredential) IsInitialized() bool {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 	return c.bearer != ""
-}
-
-// getSession retrieves the current session information.
-func (c *cloudavenueCredential) getSession() map[string]string {
-	return map[string]string{
-		"organization":   c.organization,
-		"organizationID": c.organizationID,
-		"siteID":         c.siteID,
-		"bearer":         c.bearer,
-	}
-}
-
-// restoreSession restores session-related data from a secure cache.
-func (c *cloudavenueCredential) restoreSession(data map[string]string) error {
-	if data == nil {
-		return errors.New("invalid session data")
-	}
-
-	xlogger.Debug("Restoring session from cache", "data", data)
-
-	c.organization = data["organization"]
-	c.bearer = data["bearer"]
-	c.organizationID = data["organizationID"]
-	c.siteID = data["siteID"]
-	return nil
-}
-
-func (c *cloudavenueCredential) getExtraData() map[string]string {
-	return map[string]string{
-		"organizationID": c.organizationID,
-		"siteID":         c.siteID,
-	}
 }

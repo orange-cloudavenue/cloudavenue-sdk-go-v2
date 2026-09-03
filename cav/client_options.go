@@ -14,52 +14,24 @@ import (
 	"errors"
 	"log/slog"
 
-	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/httpClient"
+	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/http-client"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/xlog"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )
 
-// settings hold the values of all client options.
+// settings stores client option values during construction.
 type settings struct {
-	// Organization is the name of the organization to which the client belongs.
-	Organization string
-	// Console contains all properties related to the console of the client.
-	Console consoles.ConsoleName
-	// SubClients contains the sub-clients for the client.
-	SubClients map[subClientName]subClientInterface
-	// CachePassphrase is the passphrase used for caching.
+	Organization    string
+	Console         consoles.ConsoleName
+	SubClients      map[subClientName]subClientInterface
 	CachePassphrase string
-	// CachePath is the path to the cache file.
-	CachePath string
+	CachePath       string
 }
 
-func newSettings(organization string) *settings {
-	return &settings{
-		Organization: organization,
-		SubClients:   make(map[subClientName]subClientInterface),
-	}
-}
-
-// ClientOption  is a function which applies options to a settings object.
+// ClientOption applies configuration to settings.
 type ClientOption func(*settings) error
 
-// * Internal options
-
-// withConsole sets the console for the client.
-func withConsole() ClientOption {
-	return func(s *settings) error {
-		c, ok := consoles.FindByOrganizationName(s.Organization)
-		if !ok {
-			return errors.New("console not found")
-		}
-		s.Console = c
-		return nil
-	}
-}
-
-// * Exporter options
-
-// WithCustomEndpoints sets custom endpoints for the sub-clients.
+// WithCustomEndpoints overrides service endpoints on detected console.
 func WithCustomEndpoints(endpoints consoles.Services) ClientOption {
 	return func(s *settings) error {
 		logger := xlogger.WithGroup("client").WithGroup("options").WithGroup("WithCustomEndpoints")
@@ -69,13 +41,11 @@ func WithCustomEndpoints(endpoints consoles.Services) ClientOption {
 	}
 }
 
-// WithCloudAvenueCredential sets the credential for the client.
+// WithCloudAvenueCredential configures shared CloudAvenue credentials.
 func WithCloudAvenueCredential(username, password string) ClientOption {
 	return func(s *settings) error {
 		logger := xlogger.WithGroup("client").WithGroup("options").WithGroup("WithCloudAvenueCredential")
 
-		// Auth client is created before the loop to avoid creating it multiple times.
-		// auth cloudavenue is shared between sub-clients vmware and cerberus.
 		cred, err := newCloudavenueCredential(s.Console, s.Organization, username, password)
 		if err != nil {
 			logger.Error("Failed to create Cloudavenue credential", "error", err)
@@ -95,7 +65,7 @@ func WithCloudAvenueCredential(username, password string) ClientOption {
 	}
 }
 
-// WithLogger sets the logger for the client.
+// WithLogger sets package and client logger.
 func WithLogger(customLogger *slog.Logger) ClientOption {
 	return func(_ *settings) error {
 		xlog.SetGlobalLogger(customLogger)
@@ -107,11 +77,29 @@ func WithLogger(customLogger *slog.Logger) ClientOption {
 	}
 }
 
-// WithCache store the tokens in a cache
+// WithCache enables session cache persistence.
 func WithCache(passphrase, path string) ClientOption {
 	return func(s *settings) error {
 		s.CachePassphrase = passphrase
 		s.CachePath = path
+		return nil
+	}
+}
+
+func newSettings(organization string) *settings {
+	return &settings{
+		Organization: organization,
+		SubClients:   make(map[subClientName]subClientInterface),
+	}
+}
+
+func withConsole() ClientOption {
+	return func(s *settings) error {
+		c, ok := consoles.FindByOrganizationName(s.Organization)
+		if !ok {
+			return errors.New("console not found")
+		}
+		s.Console = c
 		return nil
 	}
 }

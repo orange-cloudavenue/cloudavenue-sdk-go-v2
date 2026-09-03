@@ -7,14 +7,5 @@
  * or see the "LICENSE" file for more details.
  */
 
-package cav
-
-type (
-	// requestOption stores request-scoped configuration.
-	requestOption struct{}
-
-	// RequestOption configures request construction.
-	//
-	// It is kept for API compatibility and is currently unused by the runtime.
-	RequestOption func(*requestOption) error
-)
+// Package mock provides mock CloudAvenue clients and servers for tests.
+package mock

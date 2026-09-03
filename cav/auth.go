@@ -13,25 +13,23 @@ import (
 	"context"
 )
 
-// Auth implements methods required for authentication.
+// auth defines credential lifecycle required by subclients.
 type auth interface {
-	// Headers returns headers that must be included in the http request.
+	// Headers returns headers required for authenticated requests.
 	Headers() map[string]string
 
-	// Refresh refreshes the authentication token.
+	// Refresh refreshes credential state.
 	Refresh(context.Context) error
 
-	// IsInitialized checks if the authentication is initialized.
+	// IsInitialized reports whether credentials are ready for use.
 	IsInitialized() bool
 
-	// Get session is used to retrieve the current session information.
-	// Usually, this would include details like the organization Name and token
-	// It will be used for storing session-related data in a secure cache.
+	// getSession returns session data suitable for secure cache storage.
 	getSession() map[string]string
 
-	// Restore session-related data from a secure cache.
+	// restoreSession reloads session data from secure cache.
 	restoreSession(data map[string]string) error
 
-	// getExtraData returns any additional data that should be included in the session.
+	// getExtraData returns backend metadata derived from session state.
 	getExtraData() map[string]string
 }

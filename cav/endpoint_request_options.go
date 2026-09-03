@@ -12,10 +12,10 @@ package cav
 import (
 	"reflect"
 
+	"github.com/orange-cloudavenue/common-go/validators"
 	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
-	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 type (
@@ -107,12 +107,12 @@ func SetBody(body any) EndpointRequestOption {
 		// Reflect BodyRequestType and body to ensure they match
 		if endpoint.BodyRequestType != nil {
 			reflectBodyType := reflect.TypeOf(endpoint.BodyRequestType)
-			if reflectBodyType.Kind() == reflect.Ptr {
+			if reflectBodyType.Kind() == reflect.Pointer {
 				reflectBodyType = reflectBodyType.Elem()
 			}
 
 			reflectBody := reflect.TypeOf(body)
-			if reflectBody.Kind() == reflect.Ptr {
+			if reflectBody.Kind() == reflect.Pointer {
 				reflectBody = reflectBody.Elem()
 			}
 			if reflectBody != reflectBodyType {
