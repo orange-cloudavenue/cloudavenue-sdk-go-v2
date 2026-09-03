@@ -10,8 +10,9 @@
 package itypes
 
 import (
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 	"github.com/orange-cloudavenue/common-go/urn"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
 type (
@@ -21,7 +22,7 @@ type (
 	ApiResponseT0 struct {
 		Type       string                  `json:"type" fake:"tier-0-vrf"`
 		Name       string                  `json:"name" fake:"{resource_name:t0}"`
-		Properties ApiResponseT0Properties `json:"properties,omitempty"`
+		Properties ApiResponseT0Properties `json:"properties"`
 		Children   []ApiResponseT0Children `json:"children,omitempty" fakesize:"1"`
 	}
 
@@ -35,7 +36,7 @@ type (
 		Properties struct {
 			RateLimit int    `json:"rateLimit,omitempty" fake:"5"`
 			EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"` // The UUID of the edge gateway
-		} `json:"properties,omitempty"`
+		} `json:"properties"`
 	}
 )
 

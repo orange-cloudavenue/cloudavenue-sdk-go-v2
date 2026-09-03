@@ -22,9 +22,9 @@ func init() {
 		Name:             "CreatePublicIp",
 		Description:      "Create a new public IP",
 		Method:           cav.MethodPOST,
-		SubClient:        cav.ClientCerberus,
+		Backend:          cav.BackendInfrapi,
 		PathTemplate:     "/api/customers/v2.0/services",
-		BodyResponseType: cav.Job{},
+		ResponseType:     cav.CerberusJobCreatedAPIResponse{},
 		BodyRequestType:  itypes.ApiRequestEdgegatewayPublicIP{},
 	}.Register()
 }

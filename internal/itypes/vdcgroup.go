@@ -97,3 +97,34 @@ func (r *ApiResponseVdcGroupParticipatingVdc) ToModel() types.ModelGetVdcGroupVd
 		Name: r.Vdc.Name,
 	}
 }
+
+func (r *ApiRequestCreateVdcGroup) ToModel() types.ModelGetVdcGroup {
+	model := types.ModelGetVdcGroup{
+		Name:        r.Name,
+		Description: r.Description,
+	}
+
+	for _, vdc := range r.Vdcs {
+		model.Vdcs = append(model.Vdcs, vdc.ToModel())
+	}
+
+	model.NumberOfVdcs = len(model.Vdcs)
+
+	return model
+}
+
+func (r *ApiRequestUpdateVdcGroup) ToModel() types.ModelGetVdcGroup {
+	model := types.ModelGetVdcGroup{
+		ID:          r.Id,
+		Name:        r.Name,
+		Description: r.Description,
+	}
+
+	for _, vdc := range r.Vdcs {
+		model.Vdcs = append(model.Vdcs, vdc.ToModel())
+	}
+
+	model.NumberOfVdcs = len(model.Vdcs)
+
+	return model
+}

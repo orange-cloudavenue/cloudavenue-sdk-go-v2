@@ -19,7 +19,7 @@ type (
 
 	ApiResponseListVDCRecord struct {
 		HREF                    string `json:"href" fake:"{href_uuid}"`
-		ID                      string `json:"id"`
+		ID                      string `json:"id" fake:"{urn:vdc}"`
 		Name                    string `json:"name" fake:"mockvdc-{word}"`
 		Description             string `json:"description" fake:"{sentence}"`
 		NumberOfVMS             int    `json:"numberOfVms" fake:"{number:0,10}"`
