@@ -14,7 +14,7 @@ import (
 )
 
 type (
-	// ApiResponseGetOrg from infraAPI
+	// ApiResponseGetOrg is infrapi organization response.
 	ApiResponseGetOrg struct {
 		Name                string `json:"name" fake:"{resource_name:organization}"`
 		FullName            string `json:"fullName" fake:"{company}"`
@@ -25,7 +25,7 @@ type (
 		InternetBillingMode string `json:"internetBillingMode" fake:"PAYG"`
 	}
 
-	// Organization represents an organization entity from Vmware Cloud Director.
+	// ApiResponseGetOrgs is VMware Cloud Director organization list response.
 	ApiResponseGetOrgs struct {
 		Organizations []ApiResponseGetOrgDetails `json:"values" fakesize:"1"`
 	}
@@ -53,7 +53,7 @@ type (
 	}
 )
 
-// From infraAPI
+// ToModel converts infrapi organization response.
 func (r *ApiResponseGetOrg) ToModel() *types.ModelGetOrganization {
 	return &types.ModelGetOrganization{
 		Name:                r.Name,
@@ -64,7 +64,7 @@ func (r *ApiResponseGetOrg) ToModel() *types.ModelGetOrganization {
 	}
 }
 
-// From Vmware Cloud Director
+// ToModel converts VMware Cloud Director organization response.
 func (r *ApiResponseGetOrgs) ToModel() *types.ModelGetOrganization {
 	if len(r.Organizations) == 0 {
 		return nil

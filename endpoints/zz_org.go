@@ -15,7 +15,7 @@ import (
 
 // GetOrganizationDetails - Get organizations details from VMware Cloud Director
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/orgs/get/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgs/get/
 func GetOrganizationDetails() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetOrganizationDetails")
 }
