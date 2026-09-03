@@ -82,5 +82,5 @@ Orange CloudAvenue
 ## Documentation & Contribution
 
 - [Contribution Guide](./CONTRIBUTING.md)
-- [Coding Guidelines](./GUIDELINE.md)
+- [Coding Guidelines](./GUIDELINES.md)
 - [Project Architecture](./ARCHITECTURE.md)
