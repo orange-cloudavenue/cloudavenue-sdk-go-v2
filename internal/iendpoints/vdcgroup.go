@@ -10,18 +10,15 @@
 package iendpoints
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"slices"
 	"strings"
-	"time"
+
+	"github.com/orange-cloudavenue/common-go/validators"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
-	"github.com/orange-cloudavenue/common-go/generator"
-	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 //go:generate endpoint-generator -path vdcgroup.go -output vdcgroup
@@ -33,7 +30,7 @@ func init() {
 		Name:             "ListVdcGroup",
 		Description:      "List Vdc Groups",
 		Method:           cav.MethodGET,
-		SubClient:        cav.ClientVmware,
+		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/vdcGroups",
 		QueryParams: []cav.QueryParam{
 			{
@@ -63,53 +60,7 @@ func init() {
 				Value:       "100",
 			},
 		},
-		BodyResponseType: itypes.ApiResponseListVdcGroup{},
-		MockResponseFunc: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			resp := itypes.ApiResponseListVdcGroup{
-				Values: make([]itypes.ApiResponseListVdcGroupDetails, 0),
-			}
-
-			// If QueryParam "filter" is set, return a filtered response
-			if r.URL.Query().Get("filter") != "" {
-				filter := r.URL.Query().Get("filter")
-				// Remove the parentheses around the filter value
-				filter = strings.Trim(filter, "()")
-
-				filterParts := strings.Split(filter, "==")
-
-				r := &itypes.ApiResponseListVdcGroupDetails{}
-				generator.MustStruct(r)
-
-				r.ID = func() string {
-					if filterParts[0] == "id" {
-						return filterParts[1]
-					}
-					return generator.MustGenerate("{urn:vdcGroup}")
-				}()
-				r.Name = func() string {
-					if filterParts[0] == "name" {
-						return fmt.Sprintf("mockvdcgroup-%s", filterParts[1])
-					}
-					return generator.MustGenerate("mockvdcgroup-{word}")
-				}()
-				resp.Values = append(resp.Values, *r)
-			} else {
-				generator.MustStruct(&resp)
-			}
-
-			// json encode
-			w.Header().Set("Content-Type", "application/json")
-			respJ, err := json.Marshal(resp)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			_, err = w.Write(respJ)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-		}),
+		ResponseType: itypes.ApiResponseListVdcGroup{},
 	}.Register()
 
 	// CreateVdcGroup
@@ -118,10 +69,10 @@ func init() {
 		Name:             "CreateVdcGroup",
 		Description:      "Create a Vdc Group",
 		Method:           cav.MethodPOST,
-		SubClient:        cav.ClientVmware,
+		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/vdcGroups",
 		BodyRequestType:  itypes.ApiRequestCreateVdcGroup{},
-		BodyResponseType: cav.Job{},
+		ResponseType:     cav.Job{},
 	}.Register()
 
 	// UpdateVdcGroup
@@ -130,7 +81,7 @@ func init() {
 		Name:             "UpdateVdcGroup",
 		Description:      "Update a Vdc Group",
 		Method:           cav.MethodPUT,
-		SubClient:        cav.ClientVmware,
+		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}",
 		PathParams: []cav.PathParam{
 			{
@@ -142,11 +93,8 @@ func init() {
 				},
 			},
 		},
-		BodyRequestType:  itypes.ApiRequestUpdateVdcGroup{},
-		BodyResponseType: cav.Job{},
-		JobOptions: &cav.JobOptions{
-			PollInterval: 500 * time.Millisecond,
-		},
+		BodyRequestType: itypes.ApiRequestUpdateVdcGroup{},
+		ResponseType:    cav.Job{},
 	}.Register()
 
 	// DeleteVdcGroup
@@ -155,7 +103,7 @@ func init() {
 		Name:             "DeleteVdcGroup",
 		Description:      "Delete a Vdc Group",
 		Method:           cav.MethodDELETE,
-		SubClient:        cav.ClientVmware,
+		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}",
 		PathParams: []cav.PathParam{
 			{
@@ -174,9 +122,6 @@ func init() {
 				Required:    false,
 			},
 		},
-		BodyResponseType: cav.Job{},
-		JobOptions: &cav.JobOptions{
-			PollInterval: 500 * time.Millisecond,
-		},
+		ResponseType: cav.Job{},
 	}.Register()
 }

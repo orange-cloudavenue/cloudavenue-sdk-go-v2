@@ -22,7 +22,7 @@ func GetEdgeGateway() *cav.Endpoint {
 
 // QueryEdgeGateway - Query EdgeGateway
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/38.1/doc/types/QueryResultEdgeGatewayRecordType.html
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/types/QueryResultEdgeGatewayRecordType.html
 func QueryEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("QueryEdgeGateway")
 }
