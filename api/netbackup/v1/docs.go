@@ -7,8 +7,5 @@
  * or see the "LICENSE" file for more details.
  */
 
-package vdc
-
-import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
-
-var cmds = commands.NewRegistry()
+// Package netbackup provides CloudAvenue NetBackup API clients.
+package netbackup

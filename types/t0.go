@@ -18,7 +18,7 @@ type (
 		EdgegatewayName string
 	}
 
-	//* Model
+	// * Model
 
 	// ModelT0s represents the model for T0 routers.
 	ModelT0s struct {
