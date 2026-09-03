@@ -7,8 +7,5 @@
  * or see the "LICENSE" file for more details.
  */
 
-package edgegateway
-
-import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
-
-var cmds = commands.NewRegistry()
+// Package types defines public CloudAvenue SDK models and parameter types.
+package types

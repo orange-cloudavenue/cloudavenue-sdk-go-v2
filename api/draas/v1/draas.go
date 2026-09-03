@@ -7,8 +7,4 @@
  * or see the "LICENSE" file for more details.
  */
 
-package vdcgroup
-
-import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
-
-var cmds = commands.NewRegistry()
+package draas

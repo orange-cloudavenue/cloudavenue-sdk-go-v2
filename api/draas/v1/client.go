@@ -36,3 +36,5 @@ func New(c cav.Client) (*Client, error) {
 		logger: logger,
 	}, nil
 }
+
+//go:generate command-generator
