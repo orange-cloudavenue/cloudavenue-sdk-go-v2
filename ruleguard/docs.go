@@ -1,3 +1,6 @@
+//go:build ruleguard
+// +build ruleguard
+
 /*
  * SPDX-FileCopyrightText: Copyright (c) 2025 Orange
  * SPDX-License-Identifier: Mozilla Public License 2.0
@@ -7,6 +10,5 @@
  * or see the "LICENSE" file for more details.
  */
 
-package main
-
-// generator is command to generate commands/endpoints code from the definitions.
+// Package gorules defines ruleguard checks used by this repository.
+package gorules
