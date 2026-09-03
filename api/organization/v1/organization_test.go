@@ -47,21 +47,19 @@ func TestGetOrganization(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
 			// Mock from infraAPI
 			if tt.mockGetOrgResponse != nil || tt.mockGetOrgStatus != 0 {
-				// Clean all default mock responses
-				endpoints.GetOrganization().CleanMockResponse()
-				endpoints.GetOrganization().SetMockResponse(tt.mockGetOrgResponse, &tt.mockGetOrgStatus)
+				ms.CleanResponse(endpoints.GetOrganization())
+				ms.SetResponse(endpoints.GetOrganization(), tt.mockGetOrgResponse, &tt.mockGetOrgStatus)
 			}
 
 			// Mock from VMware Cloud Director
 			if tt.mockGetOrgsResponse != nil || tt.mockGetOrgsStatus != 0 {
-				// Clean all default mock responses
-				endpoints.GetOrganizationDetails().CleanMockResponse()
-				endpoints.GetOrganizationDetails().SetMockResponse(tt.mockGetOrgsResponse, &tt.mockGetOrgsStatus)
+				ms.CleanResponse(endpoints.GetOrganizationDetails())
+				ms.SetResponse(endpoints.GetOrganizationDetails(), tt.mockGetOrgsResponse, &tt.mockGetOrgsStatus)
 			}
-
-			client := newClient(t)
 
 			resp, err := client.GetOrganization(t.Context())
 			if tt.expectErr {
@@ -174,28 +172,25 @@ func TestUpdateOrganization(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
 			// Mock update
 			if tt.mockUpdateOrgResponse != nil || tt.mockUpdateOrgStatus != 0 {
-				// Clean all default mock responses
-				endpoints.UpdateOrganization().CleanMockResponse()
-				endpoints.UpdateOrganization().SetMockResponse(tt.mockUpdateOrgResponse, &tt.mockUpdateOrgStatus)
+				ms.CleanResponse(endpoints.UpdateOrganization())
+				ms.SetResponse(endpoints.UpdateOrganization(), tt.mockUpdateOrgResponse, &tt.mockUpdateOrgStatus)
 			}
 
 			// Mock get values from infraAPI
 			if tt.mockGetOrgResponse != nil || tt.mockGetOrgStatus != 0 {
-				// Clean all default mock responses
-				endpoints.GetOrganization().CleanMockResponse()
-				endpoints.GetOrganization().SetMockResponse(tt.mockGetOrgResponse, &tt.mockGetOrgStatus)
+				ms.CleanResponse(endpoints.GetOrganization())
+				ms.SetResponse(endpoints.GetOrganization(), tt.mockGetOrgResponse, &tt.mockGetOrgStatus)
 			}
 
 			// Mock get values from VMware Cloud Director
 			if tt.mockGetOrgsResponse != nil || tt.mockGetOrgsStatus != 0 {
-				// Clean all default mock responses
-				endpoints.GetOrganizationDetails().CleanMockResponse()
-				endpoints.GetOrganizationDetails().SetMockResponse(tt.mockGetOrgsResponse, &tt.mockGetOrgsStatus)
+				ms.CleanResponse(endpoints.GetOrganizationDetails())
+				ms.SetResponse(endpoints.GetOrganizationDetails(), tt.mockGetOrgsResponse, &tt.mockGetOrgsStatus)
 			}
-
-			client := newClient(t)
 
 			resp, err := client.UpdateOrganization(t.Context(), *tt.params)
 			if tt.expectErr {

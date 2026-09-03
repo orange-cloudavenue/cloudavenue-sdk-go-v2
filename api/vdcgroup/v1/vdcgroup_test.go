@@ -12,13 +12,12 @@ package vdcgroup
 import (
 	"testing"
 
+	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
-	"github.com/orange-cloudavenue/common-go/generator"
-	"github.com/orange-cloudavenue/common-go/utils"
 )
 
 func TestListVdcGroup(t *testing.T) {
@@ -59,12 +58,12 @@ func TestListVdcGroup(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.mockResponseStatus != 0 {
-				endpoints.ListVdcGroup().CleanMockResponse()
-				endpoints.ListVdcGroup().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
-			}
+			client, ms := newClient(t)
 
-			client := newClient(t)
+			if tt.mockResponseStatus != 0 {
+				ms.CleanResponse(endpoints.ListVdcGroup())
+				ms.SetResponse(endpoints.ListVdcGroup(), tt.mockResponse, &tt.mockResponseStatus)
+			}
 
 			resp, err := client.ListVdcGroup(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -131,12 +130,20 @@ func TestGetVdcGroup(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.mockResponseStatus != 0 {
-				endpoints.ListVdcGroup().CleanMockResponse()
-				endpoints.ListVdcGroup().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
-			}
+			client, ms := newClient(t)
 
-			client := newClient(t)
+			if tt.name == "Get Vdc Group by ID" {
+				ms.CleanResponse(endpoints.ListVdcGroup())
+				ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
+					Values: []itypes.ApiResponseListVdcGroupDetails{{
+						ID:   tt.params.ID,
+						Name: generator.MustGenerate("{word}"),
+					}},
+				}, nil)
+			} else if tt.mockResponseStatus != 0 {
+				ms.CleanResponse(endpoints.ListVdcGroup())
+				ms.SetResponse(endpoints.ListVdcGroup(), tt.mockResponse, &tt.mockResponseStatus)
+			}
 
 			resp, err := client.GetVdcGroup(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -199,7 +206,13 @@ func TestCreateVdcGroup(t *testing.T) {
 				Values: []itypes.ApiResponseListVdcGroupDetails{},
 			},
 			mockListVdcGroupResponseStatus: 200,
-			expectedErr:                    false,
+			mockListVdcResponse: &itypes.ApiResponseListVDC{Records: []itypes.ApiResponseListVDCRecord{{
+				HREF: "https://example.invalid/api/vdc/23d9d9a0-0efb-4591-9869-3dd33aa2247c",
+				ID:   "urn:vdc:23d9d9a0-0efb-4591-9869-3dd33aa2247c",
+				Name: "resolve-me",
+			}}},
+			mockListVdcResponseStatus: 200,
+			expectedErr:               false,
 		},
 		{
 			name: "Error List VDCGroup",
@@ -244,7 +257,11 @@ func TestCreateVdcGroup(t *testing.T) {
 					},
 				},
 			},
-			expectedErr: true,
+			mockListVdcGroupResponse: &itypes.ApiResponseListVdcGroup{Values: []itypes.ApiResponseListVdcGroupDetails{{
+				Name: "existing-vdc-group",
+			}}},
+			mockListVdcGroupResponseStatus: 200,
+			expectedErr:                    true,
 		},
 		{
 			name: "Error 400 Bad Request",
@@ -268,22 +285,44 @@ func TestCreateVdcGroup(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
 			if tt.mockResponseStatus != 0 {
-				endpoints.CreateVdcGroup().CleanMockResponse()
-				endpoints.CreateVdcGroup().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.CreateVdcGroup())
+				ms.SetResponse(endpoints.CreateVdcGroup(), tt.mockResponse, &tt.mockResponseStatus)
+			} else {
+				ms.CleanResponse(endpoints.CreateVdcGroup())
 			}
 
 			if tt.mockListVdcGroupResponseStatus != 0 {
-				endpoints.ListVdcGroup().CleanMockResponse()
-				endpoints.ListVdcGroup().SetMockResponse(tt.mockListVdcGroupResponse, &tt.mockListVdcGroupResponseStatus)
+				ms.CleanResponse(endpoints.ListVdcGroup())
+				ms.SetResponse(endpoints.ListVdcGroup(), tt.mockListVdcGroupResponse, &tt.mockListVdcGroupResponseStatus)
 			}
 
 			if tt.mockListVdcResponseStatus != 0 {
-				endpoints.ListVdc().CleanMockResponse()
-				endpoints.ListVdc().SetMockResponse(tt.mockListVdcResponse, &tt.mockListVdcResponseStatus)
+				ms.CleanResponse(endpoints.ListVdc())
+				ms.SetResponse(endpoints.ListVdc(), tt.mockListVdcResponse, &tt.mockListVdcResponseStatus)
+				ms.CleanResponse(endpoints.QueryEdgeGateway())
+				ms.SetResponse(endpoints.QueryEdgeGateway(), tt.mockListVdcResponse, &tt.mockListVdcResponseStatus)
 			}
 
-			client := newClient(t)
+			if tt.name == "Add VDC to VDC Group with VDCGroup and VDC by name" {
+				tt.params.Name = "current-vdc-group"
+				tt.params.Vdcs[0].Name = "resolve-me"
+			}
+
+			if tt.name == "Add VDC to VDC Group with VDCGroup and VDC by name" {
+				tt.params.Name = "current-vdc-group"
+				tt.params.Vdcs[0].Name = "resolve-me"
+			}
+
+			if tt.name == "Create Vdc Group without VDC ID" {
+				tt.params.Vdcs[0].Name = "resolve-me"
+			}
+
+			if tt.name == "VDCGroup already exists" {
+				tt.params.Name = "existing-vdc-group"
+			}
 
 			resp, err := client.CreateVdcGroup(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -292,6 +331,7 @@ func TestCreateVdcGroup(t *testing.T) {
 			}
 			assert.NoError(t, err, "Unexpected error: %v", err)
 			assert.NotNil(t, resp, "Response should not be nil")
+			assert.Equal(t, tt.params.Name, resp.Name)
 		})
 	}
 }
@@ -314,14 +354,20 @@ func TestDeleteVdcGroup(t *testing.T) {
 			params: types.ParamsDeleteVdcGroup{
 				ID: generator.MustGenerate("{urn:vdcGroup}"),
 			},
-			expectedErr: false,
+			mockListVdcGroupResponseStatus: 200,
+			expectedErr:                    false,
 		},
 		{
 			name: "Delete with VDC Group Name",
 			params: types.ParamsDeleteVdcGroup{
 				Name: generator.MustGenerate("{word}"),
 			},
-			expectedErr: false,
+			mockListVdcGroupResponse: &itypes.ApiResponseListVdcGroup{Values: []itypes.ApiResponseListVdcGroupDetails{{
+				ID:   generator.MustGenerate("{urn:vdcGroup}"),
+				Name: "delete-by-name",
+			}}},
+			mockListVdcGroupResponseStatus: 200,
+			expectedErr:                    false,
 		},
 		{
 			name: "Delete Vdc Group with Force",
@@ -329,7 +375,8 @@ func TestDeleteVdcGroup(t *testing.T) {
 				ID:    generator.MustGenerate("{urn:vdcGroup}"),
 				Force: true,
 			},
-			expectedErr: false,
+			mockListVdcGroupResponseStatus: 200,
+			expectedErr:                    false,
 		},
 		{
 			name: "Failed to retrieve Vdc Group",
@@ -343,17 +390,21 @@ func TestDeleteVdcGroup(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
 			if tt.mockResponseStatus != 0 {
-				endpoints.DeleteVdcGroup().CleanMockResponse()
-				endpoints.DeleteVdcGroup().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.DeleteVdcGroup())
+				ms.SetResponse(endpoints.DeleteVdcGroup(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			if tt.mockListVdcGroupResponseStatus != 0 {
-				endpoints.ListVdcGroup().CleanMockResponse()
-				endpoints.ListVdcGroup().SetMockResponse(tt.mockListVdcGroupResponse, &tt.mockListVdcGroupResponseStatus)
+				ms.CleanResponse(endpoints.ListVdcGroup())
+				ms.SetResponse(endpoints.ListVdcGroup(), tt.mockListVdcGroupResponse, &tt.mockListVdcGroupResponseStatus)
 			}
 
-			client := newClient(t)
+			if tt.name == "Delete with VDC Group Name" {
+				tt.params.Name = "delete-by-name"
+			}
 
 			err := client.DeleteVdcGroup(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -391,7 +442,8 @@ func TestAddVdcToVdcGroup(t *testing.T) {
 					},
 				},
 			},
-			expectedErr: false,
+			mockListVdcGroupResponseStatus: 200,
+			expectedErr:                    false,
 		},
 		{
 			name: "Add VDC to VDC Group with VDCGroup and VDC by name",
@@ -403,7 +455,14 @@ func TestAddVdcToVdcGroup(t *testing.T) {
 					},
 				},
 			},
-			expectedErr: false,
+			mockListVdcGroupResponseStatus: 200,
+			mockListVdcResponse: &itypes.ApiResponseListVDC{Records: []itypes.ApiResponseListVDCRecord{{
+				HREF: "https://example.invalid/api/vdc/495fe7f3-3051-4408-b483-c71ce7bc2d26",
+				ID:   "urn:vdc:495fe7f3-3051-4408-b483-c71ce7bc2d26",
+				Name: "resolve-me",
+			}}},
+			mockListVdcResponseStatus: 200,
+			expectedErr:               false,
 		},
 
 		{
@@ -465,22 +524,85 @@ func TestAddVdcToVdcGroup(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
+			if tt.name == "Add VDC to VDC Group" {
+				tt.mockListVdcGroupResponseStatus = 200
+				tt.mockListVdcGroupResponse = &itypes.ApiResponseListVdcGroup{Values: []itypes.ApiResponseListVdcGroupDetails{{
+					ID:          tt.params.ID,
+					Name:        "current-vdc-group",
+					Description: "current-description",
+					Vdcs: []itypes.ApiResponseVdcGroupParticipatingVdc{{
+						Vdc: itypes.ApiResponseVdcGroupParticipatingVdcRef{
+							ID:   generator.MustGenerate("{urn:vdc}"),
+							Name: "existing-vdc",
+						},
+					}},
+				}}}
+			}
+
+			if tt.name == "Add VDC to VDC Group with VDCGroup and VDC by name" {
+				tt.params.Name = "current-vdc-group"
+				tt.params.Vdcs[0].Name = "resolve-me"
+				tt.mockListVdcGroupResponseStatus = 200
+				tt.mockListVdcGroupResponse = &itypes.ApiResponseListVdcGroup{Values: []itypes.ApiResponseListVdcGroupDetails{{
+					ID:          generator.MustGenerate("{urn:vdcGroup}"),
+					Name:        "current-vdc-group",
+					Description: "current-description",
+				}}}
+				tt.mockListVdcResponseStatus = 200
+				tt.mockListVdcResponse = &itypes.ApiResponseListVDC{Records: []itypes.ApiResponseListVDCRecord{{
+					HREF: "https://example.invalid/api/vdc/495fe7f3-3051-4408-b483-c71ce7bc2d26",
+					ID:   "urn:vdc:495fe7f3-3051-4408-b483-c71ce7bc2d26",
+					Name: "resolve-me",
+				}}}
+			}
+
 			if tt.mockResponseStatus != 0 {
-				endpoints.UpdateVdcGroup().CleanMockResponse()
-				endpoints.UpdateVdcGroup().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.UpdateVdcGroup())
+				ms.SetResponse(endpoints.UpdateVdcGroup(), tt.mockResponse, &tt.mockResponseStatus)
+			} else {
+				ms.CleanResponse(endpoints.UpdateVdcGroup())
 			}
 
 			if tt.mockListVdcGroupResponseStatus != 0 {
-				endpoints.ListVdcGroup().CleanMockResponse()
-				endpoints.ListVdcGroup().SetMockResponse(tt.mockListVdcGroupResponse, &tt.mockListVdcGroupResponseStatus)
+				if tt.mockListVdcGroupResponse == nil && !tt.expectedErr {
+					vdcGroupName := "current-vdc-group"
+					if tt.params.Name != "" {
+						vdcGroupName = tt.params.Name
+					}
+					vdcGroupVdcs := []itypes.ApiResponseVdcGroupParticipatingVdc{{
+						Vdc: itypes.ApiResponseVdcGroupParticipatingVdcRef{
+							ID:   generator.MustGenerate("{urn:vdc}"),
+							Name: "existing-vdc",
+						},
+					}}
+					if tt.name == "Add VDC to VDC Group with VDCGroup and VDC by name" {
+						vdcGroupName = "current-vdc-group"
+						vdcGroupVdcs = nil
+					}
+					tt.mockListVdcGroupResponse = &itypes.ApiResponseListVdcGroup{Values: []itypes.ApiResponseListVdcGroupDetails{{
+						ID: func() string {
+							if tt.params.ID != "" {
+								return tt.params.ID
+							}
+							return generator.MustGenerate("{urn:vdcGroup}")
+						}(),
+						Name:        vdcGroupName,
+						Description: "current-description",
+						Vdcs:        vdcGroupVdcs,
+					}}}
+				}
+				ms.CleanResponse(endpoints.ListVdcGroup())
+				ms.SetResponse(endpoints.ListVdcGroup(), tt.mockListVdcGroupResponse, &tt.mockListVdcGroupResponseStatus)
 			}
 
 			if tt.mockListVdcResponseStatus != 0 {
-				endpoints.ListVdc().CleanMockResponse()
-				endpoints.ListVdc().SetMockResponse(tt.mockListVdcResponse, &tt.mockListVdcResponseStatus)
+				ms.CleanResponse(endpoints.ListVdc())
+				ms.SetResponse(endpoints.ListVdc(), tt.mockListVdcResponse, &tt.mockListVdcResponseStatus)
+				ms.CleanResponse(endpoints.QueryEdgeGateway())
+				ms.SetResponse(endpoints.QueryEdgeGateway(), tt.mockListVdcResponse, &tt.mockListVdcResponseStatus)
 			}
-
-			client := newClient(t)
 
 			err := client.AddVdcToVdcGroup(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -593,17 +715,77 @@ func TestRemoveVdcToVdcGroup(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
+			if tt.name == "Remove VDC from VDC Group" {
+				tt.mockListVdcGroupResponseStatus = 200
+				tt.mockListVdcGroupResponse = &itypes.ApiResponseListVdcGroup{Values: []itypes.ApiResponseListVdcGroupDetails{{
+					ID:          tt.params.ID,
+					Name:        "current-vdc-group",
+					Description: "current-description",
+					Vdcs: []itypes.ApiResponseVdcGroupParticipatingVdc{
+						{
+							Vdc: itypes.ApiResponseVdcGroupParticipatingVdcRef{
+								ID:   tt.params.Vdcs[0].ID,
+								Name: "remove-me",
+							},
+						},
+						{
+							Vdc: itypes.ApiResponseVdcGroupParticipatingVdcRef{
+								ID:   generator.MustGenerate("{urn:vdc}"),
+								Name: "keep-vdc",
+							},
+						},
+					},
+				}}}
+			}
+
 			if tt.mockResponseStatus != 0 {
-				endpoints.UpdateVdcGroup().CleanMockResponse()
-				endpoints.UpdateVdcGroup().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.UpdateVdcGroup())
+				ms.SetResponse(endpoints.UpdateVdcGroup(), tt.mockResponse, &tt.mockResponseStatus)
+			} else {
+				ms.CleanResponse(endpoints.UpdateVdcGroup())
 			}
 
 			if tt.mockListVdcGroupResponseStatus != 0 {
-				endpoints.ListVdcGroup().CleanMockResponse()
-				endpoints.ListVdcGroup().SetMockResponse(tt.mockListVdcGroupResponse, &tt.mockListVdcGroupResponseStatus)
+				if tt.mockListVdcGroupResponse == nil && !tt.expectedErr {
+					tt.mockListVdcGroupResponse = &itypes.ApiResponseListVdcGroup{Values: []itypes.ApiResponseListVdcGroupDetails{{
+						ID: func() string {
+							if tt.params.ID != "" {
+								return tt.params.ID
+							}
+							return generator.MustGenerate("{urn:vdcGroup}")
+						}(),
+						Name: func() string {
+							if tt.params.Name != "" {
+								return tt.params.Name
+							}
+							return "current-vdc-group"
+						}(),
+						Description: "current-description",
+						Vdcs: []itypes.ApiResponseVdcGroupParticipatingVdc{
+							{
+								Vdc: itypes.ApiResponseVdcGroupParticipatingVdcRef{
+									ID:   generator.MustGenerate("{urn:vdc}"),
+									Name: "my-vdc",
+								},
+							},
+							{
+								Vdc: itypes.ApiResponseVdcGroupParticipatingVdcRef{
+									ID:   generator.MustGenerate("{urn:vdc}"),
+									Name: "keep-vdc",
+								},
+							},
+						},
+					}}}
+				}
+				ms.CleanResponse(endpoints.ListVdcGroup())
+				ms.SetResponse(endpoints.ListVdcGroup(), tt.mockListVdcGroupResponse, &tt.mockListVdcGroupResponseStatus)
 			}
 
-			client := newClient(t)
+			if tt.name == "Remove VDC from VDC Group with VDCGroup and VDC by name" {
+				tt.params.Name = "my-vdc-group"
+			}
 
 			err := client.RemoveVdcFromVdcGroup(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -632,24 +814,26 @@ func TestUpdateVdcGroup(t *testing.T) {
 			name: "Update VDC Group",
 			params: types.ParamsUpdateVdcGroup{
 				ID:          generator.MustGenerate("{urn:vdcGroup}"),
-				Description: utils.ToPTR("My updated VDC Group"),
+				Description: new("My updated VDC Group"),
 			},
-			expectedErr: false,
+			mockListVdcGroupResponseStatus: 200,
+			expectedErr:                    false,
 		},
 		{
 			name: "Update VDC Group with VDCGroup name",
 			params: types.ParamsUpdateVdcGroup{
 				Name:        "my-updated-vdc-group",
-				Description: utils.ToPTR("My updated VDC Group"),
+				Description: new("My updated VDC Group"),
 			},
-			expectedErr: false,
+			mockListVdcGroupResponseStatus: 200,
+			expectedErr:                    false,
 		},
 		{
 			name: "Failed to update VDC Group",
 			params: types.ParamsUpdateVdcGroup{
 				ID:          generator.MustGenerate("{urn:vdcGroup}"),
 				Name:        "my-updated-vdc-group",
-				Description: utils.ToPTR("My updated VDC Group"),
+				Description: new("My updated VDC Group"),
 			},
 			mockResponseStatus: 400,
 			expectedErr:        true,
@@ -659,7 +843,7 @@ func TestUpdateVdcGroup(t *testing.T) {
 			params: types.ParamsUpdateVdcGroup{
 				ID:          generator.MustGenerate("{urn:vdcGroup}"),
 				Name:        "my-updated-vdc-group",
-				Description: utils.ToPTR("My updated VDC Group"),
+				Description: new("My updated VDC Group"),
 			},
 			mockListVdcGroupResponseStatus: 404,
 			expectedErr:                    true,
@@ -669,7 +853,7 @@ func TestUpdateVdcGroup(t *testing.T) {
 			params: types.ParamsUpdateVdcGroup{
 				ID:          generator.MustGenerate("{urn:vdcGroup}"),
 				Name:        "my-updated-vdc-group",
-				Description: utils.ToPTR("My updated VDC Group"),
+				Description: new("My updated VDC Group"),
 			},
 			mockListVdcGroupResponse:       itypes.ApiResponseListVdcGroup{Values: []itypes.ApiResponseListVdcGroupDetails{}},
 			mockListVdcGroupResponseStatus: 200,
@@ -679,17 +863,34 @@ func TestUpdateVdcGroup(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
 			if tt.mockResponseStatus != 0 {
-				endpoints.UpdateVdcGroup().CleanMockResponse()
-				endpoints.UpdateVdcGroup().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.UpdateVdcGroup())
+				ms.SetResponse(endpoints.UpdateVdcGroup(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			if tt.mockListVdcGroupResponseStatus != 0 {
-				endpoints.ListVdcGroup().CleanMockResponse()
-				endpoints.ListVdcGroup().SetMockResponse(tt.mockListVdcGroupResponse, &tt.mockListVdcGroupResponseStatus)
+				if tt.mockListVdcGroupResponse == nil && !tt.expectedErr {
+					tt.mockListVdcGroupResponse = &itypes.ApiResponseListVdcGroup{Values: []itypes.ApiResponseListVdcGroupDetails{{
+						ID: func() string {
+							if tt.params.ID != "" {
+								return tt.params.ID
+							}
+							return generator.MustGenerate("{urn:vdcGroup}")
+						}(),
+						Name: func() string {
+							if tt.params.Name != "" {
+								return tt.params.Name
+							}
+							return "current-vdc-group"
+						}(),
+						Description: "current-description",
+					}}}
+				}
+				ms.CleanResponse(endpoints.ListVdcGroup())
+				ms.SetResponse(endpoints.ListVdcGroup(), tt.mockListVdcGroupResponse, &tt.mockListVdcGroupResponseStatus)
 			}
-
-			client := newClient(t)
 
 			vdc, err := client.UpdateVdcGroup(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -698,6 +899,9 @@ func TestUpdateVdcGroup(t *testing.T) {
 			}
 			assert.NoError(t, err, "Unexpected error: %v", err)
 			assert.NotNil(t, vdc)
+			if tt.params.Description != nil {
+				assert.Equal(t, *tt.params.Description, vdc.Description)
+			}
 		})
 	}
 }

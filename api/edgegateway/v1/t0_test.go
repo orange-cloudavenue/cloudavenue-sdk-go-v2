@@ -13,12 +13,12 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
-	"github.com/orange-cloudavenue/common-go/generator"
 )
 
 func Test_ListT0(t *testing.T) {
@@ -37,7 +37,7 @@ func Test_ListT0(t *testing.T) {
 		{
 			name:               "Error 500",
 			mockResponseStatus: http.StatusInternalServerError,
-			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
+			expectedErr:        true, // Error HTTP 500 returns an error after retries are exhausted.
 		},
 		{
 			name:               "Error 404",
@@ -60,14 +60,13 @@ func Test_ListT0(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			eC, ms := newClient(t)
 			ep := endpoints.ListT0()
 			// Set up mock response
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
-				ep.CleanMockResponse()
-				ep.SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(ep)
+				ms.SetResponse(ep, tt.mockResponse, &tt.mockResponseStatus)
 			}
-
-			eC := newClient(t)
 
 			t0s, err := eC.ListT0(t.Context())
 			if tt.expectedErr {
@@ -93,9 +92,16 @@ func Test_GetT0(t *testing.T) {
 		{
 			name: "Valid T0",
 			params: types.ParamsGetT0{
-				T0Name: generator.MustGenerate("{resource_name:t0}"),
+				T0Name: "prvrf01eocb0001234allsp01",
 			},
-			expectedErr: false,
+			mockResponse: &itypes.ApiResponseT0s{
+				{
+					Type: "tier-0-vrf",
+					Name: "prvrf01eocb0001234allsp01",
+				},
+			},
+			mockResponseStatus: 200,
+			expectedErr:        false,
 		},
 		{
 			name: "Invalid TO name",
@@ -110,7 +116,7 @@ func Test_GetT0(t *testing.T) {
 				T0Name: generator.MustGenerate("{resource_name:t0}"),
 			},
 			mockResponseStatus: http.StatusInternalServerError,
-			expectedErr:        false, // Error HTTP 500 does not return an error because a retry is performed.
+			expectedErr:        true, // Error HTTP 500 returns an error after retries are exhausted.
 		},
 		{
 			name: "Simulate empty response",
@@ -151,13 +157,12 @@ func Test_GetT0(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			eC, ms := newClient(t)
 			ep := endpoints.ListT0()
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
-				ep.CleanMockResponse()
-				ep.SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(ep)
+				ms.SetResponse(ep, tt.mockResponse, &tt.mockResponseStatus)
 			}
-
-			eC := newClient(t)
 
 			t0, err := eC.GetT0(t.Context(), tt.params)
 

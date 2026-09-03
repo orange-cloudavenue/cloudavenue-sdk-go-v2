@@ -7,15 +7,5 @@
  * or see the "LICENSE" file for more details.
  */
 
-package draas
-
-import (
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/commands"
-)
-
-func init() {
-	// * Draas
-	cmds.Register(commands.Command{
-		Namespace: "Draas",
-	})
-}
+// Package vdc provides CloudAvenue virtual data center API clients.
+package vdc
