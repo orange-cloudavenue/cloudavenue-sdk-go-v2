@@ -46,8 +46,8 @@ func TestListVApp(t *testing.T) {
 			expectedErr:        false,
 		},
 		{
-			name:       "List VApps with empty VDC ID",
-			vdcID:      "",
+			name:        "List VApps with empty VDC ID",
+			vdcID:       "",
 			expectedErr: true,
 		},
 		{
@@ -119,7 +119,7 @@ func TestGetVApp(t *testing.T) {
 				},
 			},
 			mockListResponseStatus: 200,
-			expectedErr:             false,
+			expectedErr:            false,
 		},
 		{
 			name: "Error 401 Unauthorized",
@@ -201,7 +201,7 @@ func TestCreateVApp(t *testing.T) {
 				},
 			},
 			mockListResponseStatus: 200,
-			expectedErr:             false,
+			expectedErr:            false,
 		},
 		{
 			name: "Create VApp with missing required parameters",
