@@ -42,29 +42,6 @@ func TestCerberusJobStatusParser(t *testing.T) {
 	}
 }
 
-// * This test is commented out because it requires a specific response structure that is not mockable.
-// Due to resty.Bytes() being undefined in the mock
-//
-// func TestCerberusJobParser_201Created(t *testing.T) {
-// 	v := &cerberus{}
-// 	resp := &resty.Response{
-// 		RawResponse: &http.Response{
-// 			StatusCode: http.StatusCreated,
-// 		},
-// 		Request: &resty.Request{
-// 			PathParams: map[string]string{"taskId": "d3c42a20-96b9-4452-91dd-f71b71dfe314"},
-// 			URL:        "http://example.com/job",
-// 			Result:     &cerberusJobCreatedAPIResponse{ID: "d3c42a20-96b9-4452-91dd-f71b71dfe314", Message: "Job created successfully"},
-// 		},
-// 	}
-// 	job, err := v.JobParser(resp)
-//
-// 	assert.NoError(t, err)
-// 	assert.Equal(t, "d3c42a20-96b9-4452-91dd-f71b71dfe314", job.ID)
-// 	assert.Equal(t, "Job created successfully", job.Description)
-// 	assert.Equal(t, JobQueued, job.Status)
-// }
-
 func TestCerberusJobParser_NormalResponse(t *testing.T) {
 	v := &cerberus{}
 	resp := &resty.Response{

@@ -8,70 +8,31 @@
 package cav
 
 import (
+	"encoding/json"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/orange-cloudavenue/common-go/generator"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )
-
-// TODO refacto
 
 const (
 	mockOrg = "cav01ev01ocb0001234"
 )
 
 func newMockClient() (Client, error) {
-	// Mock implementation for testing purposes
-
-	// Get All endpoints available in the endpoint package
-	// Create an handler for each endpoint
-	// Each handler should return a mock response
-	// This is a placeholder for the actual implementation
-
 	endpoints := GetEndpointsUncategorized()
-
 	mux := chi.NewRouter()
 
 	for _, ep := range endpoints {
-		if ep.MockResponseFuncIsDefined() {
-			xlogger.Debug("Registering mock responseFunc for endpoint", slog.String("endpoint", ep.Name), slog.String("method", ep.Method.String()))
-			mux.MethodFunc(ep.Method.String(), ep.MockPath(), ep.GetMockResponseFunc(ep))
-			continue
-		}
-
-		if ep.Method == MethodGET {
-			mux.MethodFunc(ep.Method.String(), ep.MockPath(), GetDefaultMockResponseFunc(ep))
-			continue
-		}
-
-		// Methods POST/PUT/PATCH/DELETE require a body
-		if ep.BodyResponseType != nil {
-			// If the request body type is defined, we need to check if it is a pointer
-			// and dereference it to get the actual type
-			reflectBodyType := reflect.TypeOf(ep.BodyResponseType)
-			if reflectBodyType.Kind() == reflect.Ptr {
-				// If the request body type is a pointer, we need to dereference it
-				reflectBodyType = reflectBodyType.Elem()
-			}
-
-			if reflectBodyType == reflect.TypeOf(Job{}) {
-				statusAccepted := http.StatusAccepted
-				ep.SetMockResponseFunc(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-					w.Header().Add("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
-					w.WriteHeader(statusAccepted)
-				}))
-			}
-		}
-
-		mux.MethodFunc(ep.Method.String(), ep.MockPath(), GetDefaultMockResponseFunc(ep))
+		mux.MethodFunc(ep.Method.String(), ep.PathTemplate, defaultMockHandler(ep))
 	}
 
 	hts := httptest.NewServer(mux)
-
 	xlogger.Debug("Mock server started", slog.String("url", hts.URL))
 
 	nC, err := NewClient(
@@ -107,21 +68,66 @@ func newMockClient() (Client, error) {
 	return nC, nil
 }
 
-// * Not used for the moment, but can be used to set mock responses for endpoints.
+// defaultMockHandler returns an http.HandlerFunc that auto-generates mock responses.
+func defaultMockHandler(ep *Endpoint) http.HandlerFunc {
+	return func(w http.ResponseWriter, _ *http.Request) {
+		if ep.Name == "SessionVmware" {
+			w.Header().Add("X-VMWARE-VCLOUD-ACCESS-TOKEN", "mock-access-token")
+			w.Header().Set("Content-Type", "application/json")
+			resp := map[string]any{
+				"org":   map[string]string{"id": "{urn:org}", "name": mockOrg},
+				"site":  map[string]string{"id": "{urn:site}", "name": mockOrg},
+				"roles": []string{"Organization Administrator"},
+			}
+			respJ, _ := json.Marshal(resp)
+			w.Write(respJ)
+			return
+		}
 
-// func setMockResponse(ep *Endpoint, mockResponseData any, mockResponseStatusCode *int) {
-// 	if ep.MockResponseFuncIsDefined() {
-// 		return
-// 	}
+		// VMware job endpoints return 202 with Location header
+		if ep.Name == "GetJobVmware" {
+			w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
+			w.WriteHeader(http.StatusAccepted)
+			return
+		}
 
-// 	ep.SetMockResponse(mockResponseData, mockResponseStatusCode)
-// }
+		// Cerberus job endpoints return 201 with jobId
+		if ep.Name == "GetJobCerberus" {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusCreated)
+			w.Write([]byte(`{"jobId":"87ab1934-0146-4fb0-80bc-815fea03214d","message":"Job created successfully"}`))
+			return
+		}
 
-// func cleanMockResponses() {
-// 	endpoints := GetEndpointsUncategorized()
-// 	for _, ep := range endpoints {
-// 		if ep.MockResponseFuncIsDefined() {
-// 			ep.CleanMockResponse()
-// 		}
-// 	}
-// }
+		if ep.ResponseType != nil {
+			bodyType := reflect.TypeOf(ep.ResponseType)
+			if bodyType.Kind() == reflect.Pointer {
+				bodyType = bodyType.Elem()
+			}
+
+			newBodyType := reflect.PointerTo(bodyType)
+			newBody := reflect.New(newBodyType).Interface()
+
+			switch bodyType.Kind() {
+			case reflect.Slice:
+				generator.Slice(newBody)
+			default:
+				if err := generator.Struct(newBody); err != nil {
+					xlogger.Error("Error generating mock data", slog.String("endpoint", ep.Name), slog.Any("error", err))
+				}
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			respJ, err := json.Marshal(newBody)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			w.Write(respJ)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"message":"Mock response"}`))
+	}
+}

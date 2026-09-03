@@ -27,18 +27,11 @@ const (
 
 var logger = xlog.GetGlobalLogger()
 
-func NewClient(opts ...OptionFunc) (cav.Client, error) {
-	// Mock implementation for testing purposes
-
-	// Get All endpoints available in the endpoint package
-	// Create an handler for each endpoint
-	// Each handler should return a mock response
-	// This is a placeholder for the actual implementation
-
+func NewClient(opts ...OptionFunc) (cav.Client, *MockServer, error) {
 	Options := &Options{}
 	for _, opt := range opts {
 		if err := opt(Options); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 
@@ -47,13 +40,40 @@ func NewClient(opts ...OptionFunc) (cav.Client, error) {
 		logger = Options.logger
 	}
 
+	ms := newServer(logger)
+
+	// Get all endpoints and register handlers on the chi router.
+	// Handlers are registered on the real path templates, so no URL rewriting is needed.
 	endpoints := cav.GetEndpointsUncategorized()
 	mux := chi.NewRouter()
 
-	// Here, for each endpoint, we build a response handler for the mock HTTP server
+	// Group endpoints by (method, path) to handle path collisions.
+	groups := make(map[string][]*cav.Endpoint)
 	for _, ep := range endpoints {
-		logger.Debug("Registering mock endpoint", slog.String("name", ep.Name), slog.String("method", ep.Method.String()), slog.String("path", ep.MockPath()), slog.String("ID", ep.ID))
-		mux.MethodFunc(ep.Method.String(), ep.MockPath(), cav.GetDefaultMockResponseFunc(ep))
+		key := ep.Method.String() + "|" + ep.PathTemplate
+		groups[key] = append(groups[key], ep)
+	}
+
+	for _, group := range groups {
+		ep := group[0]
+		logger.Debug(
+			"Registering mock endpoint",
+			slog.String("name", ep.Name),
+			slog.String("method", ep.Method.String()),
+			slog.String("path", ep.PathTemplate),
+			slog.String("ID", ep.ID),
+			slog.Int("count", len(group)),
+		)
+		if len(group) == 1 {
+			mux.MethodFunc(ep.Method.String(), ep.PathTemplate, ms.handlerFor(ep))
+		} else {
+			mux.MethodFunc(ep.Method.String(), ep.PathTemplate, ms.handlerForGroup(group))
+		}
+	}
+
+	// Pre-register the SessionVmware mock handler.
+	if ep, err := cav.GetEndpoint("SessionVmware"); err == nil {
+		ms.SetResponseFunc(ep, cav.NewSessionVmwareMockHandler())
 	}
 
 	hts := httptest.NewServer(mux)
@@ -90,17 +110,12 @@ func NewClient(opts ...OptionFunc) (cav.Client, error) {
 		cav.WithLogger(logger),
 	)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	logger.Debug("Mock client created", slog.String("organization", mockOrg))
 
-	return nC, nil
-}
-
-func SetMockResponse(ep *cav.Endpoint, mockResponseData any, mockResponseStatusCode *int) {
-	ep.SetMockResponse(mockResponseData, mockResponseStatusCode)
-	logger.Debug("Mock response set for endpoint", slog.String("endpoint", ep.Name), slog.Int("status_code", *mockResponseStatusCode))
+	return nC, ms, nil
 }
 
 var GetEndpoint = cav.GetEndpoint

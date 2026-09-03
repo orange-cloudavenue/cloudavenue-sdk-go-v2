@@ -21,7 +21,6 @@ func Test_NewClient(t *testing.T) {
 }
 
 func Test_NewClient_InvalidOrganization(t *testing.T) {
-	// Example test case for NewClient with an invalid organization
 	_, err := NewClient("invalid_org")
 	if err == nil {
 		t.Fatal("Expected error for invalid organization, got nil")
