@@ -12,7 +12,7 @@ package cav
 import (
 	"testing"
 
-	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/httpClient"
+	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/http-client"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/xlog"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )

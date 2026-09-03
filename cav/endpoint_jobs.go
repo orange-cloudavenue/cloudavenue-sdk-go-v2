@@ -9,9 +9,7 @@
 
 package cav
 
-func (e *Endpoint) SetJobExtractorFunc(extractorFunc ExtractorFunc) {
-	if e.JobOptions == nil {
-		e.JobOptions = &JobOptions{}
-	}
-	e.JobOptions.extractorFunc = extractorFunc
-}
+// SetJobExtractorFunc remains for compatibility with pre-Operation callers.
+//
+// Job extraction now happens explicitly via AwaitJob, so this method is a no-op.
+func (e *Endpoint) SetJobExtractorFunc(_ ExtractorFunc) {}
