@@ -11,31 +11,49 @@ package cav
 
 import (
 	"context"
+	"iter"
+	"reflect"
 )
-
-// * Context
 
 type contextKey string
 
 const (
-	contextKeyClientName contextKey = "subclient.clientName" // Context key for the client name
-	contextExtraData     contextKey = "subclient.extraData"  // Context key for extra data
+	contextKeyClientName contextKey = "subclient.clientName"
+	contextExtraData     contextKey = "subclient.extraData"
 )
 
+// ContextData carries backend-specific request context.
 type ContextData struct {
-	OrganizationID string // Organization ID for the context
-	SiteID         string // Site ID for the context
+	OrganizationID string // OrganizationID is CloudAvenue organization identifier.
+	SiteID         string // SiteID is CloudAvenue site identifier.
 }
 
-// storeExtraDataInContext stores the extra data in the context.
-func storeExtraDataInContext(ctx context.Context, data ContextData) context.Context {
-	return context.WithValue(ctx, contextExtraData, data)
-}
-
-// GetExtraDataFromContext retrieves the extra data from the context.
+// GetExtraDataFromContext returns backend-specific data stored in ctx.
 func GetExtraDataFromContext(ctx context.Context) ContextData {
 	if data, ok := ctx.Value(contextExtraData).(ContextData); ok {
 		return data
 	}
 	return ContextData{}
+}
+
+// FieldsOf returns an iterator over P's exported struct fields.
+// It exposes field metadata, including tags, for SDK consumers that need reflection.
+func FieldsOf[P any]() iter.Seq[reflect.StructField] {
+	return func(yield func(reflect.StructField) bool) {
+		t := reflect.TypeFor[P]()
+		for field := range t.Fields() {
+			field := field
+			if !field.IsExported() {
+				continue
+			}
+			if !yield(field) {
+				return
+			}
+		}
+	}
+}
+
+// storeExtraDataInContext stores backend-specific data in ctx.
+func storeExtraDataInContext(ctx context.Context, data ContextData) context.Context {
+	return context.WithValue(ctx, contextExtraData, data)
 }

@@ -22,12 +22,11 @@ func Test_Endpoint_Register(t *testing.T) {
 			Endpoint: Endpoint{
 				Name:             "Fake",
 				Method:           MethodPOST,
-				SubClient:        ClientVmware,
+				Backend:          BackendVMware,
 				PathTemplate:     "/1.2.3/sessions",
 				PathParams:       []PathParam{},
 				QueryParams:      []QueryParam{},
 				DocumentationURL: "https://foo.bar",
-				RequestFunc:      nil,
 				Description:      "This is a fake endpoint",
 			},
 			expectedError: false,

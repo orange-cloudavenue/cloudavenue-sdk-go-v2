@@ -15,27 +15,17 @@ import (
 	"resty.dev/v3"
 )
 
-var (
-	defaultRequestFunc = func(ctx context.Context, client Client, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error) {
-		req, err := client.NewRequest(ctx, endpoint)
-		if err != nil {
+var defaultRequestFunc = func(ctx context.Context, client Client, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error) {
+	req, err := client.NewRequest(ctx, endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, opt := range opts {
+		if err := opt(endpoint, req); err != nil {
 			return nil, err
 		}
-
-		for _, opt := range opts {
-			if err := opt(endpoint, req); err != nil {
-				return nil, err
-			}
-		}
-
-		return req.SetResult(endpoint.BodyResponseType).Execute(endpoint.Method.String(), endpoint.PathTemplate)
 	}
 
-	defaultRequestFuncWithJob = func(ctx context.Context, client Client, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error) {
-		if endpoint.JobOptions == nil {
-			endpoint.JobOptions = &JobOptions{}
-		}
-
-		return defaultRequestFunc(ctx, client, endpoint, opts...)
-	}
-)
+	return req.SetResult(endpoint.ResponseType).Execute(endpoint.Method.String(), endpoint.PathTemplate)
+}

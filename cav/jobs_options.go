@@ -13,53 +13,31 @@ import (
 	"fmt"
 	"time"
 
-	"resty.dev/v3"
-
 	"github.com/orange-cloudavenue/common-go/validators"
+	"resty.dev/v3"
 )
 
 type (
-	// JobOptions defines the options for job operations.
+	// JobOptions configures legacy job polling helpers.
 	JobOptions struct {
-		// Timeout specifies the maximum duration to wait for a job to complete.
-		// If the job does not complete within this time, an error will be returned.
-		// Default is 5 minutes
-		// If you want to wait indefinitely, set this to -1.
+		// Timeout is maximum wait time for job completion.
 		Timeout time.Duration `default:"5m"`
 
-		// PollInterval specifies the interval between job status checks.
-		// Default is 15 seconds.
-		// This value should be less than the timeout.
+		// PollInterval is delay between status checks.
 		PollInterval time.Duration `default:"15s"`
 
 		extractorFunc ExtractorFunc
 	}
 
-	// ExtractorFunc defines a function type for extracting data from a resty.Response.
-	//
-	// The function does not return an error for not interrupting the job flow.
-	//
-	// Example usage:
-	//
-	//	var dataToExtract *string
-	//
-	//	extractorFunc := func(resp *resty.Response) {
-	//		if v, ok := resp.Result().(*cav.VmwareJobAPIResponse); ok {
-	//			dataToExtract = new(string)
-	//			*dataToExtract = v.ID
-	//		}
-	//	}
+	// ExtractorFunc extracts side-channel data from job responses.
+	// It does not return an error so polling flow is not interrupted.
 	ExtractorFunc func(resp *resty.Response)
 
-	// JobOption defines a function that modifies the JobOptions.
+	// JobOption applies configuration to JobOptions.
 	JobOption func(*JobOptions) error
 )
 
-// NewJobOptions creates a new JobOptions instance with default values.
-// Default values can be overridden by passing options.
-// Default values:
-//   - Timeout: 5 minutes
-//   - PollInterval: 15 seconds
+// NewJobOptions creates JobOptions with defaults and applies opts.
 func NewJobOptions(opts ...JobOption) (*JobOptions, error) {
 	jO := &JobOptions{}
 
@@ -67,7 +45,6 @@ func NewJobOptions(opts ...JobOption) (*JobOptions, error) {
 		return nil, err
 	}
 
-	// Override default values with provided options.
 	for _, opt := range opts {
 		if err := opt(jO); err != nil {
 			return nil, err
@@ -77,15 +54,7 @@ func NewJobOptions(opts ...JobOption) (*JobOptions, error) {
 	return jO, nil
 }
 
-// WithCustomTimeout sets the maximum duration to wait for a job to complete.
-//
-// Example:
-//
-//	opts, err := NewJobOptions(WithCustomTimeout(10 * time.Minute))
-//	if err != nil {
-//	    // handle error
-//	}
-//	// opts.Timeout will be 10 minutes
+// WithCustomTimeout sets job timeout.
 func WithCustomTimeout(timeout time.Duration) JobOption {
 	return func(opts *JobOptions) error {
 		opts.Timeout = timeout
@@ -93,15 +62,7 @@ func WithCustomTimeout(timeout time.Duration) JobOption {
 	}
 }
 
-// WithCustomPollInterval sets the interval between job status checks.
-//
-// Example:
-//
-//	opts, err := NewJobOptions(WithCustomPollInterval(30 * time.Second))
-//	if err != nil {
-//	    // handle error
-//	}
-//	// opts.PollInterval will be 30 seconds
+// WithCustomPollInterval sets job poll interval.
 func WithCustomPollInterval(interval time.Duration) JobOption {
 	return func(opts *JobOptions) error {
 		if interval <= 0 {
@@ -112,18 +73,7 @@ func WithCustomPollInterval(interval time.Duration) JobOption {
 	}
 }
 
-// SetExtractorFunc sets a custom extractor function for parsing job responses.
-// The extractor function should take a resty.Response and a target type to populate.
-//
-// Example:
-//
-//	extractor := func(resp *resty.Response) {
-//	    // custom extraction logic
-//	}
-//	opts, err := NewJobOptions(SetExtractorFunc(extractor))
-//	if err != nil {
-//	    // handle error
-//	}
+// SetExtractorFunc sets response extractor used during job polling.
 func SetExtractorFunc(extractorFunc ExtractorFunc) JobOption {
 	return func(opts *JobOptions) error {
 		opts.extractorFunc = extractorFunc
