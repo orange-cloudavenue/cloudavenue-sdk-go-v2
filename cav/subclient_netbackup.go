@@ -28,11 +28,11 @@ var _ subClientInterface = &netbackup{}
 type netbackup struct {
 	subclient
 
-	mu             sync.RWMutex
-	accessToken    string
+	mu                 sync.RWMutex
+	accessToken        string
 	storedRefreshToken string
-	tokenExpiresAt time.Time
-	baseURL        string
+	tokenExpiresAt     time.Time
+	baseURL            string
 }
 
 func newNetbackupClient() subClientInterface {
