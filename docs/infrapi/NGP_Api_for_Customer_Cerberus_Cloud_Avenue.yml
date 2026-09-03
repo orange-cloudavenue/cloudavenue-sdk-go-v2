@@ -1,0 +1,2651 @@
+openapi: 3.0.0
+info:
+  title: Cloud Avenue API
+  description: "Cloud Avenue API allows you to create and manage resources on your\
+    \ infrastructure.\n\n## Authentication\n\nIn order to authenticate to this API,\
+    \ you must first authenticate by clicking on the \"Authorize\" button and fill\
+    \ the required parameters:\n- client_id: your username\n- client_secret: your\
+    \ password\n- organization: the organization holding your user\n\n Servers purpose:\
+    \ \n- https://api1.cloudavenue.orange-business.com: this server is intended to\
+    \ be used from internet \n- https://api1.cloudavenue-vdr.itn.intraorange: this\
+    \ server is intended to be used from inside orange internal network\n\nOnce done,\
+    \ click on the \"Authorize\" button, close the authentication modal and start\
+    \ using the API!"
+  version: 2.0.0
+tags:
+- name: Authentication
+  description: Authentication method
+paths:
+  /auth/v1/user/token:
+    post:
+      x-compatibility:
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      summary: Authentication to Cerberus.
+      tags:
+      - Authentication
+      requestBody:
+        description: Authentication
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CerberusAuthentRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/CerberusAuthentResponse'
+        '500':
+          $ref: '#/components/responses/CerberusError'
+        '404':
+          $ref: '#/components/responses/CerberusError'
+      parameters: []
+  /infrapicustomerproxy/v1.0/federate:
+    get:
+      x-compatibility:
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      security:
+      - Cerberus: []
+      responses:
+        '200':
+          description: Successful response with the federation status of an organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/federation-status-type'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      summary: Return federation status of an organization
+      operationId: getFederation
+      tags:
+      - Users
+      parameters: []
+    post:
+      x-compatibility:
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      summary: Federate an existing organization
+      description: Federate an existing organization
+      operationId: createFederation
+      tags:
+      - Users
+      security:
+      - Cerberus: []
+      responses:
+        '201':
+          $ref: '#/components/responses/JobCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters: []
+    put:
+      x-compatibility:
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      summary: Regenerate SAML certificate
+      description: Regenerate SAML certificate of an organization and updates the
+        LemonLDAP entry with the new certificate.
+      operationId: updateFederation
+      tags:
+      - Users
+      security:
+      - Cerberus: []
+      responses:
+        '201':
+          $ref: '#/components/responses/JobCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters: []
+  /infrapicustomerproxy/v2.0/configurations:
+    get:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      security:
+      - Cerberus: []
+      parameters: []
+      responses:
+        '200':
+          description: Successful response - see example for usefull information at
+            creation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organization_v2_get'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      summary: Get configuration of your organization
+      tags:
+      - Organizations
+    put:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      security:
+      - Cerberus: []
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/organization_v2_put'
+      responses:
+        '201':
+          $ref: '#/components/responses/JobCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      summary: Update configuration of your organization
+      tags:
+      - Organizations
+  /infrapicustomerproxy/v1.0/jobs/{Job-Id}:
+    get:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      summary: Returns a job status by ID.
+      operationId: getJobById
+      security:
+      - Cerberus: []
+      tags:
+      - Jobs
+      parameters:
+      - in: path
+        name: Job-Id
+        required: true
+        example: 8fe586e1-405e-4e7c-9a9a-bcebe9062659
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/parentJob'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /infrapicustomerproxy/v2.0/vcda/ips:
+    get:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      summary: Get on premise IP addresses
+      description: Get list of on premise IP addresses allowed for this organization's
+        draas offer
+      operationId: getVcdaIPs
+      tags:
+      - VCDA
+      security:
+      - Cerberus: []
+      parameters: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /infrapicustomerproxy/v2.0/vcda/ips/{Ip-Address}:
+    post:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      summary: Add on premise IP address
+      description: Allow a new on premise IP address for this organization's draas
+        offer
+      operationId: createVcdaIP
+      tags:
+      - VCDA
+      security:
+      - Cerberus: []
+      parameters:
+      - in: path
+        name: Ip-Address
+        required: true
+        schema:
+          $ref: '#/components/schemas/ipAddress'
+      responses:
+        '204':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      summary: Remove on premise IP address
+      description: Remove an existing on premise IP address from this organization's
+        draas offer
+      operationId: deleteVcdaIP
+      tags:
+      - VCDA
+      security:
+      - Cerberus: []
+      parameters:
+      - in: path
+        name: Ip-Address
+        required: true
+        schema:
+          $ref: '#/components/schemas/ipAddress'
+      responses:
+        '204':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /infrapicustomerproxy/v2.0/jobs:
+    get:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      summary: Get current root job id of an organization
+      description: Get current root job id of an organization
+      operationId: getJobs
+      tags:
+      - Jobs
+      security:
+      - Cerberus: []
+      parameters: []
+      responses:
+        '200':
+          description: Current root job id of an organization.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/jobs'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /infrapicustomerproxy/v2.0/network:
+    get:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      operationId: getNetworkHierarchy
+      summary: Get network hierarchy
+      description: Get network hierarchy.
+      tags:
+      - Network & connectivity
+      security:
+      - Cerberus: []
+      parameters: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/network_hierarchy'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /infrapicustomerproxy/v2.0/vdcs/{vdc-name}/edges:
+    post:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      security:
+      - Cerberus: []
+      parameters:
+      - in: path
+        name: vdc-name
+        required: true
+        example: VDC01
+        description: VDC name.
+        schema:
+          type: string
+      requestBody:
+        description: Edge Gateway creation body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/edgeGatewayCreate'
+      responses:
+        '201':
+          description: Job to create new Edge Gateway successfully created and generated
+            name returned.
+          $ref: '#/components/responses/JobCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      summary: Create one Edge gateway
+      description: When creating an Edge Gateway attached to a vDC, this vDC will
+        be isolated.
+      operationId: createVdcEdge
+      tags:
+      - Edge Gateways
+  /infrapicustomerproxy/v2.0/vdc-groups/{vdc-group-name}/edges:
+    post:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      security:
+      - Cerberus: []
+      parameters:
+      - in: path
+        name: vdc-group-name
+        required: true
+        example: myvDCGroup
+        description: VDC Group name.
+        schema:
+          type: string
+      requestBody:
+        description: Edge Gateway creation body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/edgeGatewayCreate'
+      responses:
+        '201':
+          description: Job to create new Edge Gateway successfully created and generated
+            name returned.
+          $ref: '#/components/responses/JobCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      summary: Create one Edge gateway in vDC group
+      description: When creating an Edge Gateway attached to a vDC group, this Edge
+        Gateway will be shared with other vDC inside the same vDC group
+      operationId: createVdcGroupEdge
+      tags:
+      - Edge Gateways
+  /infrapicustomerproxy/v2.0/edges:
+    get:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      security:
+      - Cerberus: []
+      parameters: []
+      responses:
+        '200':
+          description: List of Edge gateways.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/edgeGateway'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      summary: List edge gateway of an organization
+      operationId: getEdges
+      tags:
+      - Edge Gateways
+  /infrapicustomerproxy/v2.0/edges/{edge-id}:
+    get:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      security:
+      - Cerberus: []
+      parameters:
+      - in: path
+        name: edge-id
+        required: true
+        schema:
+          type: string
+        example: cc1f35c2-90a2-48d1-9359-62794faf44ad
+      responses:
+        '200':
+          description: Edge gateway details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/edgeGateway'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      summary: Get Edge gateway details
+      operationId: getEdgeById
+      tags:
+      - Edge Gateways
+    delete:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      security:
+      - Cerberus: []
+      parameters:
+      - in: path
+        name: edge-id
+        required: true
+        schema:
+          type: string
+        example: cc1f35c2-90a2-48d1-9359-62794faf44ad
+      responses:
+        '202':
+          description: Edge gateway deleted.
+          $ref: '#/components/responses/JobCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      summary: Remove Edge Gateway
+      operationId: deleteEdge
+      tags:
+      - Edge Gateways
+    put:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      summary: Update qos rate limit on edge gateway.
+      description: Update qos rate limit on edge gateway.
+      tags:
+      - Edge Gateways
+      security:
+      - Cerberus: []
+      parameters:
+      - in: path
+        name: edge-id
+        required: true
+        schema:
+          type: string
+        example: cc1f35c2-90a2-48d1-9359-62794faf44ad
+      requestBody:
+        description: qos rate limit
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/qos_rate_limit'
+            example:
+              rateLimit: 50
+      responses:
+        '201':
+          description: Job successfully created.
+          $ref: '#/components/responses/JobCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /infrapicustomerproxy/v2.0/tier-0-vrfs:
+    get:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      summary: Get all Tier-0 Gateway
+      description: Get all Tier-0 gateway.
+      operationId: getTier0Vrfs
+      tags:
+      - Tier-0
+      security:
+      - Cerberus: []
+      parameters: []
+      responses:
+        '200':
+          description: List of Tier-0
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tier0List'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /infrapicustomerproxy/v2.0/tier-0-vrfs/{tier0_name}:
+    get:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      summary: Get Tier-0 Details
+      description: Get Tier-0 details.
+      operationId: getTier0VrfByName
+      tags:
+      - Tier-0
+      security:
+      - Cerberus: []
+      parameters:
+      - in: path
+        name: tier0_name
+        required: true
+        schema:
+          $ref: '#/components/schemas/tier0Name'
+      responses:
+        '200':
+          description: Details of Tier-0
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tier0Details'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /infrapicustomerproxy/v2.0/services:
+    post:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      summary: Add network connectivity
+      description: Add newtwork connectivity to your organization. Please look at
+        examples to know which network types are available and how to configure them.
+      operationId: addNetworkConnectivity
+      tags:
+      - Network & connectivity
+      security:
+      - Cerberus: []
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/network_schema'
+            examples:
+              EIN:
+                description: Add EIN network. This type of network is only available
+                  for Orange internal organizations.
+                value:
+                  networkType: ein
+                  tier0Name: prvrf01eocb1010311allsp02
+              INTERNET:
+                description: 'Add internet network. This network type will configure
+                  connectivity to internet and assign a public IP to the given edge
+                  gateway.<br>
+
+                  Properties key is optional.<br>
+
+                  You can define ip if you already have this ip configured on a linked
+                  organization.<br>
+
+                  Announced property allows you to enable or disable access from and
+                  to this public IP.<br>
+
+                  '
+                value:
+                  networkType: internet
+                  edgeGateway: ded5e363-1075-488c-9d72-9f91a8835bbb
+                  properties:
+                    ip: 11.12.13.14
+                    announced: true
+              BVPN:
+                description: Add bvpn network. This network type configure BVPN connectivity
+                  on the desired T0-VRF. VLAN ID must have been given by mail.
+                value:
+                  networkType: bvpn
+                  tier0Name: prvrf01eocb1010311allsp02
+                  properties:
+                    vlanId: 2268
+              CAV_SERVICES:
+                description: Add cav services. This network type enable connectivity
+                  to Standard Cloud Avenue services.
+                value:
+                  networkType: cav-services
+                  edgeGateway: e979224a-9386-4646-af8f-f2f6c4e011b6
+                  properties:
+                    prefixLength: 28
+              BACH:
+                description: Add BACH network. This network type is only available
+                  for Orange internal organizations.
+                value:
+                  networkType: bach
+                  tier0Name: prvrf01eocb1010311allsp02
+              INWLS:
+                description: 'Add internet WLS network. This network type will configure
+                  connectivity to internet WLS and assign a public IP to the given
+                  edge gateway.
+
+                  '
+                value:
+                  networkType: inwls
+                  edgeGateway: ded5e363-1075-488c-9d72-9f91a8835bbb
+      responses:
+        '201':
+          $ref: '#/components/responses/JobCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /infrapicustomerproxy/v2.0/vdcs/batch:
+    post:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      security:
+      - Cerberus: []
+      parameters: []
+      requestBody:
+        description: 'Tenant technical details.
+
+          Use vDC schema to create ''One Room vDC'', ''Dual Room 1vDC'' or ''High
+          Availability Dual Room vDC''
+
+          Use DualRoom2vDC to create Dual Room 2vDC
+
+          '
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                oneOf:
+                - $ref: '#/components/schemas/createOrgVdcV2'
+                - $ref: '#/components/schemas/createOrg2Vdcs'
+      responses:
+        '201':
+          description: Org VDC Created.
+          $ref: '#/components/responses/JobCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      summary: Create multiple Org VDC
+      tags:
+      - vDC
+  /infrapicustomerproxy/v2.0/vdcs:
+    get:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      security:
+      - Cerberus: []
+      parameters: []
+      responses:
+        '200':
+          description: VDC Name list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/vDCList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      summary: List Org vDCs
+      description: List all VDC inside an Organization
+      operationId: getOrgVdcs
+      tags:
+      - vDC
+    post:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      security:
+      - Cerberus: []
+      parameters: []
+      requestBody:
+        description: Tenant technical details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createOrgVdcV2'
+      responses:
+        '201':
+          description: Org VDC Created.
+          $ref: '#/components/responses/JobCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      summary: Create a new Org VDC
+      operationId: createOrgVdc
+      tags:
+      - vDC
+  /infrapicustomerproxy/v2.0/vdcs/{vdc-name}:
+    delete:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      security:
+      - Cerberus: []
+      parameters:
+      - in: path
+        name: vdc-name
+        required: true
+        example: VDC01
+        description: VDC name.
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Org VDC Deleted.
+          $ref: '#/components/responses/JobCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      summary: Delete a vDC
+      description: Delete an empty vDC, will return an error if the vDC has Edges
+        or vApps (must remove before)
+      operationId: deleteOrgVdc
+      tags:
+      - vDC
+    get:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      security:
+      - Cerberus: []
+      parameters:
+      - in: path
+        name: vdc-name
+        required: true
+        schema:
+          $ref: '#/components/schemas/vdcName'
+      responses:
+        '200':
+          description: vDC details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOrgVdcs2'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      summary: Get details about one vDC
+      operationId: getOrgVdcByName
+      tags:
+      - vDC
+    put:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      x-api-for-customer: true
+      security:
+      - Cerberus: []
+      parameters:
+      - in: path
+        name: vdc-name
+        required: true
+        schema:
+          $ref: '#/components/schemas/vdcName'
+      requestBody:
+        description: shaping details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrgVdcV2'
+      responses:
+        '201':
+          description: Job created
+          $ref: '#/components/responses/JobCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      summary: Update a vDC
+      operationId: updateOrgVdc
+      tags:
+      - vDC
+  /infrapicustomerproxy/v2.0/bms:
+    get:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      summary: Get list of BMS and their description
+      description: Get list of BMS and their description
+      operationId: GetBMSList
+      tags:
+      - BMS
+      security:
+      - Cerberus: []
+      parameters: []
+      responses:
+        '200':
+          description: Get list of BMS and their description
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BMS'
+  /infrapicustomerproxy/v2.0/services/{service_id}:
+    put:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      summary: update services
+      description: currently used to update cav_std_sv
+      operationId: updateNetworkService
+      tags:
+      - Network & connectivity
+      security:
+      - Cerberus: []
+      parameters:
+      - in: path
+        name: service_id
+        required: true
+        schema:
+          type: string
+        example: prvrf01iocb1010314allsp01-cav-std-sv
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/properties_cav_std_sv'
+            examples:
+              CAV-STD-SV:
+                description: activate the different services wanted
+                value:
+                  properties:
+                    adm: true
+                    os: true
+                    tf: false
+              INTERNET:
+                description: Announced property allows you to enable or disable access
+                  from and to this public IP.
+                value:
+                  properties:
+                    announced: true
+      responses:
+        '201':
+          description: Network connectivity Deleted.
+          $ref: '#/components/responses/JobCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      summary: Delete network connectivity by service ID
+      description: Delete network connectivity by service ID
+      operationId: deleteNetworkService
+      tags:
+      - Network & connectivity
+      security:
+      - Cerberus: []
+      parameters:
+      - in: path
+        name: service_id
+        required: true
+        schema:
+          type: string
+        example: tn01i01ocb1010314spt102-cav-services
+      responses:
+        '201':
+          description: Network connectivity Deleted.
+          $ref: '#/components/responses/JobCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /infrapicustomerproxy/v2.0/security-manager:
+    get:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      summary: Get Trend micro tenant status
+      description: Get Trend micro tenant status
+      tags:
+      - Security
+      security:
+      - Cerberus: []
+      parameters: []
+      responses:
+        '200':
+          description: Get Trend micro tenant status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GETTMStatus'
+    put:
+      x-compatibility:
+      - NGP
+      - CERBERUS_NGP
+      - NGP_API_FOR_CUSTOMER
+      - CERBERUS_NGP_API_FOR_CUSTOMER
+      summary: Manage Trend Micro Status
+      description: Manage Trend Micro Status
+      tags:
+      - Security
+      security:
+      - Cerberus: []
+      parameters: []
+      responses:
+        '201':
+          $ref: '#/components/responses/JobCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      requestBody:
+        description: Status management
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PUTTMStatus'
+            example: '{"enabled": "true", "mail": "mail.test@example.com"}'
+servers:
+- url: https://api1.cloudavenue.orange-business.com
+- url: https://api1.cloudavenue-vdr.itn.intraorange
+security: []
+components:
+  securitySchemes:
+    Cerberus:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://api1.cloudavenue.orange-business.com/auth/v1/user/token
+          scopes: {}
+  responses:
+    JobCreated:
+      description: Job created
+      headers:
+        X-Automation-Job-Id:
+          schema:
+            type: string
+            format: uuid
+          description: Job-Id used in jobs management requests.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/jobcreated'
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/apiError'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/apiError'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/apiError'
+    NotAcceptable:
+      description: Not Acceptable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/apiError'
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/apiError'
+    Conflict:
+      description: There is an other job pending for this organization
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/apiError'
+    InternalError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/apiError'
+    CerberusError:
+      description: An error occured on proxy side
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CerberusError'
+    CerberusAuthentResponse:
+      description: Authentication response containing access_token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CerberusAuthentResponse'
+  schemas:
+    organization_v2:
+      properties:
+        name:
+          $ref: '#/components/schemas/organizationNameV2'
+        fullName:
+          type: string
+          example: Example Full Name
+          description: Full name of the organization
+        description:
+          type: string
+          example: Organization made for testing purposes
+          description: Description of the organization
+        isSuspended:
+          type: boolean
+          default: false
+          example: true
+          description: In case of change, customer VM are activated or deactivated
+        isEnabled:
+          type: boolean
+          default: true
+          example: true
+          description: Enable organization if True
+        customerMail:
+          type: string
+          example: example@company.com
+        internetBillingMode:
+          $ref: '#/components/schemas/internetBillingMode'
+    organization_v2_put:
+      allOf:
+      - $ref: '#/components/schemas/organization_v2'
+    organization_v2_get:
+      required:
+      - name
+      - fullName
+      - description
+      - isEnabled
+      - isSuspended
+      - customerMail
+      - internetBillingMode
+      allOf:
+      - $ref: '#/components/schemas/organization_v2'
+    customerInformation:
+      required:
+      - customerType
+      - bssServiceId
+      - customerName
+      properties:
+        bssServiceId:
+          type: string
+          example: OCB1234567
+        customerName:
+          type: string
+          example: Example Name
+        customerType:
+          $ref: '#/components/schemas/customerType'
+    customerType:
+      type: string
+      enum:
+      - INTERNAL
+      - EXTERNAL
+      - NGP-INTERNAL
+      - NGP-OFR
+      - NGP-EXTERNAL
+      - NGP-MNP
+      example: NGP-EXTERNAL
+    identityProvider:
+      type: string
+      enum:
+      - local
+      - siu
+      - guardian
+      example: siu
+    siteCode:
+      type: string
+      enum:
+      - VDR
+      - RM
+      - FR4
+      - CHA
+      - SIN
+      - MUM
+      - ATL
+      example: VDR
+      description: Site where the resource is located
+    internetBillingMode:
+      type: string
+      enum:
+      - PAYG
+      - TRAFFIC_VOLUME
+      example: PAYG
+    orgUsers:
+      type: array
+      items:
+        $ref: '#/components/schemas/orgUser'
+    orgUser:
+      type: object
+      required:
+      - login
+      - providerId
+      - providerType
+      properties:
+        login:
+          type: string
+          example: CVNN4456
+          description: User login in vCloud Director
+        providerId:
+          type: string
+          description: User identifier provided by the Identify Provider. ie. local
+            => uuid; siu => siu-id
+        providerType:
+          type: string
+          example: local
+          enum:
+          - local
+          - siu
+          - guardian
+        role:
+          type: string
+          enum:
+          - Organization Administrator
+          - Catalog Author
+          - vApp Author
+          - vApp User
+          - Console Access Only
+          default: Organization Administrator
+        emailAddress:
+          type: string
+          example: noreply@orange.com
+          default: ''
+        fullName:
+          type: string
+          example: ''
+          default: ''
+        isEnabled:
+          type: boolean
+          example: true
+          default: true
+        telephone:
+          type: string
+          example: ''
+          default: ''
+    orgUserRecord:
+      type: object
+      properties:
+        login:
+          type: string
+          example: CVNN4456
+          description: User login in vCloud Director
+        providerType:
+          type: string
+          example: local
+          enum:
+          - local
+          - siu
+          - guardian
+        fullName:
+          type: string
+          example: Full Name
+          default: ''
+        isEnabled:
+          type: boolean
+          example: true
+          default: true
+    storages:
+      type: array
+      items:
+        type: object
+        required:
+        - name
+        properties:
+          name:
+            type: string
+            example: SILVERZ_CUST1
+            description: Name of the storage policy usable in a storage profile.
+    orgVdcs:
+      type: array
+      items:
+        type: object
+        required:
+        - name
+        - vdcServiceClass
+        - vdcDisponibilityClass
+        - vdcBillingModel
+        - vdcStorageBillingModel
+        - vdcStorageProfiles
+        - cpuAllocated
+        - memoryAllocated
+        properties:
+          id:
+            type: string
+            example: a90baf04-7464-4631-98af-cd86077feb13
+            description: VMware unique ID. There is no ID in the body of the POST
+              request, as VMware which generates it. This ID must be present for GET
+              and PUT.
+          name:
+            type: string
+            example: VDC_BENCH_AP
+            description: Name of the new org vdc.
+            minLength: 2
+            maxLength: 27
+            pattern: ^\w{2,27}$
+          description:
+            type: string
+            example: Additionnal VDC for benchmarks
+            description: Description of the new org vdc.
+          isEnabled:
+            type: boolean
+            example: true
+            default: true
+          vdcServiceClass:
+            type: string
+            enum:
+            - ECO
+            - STD
+            - HP
+            - VOIP
+            description: SILVER, GOLD and PLATINUM_3K storage types are available
+              for all classes. PLATINUM_5K and PLATINUM_10K are available only for
+              STD (Standard), HP (High Performance) and VOIP (VoIP).
+          vdcDisponibilityClass:
+            type: string
+            example: ONE-ROOM
+            enum:
+            - ONE-ROOM
+            - DUAL-ROOM
+            description: Allocation model used by this vdc. DUAL-ROOM isn't available
+              for vdcServiceClass ECO.
+          vdcBillingModel:
+            type: string
+            description: Choose Billing model of storage resources. PAYG and DRAAS
+              only available for vdcServiceClass ECO and STD.
+            enum:
+            - PAYG
+            - DRAAS
+            - MIXED
+            - RESERVED
+            - DEDICATED
+          vdcStorageBillingModel:
+            type: string
+            enum:
+            - PAYG
+            - RESERVED
+            description: Available for all vdcServiceClass.
+          nicQuota:
+            type: number
+            example: 0
+            description: Maximum number of virtual NICs allowed in this vdc. Defaults
+              to 0, which specifies an unlimited number.
+            default: 0
+          networkQuota:
+            type: number
+            example: 1000
+            description: Maximum number of network objects that can be deployed in
+              this vdc. Defaults to 0, which means no networks can be deployed.
+            default: 0
+          vmQuota:
+            type: number
+            example: 0
+            default: 0
+            description: Maximum number of VMs that can be created in this vdc. Defaults
+              to 0, which specifies an unlimited number.
+          vcpuInMhz2:
+            type: number
+            example: 2300
+            default: 2300
+            minimum: 1000
+            description: Specifies the clock frequency, in Mhz, for any virtual CPU
+              that is allocated to a VM.
+          cpuAllocated:
+            type: number
+            example: 100000
+            minimum: 5000
+            maximum: 1000000
+            description: Capacity that is committed to be available or used as a limit
+              in PAYG mode. Unit for compute capacity allocated to this vdc is MHz.
+              Note. Reserved capacity is automatically set according to the service
+              class.
+          memoryAllocated:
+            type: number
+            example: 72
+            minimum: 10
+            maximum: 1000
+            description: Memory capacity that is committed to be available or used
+              as a limit in PAYG mode. Unit for memory capacity allocated to this
+              vdc is Gb.
+          vdcStorageProfiles:
+            $ref: '#/components/schemas/vdcStorageProfiles'
+          vdcEdges:
+            $ref: '#/components/schemas/vdcEdges'
+    storageProfile:
+      type: object
+      required:
+      - name
+      - limit
+      properties:
+        id:
+          type: string
+          example: a90baf04-7464-4631-98af-cd86077feb13
+          description: VMware unique ID. There is no ID in the body of the POST request,
+            as VMware which generates it. This ID must be present for GET and PUT.
+        name:
+          type: string
+          enum:
+          - SILVER
+          - GOLD
+          - PLATINUM_3K
+          - PLATINUM_5K
+          - PLATINUM_10K
+        limit:
+          description: Max number of units allocated for this storage profile. In
+            Gb
+          type: integer
+          example: 5000
+          minimum: 500
+          maximum: 50000
+          default: 2000
+        used:
+          description: Current usage of this StorageProfile in Gb. Deletion is allowed
+            only if there is no usage of the StorageProfile
+          type: integer
+          example: 5000
+          minimum: 0
+        default:
+          type: boolean
+          example: true
+          enum:
+          - true
+          - false
+    vdcStorageProfiles:
+      description: List of provider vdc storage profiles to add to this vdc.
+      type: array
+      items:
+        $ref: '#/components/schemas/storageProfile'
+    action:
+      required:
+      - name
+      - status
+      - details
+      properties:
+        name:
+          type: string
+          enum:
+          - CREATE_VORG
+          - DELETE_VORG
+          - MODIFY_VDC_RESOURCES
+          - CREATE_VDC
+        status:
+          type: string
+          enum:
+          - CREATED
+          - PENDING
+          - IN_PROGRESS
+          - FAILED
+          - DONE
+        details:
+          type: string
+          description: Human-readable action description
+      type: object
+    parentJob_metadata:
+      required:
+      - description
+      - name
+      - status
+      properties:
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/action'
+        description:
+          type: string
+          description: parent job containing a list of actions
+        name:
+          type: string
+          description: parent_job
+        status:
+          type: string
+          enum:
+          - CREATED
+          - PENDING
+          - IN_PROGRESS
+          - FAILED
+          - DONE
+      type: object
+    parentJob:
+      type: array
+      items:
+        $ref: '#/components/schemas/parentJob_metadata'
+    metadata:
+      required:
+      - key
+      - value
+      - scope
+      properties:
+        key:
+          type: string
+          example: BSS-Contract-Id
+        value:
+          type: string
+          example: 12-6124343
+        scope:
+          type: string
+          enum:
+          - rw
+          - ro
+          - hidden
+          default: hidden
+      type: object
+    federation-status-type:
+      type: string
+      enum:
+      - local
+      - siu
+    jobcreated:
+      properties:
+        message:
+          type: string
+          example: Job successfully created
+        jobId:
+          type: string
+          example: 16f61fe1-481c-4ec1-b62d-046af22b51ad
+    apiError:
+      required:
+      - code
+      - reason
+      - message
+      properties:
+        code:
+          type: string
+          example: err-0002
+        reason:
+          type: string
+          example: auth-0001
+        message:
+          type: string
+          example: The request you are trying to make does not have sufficient permissions
+      type: object
+    ipAddress:
+      description: IPv4 Ip Address
+      type: string
+      pattern: ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+    serviceType:
+      type: string
+      enum:
+      - all
+      - ein
+      - eic
+      example: all
+      description: Service Type
+    tier0VRFClassOfService:
+      type: string
+      enum:
+      - SHARED_STANDARD
+      - SHARED_PREMIUM
+      - DEDICATED_MEDIUM
+      - DEDICATED_LARGE
+      example: SHARED_STANDARD
+      description: Class of service wanted on Tier-0 VRF Gateway
+    jobs:
+      description: Current root job id of an organization and get, post or delete
+        links
+      properties:
+        jobId:
+          $ref: '#/components/schemas/OrganizationJobOutput'
+        links:
+          description: get, post or delete links
+          type: object
+          example:
+            get:
+              href: /api/v1.0/jobs/d6661...ocb1270852
+              method: GET
+            post:
+              href: /api/v1.0/jobs/d6661...ocb1270852
+              method: POST
+            delete:
+              href: /api/v1.0/jobs/d6661...ocb1270852
+              method: DELETE
+    edgeGatewayCreate:
+      description: Edge Gateway (NSX-T Tier-1 Gateway)
+      type: object
+      required:
+      - tier0VrfId
+      properties:
+        tier0VrfId:
+          description: Identifier of Tier-0 VRF to connect the Edge Gateway
+          type: string
+          example: prvrf01iocb0000001allsp01
+    vdcGroup:
+      type: string
+      title: vDC Group
+      description: Name of an existing vDC group or a new one. This allows you to
+        isolate your vDC. VMs of vDCs which belong to the same vDC group can communicate
+        together.
+      example: myvDCGroup
+    organizationNameV2:
+      type: string
+      example: cav01iv02ocb0005676
+      description: Organization name
+    tier0Name:
+      type: string
+      example: prvrf01iocb1105414allsp02
+      description: Tier-0-VRF name
+    vdcName:
+      type: string
+      example: myvdc
+      description: Virtual Datacenter Name
+    vdcEdges:
+      description: List of provider edges.
+      type: array
+      items:
+        $ref: '#/components/schemas/vdcEdge'
+    vdcEdge:
+      type: object
+      required:
+      - name
+      - uuid
+      - type
+      - highAvailability
+      properties:
+        id:
+          type: string
+          example: 1e23:3432:ab32:1223
+        name:
+          type: string
+          example: vDCName_vCDESG_PFS_S1_01
+        type:
+          type: string
+          enum:
+          - ADMIN
+          - INET
+          - BVPN
+          - CROSSCONNECT
+          - RBCI
+          - PFS
+          - EIN
+          - EXPL
+          - ST
+          - GINIS
+          - GINEFA
+          - GINCMZ
+          - NFS
+          - BACKUP
+          example: INET
+          description: For external customers `ADMIN`, `INET`, `BVPN`, `CROSSCONNECT`.
+            <br/> For internal customers `PFS`, `RBCI`, `EIN`, `EXPL`, `ST`, `GINIS`,
+            `GINEFA`, `GINCMZ`, `NFS`, `BACKUP`.
+        highAvailability:
+          type: boolean
+          default: true
+    vdcStorageProfilesV2:
+      required:
+      - class
+      - limit
+      - default
+      description: Storage policies description
+      type: object
+      properties:
+        class:
+          type: string
+          description: 'The value can be on this model for dedicated ''platinum3k_ocb1234567_hm''
+            (dedicated storage is only available with GET route, it is not possible
+            to update or create a VDC with dedicated storage) or one of these values
+            : silver,silver_r1,silver_r2, gold,gold_r1,gold_r2, gold_hm, platinum3k,platinum3k_r1,platinum3k_r2,
+            platinum3k_hm, platinum7k,platinum7k_r1,platinum7k_r2, platinum7k_hm'
+          default: gold
+        limit:
+          description: Max number of units allocated for this storage profile. In
+            GiB
+          type: integer
+          example: 500
+          minimum: 100
+          maximum: 81920
+          default: 500
+        used:
+          description: Current usage of this StorageProfile in GiB. Deletion is allowed
+            only if there is no usage of the StorageProfile
+          type: integer
+          example: 5000
+          minimum: 0
+        default:
+          description: True if the storage Profile is the default one. Only one default
+            per vdc is allowed.
+          type: boolean
+          example: true
+    orgVdcV2:
+      type: object
+      required:
+      - name
+      - vdcServiceClass
+      - vdcDisponibilityClass
+      - vdcBillingModel
+      - vdcStorageBillingModel
+      - vdcStorageProfiles
+      - cpuAllocated
+      - vcpuInMhz2
+      - memoryAllocated
+      properties:
+        name:
+          type: string
+          example: VDC_ECO_1
+          description: Name of the new org vdc.
+          minLength: 2
+          maxLength: 27
+          pattern: ^\w{2,27}$
+        description:
+          type: string
+          example: Additionnal VDC for benchmarks
+          description: Description of the new org vdc.
+        vdcServiceClass:
+          type: string
+          example: ECO
+          enum:
+          - ECO
+          - STD
+          - HP
+          - VOIP
+        vdcDisponibilityClass:
+          type: string
+          example: ONE-ROOM
+          enum:
+          - ONE-ROOM
+          - DUAL-ROOM
+          - HA-DUAL-ROOM
+        vdcBillingModel:
+          type: string
+          description: Choose Billing model of compute resources.
+          enum:
+          - PAYG
+          - DRAAS
+          - RESERVED
+        vcpuInMhz2:
+          type: number
+          example: 2200
+          default: 2200
+          minimum: 1200
+          description: Specifies the clock frequency, in Mhz, for any virtual CPU
+            that is allocated to a VM.
+        cpuAllocated:
+          type: number
+          example: 11000
+          minimum: 5
+          maximum: 2500000
+          description: Capacity that is committed to be available or used as a limit
+            in PAYG mode. Unit for compute capacity allocated to this vdc is MHz.
+            Note. Reserved capacity is automatically set according to the service
+            class.
+        memoryAllocated:
+          type: number
+          example: 4
+          minimum: 1
+          maximum: 5000
+          description: Memory capacity that is committed to be available or used as
+            a limit in PAYG mode. Unit for memory capacity allocated to this vdc is
+            Gb.
+        vdcStorageBillingModel:
+          title: Storage billing model
+          type: string
+          enum:
+          - PAYG
+          - RESERVED
+          description: Available for all vdcServiceClass.
+        vdcStorageProfiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/vdcStorageProfilesV2'
+    createOrgVdcV2:
+      title: vDC
+      required:
+      - vdc
+      properties:
+        vdcGroup:
+          $ref: '#/components/schemas/vdcGroup'
+        vdc:
+          $ref: '#/components/schemas/orgVdcV2'
+    createOrg2Vdcs:
+      title: DualRoom 2vDC
+      required:
+      - vdcGroup
+      - dualVdcs
+      properties:
+        vdcGroup:
+          $ref: '#/components/schemas/vdcGroup'
+        dualVdcs:
+          type: object
+          required:
+          - vdc1
+          - vdc2
+          properties:
+            vdc1:
+              type: object
+              allOf:
+              - $ref: '#/components/schemas/orgVdcV2'
+            vdc2:
+              type: object
+              allOf:
+              - $ref: '#/components/schemas/orgVdcV2'
+    UpdateOrgVdcV2:
+      required:
+      - vdc
+      properties:
+        vdc:
+          $ref: '#/components/schemas/orgVdcV2'
+    GetOrgVdcs2:
+      required:
+      - vdc
+      properties:
+        vdc:
+          $ref: '#/components/schemas/orgVdcV2'
+    edgeGateway:
+      type: object
+      description: Edge Gateway (NSX-T Tier-1 Gateway)
+      properties:
+        tier0VrfId:
+          type: string
+          example: prvrf01iocb0000001allsp01
+          description: Identifier of Tier-0 VRF to connect the Edge Gateway
+        edgeId:
+          type: string
+          example: cc1f35c2-90a2-48d1-9359-62794faf44ad
+        edgeName:
+          type: string
+        ownerType:
+          type: string
+          enum:
+          - vdc
+          - vdc-group
+        ownerName:
+          type: string
+          example: myVDC01
+        description:
+          type: string
+        rateLimit:
+          type: integer
+          example: 50
+    vDCList:
+      type: object
+      description: vDC list
+      properties:
+        vdc_name:
+          type: string
+          example: vdc01
+          description: vDC name
+        vdc_uuid:
+          type: string
+          example: 1bb33b06-8a3b-4a2c-a077-d4771794cf3c
+          description: vDC uuid
+    edgeGatewayNetworkGet:
+      description: Edge Gateway network configuration.
+      type: object
+      required:
+      - networkType
+      - prefixLength
+      - startAddress
+      properties:
+        prefixLength:
+          type: integer
+          minimum: 27
+          maximum: 31
+          example: 27
+        startAddress:
+          type: string
+          minimum: 0
+          default: ''
+        networkType:
+          type: string
+          example: sv
+          enum:
+          - sv
+      example:
+        networkType: sv
+        prefixLength: 27
+        startAddress: 100.103.193.160
+    tier0List:
+      description: List of all Tier-0 VRF of the organisation
+      type: array
+      items:
+        $ref: '#/components/schemas/tier0Name'
+      example:
+      - prvrf01iocb0000001allsp01
+      - prvrf01iocb0000001allsp02
+    service:
+      type: object
+      description: service list of the Tier-0-VRF
+      properties:
+        service:
+          type: string
+          example: INTERNET
+        vlanId:
+          type: string
+          example: '1234'
+    services:
+      description: services list of the Tier-0-VRF
+      type: array
+      items:
+        $ref: '#/components/schemas/service'
+      example:
+      - service: OBJECT_STORAGE
+        vlanId: null
+    sla_profiles:
+      type: array
+      items:
+        type: string
+      example:
+      - platinum
+      - gold
+      - silver
+    tagVRF:
+      type: string
+      enum:
+      - VRF_STANDARD
+      - VRF_PREMIUM
+      - VRF_DEDICATED_MEDIUM
+      - VRF_DEDICATED_LARGE
+      example: VRF_STANDARD
+    class_service:
+      description: List of tag of the Tier0 VRF
+      type: array
+      items:
+        $ref: '#/components/schemas/tagVRF'
+      example:
+      - VRF_STANDARD
+    tier0Details:
+      description: Details of Tier-0 VRF of the organisation
+      type: object
+      properties:
+        tier0_vrf:
+          $ref: '#/components/schemas/tier0Name'
+        tier0_provider:
+          description: Tier0 provider infos
+          type: string
+          example: pr01e02t0sp01
+        class_service:
+          $ref: '#/components/schemas/class_service'
+        services:
+          $ref: '#/components/schemas/services'
+    OrganizationJobOutput:
+      description: Job id
+      type: string
+      example: 640d02e6-44b5-4fa5-bfea-59aca5bef017
+    properties_bvpn:
+      description: BVPN properties
+      type: object
+      properties:
+        vlanId:
+          type: number
+          description: vlan ID
+          example: 2268
+    properties_cav:
+      description: CAV SERVICES properties
+      type: object
+      properties:
+        prefixLength:
+          type: integer
+          description: Prefix length. When requested by customer, prefixLength can
+            be from 25 to 28. When requested by tech leads, prefixLength can be from
+            25 to 31. If not set, by default prefixLength will be 27.
+          example: 28
+    properties_cav_std_sv:
+      description: CAV STD SERVICES properties
+      type: object
+      properties:
+        adm:
+          type: boolean
+          description: activate connection to tooling zone
+          example: true
+        os:
+          type: boolean
+          description: activate connection to object storage service
+          example: true
+        tf:
+          type: boolean
+          description: activate connection to tufin object
+          example: true
+    network_schema:
+      description: network schema
+      type: object
+      required:
+      - networkType
+      properties:
+        networkType:
+          type: string
+          description: network type
+          example: ein
+        tier0Name:
+          type: string
+          description: tier0 name
+          example: prvrf01eocb1010311allsp02
+        edgeGateway:
+          type: string
+          description: edge ID
+          example: e979224a-9386-4646-af8f-f2f6c4e011b6
+        vmPrivateIp:
+          type: string
+          description: VM private IP (backup only)
+          example: 192.168.0.32
+        vmDisplayName:
+          type: string
+          description: VM display name (backup only)
+          example: VM Linux 01
+        properties:
+          oneOf:
+          - $ref: '#/components/schemas/properties_bvpn'
+          - $ref: '#/components/schemas/properties_cav'
+    network_hierarchy:
+      description: network hierarchy
+      type: array
+      items:
+        $ref: '#/components/schemas/network_hierarchy_item'
+    network_hierarchy_item:
+      description: network hierarchy entry
+      type: object
+      required:
+      - type
+      - name
+      - displayName
+      - properties
+      - children
+      properties:
+        type:
+          type: string
+          description: object type
+          example: tier-0-vrf
+        name:
+          type: string
+          description: object name
+          example: prvrf01iocb1010314allsp01
+        displayName:
+          type: string
+          description: object name
+          example: ''
+        properties:
+          oneOf:
+          - $ref: '#/components/schemas/network_properties_tier-0-vrf'
+          - $ref: '#/components/schemas/network_properties_edgeGateway'
+          - $ref: '#/components/schemas/network_properties_raei_service'
+          - $ref: '#/components/schemas/network_properties_bvpn_service'
+          - $ref: '#/components/schemas/network_properties_cav_services'
+          - $ref: '#/components/schemas/network_properties_cav_std_sv'
+        serviceId:
+          type: string
+          description: service id
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/network_hierarchy_item'
+          example:
+          - type: edgeGateway
+            name: tn01e02ocb1010310spt102
+            displayName: ''
+            properties:
+              rateLimit: 5
+              edgeUUID: 650699ca-2fad-493c-916b-1515b2693d74
+            children: []
+          - type: service
+            name: raei
+            displayName: INTERNET
+            properties:
+              publicIp: ''
+            children: []
+            serviceId: osgtzocb1010310raei01
+          - type: service
+            name: bvpn
+            displayName: BVPN
+            properties:
+              vlanID: 2678
+            children: []
+            serviceId: vsgexvp2678
+          - type: service
+            name: cav-services
+            displayName: Cloud Avenue Services
+            properties:
+              ranges:
+              - 10.92.41.224/27
+              ipCount: 32
+            children: []
+            serviceId: tn01i01ocb1010314spt101-cav-services
+          - type: service
+            name: cav-std-sv
+            displayName: Standard services
+            properties:
+              adm: true
+              os: true
+              tf: false
+              ecc: false
+            children: []
+            serviceId: prvrf01iocb1010314allsp01-cav-std-sv
+    network_properties_tier-0-vrf:
+      description: Network properties for tier-0-vrf
+      type: object
+      properties:
+        classOfService:
+          type: string
+          description: Class of the service
+          example: SHARED_STANDARD
+    network_properties_edgeGateway:
+      description: Network properties for edge gateway
+      type: object
+      properties:
+        rateLimit:
+          type: integer
+          description: Rate limit
+          example: 300
+        edgeUUID:
+          type: string
+          description: Edge UUID on vcd side needed to update the object
+          example: 6506921a-20ad-49mn-906b-1515b26ehd74
+    network_properties_raei_service:
+      description: Network properties for raei service
+      type: object
+      properties:
+        publicIp:
+          type: string
+          description: Public IP
+          example: ''
+    network_properties_bvpn_service:
+      description: Network properties for bvpn service
+      type: object
+      properties:
+        vlanId:
+          type: string
+          description: Vlan id
+          example: '2678'
+        primaryAddress:
+          type: string
+          description: CIDR of the interface that will be created on the customer
+            side on the primary site
+        secondaryAddress:
+          type: string
+          description: CIDR of the interface that will be created on the customer
+            side on the secondary site
+        peerAsn:
+          type: string
+          description: CDE ASN number
+        primaryPeerAddress:
+          type: string
+          description: CIDR of the CDE interface that is on the customer site
+        secondaryPeerAddress:
+          type: string
+          description: CIDR of the CDE interface that is on the second site
+    network_properties_cav_services:
+      description: Network properties for cav-services
+      type: object
+      properties:
+        ranges:
+          type: array
+          description: IP ranges
+          items:
+            type: string
+            example: 10.92.41.224/27
+        ipCount:
+          type: integer
+          description: Number of IPs
+          example: 32
+    network_properties_cav_std_sv:
+      description: Network properties for cav standard services
+      type: object
+      properties:
+        adm:
+          type: boolean
+          description: ADM enabled
+          example: true
+        os:
+          type: boolean
+          description: OS enabled
+          example: true
+        tf:
+          type: boolean
+          description: TF disabled
+          example: false
+        ecc:
+          type: boolean
+          description: ECC disabled
+          example: false
+    qos_rate_limit:
+      description: qos rate limit
+      type: object
+      required:
+      - rateLimit
+      properties:
+        rateLimit:
+          type: integer
+          description: rate limit
+          example: 50
+    BMS:
+      description: BMS and Network details
+      type: object
+      properties:
+        network:
+          type: array
+          items:
+            $ref: '#/components/schemas/BMSNetworkDetails'
+        bms:
+          type: array
+          items:
+            $ref: '#/components/schemas/BMSDetails'
+    BMSDetails:
+      description: BMS configuration
+      type: object
+      required:
+      - biosConfiguration
+      - storage
+      properties:
+        bmsType:
+          type: string
+          description: BMS class of service
+          example: bms.hc1.large
+        hostname:
+          type: string
+          description: BMS Hostname
+          example: BMS01
+        os:
+          type: string
+          description: Operating System
+          example: Microsoft Windows Server 2019 Standard 10.0.17763
+        biosConfiguration:
+          type: string
+          description: BIOS configuration
+          example: GeneralPowerEfficientCompute
+        storage:
+          $ref: '#/components/schemas/BMSStorage'
+    BMSNetworkDetails:
+      description: BMS Network Details
+      type: object
+      properties:
+        vlanid:
+          type: integer
+          description: VLAN ID
+          example: 2900
+        subnet:
+          type: string
+          description: Subnet IP Address
+          example: 10.11.12.0
+        prefix:
+          type: integer
+          description: Subnet Prefix
+          example: 24
+    BMSStorage:
+      description: BMS Storage
+      type: object
+      properties:
+        local:
+          type: array
+          items:
+            $ref: '#/components/schemas/BMSStorageDetails'
+        system:
+          type: array
+          items:
+            $ref: '#/components/schemas/BMSStorageDetails'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BMSStorageDetails'
+        shared:
+          type: array
+          items:
+            $ref: '#/components/schemas/BMSStorageDetails'
+    BMSStorageDetails:
+      description: BMS Storage Details
+      type: object
+      required:
+      - storageClass
+      - size
+      properties:
+        storageClass:
+          type: string
+          description: Drive class
+          example: NVMe
+        size:
+          type: string
+          description: Drive size
+          example: 1.46 TB
+    backupDetails:
+      description: Backup Details
+      type: object
+      required:
+      - vmDisplayName
+      - tier0Name
+      - tier1Name
+      - privateIP
+      - nattedIP
+      properties:
+        vmDisplayName:
+          type: string
+          description: VM Display Name
+          example: VM linux 01
+        tier0Name:
+          type: string
+          description: Tier 0 name
+          example: prvrf01iocb0000001allsp01
+        tier1Name:
+          type: string
+          description: Tier 1 name
+          example: tn01i01ocb0000001spt101
+        privateIP:
+          type: string
+          description: Private IP
+          example: 192.168.0.34
+        nattedIP:
+          type: string
+          description: Natted IP
+          example: 100.101.191.16
+    GETTMStatus:
+      description: Trend micro activation info
+      type: object
+      required:
+      - enabled
+      properties:
+        enabled:
+          type: boolean
+    PUTTMStatus:
+      description: Trend micro management
+      type: object
+      required:
+      - enabled
+      properties:
+        enabled:
+          type: boolean
+        mail:
+          type: string
+    CerberusAuthentRequest:
+      description: Cerberus authentication
+      type: object
+      required:
+      - client_id
+      - client_secret
+      - grant_type
+      - scope
+      properties:
+        client_id:
+          type: string
+          description: Username
+          example: username
+        client_secret:
+          type: string
+          description: Password
+          example: password
+        grant_type:
+          type: string
+          description: Authentication model
+          example: client_credentials
+        scope:
+          type: string
+          description: Organization name prefixed by "tenant:"
+          example: tenant:cav00iv00ocb0000000
+    CerberusError:
+      description: Cerberus error response
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          description: unique code of the error
+        message:
+          type: string
+          description: error type message
+        description:
+          type: string
+          description: contextualized description of the error
+    CerberusAuthentResponse:
+      description: Cerberus authentication response
+      type: object
+      required:
+      - access_token
+      - type
+      - expires_in
+      properties:
+        access_token:
+          type: string
+          description: token to put in "Authorization" header after "type"
+        type:
+          type: string
+          description: token type to put in "Authorization" header
+        expires_in:
+          type: integer
