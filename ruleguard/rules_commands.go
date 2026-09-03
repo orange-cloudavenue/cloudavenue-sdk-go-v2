@@ -35,7 +35,8 @@ func commandsModelTypes(m dsl.Matcher) {
 				m["verb"].Text == `"Update"` ||
 				m["verb"].Text == `"Get"` ||
 				m["verb"].Text == `"List"`) &&
-				!m["$$"].Text.Matches(`\bModelType\s*:`)).
+				!m["$$"].Text.Matches(`\bModelType\s*:`),
+		).
 		Report(`Command with Verb:$verb must include ModelType`)
 
 	// * For other verbs, ModelType must NOT be present
@@ -46,13 +47,13 @@ func commandsModelTypes(m dsl.Matcher) {
 				m["verb"].Text == `"Disable"` ||
 				m["verb"].Text == `"Add"` ||
 				m["verb"].Text == `"Remove"`) &&
-				m["$$"].Text.Matches(`\bModelType\s*:`)).
+				m["$$"].Text.Matches(`\bModelType\s*:`),
+		).
 		Report(`Command with Verb:$verb must NOT include ModelType`)
 }
 
 // ParamsSpecs should have a Name (only lowercase) and a Description
 func commandsParamsSpecs(m dsl.Matcher) {
-
 	// * Name
 	// Ensure the ParamsSpec struct contains a Name field.
 	m.Match(`commands.ParamsSpec{ $*_ }`).
