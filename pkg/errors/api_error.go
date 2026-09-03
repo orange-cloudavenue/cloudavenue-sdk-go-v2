@@ -10,6 +10,7 @@
 package errors
 
 import (
+	stderrors "errors"
 	"fmt"
 	"time"
 )
@@ -41,11 +42,22 @@ type APIError struct {
 
 	// Method is the HTTP method used for the API request (e.g., GET, POST).
 	Method string
+
+	// Err carries sentinel/root cause information for errors.Is / errors.AsType usage.
+	Err error
 }
 
 // IsNotFound checks if the APIError indicates a "not found" error.
 func (e *APIError) IsNotFound() bool {
-	return e.StatusCode == 404
+	return e.StatusCode == 404 || stderrors.Is(e, ErrNotFound)
+}
+
+// Unwrap returns underlying sentinel/root cause when present.
+func (e *APIError) Unwrap() error {
+	if e == nil {
+		return nil
+	}
+	return e.Err
 }
 
 // Error returns the error message for APIError.
@@ -54,7 +66,8 @@ func (e *APIError) Error() string {
 		return "nil APIError"
 	}
 
-	return fmt.Sprintf("[%s] request API error: %s (method:%s status code: %d, duration: %s, endpoint: %s)",
+	return fmt.Sprintf(
+		"[%s] request API error: %s (method:%s status code: %d, duration: %s, endpoint: %s)",
 		e.Operation, e.Message, e.Method, e.StatusCode, e.Duration, e.Endpoint,
 	)
 }

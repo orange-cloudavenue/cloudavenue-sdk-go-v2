@@ -231,7 +231,7 @@ func GetConsoles() map[ConsoleName]Console {
 	return consoles
 }
 
-// FindByOrganizationName - Returns the console by its organization name.
+// FindByOrganizationName returns console matching organization name.
 func FindByOrganizationName(organizationName string) (ConsoleName, bool) {
 	mu.RLock()
 	defer mu.RUnlock()
@@ -245,7 +245,7 @@ func FindByOrganizationName(organizationName string) (ConsoleName, bool) {
 	return "", false
 }
 
-// IsValidOrganizationName - Returns true if the organization name is valid.
+// IsValidOrganizationName reports whether organization name matches known console.
 func IsValidOrganizationName(organizationName string) bool {
 	if organizationName == "" {
 		return false
@@ -263,7 +263,7 @@ func IsValidOrganizationName(organizationName string) bool {
 	return false
 }
 
-// Services - Returns the Services.
+// Services returns services available for console.
 func (c ConsoleName) Services() Services {
 	mu.RLock()
 	defer mu.RUnlock()
@@ -271,17 +271,17 @@ func (c ConsoleName) Services() Services {
 	return consoles[c].Services
 }
 
-// Enabled - Returns true if the service is enabled.
+// IsEnabled reports whether service is enabled.
 func (ss Service) IsEnabled() bool {
 	return ss.Enabled
 }
 
-// GetEndpoint - Returns the endpoint.
+// GetEndpoint returns service endpoint.
 func (ss Service) GetEndpoint() string {
 	return ss.Endpoint
 }
 
-// GetSiteName - Returns the site name.
+// GetSiteName returns site name.
 func (c ConsoleName) GetSiteName() string {
 	mu.RLock()
 	defer mu.RUnlock()
@@ -289,7 +289,7 @@ func (c ConsoleName) GetSiteName() string {
 	return consoles[c].SiteName
 }
 
-// GetLocationCode - Returns the location code.
+// GetLocationCode returns location code.
 func (c ConsoleName) GetLocationCode() LocationCode {
 	mu.RLock()
 	defer mu.RUnlock()
@@ -297,7 +297,7 @@ func (c ConsoleName) GetLocationCode() LocationCode {
 	return consoles[c].LocationCode
 }
 
-// GetSiteID - Returns the site ID.
+// GetSiteID returns site identifier.
 func (c ConsoleName) GetSiteID() ConsoleName {
 	mu.RLock()
 	defer mu.RUnlock()
@@ -305,7 +305,7 @@ func (c ConsoleName) GetSiteID() ConsoleName {
 	return consoles[c].SiteID
 }
 
-// GetAPIVCDEndpoint - Returns the VMware API endpoint.
+// GetAPIVCDEndpoint returns VMware API endpoint.
 func (c ConsoleName) GetAPIVCDEndpoint() string {
 	mu.RLock()
 	defer mu.RUnlock()
@@ -313,7 +313,7 @@ func (c ConsoleName) GetAPIVCDEndpoint() string {
 	return consoles[c].Services.APIVCD.GetEndpoint()
 }
 
-// GetAPICerberusEndpoint - Returns the Cerberus API endpoint.
+// GetAPICerberusEndpoint returns Cerberus API endpoint.
 func (c ConsoleName) GetAPICerberusEndpoint() string {
 	mu.RLock()
 	defer mu.RUnlock()
@@ -321,7 +321,23 @@ func (c ConsoleName) GetAPICerberusEndpoint() string {
 	return consoles[c].Services.APICerberus.GetEndpoint()
 }
 
-// OverrideEndpoint - Overrides the endpoint for a specific service.
+// GetAPIOSEEndpoint returns OSE/S3 API endpoint.
+func (c ConsoleName) GetAPIOSEEndpoint() string {
+	mu.RLock()
+	defer mu.RUnlock()
+
+	return consoles[c].Services.S3.GetEndpoint()
+}
+
+// GetNetbackupEndpoint returns NetBackup API endpoint.
+func (c ConsoleName) GetNetbackupEndpoint() string {
+	mu.RLock()
+	defer mu.RUnlock()
+
+	return consoles[c].Services.Netbackup.GetEndpoint()
+}
+
+// OverrideEndpoint overrides console services.
 func (c ConsoleName) OverrideEndpoint(svc Services) {
 	mu.Lock()
 	defer mu.Unlock()
