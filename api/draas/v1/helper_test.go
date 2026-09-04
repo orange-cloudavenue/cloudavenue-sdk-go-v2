@@ -12,7 +12,6 @@ package draas
 import (
 	"log/slog"
 	"os"
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,30 +19,24 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
 )
 
-var testMutex = sync.Mutex{}
-
-func newClient(t *testing.T) *Client {
+func newClient(t *testing.T) (*Client, *mock.MockServer) {
 	t.Helper()
 
-	testMutex.Lock()
-	t.Cleanup(func() {
-		testMutex.Unlock()
-	})
-
-	mC, err := mock.NewClient(
+	mockClient, mockServer, err := mock.NewClient(
 		mock.WithLogger(
 			slog.New(
 				slog.NewTextHandler(
 					os.Stdout,
 					&slog.HandlerOptions{
 						Level: slog.LevelDebug,
-					}),
+					},
+				),
 			),
 		),
 	)
 	assert.Nil(t, err, "Error creating mock client")
 
-	eC, err := New(mC)
+	cavClient, err := New(mockClient)
 	assert.Nil(t, err, "Error creating draas client")
-	return eC
+	return cavClient, mockServer
 }

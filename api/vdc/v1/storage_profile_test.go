@@ -12,13 +12,12 @@ package vdc
 import (
 	"testing"
 
+	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
-	"github.com/orange-cloudavenue/common-go/generator"
-	"github.com/orange-cloudavenue/common-go/utils"
 )
 
 func TestListStorageProfiles(t *testing.T) {
@@ -86,16 +85,17 @@ func TestListStorageProfiles(t *testing.T) {
 			expectedErr: true,
 		},
 		{
-			name: "Error api response return an empty HREF for Storage Profile ID",
+			name: "Error api response return an empty Storage Profile ID",
 			params: types.ParamsListStorageProfile{
 				ID: generator.MustGenerate("{urn:vdcstorageProfile}"),
 			},
 			mockResponse: &itypes.ApiResponseListStorageProfiles{
 				StorageProfiles: []itypes.ApiResponseListStorageProfile{
 					{
-						HREF:      "", // Empty HREF to simulate error
+						ID:        "", // Empty ID to simulate error
 						Name:      "platinum3k_r1",
 						IsEnabled: true,
+						VdcID:     generator.MustGenerate("{urn:vdc}"),
 					},
 				},
 			},
@@ -103,14 +103,14 @@ func TestListStorageProfiles(t *testing.T) {
 			expectedErr:        true,
 		},
 		{
-			name: "Error api response return an empty HREF for VDC ID",
+			name: "Error api response return an empty VDC ID",
 			params: types.ParamsListStorageProfile{
 				VdcID: generator.MustGenerate("{urn:vdc}"),
 			},
 			mockResponse: &itypes.ApiResponseListStorageProfiles{
 				StorageProfiles: []itypes.ApiResponseListStorageProfile{
 					{
-						HREF:      generator.MustGenerate("{href_uuid}"),
+						ID:        generator.MustGenerate("{urn:vdcstorageProfile}"),
 						VdcID:     "", // Empty VdcID to simulate error
 						Name:      "platinum3k_r1",
 						IsEnabled: true,
@@ -133,12 +133,12 @@ func TestListStorageProfiles(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.mockResponseStatus != 0 {
-				endpoints.ListStorageProfile().CleanMockResponse()
-				endpoints.ListStorageProfile().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
-			}
+			client, ms := newClient(t)
 
-			client := newClient(t)
+			if tt.mockResponseStatus != 0 {
+				ms.CleanResponse(endpoints.ListStorageProfile())
+				ms.SetResponse(endpoints.ListStorageProfile(), tt.mockResponse, &tt.mockResponseStatus)
+			}
 
 			resp, err := client.ListStorageProfile(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -237,17 +237,17 @@ func TestAddStorageProfile(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
 			if tt.mockResponseStatus != 0 {
-				endpoints.UpdateVdc().CleanMockResponse()
-				endpoints.UpdateVdc().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.UpdateVdc())
+				ms.SetResponse(endpoints.UpdateVdc(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			if tt.mockResponseVDCStatus != 0 {
-				endpoints.ListVdc().CleanMockResponse()
-				endpoints.ListVdc().SetMockResponse(tt.mockResponseVDC, &tt.mockResponseVDCStatus)
+				ms.CleanResponse(endpoints.ListVdc())
+				ms.SetResponse(endpoints.ListVdc(), tt.mockResponseVDC, &tt.mockResponseVDCStatus)
 			}
-
-			client := newClient(t)
 
 			err := client.AddStorageProfile(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -281,19 +281,21 @@ func TestDeleteStorageProfile(t *testing.T) {
 				StorageProfiles: []itypes.ApiResponseListStorageProfile{
 					{
 						HREF:                    generator.MustGenerate("{href_uuid}"),
+						ID:                      generator.MustGenerate("{urn:vdcstorageProfile}"),
 						Name:                    "gold",
 						IsDefaultStorageProfile: false,
 						VdcName:                 "vdc1",
-						VdcID:                   generator.MustGenerate("{url}/5ec9d15c-dc05-4a0f-8340-b10b18cda038"),
+						VdcID:                   "urn:vcloud:vdc:5ec9d15c-dc05-4a0f-8340-b10b18cda038",
 						Limit:                   500,
 						Used:                    0,
 					},
 					{
 						HREF:                    generator.MustGenerate("{href_uuid}"),
+						ID:                      generator.MustGenerate("{urn:vdcstorageProfile}"),
 						Name:                    "silver",
 						IsDefaultStorageProfile: true,
 						VdcName:                 "vdc1",
-						VdcID:                   generator.MustGenerate("{url}/5ec9d15c-dc05-4a0f-8340-b10b18cda038"),
+						VdcID:                   "urn:vcloud:vdc:5ec9d15c-dc05-4a0f-8340-b10b18cda038",
 						Limit:                   100,
 						Used:                    0,
 					},
@@ -326,6 +328,7 @@ func TestDeleteStorageProfile(t *testing.T) {
 				StorageProfiles: []itypes.ApiResponseListStorageProfile{
 					{
 						HREF:                    generator.MustGenerate("{href_uuid}"),
+						ID:                      generator.MustGenerate("{urn:vdcstorageProfile}"),
 						Name:                    "gold",
 						IsDefaultStorageProfile: false,
 						VdcName:                 "vdc1",
@@ -335,6 +338,7 @@ func TestDeleteStorageProfile(t *testing.T) {
 					},
 					{
 						HREF:                    generator.MustGenerate("{href_uuid}"),
+						ID:                      generator.MustGenerate("{urn:vdcstorageProfile}"),
 						Name:                    "silver",
 						IsDefaultStorageProfile: true,
 						VdcName:                 "vdc1",
@@ -373,6 +377,7 @@ func TestDeleteStorageProfile(t *testing.T) {
 				StorageProfiles: []itypes.ApiResponseListStorageProfile{
 					{
 						HREF:                    generator.MustGenerate("{href_uuid}"),
+						ID:                      generator.MustGenerate("{urn:vdcstorageProfile}"),
 						Name:                    "gold",
 						IsDefaultStorageProfile: true,
 						VdcName:                 generator.MustGenerate("{word}"),
@@ -397,6 +402,7 @@ func TestDeleteStorageProfile(t *testing.T) {
 				StorageProfiles: []itypes.ApiResponseListStorageProfile{
 					{
 						HREF:                    generator.MustGenerate("{href_uuid}"),
+						ID:                      generator.MustGenerate("{urn:vdcstorageProfile}"),
 						Name:                    "gold",
 						IsDefaultStorageProfile: true,
 						VdcName:                 "vdc1",
@@ -406,6 +412,7 @@ func TestDeleteStorageProfile(t *testing.T) {
 					},
 					{
 						HREF:                    generator.MustGenerate("{href_uuid}"),
+						ID:                      generator.MustGenerate("{urn:vdcstorageProfile}"),
 						Name:                    "silver",
 						IsDefaultStorageProfile: false,
 						VdcName:                 "vdc1",
@@ -430,6 +437,7 @@ func TestDeleteStorageProfile(t *testing.T) {
 				StorageProfiles: []itypes.ApiResponseListStorageProfile{
 					{
 						HREF:                    generator.MustGenerate("{href_uuid}"),
+						ID:                      generator.MustGenerate("{urn:vdcstorageProfile}"),
 						Name:                    "gold",
 						IsDefaultStorageProfile: false,
 						VdcName:                 "vdc1",
@@ -439,6 +447,7 @@ func TestDeleteStorageProfile(t *testing.T) {
 					},
 					{
 						HREF:                    generator.MustGenerate("{href_uuid}"),
+						ID:                      generator.MustGenerate("{urn:vdcstorageProfile}"),
 						Name:                    "silver",
 						IsDefaultStorageProfile: true,
 						VdcName:                 "vdc1",
@@ -463,6 +472,7 @@ func TestDeleteStorageProfile(t *testing.T) {
 				StorageProfiles: []itypes.ApiResponseListStorageProfile{
 					{
 						HREF:                    generator.MustGenerate("{href_uuid}"),
+						ID:                      generator.MustGenerate("{urn:vdcstorageProfile}"),
 						Name:                    "silver",
 						IsDefaultStorageProfile: true,
 						VdcName:                 "vdc1",
@@ -472,6 +482,7 @@ func TestDeleteStorageProfile(t *testing.T) {
 					},
 					{
 						HREF:                    generator.MustGenerate("{href_uuid}"),
+						ID:                      generator.MustGenerate("{urn:vdcstorageProfile}"),
 						Name:                    "bronze",
 						IsDefaultStorageProfile: false,
 						VdcName:                 "vdc1",
@@ -494,8 +505,8 @@ func TestDeleteStorageProfile(t *testing.T) {
 			},
 			mockResponseListStorageProfile: &itypes.ApiResponseListStorageProfiles{
 				StorageProfiles: []itypes.ApiResponseListStorageProfile{
-					{HREF: generator.MustGenerate("{href_uuid}"), Name: "gold", IsDefaultStorageProfile: true, VdcID: generator.MustGenerate("{urn:vdc}"), VdcName: generator.MustGenerate("{word}")},
-					{HREF: generator.MustGenerate("{href_uuid}"), Name: "gold", IsDefaultStorageProfile: false, VdcID: generator.MustGenerate("{urn:vdc}"), VdcName: generator.MustGenerate("{word}")},
+					{HREF: generator.MustGenerate("{href_uuid}"), ID: generator.MustGenerate("{urn:vdcstorageProfile}"), Name: "gold", IsDefaultStorageProfile: true, VdcID: generator.MustGenerate("{urn:vdc}"), VdcName: generator.MustGenerate("{word}")},
+					{HREF: generator.MustGenerate("{href_uuid}"), ID: generator.MustGenerate("{urn:vdcstorageProfile}"), Name: "gold", IsDefaultStorageProfile: false, VdcID: generator.MustGenerate("{urn:vdc}"), VdcName: generator.MustGenerate("{word}")},
 				},
 			},
 			mockResponseListStorageProfileStatus: 200,
@@ -505,17 +516,17 @@ func TestDeleteStorageProfile(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
 			if tt.mockResponseStatus != 0 {
-				endpoints.UpdateVdc().CleanMockResponse()
-				endpoints.UpdateVdc().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.UpdateVdc())
+				ms.SetResponse(endpoints.UpdateVdc(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			if tt.mockResponseListStorageProfileStatus != 0 {
-				endpoints.ListStorageProfile().CleanMockResponse()
-				endpoints.ListStorageProfile().SetMockResponse(tt.mockResponseListStorageProfile, &tt.mockResponseListStorageProfileStatus)
+				ms.CleanResponse(endpoints.ListStorageProfile())
+				ms.SetResponse(endpoints.ListStorageProfile(), tt.mockResponseListStorageProfile, &tt.mockResponseListStorageProfileStatus)
 			}
-
-			client := newClient(t)
 
 			err := client.DeleteStorageProfile(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -547,8 +558,8 @@ func TestUpdateStorageProfile(t *testing.T) {
 			},
 			mockResponseListStorageProfile: &itypes.ApiResponseListStorageProfiles{
 				StorageProfiles: []itypes.ApiResponseListStorageProfile{
-					{HREF: generator.MustGenerate("{href_uuid}"), Name: "gold", IsDefaultStorageProfile: false, VdcName: "vdc1", VdcID: generator.MustGenerate("{url}/5ec9d15c-dc05-4a0f-8340-b10b18cda038"), Limit: 1000, Used: 0},
-					{HREF: generator.MustGenerate("{href_uuid}"), Name: "silver", IsDefaultStorageProfile: true, VdcName: "vdc1", VdcID: generator.MustGenerate("{url}/5ec9d15c-dc05-4a0f-8340-b10b18cda038"), Limit: 500, Used: 0},
+					{HREF: generator.MustGenerate("{href_uuid}"), ID: generator.MustGenerate("{urn:vdcstorageProfile}"), Name: "gold", IsDefaultStorageProfile: false, VdcName: "vdc1", VdcID: "urn:vcloud:vdc:5ec9d15c-dc05-4a0f-8340-b10b18cda038", Limit: 1000, Used: 0},
+					{HREF: generator.MustGenerate("{href_uuid}"), ID: generator.MustGenerate("{urn:vdcstorageProfile}"), Name: "silver", IsDefaultStorageProfile: true, VdcName: "vdc1", VdcID: "urn:vcloud:vdc:5ec9d15c-dc05-4a0f-8340-b10b18cda038", Limit: 500, Used: 0},
 				},
 			},
 			mockResponseListStorageProfileStatus: 200,
@@ -558,12 +569,12 @@ func TestUpdateStorageProfile(t *testing.T) {
 			name: "Success - Storage Profile set to default",
 			params: types.ParamsUpdateStorageProfile{
 				VdcName:         "vdc1",
-				StorageProfiles: []types.ParamsUpdateVDCStorageProfile{{Class: "gold", Default: utils.ToPTR(true)}},
+				StorageProfiles: []types.ParamsUpdateVDCStorageProfile{{Class: "gold", Default: new(true)}},
 			},
 			mockResponseListStorageProfile: &itypes.ApiResponseListStorageProfiles{
 				StorageProfiles: []itypes.ApiResponseListStorageProfile{
-					{HREF: generator.MustGenerate("{href_uuid}"), Name: "gold", IsDefaultStorageProfile: false, VdcName: "vdc1", VdcID: generator.MustGenerate("{url}/5ec9d15c-dc05-4a0f-8340-b10b18cda038"), Limit: 1000, Used: 0},
-					{HREF: generator.MustGenerate("{href_uuid}"), Name: "silver", IsDefaultStorageProfile: true, VdcName: "vdc1", VdcID: generator.MustGenerate("{url}/5ec9d15c-dc05-4a0f-8340-b10b18cda038"), Limit: 500, Used: 0},
+					{HREF: generator.MustGenerate("{href_uuid}"), ID: generator.MustGenerate("{urn:vdcstorageProfile}"), Name: "gold", IsDefaultStorageProfile: false, VdcName: "vdc1", VdcID: "urn:vcloud:vdc:5ec9d15c-dc05-4a0f-8340-b10b18cda038", Limit: 1000, Used: 0},
+					{HREF: generator.MustGenerate("{href_uuid}"), ID: generator.MustGenerate("{urn:vdcstorageProfile}"), Name: "silver", IsDefaultStorageProfile: true, VdcName: "vdc1", VdcID: "urn:vcloud:vdc:5ec9d15c-dc05-4a0f-8340-b10b18cda038", Limit: 500, Used: 0},
 				},
 			},
 			mockResponseListStorageProfileStatus: 200,
@@ -577,7 +588,7 @@ func TestUpdateStorageProfile(t *testing.T) {
 			},
 			mockResponseListStorageProfile: &itypes.ApiResponseListStorageProfiles{
 				StorageProfiles: []itypes.ApiResponseListStorageProfile{
-					{HREF: generator.MustGenerate("{href_uuid}"), Name: "gold", IsDefaultStorageProfile: true, VdcName: "vdc1", VdcID: generator.MustGenerate("{urn:vdc}"), Limit: 204800, Used: 150000}, // Limit is 2000 GiB (204800 MiB) and Used is 1500 GiB (153600 MiB)
+					{HREF: generator.MustGenerate("{href_uuid}"), ID: generator.MustGenerate("{urn:vdcstorageProfile}"), Name: "gold", IsDefaultStorageProfile: true, VdcName: "vdc1", VdcID: generator.MustGenerate("{urn:vdc}"), Limit: 204800, Used: 150000}, // Limit is 2000 GiB (204800 MiB) and Used is 1500 GiB (153600 MiB)
 				},
 			},
 			mockResponseListStorageProfileStatus: 200,
@@ -588,14 +599,14 @@ func TestUpdateStorageProfile(t *testing.T) {
 			params: types.ParamsUpdateStorageProfile{
 				VdcName: "vdc1",
 				StorageProfiles: []types.ParamsUpdateVDCStorageProfile{
-					{Class: "gold", Default: utils.ToPTR(true)},
-					{Class: "silver", Default: utils.ToPTR(true)},
+					{Class: "gold", Default: new(true)},
+					{Class: "silver", Default: new(true)},
 				},
 			},
 			mockResponseListStorageProfile: &itypes.ApiResponseListStorageProfiles{
 				StorageProfiles: []itypes.ApiResponseListStorageProfile{
-					{HREF: generator.MustGenerate("{href_uuid}"), Name: "gold", IsDefaultStorageProfile: false, VdcName: "vdc1", VdcID: generator.MustGenerate("{url}/5ec9d15c-dc05-4a0f-8340-b10b18cda038"), Limit: 1000, Used: 0},
-					{HREF: generator.MustGenerate("{href_uuid}"), Name: "silver", IsDefaultStorageProfile: true, VdcName: "vdc1", VdcID: generator.MustGenerate("{url}/5ec9d15c-dc05-4a0f-8340-b10b18cda038"), Limit: 500, Used: 0},
+					{HREF: generator.MustGenerate("{href_uuid}"), ID: generator.MustGenerate("{urn:vdcstorageProfile}"), Name: "gold", IsDefaultStorageProfile: false, VdcName: "vdc1", VdcID: generator.MustGenerate("{url}/5ec9d15c-dc05-4a0f-8340-b10b18cda038"), Limit: 1000, Used: 0},
+					{HREF: generator.MustGenerate("{href_uuid}"), ID: generator.MustGenerate("{urn:vdcstorageProfile}"), Name: "silver", IsDefaultStorageProfile: true, VdcName: "vdc1", VdcID: generator.MustGenerate("{url}/5ec9d15c-dc05-4a0f-8340-b10b18cda038"), Limit: 500, Used: 0},
 				},
 			},
 			mockResponseListStorageProfileStatus: 200,
@@ -609,7 +620,7 @@ func TestUpdateStorageProfile(t *testing.T) {
 			},
 			mockResponseListStorageProfile: &itypes.ApiResponseListStorageProfiles{
 				StorageProfiles: []itypes.ApiResponseListStorageProfile{
-					{HREF: generator.MustGenerate("{href_uuid}"), Name: "gold", IsDefaultStorageProfile: false, VdcName: "vdc1", VdcID: generator.MustGenerate("{urn:vdc}"), Limit: 1000, Used: 0},
+					{HREF: generator.MustGenerate("{href_uuid}"), ID: generator.MustGenerate("{urn:vdcstorageProfile}"), Name: "gold", IsDefaultStorageProfile: false, VdcName: "vdc1", VdcID: generator.MustGenerate("{urn:vdc}"), Limit: 1000, Used: 0},
 				},
 			},
 			mockResponseListStorageProfileStatus: 200,
@@ -623,7 +634,7 @@ func TestUpdateStorageProfile(t *testing.T) {
 			},
 			mockResponseListStorageProfile: &itypes.ApiResponseListStorageProfiles{
 				StorageProfiles: []itypes.ApiResponseListStorageProfile{
-					{HREF: generator.MustGenerate("{href_uuid}"), Name: "gold", IsDefaultStorageProfile: true, VdcName: "vdc1", VdcID: generator.MustGenerate("{urn:vdc}"), Limit: 1000, Used: 0},
+					{HREF: generator.MustGenerate("{href_uuid}"), ID: generator.MustGenerate("{urn:vdcstorageProfile}"), Name: "gold", IsDefaultStorageProfile: true, VdcName: "vdc1", VdcID: generator.MustGenerate("{urn:vdc}"), Limit: 1000, Used: 0},
 				},
 			},
 			mockResponseListStorageProfileStatus: 200,
@@ -647,8 +658,8 @@ func TestUpdateStorageProfile(t *testing.T) {
 			},
 			mockResponseListStorageProfile: &itypes.ApiResponseListStorageProfiles{
 				StorageProfiles: []itypes.ApiResponseListStorageProfile{
-					{HREF: generator.MustGenerate("{href_uuid}"), Name: "gold", IsDefaultStorageProfile: true, VdcName: "vdc1", VdcID: generator.MustGenerate("{urn:vdc}")},
-					{HREF: generator.MustGenerate("{href_uuid}"), Name: "gold", IsDefaultStorageProfile: false, VdcName: "vdc1", VdcID: generator.MustGenerate("{urn:vdc}")},
+					{HREF: generator.MustGenerate("{href_uuid}"), ID: generator.MustGenerate("{urn:vdcstorageProfile}"), Name: "gold", IsDefaultStorageProfile: true, VdcName: "vdc1", VdcID: generator.MustGenerate("{urn:vdc}")},
+					{HREF: generator.MustGenerate("{href_uuid}"), ID: generator.MustGenerate("{urn:vdcstorageProfile}"), Name: "gold", IsDefaultStorageProfile: false, VdcName: "vdc1", VdcID: generator.MustGenerate("{urn:vdc}")},
 				},
 			},
 			mockResponseListStorageProfileStatus: 200,
@@ -670,16 +681,16 @@ func TestUpdateStorageProfile(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
 			if tt.mockResponseStatus != 0 {
-				endpoints.UpdateVdc().CleanMockResponse()
-				endpoints.UpdateVdc().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.UpdateVdc())
+				ms.SetResponse(endpoints.UpdateVdc(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 			if tt.mockResponseListStorageProfileStatus != 0 {
-				endpoints.ListStorageProfile().CleanMockResponse()
-				endpoints.ListStorageProfile().SetMockResponse(tt.mockResponseListStorageProfile, &tt.mockResponseListStorageProfileStatus)
+				ms.CleanResponse(endpoints.ListStorageProfile())
+				ms.SetResponse(endpoints.ListStorageProfile(), tt.mockResponseListStorageProfile, &tt.mockResponseListStorageProfileStatus)
 			}
-
-			client := newClient(t)
 
 			resp, err := client.UpdateStorageProfile(t.Context(), tt.params)
 			if tt.expectedErr {
