@@ -7,6 +7,7 @@
  * or see the "LICENSE" file for more details.
  */
 
+//nolint:tagliatelle
 package cav
 
 import (
@@ -83,7 +84,7 @@ func (n *netbackup) parseAPIError(operation string, resp *resty.Response) *error
 	return &errors.APIError{
 		Operation:  operation,
 		StatusCode: resp.StatusCode(),
-		Message:    "Unknown error occurred",
+		Message:    unknownErrorMessage,
 		Duration:   resp.Duration(),
 		Endpoint:   resp.Request.URL,
 		Method:     resp.Request.Method,
@@ -279,16 +280,6 @@ func (n *netbackup) restoreSession(data map[string]string) error {
 	n.baseURL = data["baseURL"]
 
 	return nil
-}
-
-func (n *netbackup) getExtraData() map[string]string {
-	n.mu.RLock()
-	defer n.mu.RUnlock()
-
-	return map[string]string{
-		"accessToken": n.accessToken,
-		"baseURL":     n.baseURL,
-	}
 }
 
 func (n *netbackup) close() error {

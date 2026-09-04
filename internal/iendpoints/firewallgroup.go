@@ -22,7 +22,7 @@ import (
 // IP Set, and Dynamic Security Group) that all share the same NSX-T Firewall
 // Group REST resource, differentiated only by the "typeValue" field on the
 // wire and by the OwnerRef (which accepts either an EdgeGateway URN or a
-// VdcGroup URN). Unlike most cloudapi resources, VCD does not follow the
+// VDCGroup URN). Unlike most cloudapi resources, VCD does not follow the
 // regular REST scheme for listing Firewall Groups: the list endpoint
 // requires a "/summaries" suffix. Create/Update/Delete are synchronous
 // (no async job).
@@ -37,16 +37,16 @@ func init() {
 		PathTemplate:     "/cloudapi/1.0.0/firewallGroups/summaries",
 		QueryParams: []cav.QueryParam{
 			{
-				Name:        "filter",
+				Name:        queryParamFilter,
 				Description: "Filter to apply to the list of Firewall Groups. Format: key==value;key==value. Allowed keys: typeValue, ownerRef.id, _context, name, id.",
 			},
 			{
-				Name:        "pageSize",
-				Description: "The number of items per page.",
-				Value:       "100",
+				Name:        queryParamPageSize,
+				Description: descPageSize,
+				Value:       pageSize100,
 			},
 		},
-		ResponseType: itypes.ApiResponseListFirewallGroup{},
+		ResponseType: itypes.APIResponseListFirewallGroup{},
 	}.Register()
 
 	// GetFirewallGroup
@@ -56,18 +56,18 @@ func init() {
 		Description:      "Get a Firewall Group (Security Group, IP Set, or Dynamic Security Group)",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/firewallGroups/{firewallGroupId}",
+		PathTemplate:     pathFirewallGroups,
 		PathParams: []cav.PathParam{
 			{
-				Name:        "firewallGroupId",
+				Name:        pathParamFirewallGroupID,
 				Description: "ID of the Firewall Group to get",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=firewallGroup")
+					return validators.New().Var(value, urnFirewallGroup)
 				},
 			},
 		},
-		ResponseType: itypes.ApiResponseFirewallGroup{},
+		ResponseType: itypes.APIResponseFirewallGroup{},
 	}.Register()
 
 	// CreateFirewallGroup
@@ -78,8 +78,8 @@ func init() {
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/firewallGroups",
-		BodyRequestType:  itypes.ApiRequestFirewallGroup{},
-		ResponseType:     itypes.ApiResponseFirewallGroup{},
+		BodyRequestType:  itypes.APIRequestFirewallGroup{},
+		ResponseType:     itypes.APIResponseFirewallGroup{},
 	}.Register()
 
 	// UpdateFirewallGroup
@@ -89,19 +89,19 @@ func init() {
 		Description:      "Update a Firewall Group (Security Group, IP Set, or Dynamic Security Group)",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/firewallGroups/{firewallGroupId}",
+		PathTemplate:     pathFirewallGroups,
 		PathParams: []cav.PathParam{
 			{
-				Name:        "firewallGroupId",
+				Name:        pathParamFirewallGroupID,
 				Description: "ID of the Firewall Group to update",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=firewallGroup")
+					return validators.New().Var(value, urnFirewallGroup)
 				},
 			},
 		},
-		BodyRequestType: itypes.ApiRequestFirewallGroup{},
-		ResponseType:    itypes.ApiResponseFirewallGroup{},
+		BodyRequestType: itypes.APIRequestFirewallGroup{},
+		ResponseType:    itypes.APIResponseFirewallGroup{},
 	}.Register()
 
 	// DeleteFirewallGroup
@@ -111,14 +111,14 @@ func init() {
 		Description:      "Delete a Firewall Group (Security Group, IP Set, or Dynamic Security Group)",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/firewallGroups/{firewallGroupId}",
+		PathTemplate:     pathFirewallGroups,
 		PathParams: []cav.PathParam{
 			{
-				Name:        "firewallGroupId",
+				Name:        pathParamFirewallGroupID,
 				Description: "ID of the Firewall Group to delete",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=firewallGroup")
+					return validators.New().Var(value, urnFirewallGroup)
 				},
 			},
 		},

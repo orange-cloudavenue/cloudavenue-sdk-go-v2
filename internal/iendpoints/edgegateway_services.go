@@ -28,31 +28,29 @@ func init() {
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendInfrapi,
 		PathTemplate:     "/api/customers/v2.0/network",
-		ResponseType:     itypes.ApiResponseNetworkServices{},
+		ResponseType:     itypes.APIResponseNetworkServices{},
 		QueryParams: []cav.QueryParam{
 			// Query parameters are not used in this endpoint, but can be added
 			// for the mock response if needed
 			{
-				Name:        "edgeId",
+				Name:        pathParamEdgeID,
 				Description: "The ID of the edge gateway to get network services for",
 				Required:    false,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=edgegateway")
+					return validators.New().Var(value, urnEdgeGateway)
 				},
-				TransformFunc: func(value string) (string, error) {
-					return extractor.ExtractUUID(value)
-				},
+				TransformFunc: extractor.ExtractUUID,
 			},
 			{
 				Name:        "edgeName",
 				Description: "The name of the edge gateway to get network services for",
 				Required:    false,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "resource_name=edgegateway")
+					return validators.New().Var(value, ruleResourceNameEdgeGateway)
 				},
 			},
 			{
-				Name:        "publicIp",
+				Name:        "publicIP",
 				Description: "The public IP address of the edge gateway",
 				Required:    false,
 				ValidatorFunc: func(value string) error {
@@ -70,7 +68,7 @@ func init() {
 		Backend:          cav.BackendInfrapi,
 		PathTemplate:     "/api/customers/v2.0/services",
 		ResponseType:     cav.Job{},
-		BodyRequestType:  itypes.ApiRequestNetworkServicesCavSvc{},
+		BodyRequestType:  itypes.APIRequestNetworkServicesCavSvc{},
 	}.Register()
 
 	cav.Endpoint{
@@ -82,7 +80,7 @@ func init() {
 		PathTemplate:     "/api/customers/v2.0/services/{serviceId}",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "serviceId",
+				Name:        pathParamServiceID,
 				Description: "The ID of the service to delete",
 				Required:    true,
 			},

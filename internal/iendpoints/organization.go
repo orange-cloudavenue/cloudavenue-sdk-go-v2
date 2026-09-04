@@ -25,7 +25,7 @@ func init() {
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/orgs",
-		ResponseType:     itypes.ApiResponseGetOrgs{},
+		ResponseType:     itypes.APIResponseGetOrgs{},
 	}.Register()
 
 	// GetOrganization from infraAPI
@@ -36,7 +36,7 @@ func init() {
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendInfrapi,
 		PathTemplate:     "/api/customers/v2.0/configurations",
-		ResponseType:     itypes.ApiResponseGetOrg{},
+		ResponseType:     itypes.APIResponseGetOrg{},
 	}.Register()
 
 	// UpdateOrganization
@@ -47,7 +47,7 @@ func init() {
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendInfrapi,
 		PathTemplate:     "/api/customers/v2.0/configurations",
-		BodyRequestType:  itypes.ApiRequestUpdateOrg{},
+		BodyRequestType:  itypes.APIRequestUpdateOrg{},
 		ResponseType:     cav.Job{},
 	}.Register()
 }

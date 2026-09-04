@@ -11,28 +11,28 @@ package types
 
 type (
 	// * List
-	ModelListVdcGroup struct {
-		VdcGroups []ModelGetVdcGroup `documentation:"List of Vdc Groups"`
+	ModelListVDCGroup struct {
+		VDCGroups []ModelGetVDCGroup `documentation:"List of Vdc Groups"`
 	}
 
 	// * Get
-	ModelGetVdcGroup struct {
+	ModelGetVDCGroup struct {
 		ID          string `documentation:"ID of the Vdc Group"`
 		Name        string `documentation:"Name of the Vdc Group"`
 		Description string `documentation:"Description of the Vdc Group"`
 
 		NumberOfVdcs int                   `documentation:"Number of Vdcs in the Vdc Group"`
-		Vdcs         []ModelGetVdcGroupVdc `documentation:"List of Vdcs in the Vdc Group"`
+		Vdcs         []ModelGetVDCGroupVDC `documentation:"List of Vdcs in the Vdc Group"`
 	}
 
-	ModelGetVdcGroupVdc struct {
+	ModelGetVDCGroupVDC struct {
 		ID   string `documentation:"ID of the Vdc"`
 		Name string `documentation:"Name of the Vdc"`
 	}
 )
 
 type (
-	ParamsListVdcGroup struct {
+	ParamsListVDCGroup struct {
 		// ID is the unique identifier of the Vdc Group to filter by.
 		ID string
 
@@ -40,7 +40,7 @@ type (
 		Name string
 	}
 
-	ParamsGetVdcGroup struct {
+	ParamsGetVDCGroup struct {
 		// ID is the unique identifier of the Vdc Group to filter by.
 		ID string
 
@@ -48,18 +48,18 @@ type (
 		Name string
 	}
 
-	ParamsCreateVdcGroup struct {
+	ParamsCreateVDCGroup struct {
 		// Name is the name of the Vdc Group.
 		Name string
 
 		// Description is the description of the Vdc Group.
 		Description string
 
-		// Vdcs is the list of Vdcs to associate with the Vdc Group.
-		Vdcs []ParamsCreateVdcGroupVdc
+		// VDCs is the list of VDCs to associate with the Vdc Group.
+		VDCs []ParamsCreateVDCGroupVDC
 	}
 
-	ParamsCreateVdcGroupVdc struct {
+	ParamsCreateVDCGroupVDC struct {
 		// ID is the unique identifier of the Vdc to associate with the Vdc Group.
 		ID string
 
@@ -67,7 +67,7 @@ type (
 		Name string
 	}
 
-	ParamsUpdateVdcGroup struct {
+	ParamsUpdateVDCGroup struct {
 		// ID is the unique identifier of the Vdc Group to update.
 		ID string
 
@@ -78,10 +78,10 @@ type (
 		Description *string
 
 		// Vdcs is the list of Vdcs to associate with the Vdc Group.
-		Vdcs []ParamsCreateVdcGroupVdc
+		Vdcs []ParamsCreateVDCGroupVDC
 	}
 
-	ParamsDeleteVdcGroup struct {
+	ParamsDeleteVDCGroup struct {
 		// ID is the unique identifier of the Vdc Group to delete.
 		ID string
 
@@ -92,23 +92,23 @@ type (
 		Force bool
 	}
 
-	ParamsAddVdcToVdcGroup struct {
+	ParamsAddVDCToVDCGroup struct {
 		// ID is the unique identifier of the Vdc Group to update.
 		ID string
 		// Name is the name of the Vdc Group.
 		Name string
 
 		// Vdcs is the list of Vdcs to associate with the Vdc Group.
-		Vdcs []ParamsCreateVdcGroupVdc
+		Vdcs []ParamsCreateVDCGroupVDC
 	}
 
-	ParamsRemoveVdcFromVdcGroup struct {
+	ParamsRemoveVDCFromVDCGroup struct {
 		// ID is the unique identifier of the Vdc Group to update.
 		ID string
 		// Name is the name of the Vdc Group.
 		Name string
 
 		// Vdcs is the list of Vdcs to disassociate from the Vdc Group.
-		Vdcs []ParamsCreateVdcGroupVdc
+		Vdcs []ParamsCreateVDCGroupVDC
 	}
 )

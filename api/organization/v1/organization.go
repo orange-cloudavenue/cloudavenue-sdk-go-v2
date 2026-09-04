@@ -42,7 +42,7 @@ func (c *Client) GetOrganization(ctx context.Context) (*types.ModelGetOrganizati
 		if err != nil {
 			return fmt.Errorf("%s: get organization info: %w", opGetOrganization, err)
 		}
-		org = resp.Result().(*itypes.ApiResponseGetOrg).ToModel()
+		org = resp.Result().(*itypes.APIResponseGetOrg).ToModel()
 		return nil
 	})
 
@@ -51,7 +51,7 @@ func (c *Client) GetOrganization(ctx context.Context) (*types.ModelGetOrganizati
 		if err != nil {
 			return fmt.Errorf("%s: get organization details: %w", opGetOrganization, err)
 		}
-		orgDetails = resp.Result().(*itypes.ApiResponseGetOrgs).ToModel()
+		orgDetails = resp.Result().(*itypes.APIResponseGetOrgs).ToModel()
 		if orgDetails == nil {
 			return fmt.Errorf("%s: organization not found", opGetOrganization)
 		}
@@ -73,9 +73,9 @@ func (c *Client) GetOrganization(ctx context.Context) (*types.ModelGetOrganizati
 		Email:               org.Email,
 		InternetBillingMode: org.InternetBillingMode,
 		Resources: types.ModelGetOrganizationResources{
-			Vdc:       orgDetails.Resources.Vdc,
+			VDC:       orgDetails.Resources.VDC,
 			Catalog:   orgDetails.Resources.Catalog,
-			Vapp:      orgDetails.Resources.Vapp,
+			VApp:      orgDetails.Resources.VApp,
 			VMRunning: orgDetails.Resources.VMRunning,
 			User:      orgDetails.Resources.User,
 			Disk:      orgDetails.Resources.Disk,
@@ -99,9 +99,9 @@ func (c *Client) UpdateOrganization(ctx context.Context, p types.ParamsUpdateOrg
 	if err != nil {
 		return nil, fmt.Errorf("%s: get current organization: %w", opUpdateOrganization, err)
 	}
-	data := orgDefault.Result().(*itypes.ApiResponseGetOrg).ToModel()
+	data := orgDefault.Result().(*itypes.APIResponseGetOrg).ToModel()
 
-	reqBody := &itypes.ApiRequestUpdateOrg{
+	reqBody := &itypes.APIRequestUpdateOrg{
 		FullName:            data.FullName,
 		Description:         data.Description,
 		CustomerMail:        data.Email,

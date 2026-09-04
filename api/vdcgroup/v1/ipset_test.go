@@ -29,30 +29,30 @@ func TestCreateIPSet(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.CreateFirewallGroup())
-	ms.SetResponse(endpoints.CreateFirewallGroup(), &itypes.ApiResponseFirewallGroup{ID: createdID}, nil)
+	ms.SetResponse(endpoints.CreateFirewallGroup(), &itypes.APIResponseFirewallGroup{ID: createdID}, nil)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
-		Values: []itypes.ApiResponseListVdcGroupDetails{{
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.SetResponse(endpoints.ListVDCGroup(), &itypes.APIResponseListVDCGroup{
+		Values: []itypes.APIResponseListVDCGroupDetails{{
 			ID:   vdcGroupID,
 			Name: vdcGroupName,
 		}},
 	}, nil)
 
 	ms.CleanResponse(endpoints.GetFirewallGroup())
-	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.ApiResponseFirewallGroup{
+	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.APIResponseFirewallGroup{
 		ID:          createdID,
 		Name:        "ipset-1",
 		Description: "desc",
 		TypeValue:   itypes.FirewallGroupTypeIPSet,
-		OwnerRef:    &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		OwnerRef:    &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 		IPAddresses: ipAddresses,
 	}, nil)
 
 	resp, err := client.CreateIPSet(t.Context(), types.ParamsCreateIPSet{
 		Name:         "ipset-1",
 		Description:  "desc",
-		VdcGroupName: vdcGroupName,
+		VDCGroupName: vdcGroupName,
 		IPAddresses:  ipAddresses,
 	})
 
@@ -64,7 +64,7 @@ func TestCreateIPSet(t *testing.T) {
 	assert.Equal(t, ipAddresses, resp.IPAddresses)
 
 	ms.CleanResponse(endpoints.CreateFirewallGroup())
-	ms.CleanResponse(endpoints.ListVdcGroup())
+	ms.CleanResponse(endpoints.ListVDCGroup())
 	ms.CleanResponse(endpoints.GetFirewallGroup())
 }
 
@@ -75,23 +75,23 @@ func TestListIPSet(t *testing.T) {
 
 	client, ms := newClient(t)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
-		Values: []itypes.ApiResponseListVdcGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.SetResponse(endpoints.ListVDCGroup(), &itypes.APIResponseListVDCGroup{
+		Values: []itypes.APIResponseListVDCGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
 	}, nil)
 
 	ms.CleanResponse(endpoints.ListFirewallGroup())
-	ms.SetResponse(endpoints.ListFirewallGroup(), &itypes.ApiResponseListFirewallGroup{
-		Values: []itypes.ApiResponseFirewallGroup{{
+	ms.SetResponse(endpoints.ListFirewallGroup(), &itypes.APIResponseListFirewallGroup{
+		Values: []itypes.APIResponseFirewallGroup{{
 			ID:          groupID,
 			Name:        "ipset-1",
 			TypeValue:   itypes.FirewallGroupTypeIPSet,
 			IPAddresses: []string{"192.0.2.10"},
-			OwnerRef:    &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+			OwnerRef:    &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 		}},
 	}, nil)
 
-	resp, err := client.ListIPSet(t.Context(), types.ParamsListIPSet{VdcGroupName: vdcGroupName})
+	resp, err := client.ListIPSet(t.Context(), types.ParamsListIPSet{VDCGroupName: vdcGroupName})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
@@ -100,7 +100,7 @@ func TestListIPSet(t *testing.T) {
 	assert.Equal(t, []string{"192.0.2.10"}, resp.FirewallGroups[0].IPAddresses)
 
 	ms.CleanResponse(endpoints.ListFirewallGroup())
-	ms.CleanResponse(endpoints.ListVdcGroup())
+	ms.CleanResponse(endpoints.ListVDCGroup())
 }
 
 func TestGetIPSet(t *testing.T) {
@@ -109,7 +109,7 @@ func TestGetIPSet(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetFirewallGroup())
-	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.ApiResponseFirewallGroup{
+	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.APIResponseFirewallGroup{
 		ID:          groupID,
 		Name:        "ipset-1",
 		TypeValue:   itypes.FirewallGroupTypeIPSet,

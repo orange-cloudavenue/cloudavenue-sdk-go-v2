@@ -33,7 +33,7 @@ const (
 	opDeleteEdgeGatewaySecurityGroup = "EdgeGateway.SecurityGroup.Delete"
 )
 
-func resolveEdgeGatewayOwnerRef(ctx context.Context, c cav.Client, edgeGatewayID, edgeGatewayName string) (*itypes.ApiObjectReference, error) {
+func resolveEdgeGatewayOwnerRef(ctx context.Context, c cav.Client, edgeGatewayID, edgeGatewayName string) (*itypes.APIObjectReference, error) {
 	ep := endpoints.GetEdgeGateway()
 	identifier := edgeGatewayID
 	if identifier == "" {
@@ -45,15 +45,15 @@ func resolveEdgeGatewayOwnerRef(ctx context.Context, c cav.Client, edgeGatewayID
 		return nil, err
 	}
 
-	edgeGateway := resp.Result().(*itypes.ApiResponseEdgegateway)
+	edgeGateway := resp.Result().(*itypes.APIResponseEdgegateway)
 	if edgeGateway.OwnerRef == nil {
 		return nil, fmt.Errorf("edge gateway owner is missing")
 	}
 
-	return &itypes.ApiObjectReference{ID: edgeGateway.OwnerRef.ID, Name: edgeGateway.OwnerRef.Name}, nil
+	return &itypes.APIObjectReference{ID: edgeGateway.OwnerRef.ID, Name: edgeGateway.OwnerRef.Name}, nil
 }
 
-func getEdgeGatewaySecurityGroup(ctx context.Context, c cav.Client, id, name, edgeGatewayID, edgeGatewayName string) (*itypes.ApiResponseFirewallGroup, error) {
+func getEdgeGatewaySecurityGroup(ctx context.Context, c cav.Client, id, name, edgeGatewayID, edgeGatewayName string) (*itypes.APIResponseFirewallGroup, error) {
 	if id != "" {
 		ep := endpoints.GetFirewallGroup()
 		resp, err := c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], id))
@@ -61,7 +61,7 @@ func getEdgeGatewaySecurityGroup(ctx context.Context, c cav.Client, id, name, ed
 			return nil, err
 		}
 
-		return resp.Result().(*itypes.ApiResponseFirewallGroup), nil
+		return resp.Result().(*itypes.APIResponseFirewallGroup), nil
 	}
 
 	ownerRef, err := resolveEdgeGatewayOwnerRef(ctx, c, edgeGatewayID, edgeGatewayName)
@@ -79,7 +79,7 @@ func getEdgeGatewaySecurityGroup(ctx context.Context, c cav.Client, id, name, ed
 		return nil, err
 	}
 
-	list := resp.Result().(*itypes.ApiResponseListFirewallGroup)
+	list := resp.Result().(*itypes.APIResponseListFirewallGroup)
 	if len(list.Values) == 0 {
 		return nil, &pkgerrors.APIError{Operation: "GetFirewallGroup", StatusCode: 404, Message: fmt.Sprintf("security group %q not found", name)}
 	}
@@ -90,7 +90,7 @@ func getEdgeGatewaySecurityGroup(ctx context.Context, c cav.Client, id, name, ed
 	return &list.Values[0], nil
 }
 
-func getEdgeGatewaySecurityGroupWithRetry(ctx context.Context, c cav.Client, id, name, edgeGatewayID, edgeGatewayName string) (*itypes.ApiResponseFirewallGroup, error) {
+func getEdgeGatewaySecurityGroupWithRetry(ctx context.Context, c cav.Client, id, name, edgeGatewayID, edgeGatewayName string) (*itypes.APIResponseFirewallGroup, error) {
 	const maxAttempts = 5
 
 	var lastErr error
@@ -115,10 +115,10 @@ func getEdgeGatewaySecurityGroupWithRetry(ctx context.Context, c cav.Client, id,
 	return nil, lastErr
 }
 
-func securityGroupMembersToRefs(members []types.ParamsFirewallGroupMember) []itypes.ApiObjectReference {
-	refs := make([]itypes.ApiObjectReference, 0, len(members))
+func securityGroupMembersToRefs(members []types.ParamsFirewallGroupMember) []itypes.APIObjectReference {
+	refs := make([]itypes.APIObjectReference, 0, len(members))
 	for _, member := range members {
-		refs = append(refs, itypes.ApiObjectReference{ID: member.ID, Name: member.Name})
+		refs = append(refs, itypes.APIObjectReference{ID: member.ID, Name: member.Name})
 	}
 	return refs
 }
@@ -140,7 +140,7 @@ func (c *Client) ListSecurityGroup(ctx context.Context, params types.ParamsListE
 		return nil, fmt.Errorf("%s: list: %w", opListEdgeGatewaySecurityGroup, err)
 	}
 
-	return resp.Result().(*itypes.ApiResponseListFirewallGroup).ToModel(), nil
+	return resp.Result().(*itypes.APIResponseListFirewallGroup).ToModel(), nil
 }
 
 // GetSecurityGroup returns a security group by ID or name for an edge gateway.
@@ -164,7 +164,7 @@ func (c *Client) CreateSecurityGroup(ctx context.Context, params types.ParamsCre
 		return nil, fmt.Errorf("%s: edge gateway owner must be a vdc group", opCreateEdgeGatewaySecurityGroup)
 	}
 
-	body := itypes.ApiRequestFirewallGroup{
+	body := itypes.APIRequestFirewallGroup{
 		Name:        params.Name,
 		Description: params.Description,
 		TypeValue:   itypes.FirewallGroupTypeSecurityGroup,
@@ -178,7 +178,7 @@ func (c *Client) CreateSecurityGroup(ctx context.Context, params types.ParamsCre
 		return nil, fmt.Errorf("%s: %w", opCreateEdgeGatewaySecurityGroup, err)
 	}
 
-	created, ok := resp.Result().(*itypes.ApiResponseFirewallGroup)
+	created, ok := resp.Result().(*itypes.APIResponseFirewallGroup)
 	if !ok || created == nil {
 		return nil, fmt.Errorf("%s: unexpected create response type %T", opCreateEdgeGatewaySecurityGroup, resp.Result())
 	}
@@ -199,14 +199,14 @@ func (c *Client) UpdateSecurityGroup(ctx context.Context, params types.ParamsUpd
 		idOrName = params.Name
 	}
 
-	current, err := inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, itypes.FirewallGroupTypeSecurityGroup, func(ctx context.Context, idOrName, _ string) (*itypes.ApiResponseFirewallGroup, error) {
+	current, err := inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, itypes.FirewallGroupTypeSecurityGroup, func(ctx context.Context, idOrName, _ string) (*itypes.APIResponseFirewallGroup, error) {
 		return getEdgeGatewaySecurityGroup(ctx, c.c, params.ID, params.Name, params.EdgeGatewayID, params.EdgeGatewayName)
 	})
 	if err != nil {
 		return nil, fmt.Errorf("%s: resolve: %w", opUpdateEdgeGatewaySecurityGroup, err)
 	}
 
-	body := itypes.ApiRequestFirewallGroup{
+	body := itypes.APIRequestFirewallGroup{
 		ID:          current.ID,
 		Name:        current.Name,
 		Description: current.Description,
@@ -236,7 +236,7 @@ func (c *Client) DeleteSecurityGroup(ctx context.Context, params types.ParamsDel
 		idOrName = params.Name
 	}
 
-	current, err := inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, itypes.FirewallGroupTypeSecurityGroup, func(ctx context.Context, idOrName, _ string) (*itypes.ApiResponseFirewallGroup, error) {
+	current, err := inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, itypes.FirewallGroupTypeSecurityGroup, func(ctx context.Context, idOrName, _ string) (*itypes.APIResponseFirewallGroup, error) {
 		return getEdgeGatewaySecurityGroup(ctx, c.c, params.ID, params.Name, params.EdgeGatewayID, params.EdgeGatewayName)
 	})
 	if err != nil {

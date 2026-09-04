@@ -15,7 +15,7 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
-func populateEdgeGatewayServices(data *types.ModelEdgeGatewayServices, services []ApiResponseNetworkServicesSubChildren) {
+func populateEdgeGatewayServices(data *types.ModelEdgeGatewayServices, services []APIResponseNetworkServicesSubChildren) {
 	for _, service := range services {
 		switch service.Type {
 		case "load-balancer":
@@ -31,7 +31,7 @@ func populateEdgeGatewayServices(data *types.ModelEdgeGatewayServices, services 
 	}
 }
 
-func populateGenericEdgeGatewayService(data *types.ModelEdgeGatewayServices, service ApiResponseNetworkServicesSubChildren) {
+func populateGenericEdgeGatewayService(data *types.ModelEdgeGatewayServices, service APIResponseNetworkServicesSubChildren) {
 	switch service.Name {
 	case "cav-services", "cav_services":
 		data.Services = &types.ModelCloudavenueServices{

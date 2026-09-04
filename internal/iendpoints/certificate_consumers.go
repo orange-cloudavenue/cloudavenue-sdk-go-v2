@@ -25,17 +25,17 @@ func init() {
 		Description:      "List consumers of a certificate library item",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/ssl/certificateLibrary/{certLibraryItemId}/consumers",
+		PathTemplate:     pathCertificateLibraryConsumers,
 		PathParams: []cav.PathParam{{
-			Name:        "certLibraryItemId",
-			Description: "ID of the certificate library item",
+			Name:        pathParamCertLibraryItemID,
+			Description: descCertificateLibraryItemID,
 			Required:    true,
 			ValidatorFunc: func(value string) error {
-				return validators.New().Var(value, "urn=certificateLibraryItem")
+				return validators.New().Var(value, urnCertificateLibraryItem)
 			},
 		}},
-		QueryParams:  []cav.QueryParam{{Name: "filter", Description: "Filter to apply to the list of consumers."}, {Name: "pageSize", Description: "The number of items per page.", Value: "100"}},
-		ResponseType: itypes.ApiEntityReferences{},
+		QueryParams:  []cav.QueryParam{{Name: queryParamFilter, Description: "Filter to apply to the list of consumers."}, {Name: queryParamPageSize, Description: descPageSize, Value: pageSize100}},
+		ResponseType: itypes.APIEntityReferences{},
 	}.Register()
 
 	cav.Endpoint{
@@ -44,17 +44,17 @@ func init() {
 		Description:      "Add consumer reference to a certificate library item",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/ssl/certificateLibrary/{certLibraryItemId}/consumers",
+		PathTemplate:     pathCertificateLibraryConsumers,
 		PathParams: []cav.PathParam{{
-			Name:        "certLibraryItemId",
-			Description: "ID of the certificate library item",
+			Name:        pathParamCertLibraryItemID,
+			Description: descCertificateLibraryItemID,
 			Required:    true,
 			ValidatorFunc: func(value string) error {
-				return validators.New().Var(value, "urn=certificateLibraryItem")
+				return validators.New().Var(value, urnCertificateLibraryItem)
 			},
 		}},
-		BodyRequestType: itypes.ApiEntityReference{},
-		ResponseType:    itypes.ApiEntityReference{},
+		BodyRequestType: itypes.APIEntityReference{},
+		ResponseType:    itypes.APIEntityReference{},
 	}.Register()
 
 	cav.Endpoint{
@@ -63,16 +63,16 @@ func init() {
 		Description:      "Replace consumer references for a certificate library item",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/ssl/certificateLibrary/{certLibraryItemId}/consumers",
+		PathTemplate:     pathCertificateLibraryConsumers,
 		PathParams: []cav.PathParam{{
-			Name:        "certLibraryItemId",
-			Description: "ID of the certificate library item",
+			Name:        pathParamCertLibraryItemID,
+			Description: descCertificateLibraryItemID,
 			Required:    true,
 			ValidatorFunc: func(value string) error {
-				return validators.New().Var(value, "urn=certificateLibraryItem")
+				return validators.New().Var(value, urnCertificateLibraryItem)
 			},
 		}},
-		BodyRequestType: itypes.ApiEntityReferences{},
-		ResponseType:    itypes.ApiEntityReferences{},
+		BodyRequestType: itypes.APIEntityReferences{},
+		ResponseType:    itypes.APIEntityReferences{},
 	}.Register()
 }

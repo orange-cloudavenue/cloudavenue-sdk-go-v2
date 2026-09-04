@@ -30,13 +30,13 @@ const (
 
 // ListIPSet lists NSX-T IP sets owned by VDC group.
 func (c *Client) ListIPSet(ctx context.Context, params types.ParamsListIPSet) (*types.ModelListFirewallGroup, error) {
-	model, err := inetworkobjects.ListFirewallGroupsByType(ctx, c.c, params.VdcGroupID, params.VdcGroupName, itypes.FirewallGroupTypeIPSet, func(ctx context.Context, id, name string) (inetworkobjects.VdcGroupRef, error) {
-		vdcGroup, err := c.GetVdcGroup(ctx, types.ParamsGetVdcGroup{ID: id, Name: name})
+	model, err := inetworkobjects.ListFirewallGroupsByType(ctx, c.c, params.VDCGroupID, params.VDCGroupName, itypes.FirewallGroupTypeIPSet, func(ctx context.Context, id, name string) (inetworkobjects.VDCGroupRef, error) {
+		vdcGroup, err := c.GetVDCGroup(ctx, types.ParamsGetVDCGroup{ID: id, Name: name})
 		if err != nil {
-			return inetworkobjects.VdcGroupRef{}, err
+			return inetworkobjects.VDCGroupRef{}, err
 		}
 
-		return inetworkobjects.VdcGroupRef{ID: vdcGroup.ID, Name: vdcGroup.Name}, nil
+		return inetworkobjects.VDCGroupRef{ID: vdcGroup.ID, Name: vdcGroup.Name}, nil
 	})
 	if err != nil {
 		return nil, fmt.Errorf("%s: list: %w", opListIPSet, err)
@@ -47,7 +47,7 @@ func (c *Client) ListIPSet(ctx context.Context, params types.ParamsListIPSet) (*
 
 // GetIPSet gets NSX-T IP set by ID or name within VDC group.
 func (c *Client) GetIPSet(ctx context.Context, params types.ParamsGetIPSet) (*types.ModelGetFirewallGroup, error) {
-	model, err := inetworkobjects.GetFirewallGroupModel(ctx, params.ID, params.Name, itypes.FirewallGroupTypeIPSet, func(ctx context.Context, idOrName, typeValue string) (*itypes.ApiResponseFirewallGroup, error) {
+	model, err := inetworkobjects.GetFirewallGroupModel(ctx, params.ID, params.Name, itypes.FirewallGroupTypeIPSet, func(ctx context.Context, idOrName, typeValue string) (*itypes.APIResponseFirewallGroup, error) {
 		return getFirewallGroupWithRetry(ctx, c.c, idOrName, typeValue)
 	})
 	if err != nil {
@@ -70,7 +70,7 @@ func (c *Client) CreateIPSet(ctx context.Context, params types.ParamsCreateIPSet
 		return nil, fmt.Errorf("%s: %w", opCreateIPSet, err)
 	}
 
-	created, ok := resp.Result().(*itypes.ApiResponseFirewallGroup)
+	created, ok := resp.Result().(*itypes.APIResponseFirewallGroup)
 	if !ok || created == nil {
 		return nil, fmt.Errorf("%s: unexpected create response type %T", opCreateIPSet, resp.Result())
 	}
@@ -92,7 +92,7 @@ func (c *Client) UpdateIPSet(ctx context.Context, params types.ParamsUpdateIPSet
 		idOrName = params.Name
 	}
 
-	current, err := inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, itypes.FirewallGroupTypeIPSet, func(ctx context.Context, idOrName, typeValue string) (*itypes.ApiResponseFirewallGroup, error) {
+	current, err := inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, itypes.FirewallGroupTypeIPSet, func(ctx context.Context, idOrName, typeValue string) (*itypes.APIResponseFirewallGroup, error) {
 		return getFirewallGroupWithRetry(ctx, c.c, idOrName, typeValue)
 	})
 	if err != nil {
@@ -109,7 +109,7 @@ func (c *Client) UpdateIPSet(ctx context.Context, params types.ParamsUpdateIPSet
 		ipAddresses = params.IPAddresses
 	}
 
-	body := itypes.ApiRequestFirewallGroup{
+	body := itypes.APIRequestFirewallGroup{
 		ID:          current.ID,
 		Name:        current.Name,
 		Description: description,
@@ -133,7 +133,7 @@ func (c *Client) DeleteIPSet(ctx context.Context, params types.ParamsDeleteIPSet
 		idOrName = params.Name
 	}
 
-	current, err := inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, itypes.FirewallGroupTypeIPSet, func(ctx context.Context, idOrName, typeValue string) (*itypes.ApiResponseFirewallGroup, error) {
+	current, err := inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, itypes.FirewallGroupTypeIPSet, func(ctx context.Context, idOrName, typeValue string) (*itypes.APIResponseFirewallGroup, error) {
 		return getFirewallGroupWithRetry(ctx, c.c, idOrName, typeValue)
 	})
 	if err != nil {
@@ -147,17 +147,17 @@ func (c *Client) DeleteIPSet(ctx context.Context, params types.ParamsDeleteIPSet
 	return nil
 }
 
-func createIPSetBody(ctx context.Context, c cav.Client, params types.ParamsCreateIPSet) (itypes.ApiRequestFirewallGroup, error) {
-	vdcGroupID, vdcGroupName, err := resolveVdcGroupRef(ctx, c, params.VdcGroupID, params.VdcGroupName)
+func createIPSetBody(ctx context.Context, c cav.Client, params types.ParamsCreateIPSet) (itypes.APIRequestFirewallGroup, error) {
+	vdcGroupID, vdcGroupName, err := resolveVDCGroupRef(ctx, c, params.VDCGroupID, params.VDCGroupName)
 	if err != nil {
-		return itypes.ApiRequestFirewallGroup{}, err
+		return itypes.APIRequestFirewallGroup{}, err
 	}
 
-	return itypes.ApiRequestFirewallGroup{
+	return itypes.APIRequestFirewallGroup{
 		Name:        params.Name,
 		Description: params.Description,
 		TypeValue:   itypes.FirewallGroupTypeIPSet,
 		IPAddresses: params.IPAddresses,
-		OwnerRef:    &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		OwnerRef:    &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 	}, nil
 }

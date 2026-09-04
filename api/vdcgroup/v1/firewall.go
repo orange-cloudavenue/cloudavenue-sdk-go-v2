@@ -29,22 +29,22 @@ const (
 // toAPIConfiguredFirewallRules converts public firewall rules to wire format.
 //
 // Comments intentionally mirror Description for v1 compatibility, and ActionValue is always used.
-func toApiDistributedFirewallRules(rules []types.ParamsFirewallRule) []itypes.ApiDistributedFirewallRule {
-	out := make([]itypes.ApiDistributedFirewallRule, 0, len(rules))
+func toAPIDistributedFirewallRules(rules []types.ParamsFirewallRule) []itypes.APIDistributedFirewallRule {
+	out := make([]itypes.APIDistributedFirewallRule, 0, len(rules))
 
 	for _, r := range rules {
-		out = append(out, itypes.ApiDistributedFirewallRule{
+		out = append(out, itypes.APIDistributedFirewallRule{
 			ID:                        r.ID,
 			Name:                      r.Name,
 			Description:               r.Description,
 			Comments:                  r.Description,
-			ApplicationPortProfiles:   toApiObjectReferences(r.ApplicationPortProfiles),
-			SourceFirewallGroups:      toApiObjectReferences(r.SourceFirewallGroups),
-			DestinationFirewallGroups: toApiObjectReferences(r.DestinationFirewallGroups),
-			NetworkContextProfiles:    toApiObjectReferences(r.NetworkContextProfiles),
+			ApplicationPortProfiles:   toAPIObjectReferences(r.ApplicationPortProfiles),
+			SourceFirewallGroups:      toAPIObjectReferences(r.SourceFirewallGroups),
+			DestinationFirewallGroups: toAPIObjectReferences(r.DestinationFirewallGroups),
+			NetworkContextProfiles:    toAPIObjectReferences(r.NetworkContextProfiles),
 			Direction:                 r.Direction,
 			Enabled:                   r.Enabled,
-			IpProtocol:                r.IPProtocol,
+			IPProtocol:                r.IPProtocol,
 			Logging:                   r.Logging,
 			ActionValue:               r.Action,
 			SourceGroupsExcluded:      r.SourceGroupsExcluded,
@@ -55,32 +55,32 @@ func toApiDistributedFirewallRules(rules []types.ParamsFirewallRule) []itypes.Ap
 	return out
 }
 
-// toApiObjectReferences converts firewall group members to wire references.
-func toApiObjectReferences(members []types.ParamsFirewallGroupMember) []itypes.ApiObjectReference {
-	out := make([]itypes.ApiObjectReference, 0, len(members))
+// toAPIObjectReferences converts firewall group members to wire references.
+func toAPIObjectReferences(members []types.ParamsFirewallGroupMember) []itypes.APIObjectReference {
+	out := make([]itypes.APIObjectReference, 0, len(members))
 	for _, m := range members {
-		out = append(out, itypes.ApiObjectReference{ID: m.ID, Name: m.Name})
+		out = append(out, itypes.APIObjectReference{ID: m.ID, Name: m.Name})
 	}
 	return out
 }
 
 // dfwEnableOrDisable updates default-policy enabled state only when needed.
 func dfwEnableOrDisable(ctx context.Context, cc *Client, vdcGroupID string, enable bool) error {
-	epGet := endpoints.GetDfwPolicies()
+	epGet := endpoints.GetDFWPolicies()
 
 	resp, err := cc.c.Do(ctx, epGet, cav.WithPathParam(epGet.PathParams[0], vdcGroupID))
 	if err != nil {
 		return err
 	}
 
-	policies := resp.Result().(*itypes.ApiDfwPolicies)
+	policies := resp.Result().(*itypes.APIDFWPolicies)
 
 	isEnabled := policies.DefaultPolicy != nil && policies.DefaultPolicy.Enabled != nil && *policies.DefaultPolicy.Enabled
 	if isEnabled == enable {
 		return nil
 	}
 
-	defaultPolicy := itypes.ApiDfwDefaultPolicy{
+	defaultPolicy := itypes.APIDfwDefaultPolicy{
 		Enabled: &enable,
 	}
 	if policies.DefaultPolicy != nil {
@@ -93,7 +93,7 @@ func dfwEnableOrDisable(ctx context.Context, cc *Client, vdcGroupID string, enab
 		defaultPolicy.Name = "Default"
 	}
 
-	epUpdate := endpoints.UpdateDfwDefaultPolicy()
+	epUpdate := endpoints.UpdateDFWDefaultPolicy()
 
 	_, err = cc.c.Do(
 		ctx,
@@ -105,37 +105,37 @@ func dfwEnableOrDisable(ctx context.Context, cc *Client, vdcGroupID string, enab
 	return err
 }
 
-func firewallRulesBody(rules []types.ParamsFirewallRule) itypes.ApiDistributedFirewallRules {
-	return itypes.ApiDistributedFirewallRules{Values: toApiDistributedFirewallRules(rules)}
+func firewallRulesBody(rules []types.ParamsFirewallRule) itypes.APIDistributedFirewallRules {
+	return itypes.APIDistributedFirewallRules{Values: toAPIDistributedFirewallRules(rules)}
 }
 
 // GetFirewall returns distributed firewall state for a VDC group.
 func (c *Client) GetFirewall(ctx context.Context, params types.ParamsGetFirewall) (*types.ModelGetFirewall, error) {
-	vdcGroupID := params.VdcGroupID
+	vdcGroupID := params.VDCGroupID
 	if vdcGroupID == "" {
-		vdcGroup, err := c.GetVdcGroup(ctx, types.ParamsGetVdcGroup{Name: params.VdcGroupName})
+		vdcGroup, err := c.GetVDCGroup(ctx, types.ParamsGetVDCGroup{Name: params.VDCGroupName})
 		if err != nil {
 			return nil, fmt.Errorf("%s: resolve vdc group: %w", opGetFirewall, err)
 		}
 		vdcGroupID = vdcGroup.ID
 	}
 
-	epPolicies := endpoints.GetDfwPolicies()
+	epPolicies := endpoints.GetDFWPolicies()
 	respPolicies, err := c.c.Do(ctx, epPolicies, cav.WithPathParam(epPolicies.PathParams[0], vdcGroupID))
 	if err != nil {
 		return nil, fmt.Errorf("%s: get policies: %w", opGetFirewall, err)
 	}
 
-	policies := respPolicies.Result().(*itypes.ApiDfwPolicies)
+	policies := respPolicies.Result().(*itypes.APIDFWPolicies)
 	enabled := policies.DefaultPolicy != nil && policies.DefaultPolicy.Enabled != nil && *policies.DefaultPolicy.Enabled
 
-	epRules := endpoints.GetDfwRules()
+	epRules := endpoints.GetDFWRules()
 	respRules, err := c.c.Do(ctx, epRules, cav.WithPathParam(epRules.PathParams[0], vdcGroupID))
 	if err != nil {
 		return nil, fmt.Errorf("%s: get rules: %w", opGetFirewall, err)
 	}
 
-	rules := respRules.Result().(*itypes.ApiDistributedFirewallRules)
+	rules := respRules.Result().(*itypes.APIDistributedFirewallRules)
 
 	return &types.ModelGetFirewall{
 		Enabled: enabled,
@@ -145,17 +145,17 @@ func (c *Client) GetFirewall(ctx context.Context, params types.ParamsGetFirewall
 
 // CreateFirewall activates distributed firewalling and sets initial rules.
 func (c *Client) CreateFirewall(ctx context.Context, params types.ParamsCreateFirewall) (*types.ModelGetFirewall, error) {
-	vdcGroupID, _, err := resolveVdcGroupRef(ctx, c.c, params.VdcGroupID, params.VdcGroupName)
+	vdcGroupID, _, err := resolveVDCGroupRef(ctx, c.c, params.VDCGroupID, params.VDCGroupName)
 	if err != nil {
 		return nil, fmt.Errorf("%s: resolve vdc group: %w", opCreateFirewall, err)
 	}
 
-	epPolicies := endpoints.UpdateDfwPolicies()
+	epPolicies := endpoints.UpdateDFWPolicies()
 	if _, err := c.c.Do(
 		ctx,
 		epPolicies,
 		cav.WithPathParam(epPolicies.PathParams[0], vdcGroupID),
-		cav.SetBody(itypes.ApiDfwPolicies{Enabled: true}),
+		cav.SetBody(itypes.APIDFWPolicies{Enabled: true}),
 	); err != nil {
 		return nil, fmt.Errorf("%s: activate: %w", opCreateFirewall, err)
 	}
@@ -164,7 +164,7 @@ func (c *Client) CreateFirewall(ctx context.Context, params types.ParamsCreateFi
 		return nil, fmt.Errorf("%s: set enabled state: %w", opCreateFirewall, err)
 	}
 
-	epRules := endpoints.UpdateDfwRules()
+	epRules := endpoints.UpdateDFWRules()
 	respRules, err := c.c.Do(
 		ctx,
 		epRules,
@@ -175,7 +175,7 @@ func (c *Client) CreateFirewall(ctx context.Context, params types.ParamsCreateFi
 		return nil, fmt.Errorf("%s: update rules: %w", opCreateFirewall, err)
 	}
 
-	rules, ok := respRules.Result().(*itypes.ApiDistributedFirewallRules)
+	rules, ok := respRules.Result().(*itypes.APIDistributedFirewallRules)
 	if !ok || rules == nil {
 		return nil, fmt.Errorf("%s: unexpected rules response type %T", opCreateFirewall, respRules.Result())
 	}
@@ -188,7 +188,7 @@ func (c *Client) CreateFirewall(ctx context.Context, params types.ParamsCreateFi
 
 // UpdateFirewall replaces distributed firewall rules and enabled state.
 func (c *Client) UpdateFirewall(ctx context.Context, params types.ParamsUpdateFirewall) (*types.ModelGetFirewall, error) {
-	vdcGroupID, _, err := resolveVdcGroupRef(ctx, c.c, params.VdcGroupID, params.VdcGroupName)
+	vdcGroupID, _, err := resolveVDCGroupRef(ctx, c.c, params.VDCGroupID, params.VDCGroupName)
 	if err != nil {
 		return nil, fmt.Errorf("%s: resolve vdc group: %w", opUpdateFirewall, err)
 	}
@@ -197,7 +197,7 @@ func (c *Client) UpdateFirewall(ctx context.Context, params types.ParamsUpdateFi
 		return nil, fmt.Errorf("%s: set enabled state: %w", opUpdateFirewall, err)
 	}
 
-	epRules := endpoints.UpdateDfwRules()
+	epRules := endpoints.UpdateDFWRules()
 	respRules, err := c.c.Do(
 		ctx,
 		epRules,
@@ -208,7 +208,7 @@ func (c *Client) UpdateFirewall(ctx context.Context, params types.ParamsUpdateFi
 		return nil, fmt.Errorf("%s: update rules: %w", opUpdateFirewall, err)
 	}
 
-	rules, ok := respRules.Result().(*itypes.ApiDistributedFirewallRules)
+	rules, ok := respRules.Result().(*itypes.APIDistributedFirewallRules)
 	if !ok || rules == nil {
 		return nil, fmt.Errorf("%s: unexpected rules response type %T", opUpdateFirewall, respRules.Result())
 	}
@@ -221,17 +221,17 @@ func (c *Client) UpdateFirewall(ctx context.Context, params types.ParamsUpdateFi
 
 // DeleteFirewall clears distributed firewall rules and deactivates the feature.
 func (c *Client) DeleteFirewall(ctx context.Context, params types.ParamsDeleteFirewall) error {
-	vdcGroupID, _, err := resolveVdcGroupRef(ctx, c.c, params.VdcGroupID, params.VdcGroupName)
+	vdcGroupID, _, err := resolveVDCGroupRef(ctx, c.c, params.VDCGroupID, params.VDCGroupName)
 	if err != nil {
 		return fmt.Errorf("%s: resolve vdc group: %w", opDeleteFirewall, err)
 	}
 
-	epRules := endpoints.UpdateDfwRules()
+	epRules := endpoints.UpdateDFWRules()
 	if _, err = c.c.Do(
 		ctx,
 		epRules,
 		cav.WithPathParam(epRules.PathParams[0], vdcGroupID),
-		cav.SetBody(itypes.ApiDistributedFirewallRules{}),
+		cav.SetBody(itypes.APIDistributedFirewallRules{}),
 	); err != nil {
 		return fmt.Errorf("%s: clear rules: %w", opDeleteFirewall, err)
 	}
@@ -240,12 +240,12 @@ func (c *Client) DeleteFirewall(ctx context.Context, params types.ParamsDeleteFi
 		return fmt.Errorf("%s: disable default policy: %w", opDeleteFirewall, err)
 	}
 
-	epPolicies := endpoints.UpdateDfwPolicies()
+	epPolicies := endpoints.UpdateDFWPolicies()
 	if _, err = c.c.Do(
 		ctx,
 		epPolicies,
 		cav.WithPathParam(epPolicies.PathParams[0], vdcGroupID),
-		cav.SetBody(itypes.ApiDfwPolicies{Enabled: false}),
+		cav.SetBody(itypes.APIDFWPolicies{Enabled: false}),
 	); err != nil {
 		return fmt.Errorf("%s: deactivate: %w", opDeleteFirewall, err)
 	}
