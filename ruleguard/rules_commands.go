@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright (c) 2026 Orange
+// SPDX-License-Identifier: MPL-2.0
+
 //go:build ruleguard
 // +build ruleguard
 
