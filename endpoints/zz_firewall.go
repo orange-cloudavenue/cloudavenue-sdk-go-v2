@@ -13,37 +13,33 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
 
-// GetDfwPolicies - Get the Distributed Firewall policies (enabled state and default policy) of a VDC Group
+// GetDFWPolicies - Get the Distributed Firewall policies (enabled state and default policy) of a VDC Group
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/get/
-func GetDfwPolicies() *cav.Endpoint {
-	return cav.MustGetEndpoint("GetDfwPolicies")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/get/ 
+func GetDFWPolicies() *cav.Endpoint {
+	return cav.MustGetEndpoint("GetDFWPolicies")
 }
-
-// UpdateDfwPolicies - Update the Distributed Firewall policies (enabled state) of a VDC Group
+// UpdateDFWPolicies - Update the Distributed Firewall policies (enabled state) of a VDC Group
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/put/
-func UpdateDfwPolicies() *cav.Endpoint {
-	return cav.MustGetEndpoint("UpdateDfwPolicies")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/put/ 
+func UpdateDFWPolicies() *cav.Endpoint {
+	return cav.MustGetEndpoint("UpdateDFWPolicies")
 }
-
-// UpdateDfwDefaultPolicy - Update the default Distributed Firewall policy of a VDC Group
+// UpdateDFWDefaultPolicy - Update the default Distributed Firewall policy of a VDC Group
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/default/put/
-func UpdateDfwDefaultPolicy() *cav.Endpoint {
-	return cav.MustGetEndpoint("UpdateDfwDefaultPolicy")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/default/put/ 
+func UpdateDFWDefaultPolicy() *cav.Endpoint {
+	return cav.MustGetEndpoint("UpdateDFWDefaultPolicy")
 }
-
-// GetDfwRules - Get the Distributed Firewall rules of a VDC Group
+// GetDFWRules - Get the Distributed Firewall rules of a VDC Group
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/default/rules/get/
-func GetDfwRules() *cav.Endpoint {
-	return cav.MustGetEndpoint("GetDfwRules")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/default/rules/get/ 
+func GetDFWRules() *cav.Endpoint {
+	return cav.MustGetEndpoint("GetDFWRules")
 }
-
-// UpdateDfwRules - Replace (bulk) the Distributed Firewall rules of a VDC Group
+// UpdateDFWRules - Replace (bulk) the Distributed Firewall rules of a VDC Group
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/default/rules/put/
-func UpdateDfwRules() *cav.Endpoint {
-	return cav.MustGetEndpoint("UpdateDfwRules")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/default/rules/put/ 
+func UpdateDFWRules() *cav.Endpoint {
+	return cav.MustGetEndpoint("UpdateDFWRules")
 }

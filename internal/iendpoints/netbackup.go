@@ -7,6 +7,7 @@
  * or see the "LICENSE" file for more details.
  */
 
+//nolint:tagliatelle
 package iendpoints
 
 import (
@@ -109,8 +110,8 @@ func init() {
 				Required:    true,
 			},
 		},
-		BodyRequestType:  itypes.APIRequestNetbackupProtectMachine{},
-		ResponseType:     itypes.APIResponseNetbackupProtectMachine{},
+		BodyRequestType: itypes.APIRequestNetbackupProtectMachine{},
+		ResponseType:    itypes.APIResponseNetbackupProtectMachine{},
 	}.Register()
 }
 

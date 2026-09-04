@@ -80,7 +80,7 @@ func defaultMockHandler(ep *Endpoint) http.HandlerFunc {
 				"roles": []string{"Organization Administrator"},
 			}
 			respJ, _ := json.Marshal(resp)
-			w.Write(respJ)
+			_, _ = w.Write(respJ)
 			return
 		}
 
@@ -95,7 +95,7 @@ func defaultMockHandler(ep *Endpoint) http.HandlerFunc {
 		if ep.Name == "GetJobCerberus" {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusCreated)
-			w.Write([]byte(`{"jobId":"87ab1934-0146-4fb0-80bc-815fea03214d","message":"Job created successfully"}`))
+			_, _ = w.Write([]byte(`{"jobId":"87ab1934-0146-4fb0-80bc-815fea03214d","message":"Job created successfully"}`))
 			return
 		}
 
@@ -123,11 +123,11 @@ func defaultMockHandler(ep *Endpoint) http.HandlerFunc {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			w.Write(respJ)
+			_, _ = w.Write(respJ)
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"message":"Mock response"}`))
+		_, _ = w.Write([]byte(`{"message":"Mock response"}`))
 	}
 }

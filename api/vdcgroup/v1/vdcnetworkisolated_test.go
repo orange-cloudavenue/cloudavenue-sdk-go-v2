@@ -29,31 +29,31 @@ func TestCreateVdcNetworkIsolated(t *testing.T) {
 
 	client, ms := newClient(t)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
-		Values: []itypes.ApiResponseListVdcGroupDetails{{
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.SetResponse(endpoints.ListVDCGroup(), &itypes.APIResponseListVDCGroup{
+		Values: []itypes.APIResponseListVDCGroupDetails{{
 			ID:   vdcGroupID,
 			Name: vdcGroupName,
 		}},
 	}, nil)
 
-	ms.CleanResponse(endpoints.CreateVdcNetwork())
-	ms.SetResponse(endpoints.CreateVdcNetwork(), &itypes.ApiResponseVdcNetwork{
+	ms.CleanResponse(endpoints.CreateVDCNetwork())
+	ms.SetResponse(endpoints.CreateVDCNetwork(), &itypes.APIResponseVDCNetwork{
 		ID:                      createdID,
 		Name:                    "isolated-net-1",
 		Description:             "desc",
-		NetworkType:             types.VdcNetworkTypeIsolated,
-		OwnerRef:                &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
-		GuestVlanTaggingAllowed: &guestVLAN,
+		NetworkType:             types.VDCNetworkTypeIsolated,
+		OwnerRef:                &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		GuestVLANTaggingAllowed: &guestVLAN,
 		Shared:                  &shared,
-		Subnets: itypes.ApiVdcNetworkSubnets{
-			Values: []itypes.ApiVdcNetworkSubnetValue{{
+		Subnets: itypes.APIVDCNetworkSubnets{
+			Values: []itypes.APIVDCNetworkSubnetValue{{
 				Gateway:      "192.168.10.1",
 				PrefixLength: 24,
 				DNSServer1:   "1.1.1.1",
 				DNSServer2:   "8.8.8.8",
 				DNSSuffix:    "example.local",
-				IPRanges: itypes.ApiVdcNetworkIPRanges{Values: []itypes.ApiVdcNetworkIPRangeValue{{
+				IPRanges: itypes.APIVDCNetworkIPRanges{Values: []itypes.APIVDCNetworkIPRangeValue{{
 					StartAddress: "192.168.10.10",
 					EndAddress:   "192.168.10.20",
 				}}},
@@ -61,33 +61,33 @@ func TestCreateVdcNetworkIsolated(t *testing.T) {
 		},
 	}, nil)
 
-	resp, err := client.CreateVdcNetworkIsolated(t.Context(), types.ParamsCreateVdcNetworkIsolated{
+	resp, err := client.CreateVDCNetworkIsolated(t.Context(), types.ParamsCreateVDCNetworkIsolated{
 		Name:         "isolated-net-1",
 		Description:  "desc",
-		VdcGroupName: vdcGroupName,
+		VDCGroupName: vdcGroupName,
 		Subnet: types.ParamsSubnet{
 			Gateway:      "192.168.10.1",
 			PrefixLength: 24,
 			DNSServer1:   "1.1.1.1",
 			DNSServer2:   "8.8.8.8",
 			DNSSuffix:    "example.local",
-			IPRanges: []types.ParamsVdcNetworkIPRange{{
+			IPRanges: []types.ParamsVDCNetworkIPRange{{
 				StartAddress: "192.168.10.10",
 				EndAddress:   "192.168.10.20",
 			}},
 		},
-		GuestVlanTaggingAllowed: &guestVLAN,
+		GuestVLANTaggingAllowed: &guestVLAN,
 	})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 	assert.Equal(t, createdID, resp.ID)
 	assert.Equal(t, "isolated-net-1", resp.Name)
-	assert.Equal(t, types.VdcNetworkTypeIsolated, resp.NetworkType)
+	assert.Equal(t, types.VDCNetworkTypeIsolated, resp.NetworkType)
 	assert.Equal(t, vdcGroupID, resp.OwnerID)
 	assert.Equal(t, vdcGroupName, resp.OwnerName)
-	assert.NotNil(t, resp.GuestVlanTaggingAllowed)
-	assert.True(t, *resp.GuestVlanTaggingAllowed)
+	assert.NotNil(t, resp.GuestVLANTaggingAllowed)
+	assert.True(t, *resp.GuestVLANTaggingAllowed)
 	assert.NotNil(t, resp.Shared)
 	assert.True(t, *resp.Shared)
 	assert.Equal(t, "192.168.10.1", resp.Subnet.Gateway)
@@ -96,8 +96,8 @@ func TestCreateVdcNetworkIsolated(t *testing.T) {
 	assert.Equal(t, "192.168.10.10", resp.Subnet.IPRanges[0].StartAddress)
 	assert.Equal(t, "192.168.10.20", resp.Subnet.IPRanges[0].EndAddress)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.CleanResponse(endpoints.CreateVdcNetwork())
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.CleanResponse(endpoints.CreateVDCNetwork())
 }
 
 func TestListVdcNetwork(t *testing.T) {
@@ -108,36 +108,36 @@ func TestListVdcNetwork(t *testing.T) {
 
 	client, ms := newClient(t)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
-		Values: []itypes.ApiResponseListVdcGroupDetails{{
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.SetResponse(endpoints.ListVDCGroup(), &itypes.APIResponseListVDCGroup{
+		Values: []itypes.APIResponseListVDCGroupDetails{{
 			ID:   vdcGroupID,
 			Name: vdcGroupName,
 		}},
 	}, nil)
 
-	ms.CleanResponse(endpoints.ListVdcNetwork())
-	ms.SetResponse(endpoints.ListVdcNetwork(), &itypes.ApiResponseListVdcNetwork{
-		Values: []itypes.ApiResponseVdcNetwork{{
+	ms.CleanResponse(endpoints.ListVDCNetwork())
+	ms.SetResponse(endpoints.ListVDCNetwork(), &itypes.APIResponseListVDCNetwork{
+		Values: []itypes.APIResponseVDCNetwork{{
 			ID:                      generator.MustGenerate("{urn:network}"),
 			Name:                    "isolated-net-1",
-			NetworkType:             types.VdcNetworkTypeIsolated,
-			OwnerRef:                &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
-			GuestVlanTaggingAllowed: &guestVLAN,
+			NetworkType:             types.VDCNetworkTypeIsolated,
+			OwnerRef:                &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+			GuestVLANTaggingAllowed: &guestVLAN,
 			Shared:                  &shared,
 		}},
 	}, nil)
 
-	resp, err := client.ListVdcNetwork(t.Context(), types.ParamsListVdcNetwork{VdcGroupName: vdcGroupName})
+	resp, err := client.ListVDCNetwork(t.Context(), types.ParamsListVDCNetwork{VDCGroupName: vdcGroupName})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
-	assert.Len(t, resp.VdcNetworks, 1)
-	assert.Equal(t, types.VdcNetworkTypeIsolated, resp.VdcNetworks[0].NetworkType)
-	assert.Equal(t, vdcGroupID, resp.VdcNetworks[0].OwnerID)
+	assert.Len(t, resp.VDCNetworks, 1)
+	assert.Equal(t, types.VDCNetworkTypeIsolated, resp.VDCNetworks[0].NetworkType)
+	assert.Equal(t, vdcGroupID, resp.VDCNetworks[0].OwnerID)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.CleanResponse(endpoints.ListVdcNetwork())
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.CleanResponse(endpoints.ListVDCNetwork())
 }
 
 func TestGetVdcNetworkIsolated(t *testing.T) {
@@ -147,21 +147,21 @@ func TestGetVdcNetworkIsolated(t *testing.T) {
 
 	client, ms := newClient(t)
 
-	ms.CleanResponse(endpoints.GetVdcNetwork())
-	ms.SetResponse(endpoints.GetVdcNetwork(), &itypes.ApiResponseVdcNetwork{
+	ms.CleanResponse(endpoints.GetVDCNetwork())
+	ms.SetResponse(endpoints.GetVDCNetwork(), &itypes.APIResponseVDCNetwork{
 		ID:          networkID,
 		Name:        "isolated-net-1",
-		NetworkType: types.VdcNetworkTypeIsolated,
-		OwnerRef:    &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		NetworkType: types.VDCNetworkTypeIsolated,
+		OwnerRef:    &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 	}, nil)
 
-	resp, err := client.GetVdcNetworkIsolated(t.Context(), types.ParamsGetVdcNetworkIsolated{ID: networkID})
+	resp, err := client.GetVDCNetworkIsolated(t.Context(), types.ParamsGetVDCNetworkIsolated{ID: networkID})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 	assert.Equal(t, networkID, resp.ID)
-	assert.Equal(t, types.VdcNetworkTypeIsolated, resp.NetworkType)
+	assert.Equal(t, types.VDCNetworkTypeIsolated, resp.NetworkType)
 	assert.Equal(t, vdcGroupID, resp.OwnerID)
 
-	ms.CleanResponse(endpoints.GetVdcNetwork())
+	ms.CleanResponse(endpoints.GetVDCNetwork())
 }

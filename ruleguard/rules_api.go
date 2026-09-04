@@ -20,9 +20,9 @@ import (
 // It ensures that the types used in API endpoints are consistent and follow best practices.
 // Ensures that struct types in any `api/` directory follow these naming conventions:
 //   - **API Response Types:**
-//     Must be named `ApiResponse<Object>` (e.g., `ApiResponseEdgeGateway`).
+//     Must be named `APIResponse<Object>` (e.g., `APIResponseEdgeGateway`).
 //   - **API Request Body Types:**
-//     Must be named `ApiRequest<Object>` (e.g., `ApiRequestEdgeGateway`).
+//     Must be named `APIRequest<Object>` (e.g., `APIRequestEdgeGateway`).
 //   - **User-facing Model Types:**
 //     Must be named `Model<Object>` (e.g., `ModelEdgeGateway`).
 //   - **User-supplied Parameter Types:**
@@ -36,8 +36,8 @@ func apiResponseTypes(m dsl.Matcher) {
 	m.Match(
 		`type $name struct { $*_ }`,
 	).
-		Where(m.File().PkgPath.Matches(`api/`) && !m["name"].Text.Matches(`^(ApiResponse|ApiRequest|Model|Params)[A-Z][A-Za-z0-9]*$|^Client$`)).
-		Report(`Struct type names must start with ApiResponse | ApiRequest | Model | Params (See GUIDELINE.md)`)
+		Where(m.File().PkgPath.Matches(`api/`) && !m["name"].Text.Matches(`^(APIResponse|APIRequest|Model|Params)[A-Z][A-Za-z0-9]*$|^Client$`)).
+		Report(`Struct type names must start with APIResponse | APIRequest | Model | Params (See GUIDELINE.md)`)
 }
 
 // apiFuncPrefix enforces naming conventions for exported functions in API packages.

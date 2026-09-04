@@ -30,7 +30,7 @@ func (c *Client) ListT0(ctx context.Context) (*types.ModelT0s, error) {
 		return nil, fmt.Errorf("error listing T0s: %w", err)
 	}
 
-	return resp.Result().(*itypes.ApiResponseT0s).ToModel(), nil
+	return resp.Result().(*itypes.APIResponseT0s).ToModel(), nil
 }
 
 // GetT0 gets T0 router by name or by attached edge gateway.
@@ -48,7 +48,7 @@ func (c *Client) GetT0(ctx context.Context, params types.ParamsGetT0) (*types.Mo
 		return nil, fmt.Errorf("error getting T0: %w", err)
 	}
 
-	t0s := resp.Result().(*itypes.ApiResponseT0s).ToModel()
+	t0s := resp.Result().(*itypes.APIResponseT0s).ToModel()
 	var t0 *types.ModelT0
 
 	for _, t := range t0s.T0s {

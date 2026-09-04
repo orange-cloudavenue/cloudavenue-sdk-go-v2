@@ -10,7 +10,6 @@
 package edgegateway
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -20,7 +19,7 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 )
 
-func debugNewClient(t *testing.T) (*Client, *mock.MockServer) {
+func debugNewClient(t *testing.T) (*Client, *mock.Server) {
 	t.Helper()
 
 	results := reflect.ValueOf(newClient).Call([]reflect.Value{reflect.ValueOf(t)})
@@ -30,7 +29,7 @@ func debugNewClient(t *testing.T) (*Client, *mock.MockServer) {
 		return client, nil
 	}
 
-	ms, _ := results[1].Interface().(*mock.MockServer)
+	ms, _ := results[1].Interface().(*mock.Server)
 	return client, ms
 }
 
@@ -42,16 +41,16 @@ func TestDebugListT0(t *testing.T) {
 
 	ep := endpoints.ListT0()
 
-	fmt.Printf("ep.Name=%q, ep.PathTemplate=%q\n", ep.Name, ep.PathTemplate)
+	t.Logf("ep.Name=%q, ep.PathTemplate=%q\n", ep.Name, ep.PathTemplate)
 
 	// Check what endpoints are registered
 	for _, e := range cav.GetEndpointsUncategorized() {
 		if e.Name == "ListT0" || e.Name == "GetEdgeGatewayServices" {
-			fmt.Printf("Registered endpoint: Name=%q PathTemplate=%q BodyResponseType=%T\n", e.Name, e.PathTemplate, e.ResponseType)
+			t.Logf("Registered endpoint: Name=%q PathTemplate=%q BodyResponseType=%T\n", e.Name, e.PathTemplate, e.ResponseType)
 		}
 	}
 
-	mockResponse := &itypes.ApiResponseT0s{
+	mockResponse := &itypes.APIResponseT0s{
 		{
 			Type: "tier-0-vrf",
 			Name: "test-t0",
@@ -60,8 +59,8 @@ func TestDebugListT0(t *testing.T) {
 	statusCode := 404
 	ms.SetResponse(ep, mockResponse, &statusCode)
 
-	fmt.Printf("Set response for %s: data=%v, statusCode=%d\n", ep.Name, mockResponse, statusCode)
+	t.Logf("Set response for %s: data=%v, statusCode=%d\n", ep.Name, mockResponse, statusCode)
 
 	t0s, err := client.ListT0(t.Context())
-	fmt.Printf("Result: t0s=%v, err=%v\n", t0s, err)
+	t.Logf("Result: t0s=%v, err=%v\n", t0s, err)
 }

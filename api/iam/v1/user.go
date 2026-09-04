@@ -62,8 +62,8 @@ func iamUserToModel(u itypes.User) *ModelUser {
 		Telephone:       u.Telephone,
 		Description:     u.Description,
 		IsEnabled:       u.IsEnabled,
-		DeployedVmQuota: u.DeployedVmQuota,
-		StoredVmQuota:   u.StoredVmQuota,
+		DeployedVMQuota: u.DeployedVMQuota,
+		StoredVMQuota:   u.StoredVMQuota,
 		ProviderType:    u.ProviderType,
 		RoleName:        u.Role.Name,
 		RoleHref:        u.Role.Href,
@@ -83,8 +83,8 @@ func modelUserToIAMXML(params any) (itypes.UserRequest, error) {
 			Telephone:       p.Telephone,
 			Description:     p.Description,
 			IsEnabled:       &p.IsEnabled,
-			DeployedVmQuota: p.DeployedVmQuota,
-			StoredVmQuota:   p.StoredVmQuota,
+			DeployedVMQuota: p.DeployedVMQuota,
+			StoredVMQuota:   p.StoredVMQuota,
 			ProviderType:    "INTEGRATED",
 			Role: itypes.Reference{
 				Name: p.RoleName,
@@ -112,8 +112,8 @@ func modelUserToIAMXML(params any) (itypes.UserRequest, error) {
 			Telephone:       p.Telephone,
 			Description:     p.Description,
 			IsEnabled:       p.IsEnabled,
-			DeployedVmQuota: p.DeployedVmQuota,
-			StoredVmQuota:   p.StoredVmQuota,
+			DeployedVMQuota: p.DeployedVMQuota,
+			StoredVMQuota:   p.StoredVMQuota,
 			Role: itypes.Reference{
 				Name: p.RoleName,
 			},
@@ -133,8 +133,8 @@ func mergeUpdateUserParams(current *ModelUser, params ParamsUpdateUser) ParamsUp
 		EmailAddress:    current.EmailAddress,
 		Telephone:       current.Telephone,
 		Description:     current.Description,
-		DeployedVmQuota: current.DeployedVmQuota,
-		StoredVmQuota:   current.StoredVmQuota,
+		DeployedVMQuota: current.DeployedVMQuota,
+		StoredVMQuota:   current.StoredVMQuota,
 		IsEnabled:       &current.IsEnabled,
 	}
 
@@ -159,11 +159,11 @@ func mergeUpdateUserParams(current *ModelUser, params ParamsUpdateUser) ParamsUp
 	if params.Description != nil {
 		merged.Description = params.Description
 	}
-	if params.DeployedVmQuota != nil {
-		merged.DeployedVmQuota = params.DeployedVmQuota
+	if params.DeployedVMQuota != nil {
+		merged.DeployedVMQuota = params.DeployedVMQuota
 	}
-	if params.StoredVmQuota != nil {
-		merged.StoredVmQuota = params.StoredVmQuota
+	if params.StoredVMQuota != nil {
+		merged.StoredVMQuota = params.StoredVMQuota
 	}
 	if params.IsEnabled != nil {
 		merged.IsEnabled = params.IsEnabled

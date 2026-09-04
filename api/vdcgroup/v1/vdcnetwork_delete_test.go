@@ -25,21 +25,21 @@ func TestDeleteVdcNetworkIsolated(t *testing.T) {
 
 	client, ms := newClient(t)
 
-	ms.CleanResponse(endpoints.GetVdcNetwork())
-	ms.SetResponse(endpoints.GetVdcNetwork(), &itypes.ApiResponseVdcNetwork{
+	ms.CleanResponse(endpoints.GetVDCNetwork())
+	ms.SetResponse(endpoints.GetVDCNetwork(), &itypes.APIResponseVDCNetwork{
 		ID:          networkID,
 		Name:        "isolated-net-1",
-		NetworkType: types.VdcNetworkTypeIsolated,
+		NetworkType: types.VDCNetworkTypeIsolated,
 	}, nil)
 
-	ms.CleanResponse(endpoints.DeleteVdcNetwork())
+	ms.CleanResponse(endpoints.DeleteVDCNetwork())
 
-	err := client.DeleteVdcNetworkIsolated(t.Context(), types.ParamsDeleteVdcNetworkIsolated{ID: networkID})
+	err := client.DeleteVDCNetworkIsolated(t.Context(), types.ParamsDeleteVDCNetworkIsolated{ID: networkID})
 
 	assert.NoError(t, err)
 
-	ms.CleanResponse(endpoints.GetVdcNetwork())
-	ms.CleanResponse(endpoints.DeleteVdcNetwork())
+	ms.CleanResponse(endpoints.GetVDCNetwork())
+	ms.CleanResponse(endpoints.DeleteVDCNetwork())
 }
 
 func TestDeleteVdcNetworkRouted(t *testing.T) {
@@ -47,19 +47,19 @@ func TestDeleteVdcNetworkRouted(t *testing.T) {
 
 	client, ms := newClient(t)
 
-	ms.CleanResponse(endpoints.GetVdcNetwork())
-	ms.SetResponse(endpoints.GetVdcNetwork(), &itypes.ApiResponseVdcNetwork{
+	ms.CleanResponse(endpoints.GetVDCNetwork())
+	ms.SetResponse(endpoints.GetVDCNetwork(), &itypes.APIResponseVDCNetwork{
 		ID:          networkID,
 		Name:        "routed-net-1",
-		NetworkType: types.VdcNetworkTypeRouted,
+		NetworkType: types.VDCNetworkTypeRouted,
 	}, nil)
 
-	ms.CleanResponse(endpoints.DeleteVdcNetwork())
+	ms.CleanResponse(endpoints.DeleteVDCNetwork())
 
-	err := client.DeleteVdcNetworkRouted(t.Context(), types.ParamsDeleteVdcNetworkRouted{ID: networkID})
+	err := client.DeleteVDCNetworkRouted(t.Context(), types.ParamsDeleteVDCNetworkRouted{ID: networkID})
 
 	assert.NoError(t, err)
 
-	ms.CleanResponse(endpoints.GetVdcNetwork())
-	ms.CleanResponse(endpoints.DeleteVdcNetwork())
+	ms.CleanResponse(endpoints.GetVDCNetwork())
+	ms.CleanResponse(endpoints.DeleteVDCNetwork())
 }

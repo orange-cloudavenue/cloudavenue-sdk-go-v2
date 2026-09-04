@@ -36,7 +36,7 @@ const (
 // Application Port Profile). Note: there is no registered URN format for
 // this resource, so ID vs. name resolution is driven purely by which of the
 // two params is non-empty, not by URN pattern-matching.
-func findNetworkContextProfile(ctx context.Context, cc *Client, id, name, vdcGroupID string) (*itypes.ApiResponseNetworkContextProfile, error) {
+func findNetworkContextProfile(ctx context.Context, cc *Client, id, name, vdcGroupID string) (*itypes.APIResponseNetworkContextProfile, error) {
 	if id != "" {
 		ep := endpoints.GetNetworkContextProfile()
 
@@ -49,7 +49,7 @@ func findNetworkContextProfile(ctx context.Context, cc *Client, id, name, vdcGro
 			return nil, err
 		}
 
-		return resp.Result().(*itypes.ApiResponseNetworkContextProfile), nil
+		return resp.Result().(*itypes.APIResponseNetworkContextProfile), nil
 	}
 
 	ep := endpoints.ListNetworkContextProfile()
@@ -63,9 +63,9 @@ func findNetworkContextProfile(ctx context.Context, cc *Client, id, name, vdcGro
 		return nil, err
 	}
 
-	list := resp.Result().(*itypes.ApiResponseListNetworkContextProfile)
+	list := resp.Result().(*itypes.APIResponseListNetworkContextProfile)
 
-	var found []itypes.ApiResponseNetworkContextProfile
+	var found []itypes.APIResponseNetworkContextProfile
 	for _, profile := range list.Values {
 		if profile.Name == name {
 			found = append(found, profile)
@@ -82,16 +82,16 @@ func findNetworkContextProfile(ctx context.Context, cc *Client, id, name, vdcGro
 	return &found[0], nil
 }
 
-func toApiNetworkContextProfileAttributes(attrs []types.ParamsNetworkContextProfileAttribute) []itypes.ApiNetworkContextProfileAttribute {
-	out := make([]itypes.ApiNetworkContextProfileAttribute, 0, len(attrs))
+func toAPINetworkContextProfileAttributes(attrs []types.ParamsNetworkContextProfileAttribute) []itypes.APINetworkContextProfileAttribute {
+	out := make([]itypes.APINetworkContextProfileAttribute, 0, len(attrs))
 	for _, attr := range attrs {
-		apiAttr := itypes.ApiNetworkContextProfileAttribute{
+		apiAttr := itypes.APINetworkContextProfileAttribute{
 			Type:   attr.Type,
 			Values: attr.Values,
 		}
 
 		for _, sub := range attr.SubAttributes {
-			apiAttr.SubAttributes = append(apiAttr.SubAttributes, itypes.ApiNetworkContextProfileSubAttribute{
+			apiAttr.SubAttributes = append(apiAttr.SubAttributes, itypes.APINetworkContextProfileSubAttribute{
 				Type:   sub.Type,
 				Values: sub.Values,
 			})
@@ -103,12 +103,12 @@ func toApiNetworkContextProfileAttributes(attrs []types.ParamsNetworkContextProf
 	return out
 }
 
-func createNetworkContextProfileBody(ctx context.Context, cc *Client, params types.ParamsCreateNetworkContextProfile) (itypes.ApiRequestNetworkContextProfile, string, error) {
-	vdcGroupID := params.VdcGroupID
-	epList := endpoints.ListVdcGroup()
+func createNetworkContextProfileBody(ctx context.Context, cc *Client, params types.ParamsCreateNetworkContextProfile) (itypes.APIRequestNetworkContextProfile, string, error) {
+	vdcGroupID := params.VDCGroupID
+	epList := endpoints.ListVDCGroup()
 	filter := "id==" + vdcGroupID
 	if vdcGroupID == "" {
-		filter = "name==" + params.VdcGroupName
+		filter = "name==" + params.VDCGroupName
 	}
 
 	respList, err := cc.c.Do(
@@ -117,12 +117,12 @@ func createNetworkContextProfileBody(ctx context.Context, cc *Client, params typ
 		cav.WithQueryParam(epList.QueryParams[0], filter),
 	)
 	if err != nil {
-		return itypes.ApiRequestNetworkContextProfile{}, "", err
+		return itypes.APIRequestNetworkContextProfile{}, "", err
 	}
 
-	rL := respList.Result().(*itypes.ApiResponseListVdcGroup)
+	rL := respList.Result().(*itypes.APIResponseListVDCGroup)
 	if len(rL.Values) == 0 {
-		return itypes.ApiRequestNetworkContextProfile{}, "", errors.Newf("vdc group not found")
+		return itypes.APIRequestNetworkContextProfile{}, "", errors.Newf("vdc group not found")
 	}
 	if vdcGroupID == "" {
 		vdcGroupID = rL.Values[0].ID
@@ -130,21 +130,21 @@ func createNetworkContextProfileBody(ctx context.Context, cc *Client, params typ
 
 	cd := cav.GetExtraDataFromContext(respList.Request.Context())
 
-	return itypes.ApiRequestNetworkContextProfile{
+	return itypes.APIRequestNetworkContextProfile{
 		Name:            params.Name,
 		Description:     params.Description,
 		Scope:           types.NetworkContextProfileScopeTenant,
-		ContextEntityId: vdcGroupID,
-		OrgRef:          &itypes.ApiObjectReference{ID: cd.OrganizationID},
-		Attributes:      toApiNetworkContextProfileAttributes(params.Attributes),
+		ContextEntityID: vdcGroupID,
+		OrgRef:          &itypes.APIObjectReference{ID: cd.OrganizationID},
+		Attributes:      toAPINetworkContextProfileAttributes(params.Attributes),
 	}, vdcGroupID, nil
 }
 
 // ListNetworkContextProfile lists network context profiles visible from a VDC group.
 func (c *Client) ListNetworkContextProfile(ctx context.Context, params types.ParamsListNetworkContextProfile) (*types.ModelListNetworkContextProfile, error) {
-	vdcGroupID := params.VdcGroupID
+	vdcGroupID := params.VDCGroupID
 	if vdcGroupID == "" {
-		vdcGroup, err := c.GetVdcGroup(ctx, types.ParamsGetVdcGroup{Name: params.VdcGroupName})
+		vdcGroup, err := c.GetVDCGroup(ctx, types.ParamsGetVDCGroup{Name: params.VDCGroupName})
 		if err != nil {
 			return nil, fmt.Errorf("%s: resolve vdc group: %w", opListNetworkContextProfile, err)
 		}
@@ -161,14 +161,14 @@ func (c *Client) ListNetworkContextProfile(ctx context.Context, params types.Par
 		return nil, fmt.Errorf("%s: list: %w", opListNetworkContextProfile, err)
 	}
 
-	return resp.Result().(*itypes.ApiResponseListNetworkContextProfile).ToModel(), nil
+	return resp.Result().(*itypes.APIResponseListNetworkContextProfile).ToModel(), nil
 }
 
 // GetNetworkContextProfile returns a network context profile by ID or name for a VDC group.
 func (c *Client) GetNetworkContextProfile(ctx context.Context, params types.ParamsGetNetworkContextProfile) (*types.ModelGetNetworkContextProfile, error) {
-	vdcGroupID := params.VdcGroupID
-	if params.ID == "" && vdcGroupID == "" && params.VdcGroupName != "" {
-		vdcGroup, err := c.GetVdcGroup(ctx, types.ParamsGetVdcGroup{Name: params.VdcGroupName})
+	vdcGroupID := params.VDCGroupID
+	if params.ID == "" && vdcGroupID == "" && params.VDCGroupName != "" {
+		vdcGroup, err := c.GetVDCGroup(ctx, types.ParamsGetVDCGroup{Name: params.VDCGroupName})
 		if err != nil {
 			return nil, fmt.Errorf("%s: resolve vdc group: %w", opGetNetworkContextProfile, err)
 		}
@@ -223,15 +223,15 @@ func (c *Client) UpdateNetworkContextProfile(ctx context.Context, params types.P
 
 	attributes := current.Attributes
 	if len(params.Attributes) != 0 {
-		attributes = toApiNetworkContextProfileAttributes(params.Attributes)
+		attributes = toAPINetworkContextProfileAttributes(params.Attributes)
 	}
 
-	body := itypes.ApiRequestNetworkContextProfile{
+	body := itypes.APIRequestNetworkContextProfile{
 		ID:              current.ID,
 		Name:            current.Name,
 		Description:     description,
 		Scope:           current.Scope,
-		ContextEntityId: current.ContextEntityId,
+		ContextEntityID: current.ContextEntityID,
 		OrgRef:          current.OrgRef,
 		Attributes:      attributes,
 	}
@@ -252,9 +252,9 @@ func (c *Client) UpdateNetworkContextProfile(ctx context.Context, params types.P
 
 // DeleteNetworkContextProfile deletes a network context profile from a VDC group.
 func (c *Client) DeleteNetworkContextProfile(ctx context.Context, params types.ParamsDeleteNetworkContextProfile) error {
-	vdcGroupID := params.VdcGroupID
-	if params.ID == "" && vdcGroupID == "" && params.VdcGroupName != "" {
-		vdcGroup, err := c.GetVdcGroup(ctx, types.ParamsGetVdcGroup{Name: params.VdcGroupName})
+	vdcGroupID := params.VDCGroupID
+	if params.ID == "" && vdcGroupID == "" && params.VDCGroupName != "" {
+		vdcGroup, err := c.GetVDCGroup(ctx, types.ParamsGetVDCGroup{Name: params.VDCGroupName})
 		if err != nil {
 			return fmt.Errorf("%s: resolve vdc group: %w", opDeleteNetworkContextProfile, err)
 		}
@@ -280,9 +280,9 @@ func (c *Client) DeleteNetworkContextProfile(ctx context.Context, params types.P
 
 // GetNetworkContextProfileAttributes returns live APP_ID and DOMAIN_NAME values for a VDC group.
 func (c *Client) GetNetworkContextProfileAttributes(ctx context.Context, params types.ParamsGetNetworkContextProfileAttributes) (*types.ModelGetNetworkContextProfileAttributesCatalog, error) {
-	vdcGroupID := params.VdcGroupID
+	vdcGroupID := params.VDCGroupID
 	if vdcGroupID == "" {
-		vdcGroup, err := c.GetVdcGroup(ctx, types.ParamsGetVdcGroup{Name: params.VdcGroupName})
+		vdcGroup, err := c.GetVDCGroup(ctx, types.ParamsGetVDCGroup{Name: params.VDCGroupName})
 		if err != nil {
 			return nil, fmt.Errorf("%s: resolve vdc group: %w", opGetNetworkContextProfileAttributes, err)
 		}
@@ -300,7 +300,7 @@ func (c *Client) GetNetworkContextProfileAttributes(ctx context.Context, params 
 	}
 
 	catalog := &types.ModelGetNetworkContextProfileAttributesCatalog{}
-	for _, attr := range resp.Result().(*itypes.ApiNetworkContextProfileAttributesResponse).Attributes {
+	for _, attr := range resp.Result().(*itypes.APINetworkContextProfileAttributesResponse).Attributes {
 		switch attr.Type {
 		case types.NetworkContextProfileAttributeTypeAppID:
 			catalog.AppIDValues = append(catalog.AppIDValues, attr.Values...)

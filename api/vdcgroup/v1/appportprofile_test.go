@@ -32,22 +32,22 @@ func TestCreateAppPortProfile(t *testing.T) {
 
 	client, ms := newClient(t)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
-		Values: []itypes.ApiResponseListVdcGroupDetails{{
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.SetResponse(endpoints.ListVDCGroup(), &itypes.APIResponseListVDCGroup{
+		Values: []itypes.APIResponseListVDCGroupDetails{{
 			ID:   vdcGroupID,
 			Name: vdcGroupName,
 		}},
 	}, nil)
 
 	ms.CleanResponse(endpoints.CreateAppPortProfile())
-	ms.SetResponse(endpoints.CreateAppPortProfile(), &itypes.ApiResponseAppPortProfile{
+	ms.SetResponse(endpoints.CreateAppPortProfile(), &itypes.APIResponseAppPortProfile{
 		ID:          createdID,
 		Name:        "app-1",
 		Description: "desc",
 		Scope:       types.AppPortProfileScopeTenant,
-		OrgRef:      &itypes.ApiObjectReference{ID: orgID},
-		ApplicationPorts: []itypes.ApiAppPortProfilePort{{
+		OrgRef:      &itypes.APIObjectReference{ID: orgID},
+		ApplicationPorts: []itypes.APIAppPortProfilePort{{
 			Protocol:         types.AppPortProfileProtocolTCP,
 			DestinationPorts: []string{"443", "8443-8444"},
 		}},
@@ -56,7 +56,7 @@ func TestCreateAppPortProfile(t *testing.T) {
 	resp, err := client.CreateAppPortProfile(t.Context(), types.ParamsCreateAppPortProfile{
 		Name:             "app-1",
 		Description:      "desc",
-		VdcGroupName:     vdcGroupName,
+		VDCGroupName:     vdcGroupName,
 		ApplicationPorts: ports,
 	})
 
@@ -70,7 +70,7 @@ func TestCreateAppPortProfile(t *testing.T) {
 	assert.Equal(t, types.AppPortProfileProtocolTCP, resp.ApplicationPorts[0].Protocol)
 	assert.Equal(t, []string{"443", "8443-8444"}, resp.ApplicationPorts[0].DestinationPorts)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
+	ms.CleanResponse(endpoints.ListVDCGroup())
 	ms.CleanResponse(endpoints.CreateAppPortProfile())
 }
 
@@ -82,26 +82,26 @@ func TestListAppPortProfile(t *testing.T) {
 
 	client, ms := newClient(t)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
-		Values: []itypes.ApiResponseListVdcGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.SetResponse(endpoints.ListVDCGroup(), &itypes.APIResponseListVDCGroup{
+		Values: []itypes.APIResponseListVDCGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
 	}, nil)
 
 	ms.CleanResponse(endpoints.ListAppPortProfile())
-	ms.SetResponse(endpoints.ListAppPortProfile(), &itypes.ApiResponseListAppPortProfile{
-		Values: []itypes.ApiResponseAppPortProfile{{
+	ms.SetResponse(endpoints.ListAppPortProfile(), &itypes.APIResponseListAppPortProfile{
+		Values: []itypes.APIResponseAppPortProfile{{
 			ID:     profileID,
 			Name:   "app-1",
 			Scope:  types.AppPortProfileScopeTenant,
-			OrgRef: &itypes.ApiObjectReference{ID: orgID},
-			ApplicationPorts: []itypes.ApiAppPortProfilePort{{
+			OrgRef: &itypes.APIObjectReference{ID: orgID},
+			ApplicationPorts: []itypes.APIAppPortProfilePort{{
 				Protocol:         types.AppPortProfileProtocolTCP,
 				DestinationPorts: []string{"443"},
 			}},
 		}},
 	}, nil)
 
-	resp, err := client.ListAppPortProfile(t.Context(), types.ParamsListAppPortProfile{VdcGroupName: vdcGroupName})
+	resp, err := client.ListAppPortProfile(t.Context(), types.ParamsListAppPortProfile{VDCGroupName: vdcGroupName})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
@@ -110,7 +110,7 @@ func TestListAppPortProfile(t *testing.T) {
 	assert.Equal(t, orgID, resp.AppPortProfiles[0].OrgID)
 	assert.Equal(t, []string{"443"}, resp.AppPortProfiles[0].ApplicationPorts[0].DestinationPorts)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
+	ms.CleanResponse(endpoints.ListVDCGroup())
 	ms.CleanResponse(endpoints.ListAppPortProfile())
 }
 
@@ -121,12 +121,12 @@ func TestGetAppPortProfile(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetAppPortProfile())
-	ms.SetResponse(endpoints.GetAppPortProfile(), &itypes.ApiResponseAppPortProfile{
+	ms.SetResponse(endpoints.GetAppPortProfile(), &itypes.APIResponseAppPortProfile{
 		ID:     profileID,
 		Name:   "app-1",
 		Scope:  types.AppPortProfileScopeTenant,
-		OrgRef: &itypes.ApiObjectReference{ID: orgID},
-		ApplicationPorts: []itypes.ApiAppPortProfilePort{{
+		OrgRef: &itypes.APIObjectReference{ID: orgID},
+		ApplicationPorts: []itypes.APIAppPortProfilePort{{
 			Protocol:         types.AppPortProfileProtocolUDP,
 			DestinationPorts: []string{"53"},
 		}},
@@ -150,13 +150,13 @@ func TestUpdateAppPortProfile(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetAppPortProfile())
-	ms.SetResponse(endpoints.GetAppPortProfile(), &itypes.ApiResponseAppPortProfile{
+	ms.SetResponse(endpoints.GetAppPortProfile(), &itypes.APIResponseAppPortProfile{
 		ID:          profileID,
 		Name:        "app-1",
 		Description: "old-desc",
 		Scope:       types.AppPortProfileScopeTenant,
-		OrgRef:      &itypes.ApiObjectReference{ID: orgID},
-		ApplicationPorts: []itypes.ApiAppPortProfilePort{{
+		OrgRef:      &itypes.APIObjectReference{ID: orgID},
+		ApplicationPorts: []itypes.APIAppPortProfilePort{{
 			Protocol:         types.AppPortProfileProtocolTCP,
 			DestinationPorts: []string{"443"},
 		}},
@@ -194,10 +194,10 @@ func TestDeleteAppPortProfile(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetAppPortProfile())
-	ms.SetResponse(endpoints.GetAppPortProfile(), &itypes.ApiResponseAppPortProfile{
+	ms.SetResponse(endpoints.GetAppPortProfile(), &itypes.APIResponseAppPortProfile{
 		ID:              profileID,
 		Name:            "app-1",
-		ContextEntityId: vdcGroupID,
+		ContextEntityID: vdcGroupID,
 		Scope:           types.AppPortProfileScopeTenant,
 	}, nil)
 	ms.CleanResponse(endpoints.DeleteAppPortProfile())

@@ -19,21 +19,21 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
-func resolveVdcGroupParticipatingVdcs(ctx context.Context, c *Client, vdcs []types.ParamsCreateVdcGroupVdc, siteID string) ([]itypes.ApiResponseVdcGroupParticipatingVdc, error) {
-	resolved := make([]itypes.ApiResponseVdcGroupParticipatingVdc, 0, len(vdcs))
+func resolveVDCGroupParticipatingVdcs(ctx context.Context, c *Client, vdcs []types.ParamsCreateVDCGroupVDC, siteID string) ([]itypes.APIResponseVDCGroupParticipatingVDC, error) {
+	resolved := make([]itypes.APIResponseVDCGroupParticipatingVDC, 0, len(vdcs))
 
-	needsLookup := slices.ContainsFunc(vdcs, func(vdc types.ParamsCreateVdcGroupVdc) bool {
+	needsLookup := slices.ContainsFunc(vdcs, func(vdc types.ParamsCreateVDCGroupVDC) bool {
 		return vdc.ID == ""
 	})
 
 	vdcIDsByName := make(map[string]string)
 	if needsLookup {
-		respListVdc, err := c.c.Do(ctx, endpoints.ListVdc())
+		respListVDC, err := c.c.Do(ctx, endpoints.ListVDC())
 		if err != nil {
 			return nil, err
 		}
 
-		for _, vdc := range respListVdc.Result().(*itypes.ApiResponseListVDC).Records {
+		for _, vdc := range respListVDC.Result().(*itypes.APIResponseListVDC).Records {
 			vdcIDsByName[vdc.Name] = vdc.ID
 		}
 	}
@@ -47,9 +47,9 @@ func resolveVdcGroupParticipatingVdcs(ctx context.Context, c *Client, vdcs []typ
 			}
 		}
 
-		resolved = append(resolved, itypes.ApiResponseVdcGroupParticipatingVdc{
-			Vdc:                  itypes.ApiResponseVdcGroupParticipatingVdcRef{ID: resolvedID, Name: vdc.Name},
-			Site:                 itypes.ApiResponseVdcGroupParticipatingSiteRef{ID: siteID},
+		resolved = append(resolved, itypes.APIResponseVDCGroupParticipatingVDC{
+			VDC:                  itypes.APIResponseVDCGroupParticipatingVDCRef{ID: resolvedID, Name: vdc.Name},
+			Site:                 itypes.APIResponseVDCGroupParticipatingSiteRef{ID: siteID},
 			FaultDomainTag:       "AZ01",
 			NetworkProviderScope: "AZ01",
 		})
@@ -58,38 +58,38 @@ func resolveVdcGroupParticipatingVdcs(ctx context.Context, c *Client, vdcs []typ
 	return resolved, nil
 }
 
-func mergeVdcGroupMembers(current []types.ModelGetVdcGroupVdc, additions []types.ParamsCreateVdcGroupVdc) []types.ParamsCreateVdcGroupVdc {
-	vdcs := make([]types.ParamsCreateVdcGroupVdc, 0, len(additions)+len(current))
+func mergeVDCGroupMembers(current []types.ModelGetVDCGroupVDC, additions []types.ParamsCreateVDCGroupVDC) []types.ParamsCreateVDCGroupVDC {
+	vdcs := make([]types.ParamsCreateVDCGroupVDC, 0, len(additions)+len(current))
 	vdcs = append(vdcs, additions...)
 
 	for _, vdc := range current {
-		vdcs = append(vdcs, types.ParamsCreateVdcGroupVdc{ID: vdc.ID, Name: vdc.Name})
+		vdcs = append(vdcs, types.ParamsCreateVDCGroupVDC(vdc))
 	}
 
 	return vdcs
 }
 
-func remainingVdcGroupMembers(current []types.ModelGetVdcGroupVdc, removals []types.ParamsCreateVdcGroupVdc) []types.ParamsCreateVdcGroupVdc {
-	filtered := append([]types.ModelGetVdcGroupVdc(nil), current...)
+func remainingVDCGroupMembers(current []types.ModelGetVDCGroupVDC, removals []types.ParamsCreateVDCGroupVDC) []types.ParamsCreateVDCGroupVDC {
+	filtered := append([]types.ModelGetVDCGroupVDC(nil), current...)
 	for _, vdc := range removals {
-		filtered = slices.DeleteFunc(filtered, func(item types.ModelGetVdcGroupVdc) bool {
+		filtered = slices.DeleteFunc(filtered, func(item types.ModelGetVDCGroupVDC) bool {
 			return (vdc.ID != "" && item.ID == vdc.ID) || (vdc.Name != "" && item.Name == vdc.Name)
 		})
 	}
 
-	vdcs := make([]types.ParamsCreateVdcGroupVdc, 0, len(filtered))
+	vdcs := make([]types.ParamsCreateVDCGroupVDC, 0, len(filtered))
 	for _, vdc := range filtered {
-		vdcs = append(vdcs, types.ParamsCreateVdcGroupVdc{ID: vdc.ID, Name: vdc.Name})
+		vdcs = append(vdcs, types.ParamsCreateVDCGroupVDC{ID: vdc.ID, Name: vdc.Name})
 	}
 
 	return vdcs
 }
 
-// AddVdcToVdcGroup adds VDCs to an existing VDC group.
-func (c *Client) AddVdcToVdcGroup(ctx context.Context, params types.ParamsAddVdcToVdcGroup) error {
-	vdcGroup, err := c.GetVdcGroup(ctx, types.ParamsGetVdcGroup{ID: params.ID, Name: params.Name})
+// AddVDCToVDCGroup adds VDCs to an existing VDC group.
+func (c *Client) AddVDCToVDCGroup(ctx context.Context, params types.ParamsAddVDCToVDCGroup) error {
+	vdcGroup, err := c.GetVDCGroup(ctx, types.ParamsGetVDCGroup{ID: params.ID, Name: params.Name})
 	if err != nil {
-		return fmt.Errorf("%s: resolve target: %w", opAddVdcToVdcGroup, err)
+		return fmt.Errorf("%s: resolve target: %w", opAddVDCToVDCGroup, err)
 	}
 
 	var description *string
@@ -97,24 +97,24 @@ func (c *Client) AddVdcToVdcGroup(ctx context.Context, params types.ParamsAddVdc
 		description = &vdcGroup.Description
 	}
 
-	_, err = c.UpdateVdcGroup(ctx, types.ParamsUpdateVdcGroup{
+	_, err = c.UpdateVDCGroup(ctx, types.ParamsUpdateVDCGroup{
 		ID:          vdcGroup.ID,
 		Name:        vdcGroup.Name,
 		Description: description,
-		Vdcs:        mergeVdcGroupMembers(vdcGroup.Vdcs, params.Vdcs),
+		Vdcs:        mergeVDCGroupMembers(vdcGroup.Vdcs, params.Vdcs),
 	})
 	if err != nil {
-		return fmt.Errorf("%s: update: %w", opAddVdcToVdcGroup, err)
+		return fmt.Errorf("%s: update: %w", opAddVDCToVDCGroup, err)
 	}
 
 	return nil
 }
 
-// RemoveVdcFromVdcGroup removes VDCs from an existing VDC group.
-func (c *Client) RemoveVdcFromVdcGroup(ctx context.Context, params types.ParamsRemoveVdcFromVdcGroup) error {
-	vdcGroup, err := c.GetVdcGroup(ctx, types.ParamsGetVdcGroup{ID: params.ID, Name: params.Name})
+// RemoveVDCFromVDCGroup removes VDCs from an existing VDC group.
+func (c *Client) RemoveVDCFromVDCGroup(ctx context.Context, params types.ParamsRemoveVDCFromVDCGroup) error {
+	vdcGroup, err := c.GetVDCGroup(ctx, types.ParamsGetVDCGroup{ID: params.ID, Name: params.Name})
 	if err != nil {
-		return fmt.Errorf("%s: resolve target: %w", opRemoveVdcFromVdcGroup, err)
+		return fmt.Errorf("%s: resolve target: %w", opRemoveVDCFromVDCGroup, err)
 	}
 
 	var description *string
@@ -122,14 +122,14 @@ func (c *Client) RemoveVdcFromVdcGroup(ctx context.Context, params types.ParamsR
 		description = &vdcGroup.Description
 	}
 
-	_, err = c.UpdateVdcGroup(ctx, types.ParamsUpdateVdcGroup{
+	_, err = c.UpdateVDCGroup(ctx, types.ParamsUpdateVDCGroup{
 		ID:          vdcGroup.ID,
 		Name:        vdcGroup.Name,
 		Description: description,
-		Vdcs:        remainingVdcGroupMembers(vdcGroup.Vdcs, params.Vdcs),
+		Vdcs:        remainingVDCGroupMembers(vdcGroup.Vdcs, params.Vdcs),
 	})
 	if err != nil {
-		return fmt.Errorf("%s: update: %w", opRemoveVdcFromVdcGroup, err)
+		return fmt.Errorf("%s: update: %w", opRemoveVDCFromVDCGroup, err)
 	}
 
 	return nil

@@ -31,15 +31,15 @@ const (
 
 // findAppPortProfile resolves an application port profile by ID or by name.
 // Name lookups search tenant, provider, then system scopes.
-func findAppPortProfile(ctx context.Context, cc *Client, idOrName, vdcGroupID string) (*itypes.ApiResponseAppPortProfile, error) {
+func findAppPortProfile(ctx context.Context, cc *Client, idOrName, vdcGroupID string) (*itypes.APIResponseAppPortProfile, error) {
 	return inetworkobjects.FindAppPortProfile(ctx, cc.c, idOrName, vdcGroupID)
 }
 
 // ListAppPortProfile lists application port profiles visible from a VDC group.
 func (c *Client) ListAppPortProfile(ctx context.Context, params types.ParamsListAppPortProfile) (*types.ModelListAppPortProfile, error) {
-	vdcGroupID := params.VdcGroupID
+	vdcGroupID := params.VDCGroupID
 	if vdcGroupID == "" {
-		vdcGroup, err := c.GetVdcGroup(ctx, types.ParamsGetVdcGroup{Name: params.VdcGroupName})
+		vdcGroup, err := c.GetVDCGroup(ctx, types.ParamsGetVDCGroup{Name: params.VDCGroupName})
 		if err != nil {
 			return nil, fmt.Errorf("%s: resolve vdc group: %w", opListAppPortProfile, err)
 		}
@@ -56,7 +56,7 @@ func (c *Client) ListAppPortProfile(ctx context.Context, params types.ParamsList
 		return nil, fmt.Errorf("%s: list: %w", opListAppPortProfile, err)
 	}
 
-	return resp.Result().(*itypes.ApiResponseListAppPortProfile).ToModel(), nil
+	return resp.Result().(*itypes.APIResponseListAppPortProfile).ToModel(), nil
 }
 
 // GetAppPortProfile returns an application port profile by ID or name for a VDC group.
@@ -66,9 +66,9 @@ func (c *Client) GetAppPortProfile(ctx context.Context, params types.ParamsGetAp
 		idOrName = params.Name
 	}
 
-	vdcGroupID := params.VdcGroupID
-	if vdcGroupID == "" && params.VdcGroupName != "" {
-		vdcGroup, err := c.GetVdcGroup(ctx, types.ParamsGetVdcGroup{Name: params.VdcGroupName})
+	vdcGroupID := params.VDCGroupID
+	if vdcGroupID == "" && params.VDCGroupName != "" {
+		vdcGroup, err := c.GetVDCGroup(ctx, types.ParamsGetVDCGroup{Name: params.VDCGroupName})
 		if err != nil {
 			return nil, fmt.Errorf("%s: resolve vdc group: %w", opGetAppPortProfile, err)
 		}
@@ -109,16 +109,16 @@ func (c *Client) UpdateAppPortProfile(ctx context.Context, params types.ParamsUp
 
 	applicationPorts := current.ApplicationPorts
 	if len(params.ApplicationPorts) != 0 {
-		applicationPorts = inetworkobjects.ToApiAppPortProfilePorts(params.ApplicationPorts)
+		applicationPorts = inetworkobjects.ToAPIAppPortProfilePorts(params.ApplicationPorts)
 	}
 
-	body := itypes.ApiRequestAppPortProfile{
+	body := itypes.APIRequestAppPortProfile{
 		ID:               current.ID,
 		Name:             current.Name,
 		Description:      description,
 		ApplicationPorts: applicationPorts,
 		OrgRef:           current.OrgRef,
-		ContextEntityId:  current.ContextEntityId,
+		ContextEntityID:  current.ContextEntityID,
 		Scope:            current.Scope,
 	}
 
@@ -143,9 +143,9 @@ func (c *Client) DeleteAppPortProfile(ctx context.Context, params types.ParamsDe
 		idOrName = params.Name
 	}
 
-	vdcGroupID := params.VdcGroupID
-	if vdcGroupID == "" && params.VdcGroupName != "" {
-		vdcGroup, err := c.GetVdcGroup(ctx, types.ParamsGetVdcGroup{Name: params.VdcGroupName})
+	vdcGroupID := params.VDCGroupID
+	if vdcGroupID == "" && params.VDCGroupName != "" {
+		vdcGroup, err := c.GetVDCGroup(ctx, types.ParamsGetVDCGroup{Name: params.VDCGroupName})
 		if err != nil {
 			return fmt.Errorf("%s: resolve vdc group: %w", opDeleteAppPortProfile, err)
 		}
@@ -171,11 +171,11 @@ func (c *Client) DeleteAppPortProfile(ctx context.Context, params types.ParamsDe
 
 // CreateAppPortProfile creates a tenant-scoped application port profile for a VDC group.
 func (c *Client) CreateAppPortProfile(ctx context.Context, params types.ParamsCreateAppPortProfile) (*types.ModelGetAppPortProfile, error) {
-	vdcGroupID := params.VdcGroupID
-	epList := endpoints.ListVdcGroup()
+	vdcGroupID := params.VDCGroupID
+	epList := endpoints.ListVDCGroup()
 	filter := "id==" + vdcGroupID
 	if vdcGroupID == "" {
-		filter = "name==" + params.VdcGroupName
+		filter = "name==" + params.VDCGroupName
 	}
 
 	respList, err := c.c.Do(ctx, epList, cav.WithQueryParam(epList.QueryParams[0], filter))
@@ -183,7 +183,7 @@ func (c *Client) CreateAppPortProfile(ctx context.Context, params types.ParamsCr
 		return nil, fmt.Errorf("%s: resolve vdc group: %w", opCreateAppPortProfile, err)
 	}
 
-	rL := respList.Result().(*itypes.ApiResponseListVdcGroup)
+	rL := respList.Result().(*itypes.APIResponseListVDCGroup)
 	if len(rL.Values) == 0 {
 		return nil, errors.Newf("vdc group not found")
 	}
@@ -193,12 +193,12 @@ func (c *Client) CreateAppPortProfile(ctx context.Context, params types.ParamsCr
 
 	cd := cav.GetExtraDataFromContext(respList.Request.Context())
 
-	body := itypes.ApiRequestAppPortProfile{
+	body := itypes.APIRequestAppPortProfile{
 		Name:             params.Name,
 		Description:      params.Description,
-		ApplicationPorts: inetworkobjects.ToApiAppPortProfilePorts(params.ApplicationPorts),
-		OrgRef:           &itypes.ApiObjectReference{ID: cd.OrganizationID},
-		ContextEntityId:  vdcGroupID,
+		ApplicationPorts: inetworkobjects.ToAPIAppPortProfilePorts(params.ApplicationPorts),
+		OrgRef:           &itypes.APIObjectReference{ID: cd.OrganizationID},
+		ContextEntityID:  vdcGroupID,
 		Scope:            types.AppPortProfileScopeTenant,
 	}
 
@@ -208,7 +208,7 @@ func (c *Client) CreateAppPortProfile(ctx context.Context, params types.ParamsCr
 		return nil, fmt.Errorf("%s: %w", opCreateAppPortProfile, err)
 	}
 
-	profile, ok := resp.Result().(*itypes.ApiResponseAppPortProfile)
+	profile, ok := resp.Result().(*itypes.APIResponseAppPortProfile)
 	if !ok || profile == nil {
 		return nil, fmt.Errorf("%s: unexpected create response type %T", opCreateAppPortProfile, resp.Result())
 	}

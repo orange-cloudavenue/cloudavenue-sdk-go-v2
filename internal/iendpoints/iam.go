@@ -29,8 +29,8 @@ func init() {
 		PathTemplate:     pathAdminOrg + "/users",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "orgId",
-				Description: "Organization ID",
+				Name:        pathParamOrgID,
+				Description: descOrgID,
 				Required:    true,
 			},
 		},
@@ -47,13 +47,13 @@ func init() {
 		PathTemplate:     pathAdminOrg + "/user/{userId}",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "orgId",
-				Description: "Organization ID",
+				Name:        pathParamOrgID,
+				Description: descOrgID,
 				Required:    true,
 			},
 			{
-				Name:        "userId",
-				Description: "User ID or name",
+				Name:        pathParamUserID,
+				Description: descUserID,
 				Required:    true,
 			},
 		},
@@ -70,8 +70,8 @@ func init() {
 		PathTemplate:     pathAdminOrg + "/users",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "orgId",
-				Description: "Organization ID",
+				Name:        pathParamOrgID,
+				Description: descOrgID,
 				Required:    true,
 			},
 		},
@@ -89,13 +89,13 @@ func init() {
 		PathTemplate:     pathAdminOrg + "/user/{userId}",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "orgId",
-				Description: "Organization ID",
+				Name:        pathParamOrgID,
+				Description: descOrgID,
 				Required:    true,
 			},
 			{
-				Name:        "userId",
-				Description: "User ID or name",
+				Name:        pathParamUserID,
+				Description: descUserID,
 				Required:    true,
 			},
 		},
@@ -113,13 +113,13 @@ func init() {
 		PathTemplate:     pathAdminOrg + "/user/{userId}",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "orgId",
-				Description: "Organization ID",
+				Name:        pathParamOrgID,
+				Description: descOrgID,
 				Required:    true,
 			},
 			{
-				Name:        "userId",
-				Description: "User ID or name",
+				Name:        pathParamUserID,
+				Description: descUserID,
 				Required:    true,
 			},
 		},
@@ -143,13 +143,13 @@ func init() {
 		PathTemplate:     pathAdminOrg + "/user/{userId}/action/enable",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "orgId",
-				Description: "Organization ID",
+				Name:        pathParamOrgID,
+				Description: descOrgID,
 				Required:    true,
 			},
 			{
-				Name:        "userId",
-				Description: "User ID or name",
+				Name:        pathParamUserID,
+				Description: descUserID,
 				Required:    true,
 			},
 		},
@@ -166,13 +166,13 @@ func init() {
 		PathTemplate:     pathAdminOrg + "/user/{userId}/action/disable",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "orgId",
-				Description: "Organization ID",
+				Name:        pathParamOrgID,
+				Description: descOrgID,
 				Required:    true,
 			},
 			{
-				Name:        "userId",
-				Description: "User ID or name",
+				Name:        pathParamUserID,
+				Description: descUserID,
 				Required:    true,
 			},
 		},
@@ -189,13 +189,13 @@ func init() {
 		PathTemplate:     pathAdminOrg + "/user/{userId}/action/unlock",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "orgId",
-				Description: "Organization ID",
+				Name:        pathParamOrgID,
+				Description: descOrgID,
 				Required:    true,
 			},
 			{
-				Name:        "userId",
-				Description: "User ID or name",
+				Name:        pathParamUserID,
+				Description: descUserID,
 				Required:    true,
 			},
 		},
@@ -212,13 +212,13 @@ func init() {
 		PathTemplate:     pathAdminOrg + "/user/{userId}/action/changePassword",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "orgId",
-				Description: "Organization ID",
+				Name:        pathParamOrgID,
+				Description: descOrgID,
 				Required:    true,
 			},
 			{
-				Name:        "userId",
-				Description: "User ID or name",
+				Name:        pathParamUserID,
+				Description: descUserID,
 				Required:    true,
 			},
 		},

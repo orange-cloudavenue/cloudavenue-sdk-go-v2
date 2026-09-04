@@ -19,11 +19,11 @@ type (
 	}
 
 	APIResponseNetbackupMachine struct {
-		ID          string `json:"id"`
-		Name        string `json:"name"`
-		Hostname    string `json:"hostname"`
-		IPAddress   string `json:"ipAddress"`
-		Status      string `json:"status"`
+		ID        string `json:"id"`
+		Name      string `json:"name"`
+		Hostname  string `json:"hostname"`
+		IPAddress string `json:"ipAddress"`
+		Status    string `json:"status"`
 	}
 
 	APIResponseNetbackupProtectionLevel struct {
@@ -38,14 +38,14 @@ type (
 	}
 
 	APIResponseNetbackupProtectMachine struct {
-		ID          string `json:"id"`
-		MachineID   string `json:"machineId"`
-		Status      string `json:"status"`
+		ID        string `json:"id"`
+		MachineID string `json:"machineId"`
+		Status    string `json:"status"`
 	}
 )
 
 type (
-	APIResponseListNetbackupInventory []APIResponseNetbackupInventory
-	APIResponseListNetbackupMachines  []APIResponseNetbackupMachine
+	APIResponseListNetbackupInventory        []APIResponseNetbackupInventory
+	APIResponseListNetbackupMachines         []APIResponseNetbackupMachine
 	APIResponseListNetbackupProtectionLevels []APIResponseNetbackupProtectionLevel
 )

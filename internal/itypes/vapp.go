@@ -7,6 +7,7 @@
  * or see the "LICENSE" file for more details.
  */
 
+//nolint:tagliatelle
 package itypes
 
 import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
@@ -39,7 +40,7 @@ type APIResponseGetVApp struct {
 	GuestProperties      APIResponseGuestProperties      `json:"guestProperties"`
 	NetworkConfigSection APIResponseNetworkConfigSection `json:"networkConfigSection"`
 	VAppParent           string                          `json:"vAppParent" fake:"{urn:vapp}"`
-	Vdc                  string                          `json:"vdc" fake:"{urn:vdc}"`
+	VDC                  string                          `json:"vdc" fake:"{urn:vdc}"`
 	Org                  string                          `json:"org" fake:"{urn:org}"`
 	Owner                string                          `json:"owner" fake:"{urn:user}"`
 	Metadata             []APIResponseMetadata           `json:"metadataEntry" fakesize:"1"`
@@ -169,7 +170,7 @@ func (r *APIResponseGetVApp) ToModel() types.ModelVApp {
 		Status:      r.Status,
 		Deployed:    r.Deployed,
 		HREF:        r.HREF,
-		VDC:         r.Vdc,
+		VDC:         r.VDC,
 		Org:         r.Org,
 		Owner:       r.Owner,
 		Parent:      r.VAppParent,
@@ -183,8 +184,7 @@ func (r *APIResponseGetVApp) ToModel() types.ModelVApp {
 	}
 
 	for _, meta := range r.Metadata {
-		switch meta.Key {
-		case "vappBillingModel":
+		if meta.Key == "vappBillingModel" {
 			m.Properties.BillingModel = meta.Value
 		}
 	}

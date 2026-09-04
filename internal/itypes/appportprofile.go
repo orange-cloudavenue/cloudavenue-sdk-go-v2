@@ -13,39 +13,39 @@ import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 
 type (
 	// * List
-	ApiResponseListAppPortProfile struct {
-		Values []ApiResponseAppPortProfile `json:"values" fakesize:"3"`
+	APIResponseListAppPortProfile struct {
+		Values []APIResponseAppPortProfile `json:"values" fakesize:"3"`
 	}
 
 	// * Get / Create / Update / shared model
-	ApiResponseAppPortProfile struct {
+	APIResponseAppPortProfile struct {
 		ID               string                  `json:"id,omitempty" fake:"{urn:applicationPortProfile}"`
 		Name             string                  `json:"name,omitempty" fake:"mockappportprofile-{word}"`
 		Description      string                  `json:"description,omitempty" fake:"{sentence}"`
-		ApplicationPorts []ApiAppPortProfilePort `json:"applicationPorts,omitempty"`
-		OrgRef           *ApiObjectReference     `json:"orgRef,omitempty"`
-		ContextEntityId  string                  `json:"contextEntityId,omitempty"`
+		ApplicationPorts []APIAppPortProfilePort `json:"applicationPorts,omitempty"`
+		OrgRef           *APIObjectReference     `json:"orgRef,omitempty"`
+		ContextEntityID  string                  `json:"contextEntityId,omitempty"`
 		Scope            string                  `json:"scope,omitempty"`
 	}
 
-	ApiAppPortProfilePort struct {
+	APIAppPortProfilePort struct {
 		Protocol         string   `json:"protocol"`
 		DestinationPorts []string `json:"destinationPorts,omitempty"`
 	}
 
-	// * Create / Update request (same shape as ApiResponseAppPortProfile)
-	ApiRequestAppPortProfile struct {
+	// * Create / Update request (same shape as APIResponseAppPortProfile)
+	APIRequestAppPortProfile struct {
 		ID               string                  `json:"id,omitempty" fake:"{urn:applicationPortProfile}"`
 		Name             string                  `json:"name,omitempty" fake:"mockappportprofile-{word}"`
 		Description      string                  `json:"description,omitempty" fake:"{sentence}"`
-		ApplicationPorts []ApiAppPortProfilePort `json:"applicationPorts,omitempty"`
-		OrgRef           *ApiObjectReference     `json:"orgRef,omitempty"`
-		ContextEntityId  string                  `json:"contextEntityId,omitempty"`
+		ApplicationPorts []APIAppPortProfilePort `json:"applicationPorts,omitempty"`
+		OrgRef           *APIObjectReference     `json:"orgRef,omitempty"`
+		ContextEntityID  string                  `json:"contextEntityId,omitempty"`
 		Scope            string                  `json:"scope,omitempty"`
 	}
 )
 
-func (r *ApiResponseListAppPortProfile) ToModel() *types.ModelListAppPortProfile {
+func (r *APIResponseListAppPortProfile) ToModel() *types.ModelListAppPortProfile {
 	model := &types.ModelListAppPortProfile{
 		AppPortProfiles: make([]types.ModelGetAppPortProfile, 0),
 	}
@@ -57,7 +57,7 @@ func (r *ApiResponseListAppPortProfile) ToModel() *types.ModelListAppPortProfile
 	return model
 }
 
-func (r *ApiResponseAppPortProfile) ToModel() types.ModelGetAppPortProfile {
+func (r *APIResponseAppPortProfile) ToModel() types.ModelGetAppPortProfile {
 	m := types.ModelGetAppPortProfile{
 		ID:          r.ID,
 		Name:        r.Name,
@@ -79,7 +79,7 @@ func (r *ApiResponseAppPortProfile) ToModel() types.ModelGetAppPortProfile {
 	return m
 }
 
-func (r *ApiRequestAppPortProfile) ToModel() types.ModelGetAppPortProfile {
+func (r *APIRequestAppPortProfile) ToModel() types.ModelGetAppPortProfile {
 	m := types.ModelGetAppPortProfile{
 		ID:          r.ID,
 		Name:        r.Name,

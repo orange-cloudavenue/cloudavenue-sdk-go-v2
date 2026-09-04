@@ -15,14 +15,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestApiResponseVdcNetworkToModelPreservesAllSubnets(t *testing.T) {
-	network := ApiResponseVdcNetwork{
-		Subnets: ApiVdcNetworkSubnets{
-			Values: []ApiVdcNetworkSubnetValue{
+func TestAPIResponseVDCNetworkToModelPreservesAllSubnets(t *testing.T) {
+	network := APIResponseVDCNetwork{
+		Subnets: APIVDCNetworkSubnets{
+			Values: []APIVDCNetworkSubnetValue{
 				{
 					Gateway:      "10.0.0.1",
 					PrefixLength: 24,
-					IPRanges: ApiVdcNetworkIPRanges{Values: []ApiVdcNetworkIPRangeValue{{
+					IPRanges: APIVDCNetworkIPRanges{Values: []APIVDCNetworkIPRangeValue{{
 						StartAddress: "10.0.0.10",
 						EndAddress:   "10.0.0.20",
 					}}},
@@ -30,7 +30,7 @@ func TestApiResponseVdcNetworkToModelPreservesAllSubnets(t *testing.T) {
 				{
 					Gateway:      "10.0.1.1",
 					PrefixLength: 24,
-					IPRanges: ApiVdcNetworkIPRanges{Values: []ApiVdcNetworkIPRangeValue{{
+					IPRanges: APIVDCNetworkIPRanges{Values: []APIVDCNetworkIPRangeValue{{
 						StartAddress: "10.0.1.10",
 						EndAddress:   "10.0.1.20",
 					}}},
