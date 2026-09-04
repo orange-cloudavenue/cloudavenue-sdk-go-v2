@@ -17,7 +17,7 @@ This document describes the coding standards, lint rules, naming conventions, an
 ## Lint Rules and Naming Conventions
 
 To maintain code quality and consistency, the following lint rules are enforced in this project.  
-These rules are checked automatically by custom linters and ruleguard scripts.
+These rules are checked automatically by custom linters.
 
 ### API Type Naming
 
