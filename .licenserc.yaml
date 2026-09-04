@@ -24,22 +24,22 @@ header: # `header` section is configurations for source codes license header.
       or see the "LICENSE" file for more details.
 
   paths: # `paths` are the path list that will be checked (and fixed) by license-eye, default is ['**'].
-    - '**'
+    - "**"
 
   paths-ignore: # `paths-ignore` are the path list that will be ignored by license-eye.
-    - 'dist'
-    - 'licenses'
-    - '**/*.md'
-    - '**/testdata/**'
-    - '**/go.mod'
-    - '**/go.sum'
-    - '**/go.work'
-    - '**/go.work.sum'
-    - 'LICENSE'
-    - 'LICENCE'
-    - 'NOTICE'
+    - "dist"
+    - "licenses"
+    - "**/*.md"
+    - "**/testdata/**"
+    - "**/go.mod"
+    - "**/go.sum"
+    - "**/go.work"
+    - "**/go.work.sum"
+    - "LICENSE"
+    - "LICENCE"
+    - "NOTICE"
     - "**/CODEOWNERS"
-    - '**/**.svg'
+    - "**/**.svg"
     - "**/zz_generated*.go"
     - "GNUmakefile"
     - "Makefile"
@@ -70,7 +70,7 @@ header: # `header` section is configurations for source codes license header.
     - "go.work"
     - "go.work.sum"
     - "**/*.txt"
-
+    - "docs/"
 
   comment: on-failure # on what condition license-eye will comment on the pull request, `on-failure`, `always`, `never`.
 
@@ -88,4 +88,3 @@ header: # `header` section is configurations for source codes license header.
         - ".yml"
         - ".yaml"
       comment_style_id: Hashtag
-

@@ -22,14 +22,14 @@ type (
 	}
 )
 
-// New creates a new vdc group client.
+// New creates VDC group client.
 func New(c cav.Client) (*Client, error) {
 	if c == nil {
 		return nil, errors.ErrClientNotInitialized
 	}
 
 	logger := c.Logger().WithGroup("vdc-group")
-	logger.Debug("Successfully creating new client")
+	logger.Debug("created client")
 
 	return &Client{
 		c:      c,

@@ -12,12 +12,12 @@ package cav
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"regexp"
 
 	"resty.dev/v3"
 
-	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/httpClient"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
+	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/http-client"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
@@ -33,23 +33,21 @@ type cerberusError struct {
 	Message string `json:"message" fake:"{sentence:3,10}"`
 }
 
-var newCerberusClient = func() subClientInterface {
+const cerberusVCDVersion = vmwareVCDVersion
+
+func newCerberusClient() subClientInterface {
 	return &cerberus{}
 }
 
-const cerberusVCDVersion = vmwareVCDVersion // Reusing the same version as VMware
-
-// getID returns the unique identifier for the subclient
 func (v *cerberus) getID() string {
 	return string(ClientCerberus)
 }
 
-// NewClient creates a new request for the Cerberus subclient.
 func (v *cerberus) newHTTPClient(ctx context.Context) (*resty.Client, error) {
 	hC := httpclient.NewHTTPClient().
 		SetBaseURL(v.console.GetAPICerberusEndpoint()).
 		SetHeader("Accept", "application/json;version="+cerberusVCDVersion).
-		SetError(cerberusError{})
+		SetResultError(cerberusError{})
 
 	if !v.credential.IsInitialized() {
 		if err := v.credential.Refresh(ctx); err != nil {
@@ -63,30 +61,12 @@ func (v *cerberus) newHTTPClient(ctx context.Context) (*resty.Client, error) {
 	return hC, nil
 }
 
-// setCredential sets the authentication credential for the Cerberus client.
-func (v *cerberus) setCredential(a auth) {
-	v.credential = a
-}
-
-// setConsole sets the console for the Cerberus client.
-func (v *cerberus) setConsole(c consoles.ConsoleName) {
-	v.console = c
-}
-
-// Close closes the Cerberus client and releases any resources.
-func (v *cerberus) close() error {
-	return nil
-}
-
-// ParseAPIError parses the API error response from the Cerberus client.
 func (v *cerberus) parseAPIError(operation string, resp *resty.Response) *errors.APIError {
-	if resp == nil || !resp.IsError() {
+	if resp == nil || resp.StatusCode() < http.StatusBadRequest {
 		return nil
 	}
 
-	// If resp.Error() is not nil, it means an error occurred.
-	// Parse the error response body.
-	if err, ok := resp.Error().(*cerberusError); ok {
+	if err, ok := resp.ResultError().(*cerberusError); ok {
 		return &errors.APIError{
 			Operation:  operation,
 			StatusCode: resp.StatusCode(),
@@ -94,34 +74,28 @@ func (v *cerberus) parseAPIError(operation string, resp *resty.Response) *errors
 			Duration:   resp.Duration(),
 			Endpoint:   resp.Request.URL,
 			Method:     resp.Request.Method,
+			Err:        classifyStatusCode(resp.StatusCode()),
 		}
 	}
 
-	// This is used to prevent nil pointer dereference if SetError() was not called or overrided by other object.
 	return &errors.APIError{
 		Operation:  operation,
 		StatusCode: resp.StatusCode(),
-		Message:    "Unknown error occurred",
+		Message:    unknownErrorMessage,
 		Duration:   resp.Duration(),
 		Endpoint:   resp.Request.URL,
 		Method:     resp.Request.Method,
+		Err:        classifyStatusCode(resp.StatusCode()),
 	}
 }
 
-// Regexp to match the error message indicating that a job already exists.
-//
-//	{
-//	   "code": "cf-0002",
-//	   "message": "another job present on org xxxx",
-//	   "reason": "Job already exists"
-//	}
+// regexCerberusJobAlreadyExists matches Cerberus idempotency conflicts.
 var regexCerberusJobAlreadyExists = regexp.MustCompile(`Job already exists`)
 
-// idempotentRetryCondition returns a retry condition function for idempotent operations.
-// Retries are triggered if the error message indicates that the job already exists.
+// idempotentRetryCondition retries Cerberus idempotent conflicts.
 func (v *cerberus) idempotentRetryCondition() resty.RetryConditionFunc {
 	return func(resp *resty.Response, err error) bool {
-		if err, ok := resp.Error().(*cerberusError); ok {
+		if err, ok := resp.ResultError().(*cerberusError); ok {
 			return regexCerberusJobAlreadyExists.MatchString(err.Reason) || regexCerberusJobAlreadyExists.MatchString(err.Message)
 		}
 
@@ -131,4 +105,8 @@ func (v *cerberus) idempotentRetryCondition() resty.RetryConditionFunc {
 
 		return false
 	}
+}
+
+func (v *cerberus) ContextData(_ context.Context) ContextData {
+	return ContextData{}
 }

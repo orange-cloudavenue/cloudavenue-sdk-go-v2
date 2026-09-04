@@ -12,7 +12,6 @@ package organization
 import (
 	"log/slog"
 	"os"
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,24 +19,18 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
 )
 
-var testMutex = sync.Mutex{}
-
-func newClient(t *testing.T) *Client {
+func newClient(t *testing.T) (*Client, *mock.Server) {
 	t.Helper()
 
-	testMutex.Lock()
-	t.Cleanup(func() {
-		testMutex.Unlock()
-	})
-
-	mC, err := mock.NewClient(
+	mC, ms, err := mock.NewClient(
 		mock.WithLogger(
 			slog.New(
 				slog.NewTextHandler(
 					os.Stdout,
 					&slog.HandlerOptions{
 						Level: slog.LevelDebug,
-					}),
+					},
+				),
 			),
 		),
 	)
@@ -45,5 +38,5 @@ func newClient(t *testing.T) *Client {
 
 	eC, err := New(mC)
 	assert.Nil(t, err, "Error creating organization client")
-	return eC
+	return eC, ms
 }

@@ -13,30 +13,27 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
 
-// ListVdcGroup - List Vdc Groups
+// ListVDCGroup - List VDC Groups
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/vdcGroups/get/
-func ListVdcGroup() *cav.Endpoint {
-	return cav.MustGetEndpoint("ListVdcGroup")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/vdcGroups/get/ 
+func ListVDCGroup() *cav.Endpoint {
+	return cav.MustGetEndpoint("ListVDCGroup")
 }
-
-// CreateVdcGroup - Create a Vdc Group
+// CreateVDCGroup - Create a VDC Group
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/vdcGroups/post/
-func CreateVdcGroup() *cav.Endpoint {
-	return cav.MustGetEndpoint("CreateVdcGroup")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/vdcGroups/post/ 
+func CreateVDCGroup() *cav.Endpoint {
+	return cav.MustGetEndpoint("CreateVDCGroup")
 }
-
-// UpdateVdcGroup - Update a Vdc Group
+// UpdateVDCGroup - Update a VDC Group
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/put/
-func UpdateVdcGroup() *cav.Endpoint {
-	return cav.MustGetEndpoint("UpdateVdcGroup")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/put/ 
+func UpdateVDCGroup() *cav.Endpoint {
+	return cav.MustGetEndpoint("UpdateVDCGroup")
 }
-
-// DeleteVdcGroup - Delete a Vdc Group
+// DeleteVDCGroup - Delete a VDC Group
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/delete/
-func DeleteVdcGroup() *cav.Endpoint {
-	return cav.MustGetEndpoint("DeleteVdcGroup")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/delete/ 
+func DeleteVDCGroup() *cav.Endpoint {
+	return cav.MustGetEndpoint("DeleteVDCGroup")
 }

@@ -12,7 +12,6 @@ package vdcgroup
 import (
 	"log/slog"
 	"os"
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,30 +19,24 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
 )
 
-var testMutex = sync.Mutex{}
-
-func newClient(t *testing.T) *Client {
+func newClient(t *testing.T) (*Client, *mock.Server) {
 	t.Helper()
 
-	testMutex.Lock()
-	t.Cleanup(func() {
-		testMutex.Unlock()
-	})
-
-	mC, err := mock.NewClient(
+	mC, ms, err := mock.NewClient(
 		mock.WithLogger(
 			slog.New(
 				slog.NewTextHandler(
 					os.Stdout,
 					&slog.HandlerOptions{
 						Level: slog.LevelDebug,
-					}),
+					},
+				),
 			),
 		),
 	)
 	assert.Nil(t, err, "Error creating mock client")
 
 	eC, err := New(mC)
-	assert.Nil(t, err, "Error creating vdc client")
-	return eC
+	assert.Nil(t, err, "Error creating vdcgroup client")
+	return eC, ms
 }

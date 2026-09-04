@@ -12,4 +12,6 @@ package errors
 var (
 	ErrClientNotInitialized = New("client not initialized")
 	ErrNotFound             = New("not found")
+	ErrJobFailed            = New("job failed")
+	ErrJobTimeout           = New("job timeout")
 )

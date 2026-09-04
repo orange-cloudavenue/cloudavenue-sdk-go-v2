@@ -13,12 +13,12 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/orange-cloudavenue/common-go/generator"
+	"github.com/orange-cloudavenue/common-go/validators"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
-	"github.com/orange-cloudavenue/common-go/generator"
-	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 func TestListDraasOnPremiseIP(t *testing.T) {
@@ -29,7 +29,11 @@ func TestListDraasOnPremiseIP(t *testing.T) {
 		expectedErr        bool
 	}{
 		{
-			name:        "ListDraasOnPremiseIP OK",
+			name: "ListDraasOnPremiseIP OK",
+			mockResponse: []string{
+				generator.MustGenerate("{ipv4address}"),
+				generator.MustGenerate("{ipv4address}"),
+			},
 			expectedErr: false,
 		},
 		{
@@ -42,14 +46,18 @@ func TestListDraasOnPremiseIP(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.mockResponseStatus != 0 {
-				endpoints.ListDraasOnPremiseIp().CleanMockResponse()
-				endpoints.ListDraasOnPremiseIp().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+			client, ms := newClient(t)
+
+			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
+				ms.CleanResponse(endpoints.ListDraasOnPremiseIP())
+				if tt.mockResponseStatus != 0 {
+					ms.SetResponse(endpoints.ListDraasOnPremiseIP(), tt.mockResponse, &tt.mockResponseStatus)
+				} else {
+					ms.SetResponse(endpoints.ListDraasOnPremiseIP(), tt.mockResponse, nil)
+				}
 			}
 
-			client := newClient(t)
-
-			resp, err := client.ListOnPremiseIp(t.Context())
+			resp, err := client.ListOnPremiseIP(t.Context())
 			if tt.expectedErr {
 				assert.Error(t, err)
 				return
@@ -102,14 +110,14 @@ func TestAddDraasOnPremiseIP(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
 			if tt.mockResponseStatus != 0 {
-				endpoints.AddDraasOnPremiseIp().CleanMockResponse()
-				endpoints.AddDraasOnPremiseIp().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.AddDraasOnPremiseIP())
+				ms.SetResponse(endpoints.AddDraasOnPremiseIP(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
-			client := newClient(t)
-
-			err := client.AddOnPremiseIp(t.Context(), tt.params)
+			err := client.AddOnPremiseIP(t.Context(), tt.params)
 			if tt.expectedErr {
 				assert.Error(t, err)
 				return
@@ -157,14 +165,14 @@ func TestRemoveDraasOnPremiseIP(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
 			if tt.mockResponseStatus != 0 {
-				endpoints.RemoveDraasOnPremiseIp().CleanMockResponse()
-				endpoints.RemoveDraasOnPremiseIp().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.RemoveDraasOnPremiseIP())
+				ms.SetResponse(endpoints.RemoveDraasOnPremiseIP(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
-			client := newClient(t)
-
-			err := client.RemoveOnPremiseIp(t.Context(), tt.params)
+			err := client.RemoveOnPremiseIP(t.Context(), tt.params)
 			if tt.expectedErr {
 				assert.Error(t, err)
 				return

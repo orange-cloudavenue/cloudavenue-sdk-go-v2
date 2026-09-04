@@ -13,40 +13,40 @@ import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 
 type (
 	// * ListStorageProfiles
-	ApiResponseListStorageProfiles struct {
-		StorageProfiles []ApiResponseListStorageProfile `json:"record" fakesize:"1"`
+	APIResponseListStorageProfiles struct {
+		StorageProfiles []APIResponseListStorageProfile `json:"record" fakesize:"1"`
 	}
 
-	ApiResponseListStorageProfile struct {
+	APIResponseListStorageProfile struct {
 		HREF                    string `json:"href" fake:"{href_uuid}"`
-		ID                      string `json:"id" fake:"-"` // Because VMware returns an empty ID, we will extract it from the HREF
+		ID                      string `json:"id,omitempty" fake:"{urn:vdcstorageProfile}"`
 		Name                    string `json:"name" fake:"platinum3k_r1"`
 		IsEnabled               bool   `json:"isEnabled" fake:"true"`
 		IsDefaultStorageProfile bool   `json:"isDefaultStorageProfile" fake:"true"`
 
 		// Values are in MB
-		Limit int `json:"storageLimitMB" fake:"{number:100000,81920000}"`
-		Used  int `json:"storageUsedMB" fake:"{number:1000,100000}"`
+		Limit int `json:"storageLimitMB" fake:"{number:100000,81920000}"` //nolint:tagliatelle
+		Used  int `json:"storageUsedMB" fake:"{number:1000,100000}"`      //nolint:tagliatelle
 
-		// Vdc information
-		VdcID   string `json:"vdc" fake:"{href_uuid}"`
-		VdcName string `json:"vdcName" fake:"{word}"`
+		// VDC information
+		VDCID   string `json:"vdc" fake:"{href_uuid}"`
+		VDCName string `json:"vdcName" fake:"{word}"`
 	}
 )
 
-func (r *ApiResponseListStorageProfiles) ToModel() *types.ModelListStorageProfiles {
+func (r *APIResponseListStorageProfiles) ToModel() *types.ModelListStorageProfiles {
 	// Use a map to group storage profiles by unique VDC ID + Name
 	type ModelVDCKey struct {
 		ID, Name string
 	}
 	vdcMap := make(map[ModelVDCKey]*types.ModelListStorageProfilesVDC)
 	for _, apiSP := range r.StorageProfiles {
-		key := ModelVDCKey{ID: apiSP.VdcID, Name: apiSP.VdcName}
+		key := ModelVDCKey{ID: apiSP.VDCID, Name: apiSP.VDCName}
 		vdc, exists := vdcMap[key]
 		if !exists {
 			vdc = &types.ModelListStorageProfilesVDC{
-				ID:              apiSP.VdcID,
-				Name:            apiSP.VdcName,
+				ID:              apiSP.VDCID,
+				Name:            apiSP.VDCName,
 				StorageProfiles: []types.ModelListStorageProfile{},
 			}
 			vdcMap[key] = vdc

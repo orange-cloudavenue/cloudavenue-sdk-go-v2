@@ -13,70 +13,70 @@ import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 
 type (
 	// * List
-	ApiResponseListVdcGroup struct {
-		Values []ApiResponseListVdcGroupDetails `json:"values" fakesize:"3"`
+	APIResponseListVDCGroup struct {
+		Values []APIResponseListVDCGroupDetails `json:"values" fakesize:"3"`
 	}
 
-	ApiResponseListVdcGroupDetails struct {
+	APIResponseListVDCGroupDetails struct {
 		ID          string                                `json:"id" fake:"{urn:vdcGroup}"`
 		OrgID       string                                `json:"orgId" fake:"{urn:org}"`
 		Name        string                                `json:"name" fake:"mockvdcgroup-{word}"`
 		Description string                                `json:"description" fake:"{sentence}"`
-		Vdcs        []ApiResponseVdcGroupParticipatingVdc `json:"participatingOrgVdcs" fakesize:"2"`
+		Vdcs        []APIResponseVDCGroupParticipatingVDC `json:"participatingOrgVdcs" fakesize:"2"`
 	}
 
-	ApiResponseVdcGroupParticipatingVdc struct {
-		Vdc                  ApiResponseVdcGroupParticipatingVdcRef  `json:"vdcRef"`
-		Site                 ApiResponseVdcGroupParticipatingSiteRef `json:"siteRef"`
+	APIResponseVDCGroupParticipatingVDC struct {
+		VDC                  APIResponseVDCGroupParticipatingVDCRef  `json:"vdcRef"`
+		Site                 APIResponseVDCGroupParticipatingSiteRef `json:"siteRef"`
 		FaultDomainTag       string                                  `json:"faultDomainTag" fake:"AZ01"`
 		NetworkProviderScope string                                  `json:"networkProviderScope" fake:"AZ01"`
 	}
-	ApiResponseVdcGroupParticipatingSiteRef struct {
+	APIResponseVDCGroupParticipatingSiteRef struct {
 		ID   string `json:"id,omitempty" fake:"{urn:vdc}"`
 		Name string `json:"name,omitempty" fake:"mockvdc-{word}"`
 	}
 
-	ApiResponseVdcGroupParticipatingVdcRef struct {
+	APIResponseVDCGroupParticipatingVDCRef struct {
 		ID   string `json:"id,omitempty" fake:"{urn:vdc}"`
 		Name string `json:"name,omitempty" fake:"mockvdc-{word}"`
 	}
 
 	// * Create
-	ApiRequestCreateVdcGroup struct {
+	APIRequestCreateVDCGroup struct {
 		OrgID               string                                `json:"orgId" fake:"{org}"`
 		Name                string                                `json:"name" fake:"mockvdcgroup-{word}"`
 		Description         string                                `json:"description,omitempty" fake:"{sentence}"`
-		Vdcs                []ApiResponseVdcGroupParticipatingVdc `json:"participatingOrgVdcs" fakesize:"2"`
+		Vdcs                []APIResponseVDCGroupParticipatingVDC `json:"participatingOrgVdcs" fakesize:"2"`
 		NetworkProviderType string                                `json:"networkProviderType" fake:"NSX_T"`
 		Type                string                                `json:"type" fake:"LOCAL"`
 	}
 
 	// * Update
-	ApiRequestUpdateVdcGroup struct {
-		Id                  string                                `json:"id" fake:"{urn:vdcGroup}"`
+	APIRequestUpdateVDCGroup struct {
+		ID                  string                                `json:"id" fake:"{urn:vdcGroup}"`
 		OrgID               string                                `json:"orgId" fake:"{org}"`
 		Name                string                                `json:"name" fake:"mockvdcgroup-{word}"`
 		Description         string                                `json:"description,omitempty" fake:"{sentence}"`
-		Vdcs                []ApiResponseVdcGroupParticipatingVdc `json:"participatingOrgVdcs" fakesize:"2"`
+		Vdcs                []APIResponseVDCGroupParticipatingVDC `json:"participatingOrgVdcs" fakesize:"2"`
 		NetworkProviderType string                                `json:"networkProviderType" fake:"NSX_T"`
 		Type                string                                `json:"type" fake:"LOCAL"`
 	}
 )
 
-func (r *ApiResponseListVdcGroup) ToModel() *types.ModelListVdcGroup {
-	model := &types.ModelListVdcGroup{
-		VdcGroups: make([]types.ModelGetVdcGroup, 0),
+func (r *APIResponseListVDCGroup) ToModel() *types.ModelListVDCGroup {
+	model := &types.ModelListVDCGroup{
+		VDCGroups: make([]types.ModelGetVDCGroup, 0),
 	}
 
 	for _, vdcGroup := range r.Values {
-		model.VdcGroups = append(model.VdcGroups, vdcGroup.ToModel())
+		model.VDCGroups = append(model.VDCGroups, vdcGroup.ToModel())
 	}
 
 	return model
 }
 
-func (r *ApiResponseListVdcGroupDetails) ToModel() types.ModelGetVdcGroup {
-	detail := types.ModelGetVdcGroup{
+func (r *APIResponseListVDCGroupDetails) ToModel() types.ModelGetVDCGroup {
+	detail := types.ModelGetVDCGroup{
 		ID:          r.ID,
 		Name:        r.Name,
 		Description: r.Description,
@@ -91,9 +91,40 @@ func (r *ApiResponseListVdcGroupDetails) ToModel() types.ModelGetVdcGroup {
 	return detail
 }
 
-func (r *ApiResponseVdcGroupParticipatingVdc) ToModel() types.ModelGetVdcGroupVdc {
-	return types.ModelGetVdcGroupVdc{
-		ID:   r.Vdc.ID,
-		Name: r.Vdc.Name,
+func (r *APIResponseVDCGroupParticipatingVDC) ToModel() types.ModelGetVDCGroupVDC {
+	return types.ModelGetVDCGroupVDC{
+		ID:   r.VDC.ID,
+		Name: r.VDC.Name,
 	}
+}
+
+func (r *APIRequestCreateVDCGroup) ToModel() types.ModelGetVDCGroup {
+	model := types.ModelGetVDCGroup{
+		Name:        r.Name,
+		Description: r.Description,
+	}
+
+	for _, vdc := range r.Vdcs {
+		model.Vdcs = append(model.Vdcs, vdc.ToModel())
+	}
+
+	model.NumberOfVdcs = len(model.Vdcs)
+
+	return model
+}
+
+func (r *APIRequestUpdateVDCGroup) ToModel() types.ModelGetVDCGroup {
+	model := types.ModelGetVDCGroup{
+		ID:          r.ID,
+		Name:        r.Name,
+		Description: r.Description,
+	}
+
+	for _, vdc := range r.Vdcs {
+		model.Vdcs = append(model.Vdcs, vdc.ToModel())
+	}
+
+	model.NumberOfVdcs = len(model.Vdcs)
+
+	return model
 }

@@ -12,13 +12,12 @@ package vdc
 import (
 	"testing"
 
+	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
-	"github.com/orange-cloudavenue/common-go/generator"
-	"github.com/orange-cloudavenue/common-go/utils"
 )
 
 func TestListVDC(t *testing.T) {
@@ -64,14 +63,15 @@ func TestListVDC(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ep := endpoints.ListVdc()
+			client, ms := newClient(t)
+
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				// Clean all default mock responses
-				ep.CleanMockResponse()
-				ep.SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.ListVDC())
+				ms.SetResponse(endpoints.ListVDC(), tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.QueryEdgeGateway())
+				ms.SetResponse(endpoints.QueryEdgeGateway(), tt.mockResponse, &tt.mockResponseStatus)
 			}
-
-			client := newClient(t)
 
 			resp, err := client.ListVDC(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -134,7 +134,7 @@ func TestGetVDC(t *testing.T) {
 			params: types.ParamsGetVDC{
 				ID: generator.MustGenerate("{urn:vdc}"),
 			},
-			mockListVDCResponse:       itypes.ApiResponseListVDC{Records: []itypes.ApiResponseListVDCRecord{}},
+			mockListVDCResponse:       itypes.APIResponseListVDC{Records: []itypes.APIResponseListVDCRecord{}},
 			mockListVDCResponseStatus: 200,
 			expectedErr:               true,
 		},
@@ -158,22 +158,25 @@ func TestGetVDC(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				// Clean all default mock responses
-				endpoints.GetVdc().CleanMockResponse()
-				endpoints.GetVdc().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.GetVDC())
+				ms.SetResponse(endpoints.GetVDC(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			if tt.mockListVDCResponseStatus != 0 {
-				endpoints.ListVdc().CleanMockResponse()
-				endpoints.ListVdc().SetMockResponse(tt.mockListVDCResponse, &tt.mockListVDCResponseStatus)
+				ms.CleanResponse(endpoints.ListVDC())
+				ms.SetResponse(endpoints.ListVDC(), tt.mockListVDCResponse, &tt.mockListVDCResponseStatus)
+				ms.CleanResponse(endpoints.QueryEdgeGateway())
+				ms.SetResponse(endpoints.QueryEdgeGateway(), tt.mockListVDCResponse, &tt.mockListVDCResponseStatus)
 			}
 
 			if tt.mockGetMetadataResponseStatus != 0 {
-				endpoints.GetVdcMetadata().CleanMockResponse()
-				endpoints.GetVdcMetadata().SetMockResponse(nil, &tt.mockGetMetadataResponseStatus)
+				ms.CleanResponse(endpoints.GetVDCMetadata())
+				ms.SetResponse(endpoints.GetVDCMetadata(), nil, &tt.mockGetMetadataResponseStatus)
 			}
-			client := newClient(t)
 
 			resp, err := client.GetVDC(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -296,18 +299,18 @@ func TestCreateVDC(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				// Clean all default mock responses
-				endpoints.CreateVdc().CleanMockResponse()
-				endpoints.CreateVdc().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.CreateVDC())
+				ms.SetResponse(endpoints.CreateVDC(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			if tt.mockGetVDCResponse != nil || tt.mockGetVDCResponseStatus != 0 {
-				endpoints.GetVdc().CleanMockResponse()
-				endpoints.GetVdc().SetMockResponse(tt.mockGetVDCResponse, &tt.mockGetVDCResponseStatus)
+				ms.CleanResponse(endpoints.GetVDC())
+				ms.SetResponse(endpoints.GetVDC(), tt.mockGetVDCResponse, &tt.mockGetVDCResponseStatus)
 			}
-
-			client := newClient(t)
 
 			resp, err := client.CreateVDC(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -336,7 +339,7 @@ func TestUpdateVDC(t *testing.T) {
 			name: "Update VDC with valid parameters",
 			params: types.ParamsUpdateVDC{
 				Name:        generator.MustGenerate("{resource_name:vdc}"),
-				Description: utils.ToPTR("Updated VDC"),
+				Description: new("Updated VDC"),
 			},
 			expectedErr: false,
 		},
@@ -344,7 +347,7 @@ func TestUpdateVDC(t *testing.T) {
 			name: "Failed to retrieve VDC with valid parameters VCPU",
 			params: types.ParamsUpdateVDC{
 				Name: generator.MustGenerate("{resource_name:vdc}"),
-				Vcpu: utils.ToPTR(10),
+				Vcpu: new(10),
 			},
 			expectedErr:              true,
 			mockGetVDCResponseStatus: 404,
@@ -353,7 +356,7 @@ func TestUpdateVDC(t *testing.T) {
 			name: "Update VDC with valid parameters Memory",
 			params: types.ParamsUpdateVDC{
 				Name:   generator.MustGenerate("{resource_name:vdc}"),
-				Memory: utils.ToPTR(16),
+				Memory: new(16),
 			},
 			expectedErr: false,
 		},
@@ -368,7 +371,7 @@ func TestUpdateVDC(t *testing.T) {
 			name: "Update VDC with valid parameters VCPU",
 			params: types.ParamsUpdateVDC{
 				Name: generator.MustGenerate("{resource_name:vdc}"),
-				Vcpu: utils.ToPTR(10),
+				Vcpu: new(10),
 			},
 			expectedErr: false,
 		},
@@ -376,7 +379,7 @@ func TestUpdateVDC(t *testing.T) {
 			name: "Error 404 Not Found",
 			params: types.ParamsUpdateVDC{
 				Name:        generator.MustGenerate("{resource_name:vdc}"),
-				Description: utils.ToPTR("Updated VDC"),
+				Description: new("Updated VDC"),
 			},
 			mockResponseStatus: 404,
 			expectedErr:        true,
@@ -385,18 +388,18 @@ func TestUpdateVDC(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				// Clean all default mock responses
-				endpoints.UpdateVdc().CleanMockResponse()
-				endpoints.UpdateVdc().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.UpdateVDC())
+				ms.SetResponse(endpoints.UpdateVDC(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			if tt.mockGetVDCResponseStatus != 0 {
-				endpoints.GetVdc().CleanMockResponse()
-				endpoints.GetVdc().SetMockResponse(nil, &tt.mockGetVDCResponseStatus)
+				ms.CleanResponse(endpoints.GetVDC())
+				ms.SetResponse(endpoints.GetVDC(), nil, &tt.mockGetVDCResponseStatus)
 			}
-
-			client := newClient(t)
 
 			data, err := client.UpdateVDC(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -447,18 +450,20 @@ func TestDeleteVDC(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				// Clean all default mock responses
-				endpoints.DeleteVdc().CleanMockResponse()
-				endpoints.DeleteVdc().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.DeleteVDC())
+				ms.SetResponse(endpoints.DeleteVDC(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			if tt.mockGetVDCResponseStatus != 0 {
-				endpoints.ListVdc().CleanMockResponse()
-				endpoints.ListVdc().SetMockResponse(nil, &tt.mockGetVDCResponseStatus)
+				ms.CleanResponse(endpoints.ListVDC())
+				ms.SetResponse(endpoints.ListVDC(), nil, &tt.mockGetVDCResponseStatus)
+				ms.CleanResponse(endpoints.QueryEdgeGateway())
+				ms.SetResponse(endpoints.QueryEdgeGateway(), nil, &tt.mockGetVDCResponseStatus)
 			}
-
-			client := newClient(t)
 
 			err := client.DeleteVDC(t.Context(), tt.params)
 			if tt.expectedErr {

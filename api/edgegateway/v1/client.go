@@ -22,14 +22,14 @@ type (
 	}
 )
 
-// New creates a new edgegateway client.
+// New creates edgegateway client.
 func New(c cav.Client) (*Client, error) {
 	if c == nil {
 		return nil, errors.ErrClientNotInitialized
 	}
 
 	edgeLogger := c.Logger().WithGroup("edgegateway")
-	edgeLogger.Debug("Successfully creating new client")
+	edgeLogger.Debug("created client")
 
 	return &Client{
 		c:      c,
