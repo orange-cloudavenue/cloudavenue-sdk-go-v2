@@ -14,14 +14,14 @@ import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 // * Request / Response API
 
 type (
-	ApiRequestEdgeGateway struct {
+	APIRequestEdgeGateway struct {
 		T0Name string `json:"tier0VrfId" fake:"{resource_name:t0}" validate:"required,resource_name=t0"`
 	}
 
-	ApiResponseEdgegateways struct {
-		Values []ApiResponseEdgegateway `json:"values,omitempty" fakesize:"1"` // List of edge gateways.
+	APIResponseEdgegateways struct {
+		Values []APIResponseEdgegateway `json:"values,omitempty" fakesize:"1"` // List of edge gateways.
 	}
-	ApiResponseEdgegateway struct {
+	APIResponseEdgegateway struct {
 		ID          string `json:"id" fake:"{urn:edgegateway}"`             // The ID of the edge gateway.
 		Name        string `json:"name" fake:"{resource_name:edgegateway}"` // The name of the edge gateway.
 		Description string `json:"description" fake:"{sentence}"`
@@ -52,20 +52,20 @@ type (
 			UplinkName string `json:"uplinkName" fake:"{resource_name:t0}"` // The name of the uplink.
 		} `json:"edgeGatewayUplinks" fakesize:"1"`
 
-		OrgVDC *ApiObjectReference `json:"orgVdc"`
+		OrgVDC *APIObjectReference `json:"orgVdc"`
 
 		// OwnerRef contains information about the owner of the edge gateway (VDC Or VDCGroup)
-		OwnerRef *ApiObjectReference `json:"ownerRef"`
+		OwnerRef *APIObjectReference `json:"ownerRef"`
 
 		// OrgVdcNetworkCount holds the number of Org VDC networks connected to the gateway.
 		OrgVDCNetworkCount int64 `json:"orgVdcNetworkCount" fake:"{number:1,10}"`
 	}
 
-	ApiResponseQueryEdgeGateway struct {
-		Record []ApiResponseQueryEdgeGatewayRecord `json:"record,omitempty" fakesize:"1"` // List of edge gateways.
+	APIResponseQueryEdgeGateway struct {
+		Record []APIResponseQueryEdgeGatewayRecord `json:"record,omitempty" fakesize:"1"` // List of edge gateways.
 	}
 
-	ApiResponseQueryEdgeGatewayRecord struct {
+	APIResponseQueryEdgeGatewayRecord struct {
 		ID                  string `json:"id,omitempty" fake:"{urn:edgegateway}"`             // The ID of the entity.
 		HREF                string `json:"href,omitempty" fake:"{href_uuid}"`                 // The URI of the entity.
 		Type                string `json:"type,omitempty"`                                    // The MIME type of the entity.
@@ -79,8 +79,8 @@ type (
 	}
 )
 
-// ToModel converts the ApiResponseEdgegateways to ModelEdgeGateways.
-func (api *ApiResponseEdgegateways) ToModel() *types.ModelEdgeGateways {
+// ToModel converts the APIResponseEdgegateways to ModelEdgeGateways.
+func (api *APIResponseEdgegateways) ToModel() *types.ModelEdgeGateways {
 	if api == nil {
 		return nil
 	}
@@ -97,7 +97,7 @@ func (api *ApiResponseEdgegateways) ToModel() *types.ModelEdgeGateways {
 }
 
 // ToModel converts the edgegatewayAPIResponse to ModelEdgeGateway.
-func (api *ApiResponseEdgegateway) ToModel() *types.ModelEdgeGateway {
+func (api *APIResponseEdgegateway) ToModel() *types.ModelEdgeGateway {
 	if api == nil {
 		return nil
 	}

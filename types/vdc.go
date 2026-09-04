@@ -31,7 +31,7 @@ type (
 		Description string `documentation:"Description of the VDC"`
 
 		ComputeCapacity ModelGetVDCComputeCapacity  `documentation:"Compute capacity of the VDC"`
-		Networks        []ModelGetVDCNetwork        `documentation:"Available networks in the VDC"`
+		Networks        []ModelVDCNetworkRef        `documentation:"Available networks in the VDC"`
 		StorageProfiles []ModelGetVDCStorageProfile `documentation:"Storage profiles available in the VDC"`
 
 		Properties ModelGetVDCProperties `documentation:"Properties of the VDC"`
@@ -66,7 +66,7 @@ type (
 		Used  int `documentation:"Used memory in GB"`
 	}
 
-	ModelGetVDCNetwork struct {
+	ModelVDCNetworkRef struct {
 		ID   string `documentation:"ID of the network"`
 		Name string `documentation:"Name of the network"`
 	}

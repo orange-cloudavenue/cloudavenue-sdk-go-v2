@@ -36,7 +36,7 @@ const (
 // getFirewallGroupWithRetry resolves a Firewall Group by ID or name, retrying up to 5
 // times on "not found" errors to compensate for NSX-T eventual consistency shortly
 // after a Firewall Group is created.
-func getFirewallGroupWithRetry(ctx context.Context, c cav.Client, idOrName, typeValue string) (*itypes.ApiResponseFirewallGroup, error) {
+func getFirewallGroupWithRetry(ctx context.Context, c cav.Client, idOrName, typeValue string) (*itypes.APIResponseFirewallGroup, error) {
 	const maxAttempts = 5
 
 	var lastErr error
@@ -64,7 +64,7 @@ func getFirewallGroupWithRetry(ctx context.Context, c cav.Client, idOrName, type
 
 // getFirewallGroup resolves a Firewall Group by ID (if idOrName is a firewallGroup URN)
 // or by name+typeValue+ownerRef filtering against the List endpoint.
-func getFirewallGroup(ctx context.Context, c cav.Client, idOrName, typeValue string) (*itypes.ApiResponseFirewallGroup, error) {
+func getFirewallGroup(ctx context.Context, c cav.Client, idOrName, typeValue string) (*itypes.APIResponseFirewallGroup, error) {
 	if urn.IsSecurityGroup(idOrName) {
 		ep := endpoints.GetFirewallGroup()
 
@@ -77,7 +77,7 @@ func getFirewallGroup(ctx context.Context, c cav.Client, idOrName, typeValue str
 			return nil, err
 		}
 
-		return resp.Result().(*itypes.ApiResponseFirewallGroup), nil
+		return resp.Result().(*itypes.APIResponseFirewallGroup), nil
 	}
 
 	ep := endpoints.ListFirewallGroup()
@@ -91,7 +91,7 @@ func getFirewallGroup(ctx context.Context, c cav.Client, idOrName, typeValue str
 		return nil, err
 	}
 
-	list := resp.Result().(*itypes.ApiResponseListFirewallGroup)
+	list := resp.Result().(*itypes.APIResponseListFirewallGroup)
 	if len(list.Values) == 0 {
 		return nil, &errors.APIError{Operation: "GetFirewallGroup", StatusCode: 404, Message: fmt.Sprintf("firewall group %q not found", idOrName)}
 	}
@@ -102,9 +102,9 @@ func getFirewallGroup(ctx context.Context, c cav.Client, idOrName, typeValue str
 	return &list.Values[0], nil
 }
 
-func resolveVdcGroupRef(ctx context.Context, c cav.Client, id, name string) (string, string, error) {
-	ref, err := inetworkobjects.ResolveVdcGroupRef(ctx, id, name, func(ctx context.Context, id, name string) (inetworkobjects.VdcGroupRef, error) {
-		ep := endpoints.ListVdcGroup()
+func resolveVDCGroupRef(ctx context.Context, c cav.Client, id, name string) (string, string, error) {
+	ref, err := inetworkobjects.ResolveVDCGroupRef(ctx, id, name, func(ctx context.Context, id, name string) (inetworkobjects.VDCGroupRef, error) {
+		ep := endpoints.ListVDCGroup()
 		filter := "id==" + id
 		if id == "" {
 			filter = "name==" + name
@@ -112,15 +112,15 @@ func resolveVdcGroupRef(ctx context.Context, c cav.Client, id, name string) (str
 
 		resp, err := c.Do(ctx, ep, cav.WithQueryParam(ep.QueryParams[0], filter))
 		if err != nil {
-			return inetworkobjects.VdcGroupRef{}, err
+			return inetworkobjects.VDCGroupRef{}, err
 		}
 
-		list := resp.Result().(*itypes.ApiResponseListVdcGroup)
+		list := resp.Result().(*itypes.APIResponseListVDCGroup)
 		if len(list.Values) == 0 {
-			return inetworkobjects.VdcGroupRef{}, errors.Newf("vdc group not found")
+			return inetworkobjects.VDCGroupRef{}, errors.Newf("vdc group not found")
 		}
 
-		return inetworkobjects.VdcGroupRef{ID: list.Values[0].ID, Name: list.Values[0].Name}, nil
+		return inetworkobjects.VDCGroupRef{ID: list.Values[0].ID, Name: list.Values[0].Name}, nil
 	})
 	if err != nil {
 		return "", "", err
@@ -130,8 +130,8 @@ func resolveVdcGroupRef(ctx context.Context, c cav.Client, id, name string) (str
 }
 
 func listFirewallGroupsByType(ctx context.Context, c cav.Client, vdcGroupID, vdcGroupName, typeValue string) (*types.ModelListFirewallGroup, error) {
-	return inetworkobjects.ListFirewallGroupsByType(ctx, c, vdcGroupID, vdcGroupName, typeValue, func(ctx context.Context, id, name string) (inetworkobjects.VdcGroupRef, error) {
-		ep := endpoints.ListVdcGroup()
+	return inetworkobjects.ListFirewallGroupsByType(ctx, c, vdcGroupID, vdcGroupName, typeValue, func(ctx context.Context, id, name string) (inetworkobjects.VDCGroupRef, error) {
+		ep := endpoints.ListVDCGroup()
 		filter := "id==" + id
 		if id == "" {
 			filter = "name==" + name
@@ -139,45 +139,45 @@ func listFirewallGroupsByType(ctx context.Context, c cav.Client, vdcGroupID, vdc
 
 		resp, err := c.Do(ctx, ep, cav.WithQueryParam(ep.QueryParams[0], filter))
 		if err != nil {
-			return inetworkobjects.VdcGroupRef{}, err
+			return inetworkobjects.VDCGroupRef{}, err
 		}
 
-		list := resp.Result().(*itypes.ApiResponseListVdcGroup)
+		list := resp.Result().(*itypes.APIResponseListVDCGroup)
 		if len(list.Values) == 0 {
-			return inetworkobjects.VdcGroupRef{}, errors.Newf("vdc group not found")
+			return inetworkobjects.VDCGroupRef{}, errors.Newf("vdc group not found")
 		}
 
-		return inetworkobjects.VdcGroupRef{ID: list.Values[0].ID, Name: list.Values[0].Name}, nil
+		return inetworkobjects.VDCGroupRef{ID: list.Values[0].ID, Name: list.Values[0].Name}, nil
 	})
 }
 
 // resolveFirewallGroupTarget resolves a firewall group by ID or name within a type.
-func resolveFirewallGroupTarget(ctx context.Context, c cav.Client, idOrName, typeValue string) (*itypes.ApiResponseFirewallGroup, error) {
-	return inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, typeValue, func(ctx context.Context, idOrName, typeValue string) (*itypes.ApiResponseFirewallGroup, error) {
+func resolveFirewallGroupTarget(ctx context.Context, c cav.Client, idOrName, typeValue string) (*itypes.APIResponseFirewallGroup, error) {
+	return inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, typeValue, func(ctx context.Context, idOrName, typeValue string) (*itypes.APIResponseFirewallGroup, error) {
 		return getFirewallGroupWithRetry(ctx, c, idOrName, typeValue)
 	})
 }
 
-func securityGroupMembersToRefs(members []types.ParamsFirewallGroupMember) []itypes.ApiObjectReference {
-	refs := make([]itypes.ApiObjectReference, 0, len(members))
+func securityGroupMembersToRefs(members []types.ParamsFirewallGroupMember) []itypes.APIObjectReference {
+	refs := make([]itypes.APIObjectReference, 0, len(members))
 	for _, member := range members {
-		refs = append(refs, itypes.ApiObjectReference{ID: member.ID, Name: member.Name})
+		refs = append(refs, itypes.APIObjectReference{ID: member.ID, Name: member.Name})
 	}
 	return refs
 }
 
-func createSecurityGroupBody(ctx context.Context, c cav.Client, params types.ParamsCreateSecurityGroup) (itypes.ApiRequestFirewallGroup, error) {
-	vdcGroupID, vdcGroupName, err := resolveVdcGroupRef(ctx, c, params.VdcGroupID, params.VdcGroupName)
+func createSecurityGroupBody(ctx context.Context, c cav.Client, params types.ParamsCreateSecurityGroup) (itypes.APIRequestFirewallGroup, error) {
+	vdcGroupID, vdcGroupName, err := resolveVDCGroupRef(ctx, c, params.VDCGroupID, params.VDCGroupName)
 	if err != nil {
-		return itypes.ApiRequestFirewallGroup{}, err
+		return itypes.APIRequestFirewallGroup{}, err
 	}
 
-	return itypes.ApiRequestFirewallGroup{
+	return itypes.APIRequestFirewallGroup{
 		Name:        params.Name,
 		Description: params.Description,
 		TypeValue:   itypes.FirewallGroupTypeSecurityGroup,
 		Members:     securityGroupMembersToRefs(params.Members),
-		OwnerRef:    &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		OwnerRef:    &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 	}, nil
 }
 
@@ -194,7 +194,7 @@ func (c *Client) CreateSecurityGroup(ctx context.Context, params types.ParamsCre
 		return nil, fmt.Errorf("%s: %w", opCreateSecurityGroup, err)
 	}
 
-	created, ok := resp.Result().(*itypes.ApiResponseFirewallGroup)
+	created, ok := resp.Result().(*itypes.APIResponseFirewallGroup)
 	if !ok || created == nil {
 		return nil, fmt.Errorf("%s: unexpected create response type %T", opCreateSecurityGroup, resp.Result())
 	}
@@ -210,7 +210,7 @@ func (c *Client) CreateSecurityGroup(ctx context.Context, params types.ParamsCre
 
 // ListSecurityGroup lists security groups owned by a VDC group.
 func (c *Client) ListSecurityGroup(ctx context.Context, params types.ParamsListSecurityGroup) (*types.ModelListFirewallGroup, error) {
-	model, err := listFirewallGroupsByType(ctx, c.c, params.VdcGroupID, params.VdcGroupName, itypes.FirewallGroupTypeSecurityGroup)
+	model, err := listFirewallGroupsByType(ctx, c.c, params.VDCGroupID, params.VDCGroupName, itypes.FirewallGroupTypeSecurityGroup)
 	if err != nil {
 		return nil, fmt.Errorf("%s: list: %w", opListSecurityGroup, err)
 	}
@@ -220,7 +220,7 @@ func (c *Client) ListSecurityGroup(ctx context.Context, params types.ParamsListS
 
 // GetSecurityGroup returns a security group by ID or name for a VDC group.
 func (c *Client) GetSecurityGroup(ctx context.Context, params types.ParamsGetSecurityGroup) (*types.ModelGetFirewallGroup, error) {
-	model, err := inetworkobjects.GetFirewallGroupModel(ctx, params.ID, params.Name, itypes.FirewallGroupTypeSecurityGroup, func(ctx context.Context, idOrName, typeValue string) (*itypes.ApiResponseFirewallGroup, error) {
+	model, err := inetworkobjects.GetFirewallGroupModel(ctx, params.ID, params.Name, itypes.FirewallGroupTypeSecurityGroup, func(ctx context.Context, idOrName, typeValue string) (*itypes.APIResponseFirewallGroup, error) {
 		return getFirewallGroupWithRetry(ctx, c.c, idOrName, typeValue)
 	})
 	if err != nil {
@@ -252,7 +252,7 @@ func (c *Client) UpdateSecurityGroup(ctx context.Context, params types.ParamsUpd
 		members = securityGroupMembersToRefs(params.Members)
 	}
 
-	body := itypes.ApiRequestFirewallGroup{
+	body := itypes.APIRequestFirewallGroup{
 		ID:          current.ID,
 		Name:        current.Name,
 		Description: description,

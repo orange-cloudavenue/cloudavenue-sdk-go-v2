@@ -25,7 +25,7 @@ func TestListTrustedCertificate(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.ListTrustedCertificate())
-	ms.SetResponse(endpoints.ListTrustedCertificate(), &itypes.ApiResponseListTrustedCertificate{Values: []itypes.ApiResponseTrustedCertificate{{
+	ms.SetResponse(endpoints.ListTrustedCertificate(), &itypes.APIResponseListTrustedCertificate{Values: []itypes.APIResponseTrustedCertificate{{
 		ID:          certificateID,
 		Alias:       "trusted-1",
 		Certificate: "-----BEGIN CERTIFICATE-----trusted-----END CERTIFICATE-----",
@@ -46,7 +46,7 @@ func TestGetTrustedCertificateByName(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.ListTrustedCertificate())
-	ms.SetResponse(endpoints.ListTrustedCertificate(), &itypes.ApiResponseListTrustedCertificate{Values: []itypes.ApiResponseTrustedCertificate{{
+	ms.SetResponse(endpoints.ListTrustedCertificate(), &itypes.APIResponseListTrustedCertificate{Values: []itypes.APIResponseTrustedCertificate{{
 		ID:          certificateID,
 		Alias:       "trusted-1",
 		Certificate: "-----BEGIN CERTIFICATE-----trusted-----END CERTIFICATE-----",
@@ -67,9 +67,9 @@ func TestCreateTrustedCertificate(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.ListTrustedCertificate())
-	ms.SetResponse(endpoints.ListTrustedCertificate(), &itypes.ApiResponseListTrustedCertificate{Values: []itypes.ApiResponseTrustedCertificate{}}, nil)
+	ms.SetResponse(endpoints.ListTrustedCertificate(), &itypes.APIResponseListTrustedCertificate{Values: []itypes.APIResponseTrustedCertificate{}}, nil)
 	ms.CleanResponse(endpoints.CreateTrustedCertificate())
-	ms.SetResponse(endpoints.CreateTrustedCertificate(), &itypes.ApiResponseTrustedCertificate{
+	ms.SetResponse(endpoints.CreateTrustedCertificate(), &itypes.APIResponseTrustedCertificate{
 		ID:          certificateID,
 		Alias:       "trusted-1",
 		Certificate: "-----BEGIN CERTIFICATE-----trusted-----END CERTIFICATE-----",
@@ -93,13 +93,13 @@ func TestUpdateTrustedCertificate(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetTrustedCertificate())
-	ms.SetResponse(endpoints.GetTrustedCertificate(), &itypes.ApiResponseTrustedCertificate{
+	ms.SetResponse(endpoints.GetTrustedCertificate(), &itypes.APIResponseTrustedCertificate{
 		ID:          certificateID,
 		Alias:       "trusted-1",
 		Certificate: "-----BEGIN CERTIFICATE-----old-----END CERTIFICATE-----",
 	}, nil)
 	ms.CleanResponse(endpoints.UpdateTrustedCertificate())
-	ms.SetResponse(endpoints.UpdateTrustedCertificate(), &itypes.ApiResponseTrustedCertificate{
+	ms.SetResponse(endpoints.UpdateTrustedCertificate(), &itypes.APIResponseTrustedCertificate{
 		ID:          certificateID,
 		Alias:       "trusted-2",
 		Certificate: "-----BEGIN CERTIFICATE-----new-----END CERTIFICATE-----",
@@ -125,7 +125,7 @@ func TestDeleteTrustedCertificate(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetTrustedCertificate())
-	ms.SetResponse(endpoints.GetTrustedCertificate(), &itypes.ApiResponseTrustedCertificate{
+	ms.SetResponse(endpoints.GetTrustedCertificate(), &itypes.APIResponseTrustedCertificate{
 		ID:          certificateID,
 		Alias:       "trusted-1",
 		Certificate: "-----BEGIN CERTIFICATE-----trusted-----END CERTIFICATE-----",
@@ -144,7 +144,7 @@ func TestGetTrustedCertificateByNameNotFound(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.ListTrustedCertificate())
-	ms.SetResponse(endpoints.ListTrustedCertificate(), &itypes.ApiResponseListTrustedCertificate{Values: []itypes.ApiResponseTrustedCertificate{}}, nil)
+	ms.SetResponse(endpoints.ListTrustedCertificate(), &itypes.APIResponseListTrustedCertificate{Values: []itypes.APIResponseTrustedCertificate{}}, nil)
 
 	resp, err := client.GetTrustedCertificate(t.Context(), types.ParamsGetTrustedCertificate{Name: "missing-trusted"})
 
@@ -159,7 +159,7 @@ func TestGetTrustedCertificateByNameMultipleMatches(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.ListTrustedCertificate())
-	ms.SetResponse(endpoints.ListTrustedCertificate(), &itypes.ApiResponseListTrustedCertificate{Values: []itypes.ApiResponseTrustedCertificate{
+	ms.SetResponse(endpoints.ListTrustedCertificate(), &itypes.APIResponseListTrustedCertificate{Values: []itypes.APIResponseTrustedCertificate{
 		{ID: "urn:vcloud:trustedCertificate:" + generator.MustGenerate("{uuid}"), Alias: "trusted-1", Certificate: "-----BEGIN CERTIFICATE-----one-----END CERTIFICATE-----"},
 		{ID: "urn:vcloud:trustedCertificate:" + generator.MustGenerate("{uuid}"), Alias: "trusted-1", Certificate: "-----BEGIN CERTIFICATE-----two-----END CERTIFICATE-----"},
 	}}, nil)
@@ -178,7 +178,7 @@ func TestCreateTrustedCertificateRejectsDuplicateAlias(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.ListTrustedCertificate())
-	ms.SetResponse(endpoints.ListTrustedCertificate(), &itypes.ApiResponseListTrustedCertificate{Values: []itypes.ApiResponseTrustedCertificate{{
+	ms.SetResponse(endpoints.ListTrustedCertificate(), &itypes.APIResponseListTrustedCertificate{Values: []itypes.APIResponseTrustedCertificate{{
 		ID:          certificateID,
 		Alias:       "trusted-1",
 		Certificate: "-----BEGIN CERTIFICATE-----trusted-----END CERTIFICATE-----",
@@ -197,7 +197,7 @@ func TestDeleteTrustedCertificateByNameNotFound(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.ListTrustedCertificate())
-	ms.SetResponse(endpoints.ListTrustedCertificate(), &itypes.ApiResponseListTrustedCertificate{Values: []itypes.ApiResponseTrustedCertificate{}}, nil)
+	ms.SetResponse(endpoints.ListTrustedCertificate(), &itypes.APIResponseListTrustedCertificate{Values: []itypes.APIResponseTrustedCertificate{}}, nil)
 
 	err := client.DeleteTrustedCertificate(t.Context(), types.ParamsDeleteTrustedCertificate{Name: "missing-trusted"})
 

@@ -32,10 +32,10 @@ func TestCreateNetworkContextProfile(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetEdgeGateway())
-	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.ApiResponseEdgegateway{
+	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.APIResponseEdgegateway{
 		ID:       edgeGatewayID,
 		Name:     "edge-1",
-		OwnerRef: &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		OwnerRef: &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 	}, nil)
 
 	ms.CleanResponse(endpoints.ListNetworkContextProfile())
@@ -43,15 +43,15 @@ func TestCreateNetworkContextProfile(t *testing.T) {
 		assert.Contains(t, r.URL.Query().Get("filter"), "vdcGroupId=="+vdcGroupID)
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("X-Cloud-Avenue-Mock", "true")
-		assert.NoError(t, json.NewEncoder(w).Encode(&itypes.ApiResponseListNetworkContextProfile{
-			Values: []itypes.ApiResponseNetworkContextProfile{{
+		assert.NoError(t, json.NewEncoder(w).Encode(&itypes.APIResponseListNetworkContextProfile{
+			Values: []itypes.APIResponseNetworkContextProfile{{
 				ID:              profileID,
 				Name:            "ncp-1",
 				Description:     "desc",
 				Scope:           types.NetworkContextProfileScopeTenant,
-				ContextEntityId: vdcGroupID,
-				OrgRef:          &itypes.ApiObjectReference{ID: orgID},
-				Attributes: []itypes.ApiNetworkContextProfileAttribute{{
+				ContextEntityID: vdcGroupID,
+				OrgRef:          &itypes.APIObjectReference{ID: orgID},
+				Attributes: []itypes.APINetworkContextProfileAttribute{{
 					Type:   types.NetworkContextProfileAttributeTypeAppID,
 					Values: []string{"HTTP"},
 				}},
@@ -90,10 +90,10 @@ func TestListNetworkContextProfileUsesVdcScope(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetEdgeGateway())
-	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.ApiResponseEdgegateway{
+	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.APIResponseEdgegateway{
 		ID:       edgeGatewayID,
 		Name:     "edge-1",
-		OwnerRef: &itypes.ApiObjectReference{ID: vdcID, Name: "vdc-1"},
+		OwnerRef: &itypes.APIObjectReference{ID: vdcID, Name: "vdc-1"},
 	}, nil)
 
 	ms.CleanResponse(endpoints.ListNetworkContextProfile())
@@ -101,13 +101,13 @@ func TestListNetworkContextProfileUsesVdcScope(t *testing.T) {
 		assert.Contains(t, r.URL.Query().Get("filter"), "orgVdcId=="+vdcID)
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("X-Cloud-Avenue-Mock", "true")
-		assert.NoError(t, json.NewEncoder(w).Encode(&itypes.ApiResponseListNetworkContextProfile{
-			Values: []itypes.ApiResponseNetworkContextProfile{{
+		assert.NoError(t, json.NewEncoder(w).Encode(&itypes.APIResponseListNetworkContextProfile{
+			Values: []itypes.APIResponseNetworkContextProfile{{
 				ID:     profileID,
 				Name:   "ncp-1",
 				Scope:  types.NetworkContextProfileScopeTenant,
-				OrgRef: &itypes.ApiObjectReference{ID: orgID},
-				Attributes: []itypes.ApiNetworkContextProfileAttribute{{
+				OrgRef: &itypes.APIObjectReference{ID: orgID},
+				Attributes: []itypes.APINetworkContextProfileAttribute{{
 					Type:   types.NetworkContextProfileAttributeTypeDomainName,
 					Values: []string{"example.com"},
 				}},
@@ -137,20 +137,20 @@ func TestGetNetworkContextProfileByName(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetEdgeGateway())
-	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.ApiResponseEdgegateway{
+	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.APIResponseEdgegateway{
 		ID:       edgeGatewayID,
 		Name:     "edge-1",
-		OwnerRef: &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		OwnerRef: &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 	}, nil)
 
 	ms.CleanResponse(endpoints.ListNetworkContextProfile())
-	ms.SetResponse(endpoints.ListNetworkContextProfile(), &itypes.ApiResponseListNetworkContextProfile{
-		Values: []itypes.ApiResponseNetworkContextProfile{{
+	ms.SetResponse(endpoints.ListNetworkContextProfile(), &itypes.APIResponseListNetworkContextProfile{
+		Values: []itypes.APIResponseNetworkContextProfile{{
 			ID:     profileID,
 			Name:   "ncp-1",
 			Scope:  types.NetworkContextProfileScopeTenant,
-			OrgRef: &itypes.ApiObjectReference{ID: orgID},
-			Attributes: []itypes.ApiNetworkContextProfileAttribute{{
+			OrgRef: &itypes.APIObjectReference{ID: orgID},
+			Attributes: []itypes.APINetworkContextProfileAttribute{{
 				Type:   types.NetworkContextProfileAttributeTypeDomainName,
 				Values: []string{"example.com"},
 			}},
@@ -180,10 +180,10 @@ func TestGetNetworkContextProfileAttributes(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetEdgeGateway())
-	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.ApiResponseEdgegateway{
+	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.APIResponseEdgegateway{
 		ID:       edgeGatewayID,
 		Name:     "edge-1",
-		OwnerRef: &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		OwnerRef: &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 	}, nil)
 
 	ms.CleanResponse(endpoints.GetNetworkContextProfileAttributes())
@@ -191,8 +191,8 @@ func TestGetNetworkContextProfileAttributes(t *testing.T) {
 		assert.Contains(t, r.URL.Query().Get("filter"), "vdcGroupId=="+vdcGroupID)
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("X-Cloud-Avenue-Mock", "true")
-		assert.NoError(t, json.NewEncoder(w).Encode(&itypes.ApiNetworkContextProfileAttributesResponse{
-			Attributes: []itypes.ApiNetworkContextProfileAttribute{
+		assert.NoError(t, json.NewEncoder(w).Encode(&itypes.APINetworkContextProfileAttributesResponse{
+			Attributes: []itypes.APINetworkContextProfileAttribute{
 				{Type: types.NetworkContextProfileAttributeTypeAppID, Values: []string{"HTTP", "DNS"}},
 				{Type: types.NetworkContextProfileAttributeTypeDomainName, Values: []string{"example.com", "orange.com"}},
 			},
@@ -218,14 +218,14 @@ func TestUpdateNetworkContextProfile(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetNetworkContextProfile())
-	ms.SetResponse(endpoints.GetNetworkContextProfile(), &itypes.ApiResponseNetworkContextProfile{
+	ms.SetResponse(endpoints.GetNetworkContextProfile(), &itypes.APIResponseNetworkContextProfile{
 		ID:              profileID,
 		Name:            "ncp-1",
 		Description:     "old-desc",
 		Scope:           types.NetworkContextProfileScopeTenant,
-		ContextEntityId: vdcGroupID,
-		OrgRef:          &itypes.ApiObjectReference{ID: orgID},
-		Attributes: []itypes.ApiNetworkContextProfileAttribute{{
+		ContextEntityID: vdcGroupID,
+		OrgRef:          &itypes.APIObjectReference{ID: orgID},
+		Attributes: []itypes.APINetworkContextProfileAttribute{{
 			Type:   types.NetworkContextProfileAttributeTypeAppID,
 			Values: []string{"HTTP"},
 		}},
@@ -262,10 +262,10 @@ func TestDeleteNetworkContextProfile(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetNetworkContextProfile())
-	ms.SetResponse(endpoints.GetNetworkContextProfile(), &itypes.ApiResponseNetworkContextProfile{
+	ms.SetResponse(endpoints.GetNetworkContextProfile(), &itypes.APIResponseNetworkContextProfile{
 		ID:              profileID,
 		Name:            "ncp-1",
-		ContextEntityId: generator.MustGenerate("{urn:vdcGroup}"),
+		ContextEntityID: generator.MustGenerate("{urn:vdcGroup}"),
 		Scope:           types.NetworkContextProfileScopeTenant,
 	}, nil)
 	ms.CleanResponse(endpoints.DeleteNetworkContextProfile())

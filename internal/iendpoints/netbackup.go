@@ -109,8 +109,8 @@ func init() {
 				Required:    true,
 			},
 		},
-		BodyRequestType:  itypes.APIRequestNetbackupProtectMachine{},
-		ResponseType:     itypes.APIResponseNetbackupProtectMachine{},
+		BodyRequestType: itypes.APIRequestNetbackupProtectMachine{},
+		ResponseType:    itypes.APIResponseNetbackupProtectMachine{},
 	}.Register()
 }
 

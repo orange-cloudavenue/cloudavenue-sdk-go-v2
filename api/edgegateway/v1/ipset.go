@@ -50,7 +50,7 @@ func (c *Client) ListIPSet(ctx context.Context, params types.ParamsListEdgeGatew
 		return nil, fmt.Errorf("%s: list: %w", opListEdgeGatewayIPSet, err)
 	}
 
-	return resp.Result().(*itypes.ApiResponseListFirewallGroup).ToModel(), nil
+	return resp.Result().(*itypes.APIResponseListFirewallGroup).ToModel(), nil
 }
 
 // GetIPSet gets NSX-T IP set by ID or name within edge gateway.
@@ -74,7 +74,7 @@ func (c *Client) CreateIPSet(ctx context.Context, params types.ParamsCreateEdgeG
 		return nil, fmt.Errorf("%s: edge gateway owner must be a vdc group", opCreateEdgeGatewayIPSet)
 	}
 
-	body := itypes.ApiRequestFirewallGroup{
+	body := itypes.APIRequestFirewallGroup{
 		Name:        params.Name,
 		Description: params.Description,
 		TypeValue:   itypes.FirewallGroupTypeIPSet,
@@ -88,7 +88,7 @@ func (c *Client) CreateIPSet(ctx context.Context, params types.ParamsCreateEdgeG
 		return nil, fmt.Errorf("%s: %w", opCreateEdgeGatewayIPSet, err)
 	}
 
-	created, ok := resp.Result().(*itypes.ApiResponseFirewallGroup)
+	created, ok := resp.Result().(*itypes.APIResponseFirewallGroup)
 	if !ok || created == nil {
 		return nil, fmt.Errorf("%s: unexpected create response type %T", opCreateEdgeGatewayIPSet, resp.Result())
 	}
@@ -109,14 +109,14 @@ func (c *Client) UpdateIPSet(ctx context.Context, params types.ParamsUpdateEdgeG
 		idOrName = params.Name
 	}
 
-	current, err := inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, itypes.FirewallGroupTypeIPSet, func(ctx context.Context, idOrName, _ string) (*itypes.ApiResponseFirewallGroup, error) {
+	current, err := inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, itypes.FirewallGroupTypeIPSet, func(ctx context.Context, idOrName, _ string) (*itypes.APIResponseFirewallGroup, error) {
 		return getEdgeGatewayIPSet(ctx, c.c, params.ID, params.Name, params.EdgeGatewayID, params.EdgeGatewayName)
 	})
 	if err != nil {
 		return nil, fmt.Errorf("%s: resolve: %w", opUpdateEdgeGatewayIPSet, err)
 	}
 
-	body := itypes.ApiRequestFirewallGroup{
+	body := itypes.APIRequestFirewallGroup{
 		ID:          current.ID,
 		Name:        current.Name,
 		Description: current.Description,
@@ -146,7 +146,7 @@ func (c *Client) DeleteIPSet(ctx context.Context, params types.ParamsDeleteEdgeG
 		idOrName = params.Name
 	}
 
-	current, err := inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, itypes.FirewallGroupTypeIPSet, func(ctx context.Context, idOrName, _ string) (*itypes.ApiResponseFirewallGroup, error) {
+	current, err := inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, itypes.FirewallGroupTypeIPSet, func(ctx context.Context, idOrName, _ string) (*itypes.APIResponseFirewallGroup, error) {
 		return getEdgeGatewayIPSet(ctx, c.c, params.ID, params.Name, params.EdgeGatewayID, params.EdgeGatewayName)
 	})
 	if err != nil {
@@ -160,7 +160,7 @@ func (c *Client) DeleteIPSet(ctx context.Context, params types.ParamsDeleteEdgeG
 	return nil
 }
 
-func getEdgeGatewayIPSet(ctx context.Context, c cav.Client, id, name, edgeGatewayID, edgeGatewayName string) (*itypes.ApiResponseFirewallGroup, error) {
+func getEdgeGatewayIPSet(ctx context.Context, c cav.Client, id, name, edgeGatewayID, edgeGatewayName string) (*itypes.APIResponseFirewallGroup, error) {
 	if id != "" {
 		ep := endpoints.GetFirewallGroup()
 		resp, err := c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], id))
@@ -168,7 +168,7 @@ func getEdgeGatewayIPSet(ctx context.Context, c cav.Client, id, name, edgeGatewa
 			return nil, err
 		}
 
-		return resp.Result().(*itypes.ApiResponseFirewallGroup), nil
+		return resp.Result().(*itypes.APIResponseFirewallGroup), nil
 	}
 
 	ownerRef, err := resolveEdgeGatewayOwnerRef(ctx, c, edgeGatewayID, edgeGatewayName)
@@ -186,7 +186,7 @@ func getEdgeGatewayIPSet(ctx context.Context, c cav.Client, id, name, edgeGatewa
 		return nil, err
 	}
 
-	list := resp.Result().(*itypes.ApiResponseListFirewallGroup)
+	list := resp.Result().(*itypes.APIResponseListFirewallGroup)
 	if len(list.Values) == 0 {
 		return nil, &pkgerrors.APIError{Operation: "GetFirewallGroup", StatusCode: 404, Message: fmt.Sprintf("ip set %q not found", name)}
 	}
@@ -197,7 +197,7 @@ func getEdgeGatewayIPSet(ctx context.Context, c cav.Client, id, name, edgeGatewa
 	return &list.Values[0], nil
 }
 
-func getEdgeGatewayIPSetWithRetry(ctx context.Context, c cav.Client, id, name, edgeGatewayID, edgeGatewayName string) (*itypes.ApiResponseFirewallGroup, error) {
+func getEdgeGatewayIPSetWithRetry(ctx context.Context, c cav.Client, id, name, edgeGatewayID, edgeGatewayName string) (*itypes.APIResponseFirewallGroup, error) {
 	const maxAttempts = 5
 
 	var lastErr error

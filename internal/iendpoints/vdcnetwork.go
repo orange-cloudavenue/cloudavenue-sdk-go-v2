@@ -18,106 +18,106 @@ import (
 
 //go:generate endpoint-generator -path vdcnetwork.go -output vdcnetwork
 
-// VdcNetwork endpoints back Org VDC Networks (both routed and isolated),
+// VDCNetwork endpoints back Org VDC Networks (both routed and isolated),
 // differentiated only by the "networkType" field on the wire and by the
 // optional "connection" field (present only for routed networks). Ownership
 // is expressed via a single OwnerRef, which accepts either a VDC URN or a
-// VdcGroup URN. Unlike FirewallGroup and AppPortProfile, VCD enforces a
+// VDCGroup URN. Unlike FirewallGroup and AppPortProfile, VCD enforces a
 // maximum pageSize of 32 for this resource. Create/Update/Delete are
 // synchronous (no async job).
 func init() {
-	// ListVdcNetwork
+	// ListVDCNetwork
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/get/",
-		Name:             "ListVdcNetwork",
+		Name:             "ListVDCNetwork",
 		Description:      "List Org VDC Networks (routed and isolated)",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/orgVdcNetworks",
 		QueryParams: []cav.QueryParam{
 			{
-				Name:        "filter",
+				Name:        queryParamFilter,
 				Description: "Filter to apply to the list of Org VDC Networks. Format: key==value;key==value. Allowed keys: name, ownerRef.id, id.",
 			},
 			{
-				Name:        "pageSize",
+				Name:        queryParamPageSize,
 				Description: "The number of items per page. VCD enforces a maximum of 32 for this resource.",
-				Value:       "32",
+				Value:       pageSize32,
 			},
 		},
-		ResponseType: itypes.ApiResponseListVdcNetwork{},
+		ResponseType: itypes.APIResponseListVDCNetwork{},
 	}.Register()
 
-	// GetVdcNetwork
+	// GetVDCNetwork
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/get/",
-		Name:             "GetVdcNetwork",
+		Name:             "GetVDCNetwork",
 		Description:      "Get an Org VDC Network (routed or isolated)",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/orgVdcNetworks/{vdcNetworkId}",
+		PathTemplate:     pathOrgVDCNetworks,
 		PathParams: []cav.PathParam{
 			{
-				Name:        "vdcNetworkId",
+				Name:        pathParamVDCNetworkID,
 				Description: "ID of the Org VDC Network to get",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=network")
+					return validators.New().Var(value, urnNetwork)
 				},
 			},
 		},
-		ResponseType: itypes.ApiResponseVdcNetwork{},
+		ResponseType: itypes.APIResponseVDCNetwork{},
 	}.Register()
 
-	// CreateVdcNetwork
+	// CreateVDCNetwork
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/post/",
-		Name:             "CreateVdcNetwork",
+		Name:             "CreateVDCNetwork",
 		Description:      "Create an Org VDC Network (routed or isolated)",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/orgVdcNetworks",
-		BodyRequestType:  itypes.ApiRequestVdcNetwork{},
-		ResponseType:     itypes.ApiResponseVdcNetwork{},
+		BodyRequestType:  itypes.APIRequestVDCNetwork{},
+		ResponseType:     itypes.APIResponseVDCNetwork{},
 	}.Register()
 
-	// UpdateVdcNetwork
+	// UpdateVDCNetwork
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/put/",
-		Name:             "UpdateVdcNetwork",
+		Name:             "UpdateVDCNetwork",
 		Description:      "Update an Org VDC Network (routed or isolated)",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/orgVdcNetworks/{vdcNetworkId}",
+		PathTemplate:     pathOrgVDCNetworks,
 		PathParams: []cav.PathParam{
 			{
-				Name:        "vdcNetworkId",
+				Name:        pathParamVDCNetworkID,
 				Description: "ID of the Org VDC Network to update",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=network")
+					return validators.New().Var(value, urnNetwork)
 				},
 			},
 		},
-		BodyRequestType: itypes.ApiRequestVdcNetwork{},
-		ResponseType:    itypes.ApiResponseVdcNetwork{},
+		BodyRequestType: itypes.APIRequestVDCNetwork{},
+		ResponseType:    itypes.APIResponseVDCNetwork{},
 	}.Register()
 
-	// DeleteVdcNetwork
+	// DeleteVDCNetwork
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/delete/",
-		Name:             "DeleteVdcNetwork",
+		Name:             "DeleteVDCNetwork",
 		Description:      "Delete an Org VDC Network (routed or isolated)",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/orgVdcNetworks/{vdcNetworkId}",
+		PathTemplate:     pathOrgVDCNetworks,
 		PathParams: []cav.PathParam{
 			{
-				Name:        "vdcNetworkId",
+				Name:        pathParamVDCNetworkID,
 				Description: "ID of the Org VDC Network to delete",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=network")
+					return validators.New().Var(value, urnNetwork)
 				},
 			},
 		},

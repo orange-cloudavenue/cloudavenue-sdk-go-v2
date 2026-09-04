@@ -70,7 +70,7 @@ func (v *vmware) parseAPIError(operation string, resp *resty.Response) *errors.A
 	return &errors.APIError{
 		Operation:  operation,
 		StatusCode: resp.StatusCode(),
-		Message:    "Unknown error occurred",
+		Message:    unknownErrorMessage,
 		Duration:   resp.Duration(),
 		Endpoint:   resp.Request.URL,
 		Method:     resp.Request.Method,

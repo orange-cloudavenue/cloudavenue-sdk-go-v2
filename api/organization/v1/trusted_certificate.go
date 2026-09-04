@@ -42,7 +42,7 @@ func (c *Client) ListTrustedCertificate(ctx context.Context, params types.Params
 		return nil, fmt.Errorf("%s: list: %w", opListTrustedCertificate, err)
 	}
 
-	return resp.Result().(*itypes.ApiResponseListTrustedCertificate).ToModel(), nil
+	return resp.Result().(*itypes.APIResponseListTrustedCertificate).ToModel(), nil
 }
 
 // GetTrustedCertificate gets trusted certificate by URN or alias.
@@ -68,10 +68,10 @@ func (c *Client) CreateTrustedCertificate(ctx context.Context, params types.Para
 		Endpoint: endpoints.CreateTrustedCertificate(),
 		Validate: validateCreateTrustedCertificateParams,
 		Transform: func(p types.ParamsCreateTrustedCertificate) (any, error) {
-			return itypes.ApiRequestTrustedCertificate{Alias: p.Name, Certificate: p.Certificate}, nil
+			return itypes.APIRequestTrustedCertificate{Alias: p.Name, Certificate: p.Certificate}, nil
 		},
 		Extract: func(resp *cav.Response, _ types.ParamsCreateTrustedCertificate) (*types.ModelGetTrustedCertificate, error) {
-			certificate, ok := resp.Result().(*itypes.ApiResponseTrustedCertificate)
+			certificate, ok := resp.Result().(*itypes.APIResponseTrustedCertificate)
 			if !ok || certificate == nil {
 				return nil, fmt.Errorf("%s: unexpected create response type %T", opCreateTrustedCertificate, resp.Result())
 			}
@@ -92,7 +92,7 @@ func (c *Client) UpdateTrustedCertificate(ctx context.Context, params types.Para
 		return nil, fmt.Errorf("%s: resolve: %w", opUpdateTrustedCertificate, err)
 	}
 
-	body := itypes.ApiRequestTrustedCertificate{ID: current.ID, Alias: current.Alias, Certificate: current.Certificate}
+	body := itypes.APIRequestTrustedCertificate{ID: current.ID, Alias: current.Alias, Certificate: current.Certificate}
 	if params.Name != "" {
 		body.Alias = params.Name
 	}
@@ -124,14 +124,14 @@ func (c *Client) DeleteTrustedCertificate(ctx context.Context, params types.Para
 	return nil
 }
 
-func findTrustedCertificate(ctx context.Context, c *Client, id, name string) (*itypes.ApiResponseTrustedCertificate, error) {
+func findTrustedCertificate(ctx context.Context, c *Client, id, name string) (*itypes.APIResponseTrustedCertificate, error) {
 	if id != "" {
 		ep := endpoints.GetTrustedCertificate()
 		resp, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], id))
 		if err != nil {
 			return nil, err
 		}
-		return resp.Result().(*itypes.ApiResponseTrustedCertificate), nil
+		return resp.Result().(*itypes.APIResponseTrustedCertificate), nil
 	}
 
 	if name == "" {
@@ -144,7 +144,7 @@ func findTrustedCertificate(ctx context.Context, c *Client, id, name string) (*i
 		return nil, err
 	}
 
-	list := resp.Result().(*itypes.ApiResponseListTrustedCertificate)
+	list := resp.Result().(*itypes.APIResponseListTrustedCertificate)
 	if len(list.Values) == 0 {
 		return nil, &pkgerrors.APIError{Operation: "GetTrustedCertificate", StatusCode: 404, Message: fmt.Sprintf("trusted certificate %q not found", name)}
 	}

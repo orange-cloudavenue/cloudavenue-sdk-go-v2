@@ -10,7 +10,7 @@
 package itypes
 
 type (
-	ApiRequestBandwidth struct {
+	APIRequestBandwidth struct {
 		Bandwidth int `json:"rateLimit" fake:"5"`
 	}
 )

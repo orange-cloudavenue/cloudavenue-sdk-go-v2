@@ -35,18 +35,18 @@ func Test_GetEdgeGatewayBandwidth(t *testing.T) {
 			params: types.ParamsEdgeGateway{
 				ID: "urn:vcloud:gateway:test-edge-gw-id",
 			},
-			mockResponse: func() *itypes.ApiResponseT0s {
-				child := itypes.ApiResponseT0Children{
+			mockResponse: func() *itypes.APIResponseT0s {
+				child := itypes.APIResponseT0Children{
 					Type: "edge-gateway",
 					Name: "test-edge-gw",
 				}
 				child.Properties.RateLimit = 5
 				child.Properties.EdgeUUID = "urn:vcloud:gateway:test-edge-gw-id"
-				return &itypes.ApiResponseT0s{
+				return &itypes.APIResponseT0s{
 					{
 						Type:     "tier-0-vrf",
 						Name:     "test-t0",
-						Children: []itypes.ApiResponseT0Children{child},
+						Children: []itypes.APIResponseT0Children{child},
 					},
 				}
 			}(),
@@ -58,18 +58,18 @@ func Test_GetEdgeGatewayBandwidth(t *testing.T) {
 			params: types.ParamsEdgeGateway{
 				Name: validEdgeGatewayName,
 			},
-			mockResponse: func() *itypes.ApiResponseT0s {
-				child := itypes.ApiResponseT0Children{
+			mockResponse: func() *itypes.APIResponseT0s {
+				child := itypes.APIResponseT0Children{
 					Type: "edge-gateway",
 					Name: validEdgeGatewayName,
 				}
 				child.Properties.RateLimit = 5
 				child.Properties.EdgeUUID = "urn:vcloud:gateway:test-edge-gw-id"
-				return &itypes.ApiResponseT0s{
+				return &itypes.APIResponseT0s{
 					{
 						Type:     "tier-0-vrf",
 						Name:     "test-t0",
-						Children: []itypes.ApiResponseT0Children{child},
+						Children: []itypes.APIResponseT0Children{child},
 					},
 				}
 			}(),

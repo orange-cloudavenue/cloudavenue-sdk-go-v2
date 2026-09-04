@@ -67,8 +67,8 @@ func TestListVDC(t *testing.T) {
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				// Clean all default mock responses
-				ms.CleanResponse(endpoints.ListVdc())
-				ms.SetResponse(endpoints.ListVdc(), tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.ListVDC())
+				ms.SetResponse(endpoints.ListVDC(), tt.mockResponse, &tt.mockResponseStatus)
 				ms.CleanResponse(endpoints.QueryEdgeGateway())
 				ms.SetResponse(endpoints.QueryEdgeGateway(), tt.mockResponse, &tt.mockResponseStatus)
 			}
@@ -134,7 +134,7 @@ func TestGetVDC(t *testing.T) {
 			params: types.ParamsGetVDC{
 				ID: generator.MustGenerate("{urn:vdc}"),
 			},
-			mockListVDCResponse:       itypes.ApiResponseListVDC{Records: []itypes.ApiResponseListVDCRecord{}},
+			mockListVDCResponse:       itypes.APIResponseListVDC{Records: []itypes.APIResponseListVDCRecord{}},
 			mockListVDCResponseStatus: 200,
 			expectedErr:               true,
 		},
@@ -162,20 +162,20 @@ func TestGetVDC(t *testing.T) {
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				// Clean all default mock responses
-				ms.CleanResponse(endpoints.GetVdc())
-				ms.SetResponse(endpoints.GetVdc(), tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.GetVDC())
+				ms.SetResponse(endpoints.GetVDC(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			if tt.mockListVDCResponseStatus != 0 {
-				ms.CleanResponse(endpoints.ListVdc())
-				ms.SetResponse(endpoints.ListVdc(), tt.mockListVDCResponse, &tt.mockListVDCResponseStatus)
+				ms.CleanResponse(endpoints.ListVDC())
+				ms.SetResponse(endpoints.ListVDC(), tt.mockListVDCResponse, &tt.mockListVDCResponseStatus)
 				ms.CleanResponse(endpoints.QueryEdgeGateway())
 				ms.SetResponse(endpoints.QueryEdgeGateway(), tt.mockListVDCResponse, &tt.mockListVDCResponseStatus)
 			}
 
 			if tt.mockGetMetadataResponseStatus != 0 {
-				ms.CleanResponse(endpoints.GetVdcMetadata())
-				ms.SetResponse(endpoints.GetVdcMetadata(), nil, &tt.mockGetMetadataResponseStatus)
+				ms.CleanResponse(endpoints.GetVDCMetadata())
+				ms.SetResponse(endpoints.GetVDCMetadata(), nil, &tt.mockGetMetadataResponseStatus)
 			}
 
 			resp, err := client.GetVDC(t.Context(), tt.params)
@@ -303,13 +303,13 @@ func TestCreateVDC(t *testing.T) {
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				// Clean all default mock responses
-				ms.CleanResponse(endpoints.CreateVdc())
-				ms.SetResponse(endpoints.CreateVdc(), tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.CreateVDC())
+				ms.SetResponse(endpoints.CreateVDC(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			if tt.mockGetVDCResponse != nil || tt.mockGetVDCResponseStatus != 0 {
-				ms.CleanResponse(endpoints.GetVdc())
-				ms.SetResponse(endpoints.GetVdc(), tt.mockGetVDCResponse, &tt.mockGetVDCResponseStatus)
+				ms.CleanResponse(endpoints.GetVDC())
+				ms.SetResponse(endpoints.GetVDC(), tt.mockGetVDCResponse, &tt.mockGetVDCResponseStatus)
 			}
 
 			resp, err := client.CreateVDC(t.Context(), tt.params)
@@ -392,13 +392,13 @@ func TestUpdateVDC(t *testing.T) {
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				// Clean all default mock responses
-				ms.CleanResponse(endpoints.UpdateVdc())
-				ms.SetResponse(endpoints.UpdateVdc(), tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.UpdateVDC())
+				ms.SetResponse(endpoints.UpdateVDC(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			if tt.mockGetVDCResponseStatus != 0 {
-				ms.CleanResponse(endpoints.GetVdc())
-				ms.SetResponse(endpoints.GetVdc(), nil, &tt.mockGetVDCResponseStatus)
+				ms.CleanResponse(endpoints.GetVDC())
+				ms.SetResponse(endpoints.GetVDC(), nil, &tt.mockGetVDCResponseStatus)
 			}
 
 			data, err := client.UpdateVDC(t.Context(), tt.params)
@@ -454,13 +454,13 @@ func TestDeleteVDC(t *testing.T) {
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				// Clean all default mock responses
-				ms.CleanResponse(endpoints.DeleteVdc())
-				ms.SetResponse(endpoints.DeleteVdc(), tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.DeleteVDC())
+				ms.SetResponse(endpoints.DeleteVDC(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			if tt.mockGetVDCResponseStatus != 0 {
-				ms.CleanResponse(endpoints.ListVdc())
-				ms.SetResponse(endpoints.ListVdc(), nil, &tt.mockGetVDCResponseStatus)
+				ms.CleanResponse(endpoints.ListVDC())
+				ms.SetResponse(endpoints.ListVDC(), nil, &tt.mockGetVDCResponseStatus)
 				ms.CleanResponse(endpoints.QueryEdgeGateway())
 				ms.SetResponse(endpoints.QueryEdgeGateway(), nil, &tt.mockGetVDCResponseStatus)
 			}

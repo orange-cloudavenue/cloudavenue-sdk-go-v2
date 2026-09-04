@@ -30,20 +30,20 @@ func TestCreateAppPortProfile(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetEdgeGateway())
-	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.ApiResponseEdgegateway{
+	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.APIResponseEdgegateway{
 		ID:       edgeGatewayID,
 		Name:     "edge-1",
-		OwnerRef: &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		OwnerRef: &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 	}, nil)
 
 	ms.CleanResponse(endpoints.CreateAppPortProfile())
-	ms.SetResponse(endpoints.CreateAppPortProfile(), &itypes.ApiResponseAppPortProfile{
+	ms.SetResponse(endpoints.CreateAppPortProfile(), &itypes.APIResponseAppPortProfile{
 		ID:          createdID,
 		Name:        "app-1",
 		Description: "desc",
 		Scope:       types.AppPortProfileScopeTenant,
-		OrgRef:      &itypes.ApiObjectReference{ID: orgID},
-		ApplicationPorts: []itypes.ApiAppPortProfilePort{{
+		OrgRef:      &itypes.APIObjectReference{ID: orgID},
+		ApplicationPorts: []itypes.APIAppPortProfilePort{{
 			Protocol:         types.AppPortProfileProtocolTCP,
 			DestinationPorts: []string{"443", "8443-8444"},
 		}},
@@ -81,20 +81,20 @@ func TestListAppPortProfile(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetEdgeGateway())
-	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.ApiResponseEdgegateway{
+	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.APIResponseEdgegateway{
 		ID:       edgeGatewayID,
 		Name:     "edge-1",
-		OwnerRef: &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		OwnerRef: &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 	}, nil)
 
 	ms.CleanResponse(endpoints.ListAppPortProfile())
-	ms.SetResponse(endpoints.ListAppPortProfile(), &itypes.ApiResponseListAppPortProfile{
-		Values: []itypes.ApiResponseAppPortProfile{{
+	ms.SetResponse(endpoints.ListAppPortProfile(), &itypes.APIResponseListAppPortProfile{
+		Values: []itypes.APIResponseAppPortProfile{{
 			ID:     profileID,
 			Name:   "app-1",
 			Scope:  types.AppPortProfileScopeTenant,
-			OrgRef: &itypes.ApiObjectReference{ID: orgID},
-			ApplicationPorts: []itypes.ApiAppPortProfilePort{{
+			OrgRef: &itypes.APIObjectReference{ID: orgID},
+			ApplicationPorts: []itypes.APIAppPortProfilePort{{
 				Protocol:         types.AppPortProfileProtocolTCP,
 				DestinationPorts: []string{"443"},
 			}},
@@ -124,20 +124,20 @@ func TestGetAppPortProfileByName(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetEdgeGateway())
-	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.ApiResponseEdgegateway{
+	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.APIResponseEdgegateway{
 		ID:       edgeGatewayID,
 		Name:     "edge-1",
-		OwnerRef: &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		OwnerRef: &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 	}, nil)
 
 	ms.CleanResponse(endpoints.ListAppPortProfile())
-	ms.SetResponse(endpoints.ListAppPortProfile(), &itypes.ApiResponseListAppPortProfile{
-		Values: []itypes.ApiResponseAppPortProfile{{
+	ms.SetResponse(endpoints.ListAppPortProfile(), &itypes.APIResponseListAppPortProfile{
+		Values: []itypes.APIResponseAppPortProfile{{
 			ID:     profileID,
 			Name:   "app-1",
 			Scope:  types.AppPortProfileScopeTenant,
-			OrgRef: &itypes.ApiObjectReference{ID: orgID},
-			ApplicationPorts: []itypes.ApiAppPortProfilePort{{
+			OrgRef: &itypes.APIObjectReference{ID: orgID},
+			ApplicationPorts: []itypes.APIAppPortProfilePort{{
 				Protocol:         types.AppPortProfileProtocolUDP,
 				DestinationPorts: []string{"53"},
 			}},
@@ -166,13 +166,13 @@ func TestUpdateAppPortProfile(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetAppPortProfile())
-	ms.SetResponse(endpoints.GetAppPortProfile(), &itypes.ApiResponseAppPortProfile{
+	ms.SetResponse(endpoints.GetAppPortProfile(), &itypes.APIResponseAppPortProfile{
 		ID:          profileID,
 		Name:        "app-1",
 		Description: "old-desc",
 		Scope:       types.AppPortProfileScopeTenant,
-		OrgRef:      &itypes.ApiObjectReference{ID: orgID},
-		ApplicationPorts: []itypes.ApiAppPortProfilePort{{
+		OrgRef:      &itypes.APIObjectReference{ID: orgID},
+		ApplicationPorts: []itypes.APIAppPortProfilePort{{
 			Protocol:         types.AppPortProfileProtocolTCP,
 			DestinationPorts: []string{"443"},
 		}},
@@ -209,10 +209,10 @@ func TestDeleteAppPortProfile(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetAppPortProfile())
-	ms.SetResponse(endpoints.GetAppPortProfile(), &itypes.ApiResponseAppPortProfile{
+	ms.SetResponse(endpoints.GetAppPortProfile(), &itypes.APIResponseAppPortProfile{
 		ID:              profileID,
 		Name:            "app-1",
-		ContextEntityId: generator.MustGenerate("{urn:vdcGroup}"),
+		ContextEntityID: generator.MustGenerate("{urn:vdcGroup}"),
 		Scope:           types.AppPortProfileScopeTenant,
 	}, nil)
 	ms.CleanResponse(endpoints.DeleteAppPortProfile())

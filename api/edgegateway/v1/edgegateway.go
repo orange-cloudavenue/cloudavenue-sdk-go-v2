@@ -46,7 +46,7 @@ var (
 		Backend:  cav.BackendVMware,
 		Endpoint: endpoints.ListEdgeGateway(),
 		Extract: func(resp *cav.Response, _ struct{}) (*types.ModelEdgeGateways, error) {
-			list, ok := resp.Result().(*itypes.ApiResponseEdgegateways)
+			list, ok := resp.Result().(*itypes.APIResponseEdgegateways)
 			if !ok || list == nil {
 				return nil, fmt.Errorf("unexpected list response type %T", resp.Result())
 			}
@@ -70,7 +70,7 @@ var (
 			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
 		},
 		Extract: func(resp *cav.Response, _ getEdgeGatewayByIDParams) (*types.ModelEdgeGateway, error) {
-			edgeGateway, ok := resp.Result().(*itypes.ApiResponseEdgegateway)
+			edgeGateway, ok := resp.Result().(*itypes.APIResponseEdgegateway)
 			if !ok || edgeGateway == nil {
 				return nil, fmt.Errorf("unexpected get response type %T", resp.Result())
 			}
@@ -116,7 +116,7 @@ var (
 			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
 		},
 		Transform: func(p updateEdgeGatewayByIDParams) (any, error) {
-			return itypes.ApiRequestBandwidth{Bandwidth: p.Bandwidth}, nil
+			return itypes.APIRequestBandwidth{Bandwidth: p.Bandwidth}, nil
 		},
 		Extract: func(_ *cav.Response, _ updateEdgeGatewayByIDParams) (struct{}, error) {
 			return struct{}{}, nil
