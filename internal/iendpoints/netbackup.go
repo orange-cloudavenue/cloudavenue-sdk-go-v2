@@ -115,19 +115,19 @@ func init() {
 }
 
 type netbackupTokenRequest struct {
-	GrantType string `json:"grant_type"`
+	GrantType string `json:"grant_type"` //nolint:tagliatelle
 	Username  string `json:"username"`
 	Password  string `json:"password"`
 }
 
 type netbackupRefreshTokenRequest struct {
-	GrantType    string `json:"grant_type"`
-	RefreshToken string `json:"refresh_token"`
+	GrantType    string `json:"grant_type"`    //nolint:tagliatelle
+	RefreshToken string `json:"refresh_token"` //nolint:tagliatelle
 }
 
 type netbackupTokenResponse struct {
-	AccessToken  string `json:"access_token"`
-	TokenType    string `json:"token_type"`
-	ExpiresIn    int    `json:"expires_in"`
-	RefreshToken string `json:"refresh_token"`
+	AccessToken  string `json:"access_token"`  //nolint:tagliatelle
+	TokenType    string `json:"token_type"`    //nolint:tagliatelle
+	ExpiresIn    int    `json:"expires_in"`    //nolint:tagliatelle
+	RefreshToken string `json:"refresh_token"` //nolint:tagliatelle //nolint:tagliatelle
 }

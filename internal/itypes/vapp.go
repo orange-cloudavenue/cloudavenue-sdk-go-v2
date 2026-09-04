@@ -58,20 +58,20 @@ type APIResponseGuestProperties struct {
 	XMLNS                        string                      `json:"xmlns" fake:"http://www.vmware.com/vcloud/v1.5"`
 	XMLNSXsi                     string                      `json:"xmlns:xsi" fake:"http://www.w3.org/2001/XMLSchema-instance"`
 	XsiNoNamespaceSchemaLocation string                      `json:"xsi:noNamespaceSchemaLocation" fake:"http://www.vmware.com/vcloud/v1.5/vmguest.xsd"`
-	ProductSectionList           []APIResponseProductSection `json:"ProductSectionList" fakesize:"1"`
+	ProductSectionList           []APIResponseProductSection `json:"ProductSectionList" fakesize:"1"` //nolint:tagliatelle
 }
 
 // APIResponseProductSection contains product section info for guest properties.
 type APIResponseProductSection struct {
-	Info    string               `json:"Info" fake:"Product section"`
-	Product []APIResponseProduct `json:"Product" fakesize:"1"`
+	Info    string               `json:"Info" fake:"Product section"` //nolint:tagliatelle
+	Product []APIResponseProduct `json:"Product" fakesize:"1"`        //nolint:tagliatelle
 }
 
 // APIResponseProduct contains product info.
 type APIResponseProduct struct {
-	Info     string `json:"Info" fake:"Product info"`
-	Class    string `json:"Class" fake:"{word}"`
-	Instance string `json:"Instance" fake:"{word}"`
+	Info     string `json:"Info" fake:"Product info"` //nolint:tagliatelle
+	Class    string `json:"Class" fake:"{word}"`      //nolint:tagliatelle
+	Instance string `json:"Instance" fake:"{word}"`   //nolint:tagliatelle
 }
 
 // APIResponseNetworkConfigSection contains network configuration.

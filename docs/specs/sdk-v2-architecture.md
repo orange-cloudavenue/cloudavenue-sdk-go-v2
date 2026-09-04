@@ -165,7 +165,7 @@ Concretely:
   error handling — never inside a `Validate()` method.
 
 This distinction must be enforced by code review discipline (and ideally a
-lint rule under `ruleguard/`) — the specific failure mode being prevented is
+lint rule under ruleguard) — the specific failure mode being prevented is
 a future engineer "helpfully" adding an API call inside a `Validate()` method
 because it's convenient, silently reintroducing TOCTOU bugs and turning a
 supposedly pure function into one with hidden I/O and hidden latency.
