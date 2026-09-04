@@ -12,24 +12,24 @@ package itypes
 import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 
 type (
-	ApiResponseListTrustedCertificate struct {
-		Values []ApiResponseTrustedCertificate `json:"values" fakesize:"2"`
+	APIResponseListTrustedCertificate struct {
+		Values []APIResponseTrustedCertificate `json:"values" fakesize:"2"`
 	}
 
-	ApiResponseTrustedCertificate struct {
+	APIResponseTrustedCertificate struct {
 		ID          string `json:"id,omitempty" fake:"{urn:trustedCertificate}"`
 		Alias       string `json:"alias,omitempty" fake:"mock-trusted-cert-{word}"`
 		Certificate string `json:"certificate,omitempty" fake:"-----BEGIN CERTIFICATE-----mock-----END CERTIFICATE-----"`
 	}
 
-	ApiRequestTrustedCertificate struct {
+	APIRequestTrustedCertificate struct {
 		ID          string `json:"id,omitempty" fake:"{urn:trustedCertificate}"`
 		Alias       string `json:"alias,omitempty" fake:"mock-trusted-cert-{word}"`
 		Certificate string `json:"certificate,omitempty" fake:"-----BEGIN CERTIFICATE-----mock-----END CERTIFICATE-----"`
 	}
 )
 
-func (r *ApiResponseListTrustedCertificate) ToModel() *types.ModelListTrustedCertificate {
+func (r *APIResponseListTrustedCertificate) ToModel() *types.ModelListTrustedCertificate {
 	model := &types.ModelListTrustedCertificate{Certificates: make([]types.ModelGetTrustedCertificate, 0, len(r.Values))}
 	for _, certificate := range r.Values {
 		model.Certificates = append(model.Certificates, certificate.ToModel())
@@ -37,10 +37,10 @@ func (r *ApiResponseListTrustedCertificate) ToModel() *types.ModelListTrustedCer
 	return model
 }
 
-func (r *ApiResponseTrustedCertificate) ToModel() types.ModelGetTrustedCertificate {
+func (r *APIResponseTrustedCertificate) ToModel() types.ModelGetTrustedCertificate {
 	return types.ModelGetTrustedCertificate{ID: r.ID, Name: r.Alias, Certificate: r.Certificate}
 }
 
-func (r *ApiRequestTrustedCertificate) ToModel() types.ModelGetTrustedCertificate {
+func (r *APIRequestTrustedCertificate) ToModel() types.ModelGetTrustedCertificate {
 	return types.ModelGetTrustedCertificate{ID: r.ID, Name: r.Alias, Certificate: r.Certificate}
 }

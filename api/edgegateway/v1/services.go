@@ -48,7 +48,7 @@ func (c *Client) GetServices(ctx context.Context, params types.ParamsEdgeGateway
 		return nil, fmt.Errorf("error retrieving network services for edge gateway %s: %w", params.ID, err)
 	}
 
-	data := resp.Result().(*itypes.ApiResponseNetworkServices).ToModel(params)
+	data := resp.Result().(*itypes.APIResponseNetworkServices).ToModel(params)
 	if data == nil {
 		return nil, fmt.Errorf("no network services found for edge gateway %s", params.ID)
 	}
@@ -82,7 +82,7 @@ func (c *Client) EnableCloudavenueServices(ctx context.Context, params types.Par
 		}
 	}
 
-	requestBody := &itypes.ApiRequestNetworkServicesCavSvc{
+	requestBody := &itypes.APIRequestNetworkServicesCavSvc{
 		NetworkType:   "cav-services",
 		EdgeGatewayID: urn.ExtractUUID(params.ID),
 		Properties: struct {

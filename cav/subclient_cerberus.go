@@ -81,7 +81,7 @@ func (v *cerberus) parseAPIError(operation string, resp *resty.Response) *errors
 	return &errors.APIError{
 		Operation:  operation,
 		StatusCode: resp.StatusCode(),
-		Message:    "Unknown error occurred",
+		Message:    unknownErrorMessage,
 		Duration:   resp.Duration(),
 		Endpoint:   resp.Request.URL,
 		Method:     resp.Request.Method,

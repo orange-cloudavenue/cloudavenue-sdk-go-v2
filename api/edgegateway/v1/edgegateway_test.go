@@ -49,13 +49,13 @@ func TestGetEdgeGateway(t *testing.T) {
 			},
 			expectedErr:             false,
 			mockQueryResponseStatus: 200,
-			mockQueryResponse: &itypes.ApiResponseQueryEdgeGateway{
-				Record: []itypes.ApiResponseQueryEdgeGatewayRecord{{
+			mockQueryResponse: &itypes.APIResponseQueryEdgeGateway{
+				Record: []itypes.APIResponseQueryEdgeGatewayRecord{{
 					ID:   generator.MustGenerate("{urn:edgegateway}"),
 					HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 				}},
 			},
-			mockResponse: &itypes.ApiResponseEdgegateway{
+			mockResponse: &itypes.APIResponseEdgegateway{
 				ID:   generator.MustGenerate("{urn:edgegateway}"),
 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
@@ -102,10 +102,10 @@ func TestGetEdgeGateway(t *testing.T) {
 
 			if tt.mockQueryResponse != nil || tt.mockQueryResponseStatus != 0 {
 				ms.SetResponse(endpoints.QueryEdgeGateway(), tt.mockQueryResponse, &tt.mockQueryResponseStatus)
-				ms.SetResponse(endpoints.ListVdc(), tt.mockQueryResponse, &tt.mockQueryResponseStatus)
+				ms.SetResponse(endpoints.ListVDC(), tt.mockQueryResponse, &tt.mockQueryResponseStatus)
 			}
 
-			if edgeResp, ok := tt.mockResponse.(*itypes.ApiResponseEdgegateway); ok && tt.mockResponseStatus == 200 {
+			if edgeResp, ok := tt.mockResponse.(*itypes.APIResponseEdgegateway); ok && tt.mockResponseStatus == 200 {
 				ms.SetResponse(endpoints.GetEdgeGateway(), edgeResp, &tt.mockResponseStatus)
 			}
 
@@ -142,7 +142,7 @@ func TestRetrieveEdgeGatewayIDByName(t *testing.T) {
 	tests := []struct {
 		name        string
 		edgeName    string
-		queryResp   *itypes.ApiResponseQueryEdgeGateway
+		queryResp   *itypes.APIResponseQueryEdgeGateway
 		queryStatus int
 		expectedID  string
 		expectedErr bool
@@ -150,8 +150,8 @@ func TestRetrieveEdgeGatewayIDByName(t *testing.T) {
 		{
 			name:     "Valid Edge Gateway Name",
 			edgeName: generator.MustGenerate("{resource_name:edgegateway}"),
-			queryResp: &itypes.ApiResponseQueryEdgeGateway{
-				Record: []itypes.ApiResponseQueryEdgeGatewayRecord{
+			queryResp: &itypes.APIResponseQueryEdgeGateway{
+				Record: []itypes.APIResponseQueryEdgeGatewayRecord{
 					{ID: "urn:vcloud:gateway:ed0a243a-374b-4306-ab25-9c3787cbdb4c", HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c"},
 				},
 			},
@@ -166,7 +166,7 @@ func TestRetrieveEdgeGatewayIDByName(t *testing.T) {
 			eC, ms := newClient(t)
 
 			ms.SetResponse(endpoints.QueryEdgeGateway(), tt.queryResp, &tt.queryStatus)
-			ms.SetResponse(endpoints.ListVdc(), tt.queryResp, &tt.queryStatus)
+			ms.SetResponse(endpoints.ListVDC(), tt.queryResp, &tt.queryStatus)
 
 			id, err := eC.retrieveEdgeGatewayIDByName(t.Context(), tt.edgeName)
 			if tt.expectedErr {
@@ -265,7 +265,7 @@ func TestDeleteEdgeGateway(t *testing.T) {
 
 			if tt.mockQueryResponseStatus != 0 {
 				ms.SetResponse(endpoints.QueryEdgeGateway(), nil, &tt.mockQueryResponseStatus)
-				ms.SetResponse(endpoints.ListVdc(), nil, &tt.mockQueryResponseStatus)
+				ms.SetResponse(endpoints.ListVDC(), nil, &tt.mockQueryResponseStatus)
 			}
 
 			err := eC.DeleteEdgeGateway(t.Context(), *tt.params)
@@ -326,18 +326,18 @@ func TestCreateEdgeGateway(t *testing.T) {
 			params: &types.ParamsCreateEdgeGateway{
 				OwnerName: "owner-vdc",
 			},
-			mockListVDCResponse: &itypes.ApiResponseListVDC{Records: []itypes.ApiResponseListVDCRecord{{
+			mockListVDCResponse: &itypes.APIResponseListVDC{Records: []itypes.APIResponseListVDCRecord{{
 				Name: "owner-vdc",
 				HREF: "https://api.example.com/api/vdc/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 				ID:   "urn:vcloud:vdc:ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 			}}},
 			mockListVDCResponseStatus: 200,
-			mockGetEdgeGatewayResponse: &itypes.ApiResponseEdgegateway{
+			mockGetEdgeGatewayResponse: &itypes.APIResponseEdgegateway{
 				ID:   generator.MustGenerate("{urn:edgegateway}"),
 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			mockGetEdgeGatewayResponseStatus: 200,
-			mockQueryResponse: &itypes.ApiResponseQueryEdgeGateway{Record: []itypes.ApiResponseQueryEdgeGatewayRecord{{
+			mockQueryResponse: &itypes.APIResponseQueryEdgeGateway{Record: []itypes.APIResponseQueryEdgeGatewayRecord{{
 				HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 				ID:   generator.MustGenerate("{urn:edgegateway}"),
 			}}},
@@ -356,13 +356,13 @@ func TestCreateEdgeGateway(t *testing.T) {
 					Description: "Edge Gateway created successfully",
 				},
 			},
-			mockListVDCGroupResponse:       &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponse:       &itypes.APIResponseListVDCGroup{},
 			mockListVDCGroupResponseStatus: 200,
-			mockListT0Response: func() itypes.ApiResponseT0s {
-				return itypes.ApiResponseT0s{{
+			mockListT0Response: func() itypes.APIResponseT0s {
+				return itypes.APIResponseT0s{{
 					Type: "tier-0-vrf",
 					Name: "prvrf01eocb0001234allsp01",
-					Properties: itypes.ApiResponseT0Properties{
+					Properties: itypes.APIResponseT0Properties{
 						ClassOfService: "SHARED_STANDARD",
 					},
 				}}
@@ -377,19 +377,19 @@ func TestCreateEdgeGateway(t *testing.T) {
 				OwnerName: "owner-vdcgroup",
 			},
 			mockListVDCResponseStatus: 200,
-			mockListVDCResponse:       &itypes.ApiResponseListVDC{},
-			mockGetEdgeGatewayResponse: &itypes.ApiResponseEdgegateway{
+			mockListVDCResponse:       &itypes.APIResponseListVDC{},
+			mockGetEdgeGatewayResponse: &itypes.APIResponseEdgegateway{
 				ID:   generator.MustGenerate("{urn:edgegateway}"),
 				Name: "tn-edge-created-vdcgroup",
 			},
 			mockGetEdgeGatewayResponseStatus: 200,
-			mockQueryResponse: &itypes.ApiResponseQueryEdgeGateway{Record: []itypes.ApiResponseQueryEdgeGatewayRecord{{
+			mockQueryResponse: &itypes.APIResponseQueryEdgeGateway{Record: []itypes.APIResponseQueryEdgeGatewayRecord{{
 				HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 				Name: "tn-edge-created-vdcgroup",
 				ID:   generator.MustGenerate("{urn:edgegateway}"),
 			}}},
 			mockQueryResponseStatus: 200,
-			mockListVDCGroupResponse: &itypes.ApiResponseListVdcGroup{Values: []itypes.ApiResponseListVdcGroupDetails{{
+			mockListVDCGroupResponse: &itypes.APIResponseListVDCGroup{Values: []itypes.APIResponseListVDCGroupDetails{{
 				Name: "owner-vdcgroup",
 			}}},
 			mockListVDCGroupResponseStatus: 200,
@@ -407,11 +407,11 @@ func TestCreateEdgeGateway(t *testing.T) {
 					Description: "Edge Gateway created successfully",
 				},
 			},
-			mockListT0Response: func() itypes.ApiResponseT0s {
-				return itypes.ApiResponseT0s{{
+			mockListT0Response: func() itypes.APIResponseT0s {
+				return itypes.APIResponseT0s{{
 					Type: "tier-0-vrf",
 					Name: "prvrf01eocb0001234allsp01",
-					Properties: itypes.ApiResponseT0Properties{
+					Properties: itypes.APIResponseT0Properties{
 						ClassOfService: "SHARED_STANDARD",
 					},
 				}}
@@ -426,18 +426,18 @@ func TestCreateEdgeGateway(t *testing.T) {
 				OwnerName: "owner-vdc-bandwidth",
 				Bandwidth: 25,
 			},
-			mockListVDCResponse: &itypes.ApiResponseListVDC{Records: []itypes.ApiResponseListVDCRecord{{
+			mockListVDCResponse: &itypes.APIResponseListVDC{Records: []itypes.APIResponseListVDCRecord{{
 				Name: "owner-vdc-bandwidth",
 				HREF: "https://api.example.com/api/vdc/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 				ID:   "urn:vcloud:vdc:ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 			}}},
 			mockListVDCResponseStatus: 200,
-			mockGetEdgeGatewayResponse: &itypes.ApiResponseEdgegateway{
+			mockGetEdgeGatewayResponse: &itypes.APIResponseEdgegateway{
 				ID:   generator.MustGenerate("{urn:edgegateway}"),
 				Name: "tn-edge-created-bandwidth",
 			},
 			mockGetEdgeGatewayResponseStatus: 200,
-			mockQueryResponse: &itypes.ApiResponseQueryEdgeGateway{Record: []itypes.ApiResponseQueryEdgeGatewayRecord{{
+			mockQueryResponse: &itypes.APIResponseQueryEdgeGateway{Record: []itypes.APIResponseQueryEdgeGatewayRecord{{
 				HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 				Name: "tn-edge-created-bandwidth",
 				ID:   generator.MustGenerate("{urn:edgegateway}"),
@@ -458,13 +458,13 @@ func TestCreateEdgeGateway(t *testing.T) {
 				},
 			},
 			mockJobResponseStatus:          200,
-			mockListVDCGroupResponse:       &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponse:       &itypes.APIResponseListVDCGroup{},
 			mockListVDCGroupResponseStatus: 200,
-			mockListT0Response: func() itypes.ApiResponseT0s {
-				return itypes.ApiResponseT0s{{
+			mockListT0Response: func() itypes.APIResponseT0s {
+				return itypes.APIResponseT0s{{
 					Type: "tier-0-vrf",
 					Name: "prvrf01eocb0001234allsp01",
-					Properties: itypes.ApiResponseT0Properties{
+					Properties: itypes.APIResponseT0Properties{
 						ClassOfService: "SHARED_STANDARD",
 					},
 				}}
@@ -491,14 +491,14 @@ func TestCreateEdgeGateway(t *testing.T) {
 			expectedErr:                    true,
 		},
 		{
-			name: "Failed no Vdc or VdcGroup Found",
+			name: "Failed no Vdc or VDCGroup Found",
 			params: &types.ParamsCreateEdgeGateway{
 				OwnerName: generator.MustGenerate("{word}"),
 				Bandwidth: 25,
 			},
-			mockListVDCGroupResponse:       &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponse:       &itypes.APIResponseListVDCGroup{},
 			mockListVDCGroupResponseStatus: 200,
-			mockListVDCResponse:            &itypes.ApiResponseListVDC{},
+			mockListVDCResponse:            &itypes.APIResponseListVDC{},
 			mockListVDCResponseStatus:      200,
 			expectedErr:                    true,
 		},
@@ -508,8 +508,8 @@ func TestCreateEdgeGateway(t *testing.T) {
 				OwnerName: generator.MustGenerate("{word}"),
 				Bandwidth: 25,
 			},
-			mockListVDCGroupResponse: &itypes.ApiResponseListVdcGroup{
-				Values: []itypes.ApiResponseListVdcGroupDetails{
+			mockListVDCGroupResponse: &itypes.APIResponseListVDCGroup{
+				Values: []itypes.APIResponseListVDCGroupDetails{
 					{
 						Name: generator.MustGenerate("{word}"),
 					},
@@ -519,8 +519,8 @@ func TestCreateEdgeGateway(t *testing.T) {
 				},
 			},
 			mockListVDCGroupResponseStatus: 200,
-			mockListVDCResponse: &itypes.ApiResponseListVDC{
-				Records: []itypes.ApiResponseListVDCRecord{
+			mockListVDCResponse: &itypes.APIResponseListVDC{
+				Records: []itypes.APIResponseListVDCRecord{
 					{
 						Name: generator.MustGenerate("{word}"),
 					},
@@ -549,7 +549,7 @@ func TestCreateEdgeGateway(t *testing.T) {
 				OwnerName: generator.MustGenerate("{word}"),
 				Bandwidth: 25,
 			},
-			mockListT0Response:       &itypes.ApiResponseT0s{},
+			mockListT0Response:       &itypes.APIResponseT0s{},
 			mockListT0ResponseStatus: 200,
 			expectedErr:              true,
 		},
@@ -559,12 +559,12 @@ func TestCreateEdgeGateway(t *testing.T) {
 				OwnerName: generator.MustGenerate("{word}"),
 				Bandwidth: 25,
 			},
-			mockListT0Response: &itypes.ApiResponseT0s{
-				itypes.ApiResponseT0{
+			mockListT0Response: &itypes.APIResponseT0s{
+				itypes.APIResponseT0{
 					Type: "tier-0-vrf",
 					Name: generator.MustGenerate("{resource_name:t0}"),
 				},
-				itypes.ApiResponseT0{
+				itypes.APIResponseT0{
 					Type: "tier-0-vrf",
 					Name: generator.MustGenerate("{resource_name:t0}"),
 				},
@@ -579,27 +579,27 @@ func TestCreateEdgeGateway(t *testing.T) {
 				T0Name:    "prvrf01eocb0001234allsp01",
 				Bandwidth: 25,
 			},
-			mockListVDCResponse: &itypes.ApiResponseListVDC{Records: []itypes.ApiResponseListVDCRecord{{
+			mockListVDCResponse: &itypes.APIResponseListVDC{Records: []itypes.APIResponseListVDCRecord{{
 				Name: "owner-vdc-shared-t0",
 				HREF: "https://api.example.com/api/vdc/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 				ID:   "urn:vcloud:vdc:ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 			}}},
 			mockListVDCResponseStatus: 200,
-			mockGetEdgeGatewayResponse: &itypes.ApiResponseEdgegateway{
+			mockGetEdgeGatewayResponse: &itypes.APIResponseEdgegateway{
 				ID:   generator.MustGenerate("{urn:edgegateway}"),
 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			mockGetEdgeGatewayResponseStatus: 200,
-			mockQueryResponse: &itypes.ApiResponseQueryEdgeGateway{Record: []itypes.ApiResponseQueryEdgeGatewayRecord{{
+			mockQueryResponse: &itypes.APIResponseQueryEdgeGateway{Record: []itypes.APIResponseQueryEdgeGatewayRecord{{
 				HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 				ID:   generator.MustGenerate("{urn:edgegateway}"),
 			}}},
 			mockQueryResponseStatus: 200,
-			mockListT0Response: func() itypes.ApiResponseT0s {
-				return itypes.ApiResponseT0s{{
+			mockListT0Response: func() itypes.APIResponseT0s {
+				return itypes.APIResponseT0s{{
 					Type: "tier-0-vrf",
 					Name: "prvrf01eocb0001234allsp01",
-					Properties: itypes.ApiResponseT0Properties{
+					Properties: itypes.APIResponseT0Properties{
 						ClassOfService: "SHARED_STANDARD",
 					},
 				}}
@@ -619,7 +619,7 @@ func TestCreateEdgeGateway(t *testing.T) {
 				},
 			},
 			mockJobResponseStatus:          200,
-			mockListVDCGroupResponse:       &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponse:       &itypes.APIResponseListVDCGroup{},
 			mockListVDCGroupResponseStatus: 200,
 			mockListT0ResponseStatus:       200,
 			expectedErr:                    false,
@@ -639,7 +639,7 @@ func TestCreateEdgeGateway(t *testing.T) {
 				OwnerName: generator.MustGenerate("{word}"),
 				Bandwidth: 500,
 			},
-			mockListVDCGroupResponse:       &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponse:       &itypes.APIResponseListVDCGroup{},
 			mockListVDCGroupResponseStatus: 200,
 			expectedErr:                    true,
 		},
@@ -649,7 +649,7 @@ func TestCreateEdgeGateway(t *testing.T) {
 				OwnerName: generator.MustGenerate("{word}"),
 				Bandwidth: 25,
 			},
-			mockListVDCGroupResponse:       &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponse:       &itypes.APIResponseListVDCGroup{},
 			mockListVDCGroupResponseStatus: 200,
 			mockJobResponse:                &cav.CerberusJobAPIResponse{},
 			mockJobResponseStatus:          200,
@@ -662,19 +662,19 @@ func TestCreateEdgeGateway(t *testing.T) {
 				Bandwidth: 5,
 			},
 
-			mockListVDCResponse: &itypes.ApiResponseListVDC{Records: []itypes.ApiResponseListVDCRecord{{
+			mockListVDCResponse: &itypes.APIResponseListVDC{Records: []itypes.APIResponseListVDCRecord{{
 				Name: "owner-vdc-get-fail",
 				HREF: "https://api.example.com/api/vdc/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 				ID:   "urn:vcloud:vdc:ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 			}}},
 			mockListVDCResponseStatus:      200,
-			mockListVDCGroupResponse:       &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponse:       &itypes.APIResponseListVDCGroup{},
 			mockListVDCGroupResponseStatus: 200,
-			mockListT0Response: func() itypes.ApiResponseT0s {
-				return itypes.ApiResponseT0s{{
+			mockListT0Response: func() itypes.APIResponseT0s {
+				return itypes.APIResponseT0s{{
 					Type: "tier-0-vrf",
 					Name: "prvrf01eocb0001234allsp01",
-					Properties: itypes.ApiResponseT0Properties{
+					Properties: itypes.APIResponseT0Properties{
 						ClassOfService: "SHARED_STANDARD",
 					},
 				}}
@@ -698,7 +698,7 @@ func TestCreateEdgeGateway(t *testing.T) {
 			mockJobResponseStatus: 200,
 
 			mockGetEdgeGatewayResponseStatus: 404,
-			mockQueryResponse: &itypes.ApiResponseQueryEdgeGateway{Record: []itypes.ApiResponseQueryEdgeGatewayRecord{{
+			mockQueryResponse: &itypes.APIResponseQueryEdgeGateway{Record: []itypes.APIResponseQueryEdgeGatewayRecord{{
 				HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 			}}},
 			mockQueryResponseStatus: 200,
@@ -711,26 +711,26 @@ func TestCreateEdgeGateway(t *testing.T) {
 				T0Name:    "prvrf01eocb0001234allsp01",
 				Bandwidth: 25,
 			},
-			mockListVDCResponse: &itypes.ApiResponseListVDC{Records: []itypes.ApiResponseListVDCRecord{{
+			mockListVDCResponse: &itypes.APIResponseListVDC{Records: []itypes.APIResponseListVDCRecord{{
 				Name: "owner-vdc-bandwidth-update-fail",
 				HREF: "https://api.example.com/api/vdc/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 				ID:   "urn:vcloud:vdc:ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 			}}},
 			mockListVDCResponseStatus: 200,
-			mockGetEdgeGatewayResponse: &itypes.ApiResponseEdgegateway{
+			mockGetEdgeGatewayResponse: &itypes.APIResponseEdgegateway{
 				ID:   generator.MustGenerate("{urn:edgegateway}"),
 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			mockGetEdgeGatewayResponseStatus: 200,
-			mockQueryResponse: &itypes.ApiResponseQueryEdgeGateway{Record: []itypes.ApiResponseQueryEdgeGatewayRecord{{
+			mockQueryResponse: &itypes.APIResponseQueryEdgeGateway{Record: []itypes.APIResponseQueryEdgeGatewayRecord{{
 				HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 			}}},
 			mockQueryResponseStatus: 200,
-			mockListT0Response: func() itypes.ApiResponseT0s {
-				return itypes.ApiResponseT0s{{
+			mockListT0Response: func() itypes.APIResponseT0s {
+				return itypes.APIResponseT0s{{
 					Type: "tier-0-vrf",
 					Name: "prvrf01eocb0001234allsp01",
-					Properties: itypes.ApiResponseT0Properties{
+					Properties: itypes.APIResponseT0Properties{
 						ClassOfService: "SHARED_STANDARD",
 					},
 				}}
@@ -752,7 +752,7 @@ func TestCreateEdgeGateway(t *testing.T) {
 			mockJobResponseStatus:                        200,
 			mockListT0ResponseStatus:                     200,
 			mockUpdateEdgeGatewayBandwidthResponseStatus: http.StatusBadRequest,
-			mockListVDCGroupResponse:                     &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponse:                     &itypes.APIResponseListVDCGroup{},
 			mockListVDCGroupResponseStatus:               200,
 			expectedErr:                                  true,
 		},
@@ -763,21 +763,21 @@ func TestCreateEdgeGateway(t *testing.T) {
 				T0Name:    "prvrf01eocb0001234allsp01",
 				Bandwidth: 25,
 			},
-			mockListT0Response: func() itypes.ApiResponseT0s {
+			mockListT0Response: func() itypes.APIResponseT0s {
 				countOfT0s := 5
-				var t0 itypes.ApiResponseT0
+				var t0 itypes.APIResponseT0
 				t0.Name = "prvrf01eocb0001234allsp01"
 				for range countOfT0s {
-					edge := itypes.ApiResponseT0Children{}
+					edge := itypes.APIResponseT0Children{}
 					_ = generator.Struct(&edge)
 					t0.Children = append(t0.Children, edge)
 				}
-				return itypes.ApiResponseT0s{
+				return itypes.APIResponseT0s{
 					t0,
 				}
 			}(),
 			mockListT0ResponseStatus:       200,
-			mockListVDCGroupResponse:       &itypes.ApiResponseListVdcGroup{},
+			mockListVDCGroupResponse:       &itypes.APIResponseListVDCGroup{},
 			mockListVDCGroupResponseStatus: 200,
 			expectedErr:                    true,
 		},
@@ -788,13 +788,13 @@ func TestCreateEdgeGateway(t *testing.T) {
 			eC, ms := newClient(t)
 
 			if tt.mockListVDCResponseStatus != 0 {
-				ms.CleanResponse(endpoints.ListVdc())
-				ms.SetResponse(endpoints.ListVdc(), tt.mockListVDCResponse, &tt.mockListVDCResponseStatus)
+				ms.CleanResponse(endpoints.ListVDC())
+				ms.SetResponse(endpoints.ListVDC(), tt.mockListVDCResponse, &tt.mockListVDCResponseStatus)
 			}
 
 			if tt.mockListVDCGroupResponseStatus != 0 {
-				ms.CleanResponse(endpoints.ListVdcGroup())
-				ms.SetResponse(endpoints.ListVdcGroup(), tt.mockListVDCGroupResponse, &tt.mockListVDCGroupResponseStatus)
+				ms.CleanResponse(endpoints.ListVDCGroup())
+				ms.SetResponse(endpoints.ListVDCGroup(), tt.mockListVDCGroupResponse, &tt.mockListVDCGroupResponseStatus)
 			}
 
 			if tt.mockListT0ResponseStatus != 0 {
@@ -853,8 +853,8 @@ func TestCreateEdgeGateway(t *testing.T) {
 
 				ms.CleanResponse(endpoints.QueryEdgeGateway())
 				ms.SetResponseFunc(endpoints.QueryEdgeGateway(), handler)
-				ms.CleanResponse(endpoints.ListVdc())
-				ms.SetResponseFunc(endpoints.ListVdc(), handler)
+				ms.CleanResponse(endpoints.ListVDC())
+				ms.SetResponseFunc(endpoints.ListVDC(), handler)
 			}
 
 			if tt.mockUpdateEdgeGatewayBandwidthResponseStatus != 0 {
@@ -978,8 +978,8 @@ func TestUpdateEdgeGateway(t *testing.T) {
 			if tt.mockQueryResponseStatus != 0 {
 				ms.CleanResponse(endpoints.QueryEdgeGateway())
 				ms.SetResponse(endpoints.QueryEdgeGateway(), nil, &tt.mockQueryResponseStatus)
-				ms.CleanResponse(endpoints.ListVdc())
-				ms.SetResponse(endpoints.ListVdc(), nil, &tt.mockQueryResponseStatus)
+				ms.CleanResponse(endpoints.ListVDC())
+				ms.SetResponse(endpoints.ListVDC(), nil, &tt.mockQueryResponseStatus)
 			}
 
 			_, err := eC.UpdateEdgeGateway(t.Context(), *tt.params)

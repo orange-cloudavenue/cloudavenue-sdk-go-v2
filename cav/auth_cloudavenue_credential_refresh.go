@@ -11,18 +11,27 @@ package cav
 
 import (
 	"context"
-	"errors"
+	stderrors "errors"
+	"fmt"
+	"net/http"
 
 	"resty.dev/v3"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
+)
+
+const (
+	sessionVmwareEndpoint = "SessionVmware"
+	unknownErrorMessage   = "Unknown error occurred"
 )
 
 // Refresh refreshes authentication token and session metadata.
 func (c *cloudavenueCredential) Refresh(ctx context.Context) error {
 	logger := c.logger.WithGroup("refresh")
-	ep, err := GetEndpoint("SessionVmware")
+	ep, err := GetEndpoint(sessionVmwareEndpoint)
 	if err != nil {
 		logger.ErrorContext(ctx, "Failed to get endpoint for CreateSessionVmware", "error", err)
-		return errors.New("failed to get endpoint for CreateSessionVmware: " + err.Error())
+		return stderrors.New("failed to get endpoint for CreateSessionVmware: " + err.Error())
 	}
 
 	resp, err := c.executeRefreshRequest(ctx, ep)
@@ -31,10 +40,31 @@ func (c *cloudavenueCredential) Refresh(ctx context.Context) error {
 		return err
 	}
 
-	if err := (&vmware{}).parseAPIError("SessionVmware", resp); err != nil {
+	if resp.StatusCode() < http.StatusOK || resp.StatusCode() >= http.StatusBadRequest {
+		if err, ok := resp.ResultError().(*vmwareError); ok {
+			c.clearBearer()
+			logger.ErrorContext(ctx, "Failed to refresh session", "error", err)
+			return &errors.APIError{
+				Operation:  sessionVmwareEndpoint,
+				StatusCode: resp.StatusCode(),
+				Message:    err.Message,
+				Duration:   resp.Duration(),
+				Endpoint:   resp.Request.URL,
+				Method:     resp.Request.Method,
+				Err:        classifyStatusCode(resp.StatusCode()),
+			}
+		}
 		c.clearBearer()
-		logger.ErrorContext(ctx, "Failed to refresh session", "error", err)
-		return err
+		logger.ErrorContext(ctx, "Failed to refresh session", "error", fmt.Errorf("unknown error occurred"))
+		return &errors.APIError{
+			Operation:  sessionVmwareEndpoint,
+			StatusCode: resp.StatusCode(),
+			Message:    unknownErrorMessage,
+			Duration:   resp.Duration(),
+			Endpoint:   resp.Request.URL,
+			Method:     resp.Request.Method,
+			Err:        classifyStatusCode(resp.StatusCode()),
+		}
 	}
 
 	logger.DebugContext(
@@ -58,23 +88,20 @@ func (c *cloudavenueCredential) executeRefreshRequest(ctx context.Context, ep *E
 		SetResultError(&vmwareError{}).
 		SetURL(c.console.GetAPIVCDEndpoint())
 
-	if err := c.applyRefreshAuth(request); err != nil {
-		return nil, err
-	}
+	c.applyRefreshAuth(request)
 
 	return request.Execute("POST", ep.PathTemplate)
 }
 
 // applyRefreshAuth applies bearer or basic authentication to request.
-func (c *cloudavenueCredential) applyRefreshAuth(request *resty.Request) error {
+func (c *cloudavenueCredential) applyRefreshAuth(request *resty.Request) {
 	bearer := c.currentBearer()
 	if bearer != "" {
 		request.SetAuthToken(bearer)
-		return nil
+		return
 	}
 
 	request.SetBasicAuth(c.username+"@"+c.organization, c.password)
-	return nil
 }
 
 // currentBearer returns current bearer token.

@@ -13,44 +13,39 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
 
-// ListVdc - List VDCs
+// ListVDC - List VDCs
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/38.1/doc/types/ReferenceType.html
-func ListVdc() *cav.Endpoint {
-	return cav.MustGetEndpoint("ListVdc")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/38.1/doc/types/ReferenceType.html 
+func ListVDC() *cav.Endpoint {
+	return cav.MustGetEndpoint("ListVDC")
 }
-
-// GetVdc - Get VDC
+// GetVDC - Get VDC
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-Vdc.html
-func GetVdc() *cav.Endpoint {
-	return cav.MustGetEndpoint("GetVdc")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-Vdc.html 
+func GetVDC() *cav.Endpoint {
+	return cav.MustGetEndpoint("GetVDC")
 }
-
-// GetVdcMetadata - Get VDC Metadata
+// GetVDCMetadata - Get VDC Metadata
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-VdcMetadata.html
-func GetVdcMetadata() *cav.Endpoint {
-	return cav.MustGetEndpoint("GetVdcMetadata")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-VdcMetadata.html 
+func GetVDCMetadata() *cav.Endpoint {
+	return cav.MustGetEndpoint("GetVDCMetadata")
 }
-
-// CreateVdc - Create a new Org VDC
+// CreateVDC - Create a new Org VDC
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/vDC/createOrgVdc
-func CreateVdc() *cav.Endpoint {
-	return cav.MustGetEndpoint("CreateVdc")
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/vDC/createOrgVdc 
+func CreateVDC() *cav.Endpoint {
+	return cav.MustGetEndpoint("CreateVDC")
 }
-
-// UpdateVdc - Update an existing Org VDC
+// UpdateVDC - Update an existing Org VDC
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/vDC/updateOrgVdc
-func UpdateVdc() *cav.Endpoint {
-	return cav.MustGetEndpoint("UpdateVdc")
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/vDC/updateOrgVdc 
+func UpdateVDC() *cav.Endpoint {
+	return cav.MustGetEndpoint("UpdateVDC")
 }
-
-// DeleteVdc - Delete an existing Org VDC
+// DeleteVDC - Delete an existing Org VDC
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/vDC/deleteOrgVdc
-func DeleteVdc() *cav.Endpoint {
-	return cav.MustGetEndpoint("DeleteVdc")
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/vDC/deleteOrgVdc 
+func DeleteVDC() *cav.Endpoint {
+	return cav.MustGetEndpoint("DeleteVDC")
 }

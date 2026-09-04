@@ -15,7 +15,6 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/validators"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
@@ -36,9 +35,6 @@ const (
 	pathParamVDCID                   = "vdc-id"
 	pathParamVDCName                 = "vdc-name"
 	pathParamVAppID                  = "vapp-id"
-
-	pathCustomersEdgesByID = "/api/customers/v2.0/edges/{edgeId}"
-	pathCustomersVDCByName = "/api/customers/v2.0/vdcs/{vdc-name}"
 
 	pageSize32  = "32"
 	pageSize30  = "30"
@@ -64,33 +60,42 @@ const (
 	descVDCID                    = "The ID of the VDC."
 	descVAppID                   = "The ID of the VApp."
 
-	ruleResourceNameEdgeGateway = "resource_name=edgegateway"
-
 	errFilterFormatSingle   = "filter must be in the format 'key==value'"
 	errFilterFormatMultiple = "filter must be in the format 'key==value' or 'key1==value1;key2==value2'"
 	errFilterKeyNotAllowed  = "filter key '%s' is not allowed"
 
-	urnApplicationPortProfile  = "urn=applicationPortProfile"
-	urnCertificateLibraryItem  = "urn=certificateLibraryItem"
-	urnEdgeGateway             = "urn=edgegateway"
-	urnFirewallGroup           = "urn=firewallGroup"
-	urnNetwork                 = "urn=network"
-	urnVDC                     = "urn=vdc"
-	urnVDCGroup                = "urn=vdcGroup"
-	urnVDCStorageProfile       = "urn=vdcstorageProfile"
-	urnVApp                    = "urn=vapp"
-	ruleRequiredURNEdgeGateway = "required," + urnEdgeGateway
+	urnApplicationPortProfile   = "urn=applicationPortProfile"
+	urnCertificateLibraryItem   = "urn=certificateLibraryItem"
+	urnEdgeGateway              = "urn=edgegateway"
+	urnFirewallGroup            = "urn=firewallGroup"
+	urnNetwork                  = "urn=network"
+	urnVDC                      = "urn=vdc"
+	urnVDCGroup                 = "urn=vdcGroup"
+	urnVDCStorageProfile        = "urn=vdcstorageProfile"
+	urnVApp                     = "urn=vapp"
+	ruleRequiredURNEdgeGateway  = "required," + urnEdgeGateway
+	ruleResourceNameEdgeGateway = "resource_name=edgegateway"
+
+	pathQueryAPI                    = "/api/query"
+	pathApplicationPortProfiles     = "/cloudapi/1.0.0/applicationPortProfiles/{appPortProfileId}"
+	pathParamAppPortProfileID       = "appPortProfileId"
+	pathCertificateLibrary          = "/cloudapi/1.0.0/ssl/certificateLibrary/{id}"
+	pathParamCertLibraryItemID      = "certLibraryItemId"
+	pathCertificateLibraryConsumers = "/cloudapi/1.0.0/ssl/certificateLibrary/{certLibraryItemId}/consumers"
+	pathFirewallGroups              = "/cloudapi/1.0.0/firewallGroups/{firewallGroupId}"
+	pathParamFirewallGroupID        = "firewallGroupId"
+	pathNetworkContextProfiles      = "/cloudapi/1.0.0/networkContextProfiles/{networkContextProfileId}"
+	pathTrustedCertificates         = "/cloudapi/1.0.0/ssl/trustedCertificates/{trustedCertificate}"
+	pathOrgVDCNetworks              = "/cloudapi/1.0.0/orgVdcNetworks/{vdcNetworkId}"
+	pathParamVDCNetworkID           = "vdcNetworkId"
+	pathParamOrgID                  = "orgId"
+	descOrgID                       = "Organization ID"
+	pathParamUserID                 = "userId"
+	descUserID                      = "User ID or name"
+	queryParamVDC                   = "vdc"
 )
 
-var filterKeysNameOrID = []string{"name", "id"}
-
-func requiredPathParam(name, description string) cav.PathParam {
-	return cav.PathParam{
-		Name:        name,
-		Description: description,
-		Required:    true,
-	}
-}
+var filterKeysNameOrID = []string{sortAscName, "id"}
 
 func pageSizeQueryParam(value string) cav.QueryParam {
 	return cav.QueryParam{
@@ -116,28 +121,10 @@ func typeQueryParam(value string) cav.QueryParam {
 	}
 }
 
-func filterQueryParam(description string) cav.QueryParam {
-	return cav.QueryParam{
-		Name:        queryParamFilter,
-		Description: description,
-	}
-}
-
-func requiredURNPathParam(name, description, rule string) cav.PathParam {
-	param := requiredPathParam(name, description)
-	param.ValidatorFunc = validateRule(rule)
-
-	return param
-}
-
 func validateRule(rule string) func(string) error {
 	return func(value string) error {
 		return validators.New().Var(value, rule)
 	}
-}
-
-func extractUUID(value string) (string, error) {
-	return extractor.ExtractUUID(value)
 }
 
 func validateSingleFilterAllowedKeys(value string, allowedKeys []string) error {

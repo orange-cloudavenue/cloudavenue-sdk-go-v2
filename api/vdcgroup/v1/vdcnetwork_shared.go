@@ -24,11 +24,11 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
-func isVdcNetworkURN(idOrName string) bool {
+func isVDCNetworkURN(idOrName string) bool {
 	return urn.IsNetwork(idOrName)
 }
 
-func getVdcNetworkWithRetry(ctx context.Context, c cav.Client, idOrName, vdcGroupID string) (*itypes.ApiResponseVdcNetwork, error) {
+func getVDCNetworkWithRetry(ctx context.Context, c cav.Client, idOrName, vdcGroupID string) (*itypes.APIResponseVDCNetwork, error) {
 	const maxAttempts = 5
 
 	var lastErr error
@@ -37,7 +37,7 @@ func getVdcNetworkWithRetry(ctx context.Context, c cav.Client, idOrName, vdcGrou
 			time.Sleep(2 * time.Second)
 		}
 
-		network, err := getVdcNetwork(ctx, c, idOrName, vdcGroupID)
+		network, err := getVDCNetwork(ctx, c, idOrName, vdcGroupID)
 		if err == nil {
 			return network, nil
 		}
@@ -53,18 +53,18 @@ func getVdcNetworkWithRetry(ctx context.Context, c cav.Client, idOrName, vdcGrou
 	return nil, lastErr
 }
 
-func getVdcNetwork(ctx context.Context, c cav.Client, idOrName, vdcGroupID string) (*itypes.ApiResponseVdcNetwork, error) {
-	if isVdcNetworkURN(idOrName) {
-		ep := endpoints.GetVdcNetwork()
+func getVDCNetwork(ctx context.Context, c cav.Client, idOrName, vdcGroupID string) (*itypes.APIResponseVDCNetwork, error) {
+	if isVDCNetworkURN(idOrName) {
+		ep := endpoints.GetVDCNetwork()
 		resp, err := c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], idOrName))
 		if err != nil {
 			return nil, err
 		}
 
-		return resp.Result().(*itypes.ApiResponseVdcNetwork), nil
+		return resp.Result().(*itypes.APIResponseVDCNetwork), nil
 	}
 
-	ep := endpoints.ListVdcNetwork()
+	ep := endpoints.ListVDCNetwork()
 	resp, err := c.Do(
 		ctx,
 		ep,
@@ -74,9 +74,9 @@ func getVdcNetwork(ctx context.Context, c cav.Client, idOrName, vdcGroupID strin
 		return nil, err
 	}
 
-	list := resp.Result().(*itypes.ApiResponseListVdcNetwork)
+	list := resp.Result().(*itypes.APIResponseListVDCNetwork)
 	if len(list.Values) == 0 {
-		return nil, &errors.APIError{Operation: "GetVdcNetwork", StatusCode: 404, Message: fmt.Sprintf("vdc network %q not found", idOrName)}
+		return nil, &errors.APIError{Operation: "GetVDCNetwork", StatusCode: 404, Message: fmt.Sprintf("vdc network %q not found", idOrName)}
 	}
 	if len(list.Values) > 1 {
 		return nil, errors.Newf("multiple vdc networks found for %q", idOrName)
@@ -85,19 +85,19 @@ func getVdcNetwork(ctx context.Context, c cav.Client, idOrName, vdcGroupID strin
 	return &list.Values[0], nil
 }
 
-func resolveVdcNetworkLookup(ctx context.Context, c cav.Client, idOrName, vdcGroupID, vdcGroupName string) (string, error) {
-	if isVdcNetworkURN(idOrName) {
+func resolveVDCNetworkLookup(ctx context.Context, c cav.Client, idOrName, vdcGroupID, vdcGroupName string) (string, error) {
+	if isVDCNetworkURN(idOrName) {
 		return "", nil
 	}
 
 	if vdcGroupID == "" && vdcGroupName != "" {
-		ep := endpoints.ListVdcGroup()
+		ep := endpoints.ListVDCGroup()
 		resp, err := c.Do(ctx, ep, cav.WithQueryParam(ep.QueryParams[0], "name=="+vdcGroupName))
 		if err != nil {
 			return "", err
 		}
 
-		list := resp.Result().(*itypes.ApiResponseListVdcGroup)
+		list := resp.Result().(*itypes.APIResponseListVDCGroup)
 		if len(list.Values) > 0 {
 			vdcGroupID = list.Values[0].ID
 		}
@@ -110,72 +110,72 @@ func resolveVdcNetworkLookup(ctx context.Context, c cav.Client, idOrName, vdcGro
 	return vdcGroupID, nil
 }
 
-func listVdcNetworkModel(ctx context.Context, c cav.Client, vdcGroupID, vdcGroupName string) (*types.ModelListVdcNetwork, error) {
+func listVDCNetworkModel(ctx context.Context, c cav.Client, vdcGroupID, vdcGroupName string) (*types.ModelListVDCNetwork, error) {
 	if vdcGroupID == "" {
-		ep := endpoints.ListVdcGroup()
+		ep := endpoints.ListVDCGroup()
 		resp, err := c.Do(ctx, ep, cav.WithQueryParam(ep.QueryParams[0], "name=="+vdcGroupName))
 		if err != nil {
 			return nil, err
 		}
 
-		list := resp.Result().(*itypes.ApiResponseListVdcGroup)
+		list := resp.Result().(*itypes.APIResponseListVDCGroup)
 		if len(list.Values) > 0 {
 			vdcGroupID = list.Values[0].ID
 		}
 	}
 
-	ep := endpoints.ListVdcNetwork()
+	ep := endpoints.ListVDCNetwork()
 	resp, err := c.Do(ctx, ep, cav.WithQueryParam(ep.QueryParams[0], fmt.Sprintf("ownerRef.id==%s", vdcGroupID)))
 	if err != nil {
 		return nil, err
 	}
 
-	return resp.Result().(*itypes.ApiResponseListVdcNetwork).ToModel(), nil
+	return resp.Result().(*itypes.APIResponseListVDCNetwork).ToModel(), nil
 }
 
-func getVdcNetworkModel(ctx context.Context, c cav.Client, id, name, vdcGroupID, vdcGroupName, expectedType string) (*types.ModelGetVdcNetwork, error) {
+func getVDCNetworkModel(ctx context.Context, c cav.Client, id, name, vdcGroupID, vdcGroupName, expectedType string) (*types.ModelGetVDCNetwork, error) {
 	idOrName := id
 	if idOrName == "" {
 		idOrName = name
 	}
 
-	resolvedVdcGroupID, err := resolveVdcNetworkLookup(ctx, c, idOrName, vdcGroupID, vdcGroupName)
+	resolvedVDCGroupID, err := resolveVDCNetworkLookup(ctx, c, idOrName, vdcGroupID, vdcGroupName)
 	if err != nil {
 		return nil, err
 	}
 
-	network, err := getVdcNetworkWithRetry(ctx, c, idOrName, resolvedVdcGroupID)
+	network, err := getVDCNetworkWithRetry(ctx, c, idOrName, resolvedVDCGroupID)
 	if err != nil {
 		return nil, err
 	}
 
 	if network.NetworkType != expectedType {
-		return nil, errors.Newf("org vdc network %q is not a %s network", idOrName, map[string]string{types.VdcNetworkTypeIsolated: "isolated", types.VdcNetworkTypeRouted: "routed"}[expectedType])
+		return nil, errors.Newf("org vdc network %q is not a %s network", idOrName, map[string]string{types.VDCNetworkTypeIsolated: "isolated", types.VDCNetworkTypeRouted: "routed"}[expectedType])
 	}
 
 	model := network.ToModel()
 	return &model, nil
 }
 
-func createVdcNetworkIPRanges(ipRanges []types.ParamsVdcNetworkIPRange) []itypes.ApiVdcNetworkIPRangeValue {
-	out := make([]itypes.ApiVdcNetworkIPRangeValue, 0, len(ipRanges))
+func createVDCNetworkIPRanges(ipRanges []types.ParamsVDCNetworkIPRange) []itypes.APIVDCNetworkIPRangeValue {
+	out := make([]itypes.APIVDCNetworkIPRangeValue, 0, len(ipRanges))
 	for _, ipRange := range ipRanges {
-		out = append(out, itypes.ApiVdcNetworkIPRangeValue{StartAddress: ipRange.StartAddress, EndAddress: ipRange.EndAddress})
+		out = append(out, itypes.APIVDCNetworkIPRangeValue{StartAddress: ipRange.StartAddress, EndAddress: ipRange.EndAddress})
 	}
 
 	return out
 }
 
-func deleteVdcNetworkTarget(ctx context.Context, c cav.Client, id, name, vdcGroupID, vdcGroupName string) (*itypes.ApiResponseVdcNetwork, error) {
+func deleteVDCNetworkTarget(ctx context.Context, c cav.Client, id, name, vdcGroupID, vdcGroupName string) (*itypes.APIResponseVDCNetwork, error) {
 	idOrName := id
 	if idOrName == "" {
 		idOrName = name
 	}
 
-	resolvedVdcGroupID, err := resolveVdcNetworkLookup(ctx, c, idOrName, vdcGroupID, vdcGroupName)
-	if err != nil && !isVdcNetworkURN(idOrName) {
+	resolvedVDCGroupID, err := resolveVDCNetworkLookup(ctx, c, idOrName, vdcGroupID, vdcGroupName)
+	if err != nil && !isVDCNetworkURN(idOrName) {
 		return nil, err
 	}
 
-	return getVdcNetworkWithRetry(ctx, c, idOrName, resolvedVdcGroupID)
+	return getVDCNetworkWithRetry(ctx, c, idOrName, resolvedVDCGroupID)
 }

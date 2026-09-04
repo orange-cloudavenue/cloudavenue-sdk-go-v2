@@ -16,21 +16,21 @@ import (
 )
 
 type (
-	// * ApiResponse
-	ApiResponseT0s []ApiResponseT0
+	// * APIResponse
+	APIResponseT0s []APIResponseT0
 
-	ApiResponseT0 struct {
+	APIResponseT0 struct {
 		Type       string                  `json:"type" fake:"tier-0-vrf"`
 		Name       string                  `json:"name" fake:"{resource_name:t0}"`
-		Properties ApiResponseT0Properties `json:"properties"`
-		Children   []ApiResponseT0Children `json:"children,omitempty" fakesize:"1"`
+		Properties APIResponseT0Properties `json:"properties"`
+		Children   []APIResponseT0Children `json:"children,omitempty" fakesize:"1"`
 	}
 
-	ApiResponseT0Properties struct {
+	APIResponseT0Properties struct {
 		ClassOfService string `json:"classOfService,omitempty" fake:"SHARED_STANDARD"`
 	}
 
-	ApiResponseT0Children struct {
+	APIResponseT0Children struct {
 		Type       string `json:"type" fake:"edge-gateway"`
 		Name       string `json:"name" fake:"{resource_name:edgegateway}"`
 		Properties struct {
@@ -40,7 +40,7 @@ type (
 	}
 )
 
-func (t0s ApiResponseT0s) ToModel() *types.ModelT0s {
+func (t0s APIResponseT0s) ToModel() *types.ModelT0s {
 	var modelT0s types.ModelT0s
 	for _, t0 := range t0s {
 		modelT0 := types.ModelT0{

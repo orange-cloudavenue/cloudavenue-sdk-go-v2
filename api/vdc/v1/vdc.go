@@ -31,7 +31,7 @@ const (
 
 // ListVDC lists VDCs visible to current organization.
 func (c *Client) ListVDC(ctx context.Context, params types.ParamsListVDC) (*types.ModelListVDC, error) {
-	ep := endpoints.ListVdc()
+	ep := endpoints.ListVDC()
 
 	query := ""
 	if params.Name != "" {
@@ -50,7 +50,7 @@ func (c *Client) ListVDC(ctx context.Context, params types.ParamsListVDC) (*type
 		return nil, fmt.Errorf("%s: list: %w", opListVDC, err)
 	}
 
-	return resp.Result().(*itypes.ApiResponseListVDC).ToModel(), nil
+	return resp.Result().(*itypes.APIResponseListVDC).ToModel(), nil
 }
 
 // GetVDC returns detailed information for a VDC by ID or name.
@@ -66,14 +66,14 @@ func (c *Client) GetVDC(ctx context.Context, params types.ParamsGetVDC) (*types.
 	vdc := results.VDCS[0]
 
 	var (
-		vdcMetadata *itypes.ApiResponseGetVDCMetadatas
+		vdcMetadata *itypes.APIResponseGetVDCMetadatas
 		model       types.ModelGetVDC
 	)
 
 	eg, egCtx := errgroup.WithContext(ctx)
 
 	eg.Go(func() error {
-		epGetVDCMetadata := endpoints.GetVdcMetadata()
+		epGetVDCMetadata := endpoints.GetVDCMetadata()
 		vdcMetadataResp, err := c.c.Do(
 			egCtx,
 			epGetVDCMetadata,
@@ -83,12 +83,12 @@ func (c *Client) GetVDC(ctx context.Context, params types.ParamsGetVDC) (*types.
 			return fmt.Errorf("get metadata: %w", err)
 		}
 
-		vdcMetadata = vdcMetadataResp.Result().(*itypes.ApiResponseGetVDCMetadatas)
+		vdcMetadata = vdcMetadataResp.Result().(*itypes.APIResponseGetVDCMetadatas)
 		return nil
 	})
 
 	eg.Go(func() error {
-		epGetVDC := endpoints.GetVdc()
+		epGetVDC := endpoints.GetVDC()
 		vdcResp, err := c.c.Do(
 			egCtx,
 			epGetVDC,
@@ -98,7 +98,7 @@ func (c *Client) GetVDC(ctx context.Context, params types.ParamsGetVDC) (*types.
 			return fmt.Errorf("get details: %w", err)
 		}
 
-		vdcDetails := vdcResp.Result().(*itypes.ApiResponseGetVDC)
+		vdcDetails := vdcResp.Result().(*itypes.APIResponseGetVDC)
 		model = vdcDetails.ToModel()
 		model.NumberOfDisks = vdc.NumberOfDisks
 		model.NumberOfStorageProfiles = vdc.NumberOfStorageProfiles
@@ -135,8 +135,8 @@ func (c *Client) CreateVDC(ctx context.Context, params types.ParamsCreateVDC) (*
 		return nil, fmt.Errorf("%s: validate: %w", opCreateVDC, err)
 	}
 
-	reqBody := itypes.ApiRequestCreateVDC{
-		VDC: itypes.ApiRequestCreateVDCVDC{
+	reqBody := itypes.APIRequestCreateVDC{
+		VDC: itypes.APIRequestCreateVDCVDC{
 			Name:                params.Name,
 			Description:         params.Description,
 			ServiceClass:        params.ServiceClass,
@@ -146,19 +146,19 @@ func (c *Client) CreateVDC(ctx context.Context, params types.ParamsCreateVDC) (*
 			VCPUInMhz:           serviceClassToCPUInMhz(params.ServiceClass),
 			CPUAllocated:        serviceClassToCPUInMhz(params.ServiceClass) * params.Vcpu,
 			MemoryAllocated:     params.Memory,
-			StorageProfiles:     make([]itypes.ApiRequestVDCStorageProfile, len(params.StorageProfiles)),
+			StorageProfiles:     make([]itypes.APIRequestVDCStorageProfile, len(params.StorageProfiles)),
 		},
 	}
 
 	for i, sp := range params.StorageProfiles {
-		reqBody.VDC.StorageProfiles[i] = itypes.ApiRequestVDCStorageProfile{
+		reqBody.VDC.StorageProfiles[i] = itypes.APIRequestVDCStorageProfile{
 			Class:   sp.Class,
 			Limit:   sp.Limit,
 			Default: sp.Default,
 		}
 	}
 
-	ep := endpoints.CreateVdc()
+	ep := endpoints.CreateVDC()
 	if _, err := c.c.Do(ctx, ep, cav.SetBody(reqBody)); err != nil {
 		return nil, fmt.Errorf("%s: create: %w", opCreateVDC, err)
 	}
@@ -177,9 +177,9 @@ func (c *Client) UpdateVDC(ctx context.Context, params types.ParamsUpdateVDC) (*
 		return nil, fmt.Errorf("%s: validate: %w", opUpdateVDC, err)
 	}
 
-	ep := endpoints.UpdateVdc()
-	apiR := itypes.ApiRequestUpdateVDC{
-		VDC: itypes.ApiRequestUpdateVDCVDC{Name: params.Name},
+	ep := endpoints.UpdateVDC()
+	apiR := itypes.APIRequestUpdateVDC{
+		VDC: itypes.APIRequestUpdateVDCVDC{Name: params.Name},
 	}
 
 	if params.Vcpu != nil || params.Name == "" {
@@ -228,7 +228,7 @@ func (c *Client) DeleteVDC(ctx context.Context, params types.ParamsDeleteVDC) er
 		name = vdc.Name
 	}
 
-	ep := endpoints.DeleteVdc()
+	ep := endpoints.DeleteVDC()
 	if _, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], name)); err != nil {
 		return fmt.Errorf("%s: delete: %w", opDeleteVDC, err)
 	}
