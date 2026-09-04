@@ -9,11 +9,9 @@
 
 package cav
 
-import (
-	"fmt"
-	"strings"
-)
+import "fmt"
 
+// String returns human-readable endpoint identifier.
 func (e Endpoint) String() string {
 	return fmt.Sprintf("[%s] %s %s",
 		e.Name,
@@ -21,22 +19,17 @@ func (e Endpoint) String() string {
 		e.PathTemplate)
 }
 
-// String returns a string representation of the Endpoint.
+// String returns API as string.
 func (e API) String() string {
 	return string(e)
 }
 
-// String returns a string representation of the version.
+// String returns version as string.
 func (e Version) String() string {
 	return string(e)
 }
 
-// String returns a string representation of the Method.
+// String returns method as string.
 func (e Method) String() string {
 	return string(e)
-}
-
-// MockPath returns the mock path for the endpoint.
-func (e Endpoint) MockPath() string {
-	return fmt.Sprintf("/mock/%s%s", strings.ToLower(e.Name), e.PathTemplate)
 }

@@ -18,16 +18,12 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
-var subClients = map[subClientName]subClientInterface{
-	ClientVmware:   newVmwareClient(),
-	ClientCerberus: newCerberusClient(),
-}
-
 type subClientName string
 
 const (
 	ClientVmware    subClientName = "vmware"
 	ClientCerberus  subClientName = "cerberus"
+	ClientOSE       subClientName = "ose"
 	ClientNetbackup subClientName = "netbackup"
 )
 
@@ -45,23 +41,33 @@ type subClientInterface interface {
 	parseAPIError(operation string, resp *resty.Response) *errors.APIError
 	idempotentRetryCondition() resty.RetryConditionFunc
 
-	// getID returns the unique identifier for the subclient
+	ContextData(ctx context.Context) ContextData
+
+	// getID returns stable cache identifier for subclient.
 	getID() string
 
 	close() error
 }
 
-// getCredential retrieves the current authentication credentials.
+var subClients = map[subClientName]subClientInterface{
+	ClientVmware:    newVmwareClient(),
+	ClientCerberus:  newCerberusClient(),
+	ClientOSE:       newOSEClient(),
+	ClientNetbackup: newNetbackupClient(),
+}
+
 func (s *subclient) getCredential() auth {
 	return s.credential
 }
 
-// setCredential sets the authentication credential for the subclient.
 func (s *subclient) setCredential(a auth) {
 	s.credential = a
 }
 
-// setConsole sets the console name for the subclient.
 func (s *subclient) setConsole(console consoles.ConsoleName) {
 	s.console = console
+}
+
+func (s *subclient) close() error {
+	return nil
 }

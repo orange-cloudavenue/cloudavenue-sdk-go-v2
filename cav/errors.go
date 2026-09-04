@@ -9,12 +9,13 @@
 
 package cav
 
-type (
-	// requestOption stores request-scoped configuration.
-	requestOption struct{}
+import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 
-	// RequestOption configures request construction.
-	//
-	// It is kept for API compatibility and is currently unused by the runtime.
-	RequestOption func(*requestOption) error
-)
+func classifyStatusCode(statusCode int) error {
+	switch statusCode {
+	case 404:
+		return errors.ErrNotFound
+	default:
+		return nil
+	}
+}

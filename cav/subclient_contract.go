@@ -9,12 +9,10 @@
 
 package cav
 
-type (
-	// requestOption stores request-scoped configuration.
-	requestOption struct{}
+import "context"
 
-	// RequestOption configures request construction.
-	//
-	// It is kept for API compatibility and is currently unused by the runtime.
-	RequestOption func(*requestOption) error
-)
+// SubClient exposes backend-specific context data needed by request construction.
+type SubClient interface {
+	// ContextData returns backend metadata needed to build requests.
+	ContextData(ctx context.Context) ContextData
+}
