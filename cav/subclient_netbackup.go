@@ -292,10 +292,10 @@ type netbackupError struct {
 }
 
 type netbackupTokenResponse struct {
-	AccessToken  string `json:"access_token"`
-	TokenType    string `json:"token_type"`
-	ExpiresIn    int    `json:"expires_in"`
-	RefreshToken string `json:"refresh_token"`
+	AccessToken  string `json:"access_token"`  //nolint:tagliatelle
+	TokenType    string `json:"token_type"`    //nolint:tagliatelle
+	ExpiresIn    int    `json:"expires_in"`    //nolint:tagliatelle
+	RefreshToken string `json:"refresh_token"` //nolint:tagliatelle
 }
 
 // WithNetbackupCredential configures NetBackup credentials from environment variables.
