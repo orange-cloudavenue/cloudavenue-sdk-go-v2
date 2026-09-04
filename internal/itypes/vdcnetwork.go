@@ -13,86 +13,86 @@ import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 
 type (
 	// * List
-	ApiResponseListVdcNetwork struct {
-		Values []ApiResponseVdcNetwork `json:"values" fakesize:"3"`
+	APIResponseListVDCNetwork struct {
+		Values []APIResponseVDCNetwork `json:"values" fakesize:"3"`
 	}
 
 	// * Get / Create / Update / shared model
-	ApiResponseVdcNetwork struct {
+	APIResponseVDCNetwork struct {
 		ID                      string                   `json:"id,omitempty" fake:"{urn:network}"`
 		Name                    string                   `json:"name" fake:"mockvdcnetwork-{word}"`
 		Description             string                   `json:"description,omitempty" fake:"{sentence}"`
 		Status                  string                   `json:"status,omitempty"`
-		OwnerRef                *ApiObjectReference      `json:"ownerRef,omitempty"`
+		OwnerRef                *APIObjectReference      `json:"ownerRef,omitempty"`
 		NetworkType             string                   `json:"networkType"`
-		Connection              *ApiVdcNetworkConnection `json:"connection,omitempty"`
-		GuestVlanTaggingAllowed *bool                    `json:"guestVlanTaggingAllowed"`
-		Subnets                 ApiVdcNetworkSubnets     `json:"subnets"`
+		Connection              *APIVDCNetworkConnection `json:"connection,omitempty"`
+		GuestVLANTaggingAllowed *bool                    `json:"guestVLANTaggingAllowed"`
+		Subnets                 APIVDCNetworkSubnets     `json:"subnets"`
 		Shared                  *bool                    `json:"shared,omitempty"`
 	}
 
-	ApiVdcNetworkConnection struct {
-		RouterRef           ApiObjectReference `json:"routerRef"`
+	APIVDCNetworkConnection struct {
+		RouterRef           APIObjectReference `json:"routerRef"`
 		ConnectionTypeValue string             `json:"connectionTypeValue,omitempty"`
 	}
 
-	ApiVdcNetworkSubnets struct {
-		Values []ApiVdcNetworkSubnetValue `json:"values"`
+	APIVDCNetworkSubnets struct {
+		Values []APIVDCNetworkSubnetValue `json:"values"`
 	}
 
-	ApiVdcNetworkSubnetValue struct {
+	APIVDCNetworkSubnetValue struct {
 		Gateway      string                `json:"gateway"`
 		PrefixLength int                   `json:"prefixLength"`
 		DNSServer1   string                `json:"dnsServer1,omitempty"`
 		DNSServer2   string                `json:"dnsServer2,omitempty"`
 		DNSSuffix    string                `json:"dnsSuffix,omitempty"`
-		IPRanges     ApiVdcNetworkIPRanges `json:"ipRanges"`
+		IPRanges     APIVDCNetworkIPRanges `json:"ipRanges"`
 	}
 
-	ApiVdcNetworkIPRanges struct {
-		Values []ApiVdcNetworkIPRangeValue `json:"values"`
+	APIVDCNetworkIPRanges struct {
+		Values []APIVDCNetworkIPRangeValue `json:"values"`
 	}
 
-	ApiVdcNetworkIPRangeValue struct {
+	APIVDCNetworkIPRangeValue struct {
 		StartAddress string `json:"startAddress"`
 		EndAddress   string `json:"endAddress"`
 	}
 
-	// * Create / Update request (same shape as ApiResponseVdcNetwork)
-	ApiRequestVdcNetwork struct {
+	// * Create / Update request (same shape as APIResponseVDCNetwork)
+	APIRequestVDCNetwork struct {
 		ID                      string                   `json:"id,omitempty" fake:"{urn:network}"`
 		Name                    string                   `json:"name" fake:"mockvdcnetwork-{word}"`
 		Description             string                   `json:"description,omitempty" fake:"{sentence}"`
 		Status                  string                   `json:"status,omitempty"`
-		OwnerRef                *ApiObjectReference      `json:"ownerRef,omitempty"`
+		OwnerRef                *APIObjectReference      `json:"ownerRef,omitempty"`
 		NetworkType             string                   `json:"networkType"`
-		Connection              *ApiVdcNetworkConnection `json:"connection,omitempty"`
-		GuestVlanTaggingAllowed *bool                    `json:"guestVlanTaggingAllowed"`
-		Subnets                 ApiVdcNetworkSubnets     `json:"subnets"`
+		Connection              *APIVDCNetworkConnection `json:"connection,omitempty"`
+		GuestVLANTaggingAllowed *bool                    `json:"guestVLANTaggingAllowed"`
+		Subnets                 APIVDCNetworkSubnets     `json:"subnets"`
 		Shared                  *bool                    `json:"shared,omitempty"`
 	}
 )
 
-func (r *ApiResponseListVdcNetwork) ToModel() *types.ModelListVdcNetwork {
-	model := &types.ModelListVdcNetwork{
-		VdcNetworks: make([]types.ModelGetVdcNetwork, 0),
+func (r *APIResponseListVDCNetwork) ToModel() *types.ModelListVDCNetwork {
+	model := &types.ModelListVDCNetwork{
+		VDCNetworks: make([]types.ModelGetVDCNetwork, 0),
 	}
 
 	for _, network := range r.Values {
-		model.VdcNetworks = append(model.VdcNetworks, network.ToModel())
+		model.VDCNetworks = append(model.VDCNetworks, network.ToModel())
 	}
 
 	return model
 }
 
-func (r *ApiResponseVdcNetwork) ToModel() types.ModelGetVdcNetwork {
-	m := types.ModelGetVdcNetwork{
+func (r *APIResponseVDCNetwork) ToModel() types.ModelGetVDCNetwork {
+	m := types.ModelGetVDCNetwork{
 		ID:                      r.ID,
 		Name:                    r.Name,
 		Description:             r.Description,
 		Status:                  r.Status,
 		NetworkType:             r.NetworkType,
-		GuestVlanTaggingAllowed: r.GuestVlanTaggingAllowed,
+		GuestVLANTaggingAllowed: r.GuestVLANTaggingAllowed,
 		Shared:                  r.Shared,
 	}
 
@@ -103,7 +103,7 @@ func (r *ApiResponseVdcNetwork) ToModel() types.ModelGetVdcNetwork {
 
 	if len(r.Subnets.Values) > 0 {
 		subnet := r.Subnets.Values[0]
-		m.Subnet = types.ModelVdcNetworkSubnet{
+		m.Subnet = types.ModelVDCNetworkSubnet{
 			Gateway:      subnet.Gateway,
 			PrefixLength: subnet.PrefixLength,
 			DNSServer1:   subnet.DNSServer1,
@@ -111,7 +111,7 @@ func (r *ApiResponseVdcNetwork) ToModel() types.ModelGetVdcNetwork {
 			DNSSuffix:    subnet.DNSSuffix,
 		}
 		for _, ipRange := range subnet.IPRanges.Values {
-			m.Subnet.IPRanges = append(m.Subnet.IPRanges, types.ModelVdcNetworkIPRange{
+			m.Subnet.IPRanges = append(m.Subnet.IPRanges, types.ModelVDCNetworkIPRange{
 				StartAddress: ipRange.StartAddress,
 				EndAddress:   ipRange.EndAddress,
 			})
@@ -126,8 +126,8 @@ func (r *ApiResponseVdcNetwork) ToModel() types.ModelGetVdcNetwork {
 	return m
 }
 
-func (r *ApiRequestVdcNetwork) ToModel() types.ModelGetVdcNetwork {
-	resp := ApiResponseVdcNetwork{
+func (r *APIRequestVDCNetwork) ToModel() types.ModelGetVDCNetwork {
+	resp := APIResponseVDCNetwork{
 		ID:                      r.ID,
 		Name:                    r.Name,
 		Description:             r.Description,
@@ -135,7 +135,7 @@ func (r *ApiRequestVdcNetwork) ToModel() types.ModelGetVdcNetwork {
 		OwnerRef:                r.OwnerRef,
 		NetworkType:             r.NetworkType,
 		Connection:              r.Connection,
-		GuestVlanTaggingAllowed: r.GuestVlanTaggingAllowed,
+		GuestVLANTaggingAllowed: r.GuestVLANTaggingAllowed,
 		Subnets:                 r.Subnets,
 		Shared:                  r.Shared,
 	}

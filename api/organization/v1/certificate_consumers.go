@@ -32,7 +32,7 @@ func (c *Client) ListCertificateConsumers(ctx context.Context, params types.Para
 		return nil, fmt.Errorf("%s: list: %w", opListCertificateConsumers, err)
 	}
 
-	return resp.Result().(*itypes.ApiEntityReferences).ToModel(), nil
+	return resp.Result().(*itypes.APIEntityReferences).ToModel(), nil
 }
 
 // AddCertificateConsumer adds consumer reference to certificate library item.
@@ -45,14 +45,14 @@ func (c *Client) AddCertificateConsumer(ctx context.Context, params types.Params
 		return nil, fmt.Errorf("%s: consumer id or name is required", opAddCertificateConsumer)
 	}
 
-	body := itypes.ApiEntityReference{ID: params.ConsumerID, Name: params.ConsumerName}
+	body := itypes.APIEntityReference{ID: params.ConsumerID, Name: params.ConsumerName}
 	ep := endpoints.AddCertificateConsumer()
 	resp, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], certificate.ID), cav.SetBody(body))
 	if err != nil {
 		return nil, fmt.Errorf("%s: add: %w", opAddCertificateConsumer, err)
 	}
 
-	entity, ok := resp.Result().(*itypes.ApiEntityReference)
+	entity, ok := resp.Result().(*itypes.APIEntityReference)
 	if !ok || entity == nil {
 		return nil, fmt.Errorf("%s: unexpected add response type %T", opAddCertificateConsumer, resp.Result())
 	}
@@ -68,9 +68,9 @@ func (c *Client) SetCertificateConsumers(ctx context.Context, params types.Param
 		return nil, fmt.Errorf("%s: resolve certificate: %w", opSetCertificateConsumers, err)
 	}
 
-	body := itypes.ApiEntityReferences{Values: make([]itypes.ApiEntityReference, 0, len(params.Consumers))}
+	body := itypes.APIEntityReferences{Values: make([]itypes.APIEntityReference, 0, len(params.Consumers))}
 	for _, consumer := range params.Consumers {
-		body.Values = append(body.Values, itypes.ApiEntityReference{ID: consumer.ID, Name: consumer.Name})
+		body.Values = append(body.Values, itypes.APIEntityReference{ID: consumer.ID, Name: consumer.Name})
 	}
 
 	ep := endpoints.SetCertificateConsumers()
@@ -79,7 +79,7 @@ func (c *Client) SetCertificateConsumers(ctx context.Context, params types.Param
 		return nil, fmt.Errorf("%s: set: %w", opSetCertificateConsumers, err)
 	}
 
-	refs, ok := resp.Result().(*itypes.ApiEntityReferences)
+	refs, ok := resp.Result().(*itypes.APIEntityReferences)
 	if !ok || refs == nil {
 		return nil, fmt.Errorf("%s: unexpected set response type %T", opSetCertificateConsumers, resp.Result())
 	}

@@ -32,13 +32,13 @@ const (
 
 // ListDynamicSecurityGroup lists NSX-T dynamic security groups owned by VDC group.
 func (c *Client) ListDynamicSecurityGroup(ctx context.Context, params types.ParamsListDynamicSecurityGroup) (*types.ModelListFirewallGroup, error) {
-	model, err := inetworkobjects.ListFirewallGroupsByType(ctx, c.c, params.VdcGroupID, params.VdcGroupName, itypes.FirewallGroupTypeVMCriteria, func(ctx context.Context, id, name string) (inetworkobjects.VdcGroupRef, error) {
-		vdcGroup, err := c.GetVdcGroup(ctx, types.ParamsGetVdcGroup{ID: id, Name: name})
+	model, err := inetworkobjects.ListFirewallGroupsByType(ctx, c.c, params.VDCGroupID, params.VDCGroupName, itypes.FirewallGroupTypeVMCriteria, func(ctx context.Context, id, name string) (inetworkobjects.VDCGroupRef, error) {
+		vdcGroup, err := c.GetVDCGroup(ctx, types.ParamsGetVDCGroup{ID: id, Name: name})
 		if err != nil {
-			return inetworkobjects.VdcGroupRef{}, err
+			return inetworkobjects.VDCGroupRef{}, err
 		}
 
-		return inetworkobjects.VdcGroupRef{ID: vdcGroup.ID, Name: vdcGroup.Name}, nil
+		return inetworkobjects.VDCGroupRef{ID: vdcGroup.ID, Name: vdcGroup.Name}, nil
 	})
 	if err != nil {
 		return nil, fmt.Errorf("%s: list: %w", opListDynamicSecurityGroup, err)
@@ -49,7 +49,7 @@ func (c *Client) ListDynamicSecurityGroup(ctx context.Context, params types.Para
 
 // GetDynamicSecurityGroup gets NSX-T dynamic security group by ID or name within VDC group.
 func (c *Client) GetDynamicSecurityGroup(ctx context.Context, params types.ParamsGetDynamicSecurityGroup) (*types.ModelGetFirewallGroup, error) {
-	model, err := inetworkobjects.GetFirewallGroupModel(ctx, params.ID, params.Name, itypes.FirewallGroupTypeVMCriteria, func(ctx context.Context, idOrName, typeValue string) (*itypes.ApiResponseFirewallGroup, error) {
+	model, err := inetworkobjects.GetFirewallGroupModel(ctx, params.ID, params.Name, itypes.FirewallGroupTypeVMCriteria, func(ctx context.Context, idOrName, typeValue string) (*itypes.APIResponseFirewallGroup, error) {
 		return getFirewallGroupWithRetry(ctx, c.c, idOrName, typeValue)
 	})
 	if err != nil {
@@ -72,7 +72,7 @@ func (c *Client) CreateDynamicSecurityGroup(ctx context.Context, params types.Pa
 		return nil, fmt.Errorf("%s: %w", opCreateDynamicSecurityGroup, err)
 	}
 
-	created, ok := resp.Result().(*itypes.ApiResponseFirewallGroup)
+	created, ok := resp.Result().(*itypes.APIResponseFirewallGroup)
 	if !ok || created == nil {
 		return nil, fmt.Errorf("%s: unexpected create response type %T", opCreateDynamicSecurityGroup, resp.Result())
 	}
@@ -98,7 +98,7 @@ func (c *Client) UpdateDynamicSecurityGroup(ctx context.Context, params types.Pa
 		idOrName = params.Name
 	}
 
-	current, err := inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, itypes.FirewallGroupTypeVMCriteria, func(ctx context.Context, idOrName, typeValue string) (*itypes.ApiResponseFirewallGroup, error) {
+	current, err := inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, itypes.FirewallGroupTypeVMCriteria, func(ctx context.Context, idOrName, typeValue string) (*itypes.APIResponseFirewallGroup, error) {
 		return getFirewallGroupWithRetry(ctx, c.c, idOrName, typeValue)
 	})
 	if err != nil {
@@ -112,10 +112,10 @@ func (c *Client) UpdateDynamicSecurityGroup(ctx context.Context, params types.Pa
 
 	vmCriteria := current.VMCriteria
 	if len(params.Criteria) != 0 {
-		vmCriteria = toApiFirewallGroupVMCriteria(params.Criteria)
+		vmCriteria = toAPIFirewallGroupVMCriteria(params.Criteria)
 	}
 
-	body := itypes.ApiRequestFirewallGroup{
+	body := itypes.APIRequestFirewallGroup{
 		ID:          current.ID,
 		Name:        current.Name,
 		Description: description,
@@ -139,7 +139,7 @@ func (c *Client) DeleteDynamicSecurityGroup(ctx context.Context, params types.Pa
 		idOrName = params.Name
 	}
 
-	current, err := inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, itypes.FirewallGroupTypeVMCriteria, func(ctx context.Context, idOrName, typeValue string) (*itypes.ApiResponseFirewallGroup, error) {
+	current, err := inetworkobjects.ResolveFirewallGroupTarget(ctx, idOrName, itypes.FirewallGroupTypeVMCriteria, func(ctx context.Context, idOrName, typeValue string) (*itypes.APIResponseFirewallGroup, error) {
 		return getFirewallGroupWithRetry(ctx, c.c, idOrName, typeValue)
 	})
 	if err != nil {
@@ -153,22 +153,22 @@ func (c *Client) DeleteDynamicSecurityGroup(ctx context.Context, params types.Pa
 	return nil
 }
 
-func createDynamicSecurityGroupBody(ctx context.Context, c cav.Client, params types.ParamsCreateDynamicSecurityGroup) (itypes.ApiRequestFirewallGroup, error) {
+func createDynamicSecurityGroupBody(ctx context.Context, c cav.Client, params types.ParamsCreateDynamicSecurityGroup) (itypes.APIRequestFirewallGroup, error) {
 	if err := validateDynamicSecurityGroupCriteria(params.Criteria); err != nil {
-		return itypes.ApiRequestFirewallGroup{}, err
+		return itypes.APIRequestFirewallGroup{}, err
 	}
 
-	vdcGroupID, vdcGroupName, err := resolveVdcGroupRef(ctx, c, params.VdcGroupID, params.VdcGroupName)
+	vdcGroupID, vdcGroupName, err := resolveVDCGroupRef(ctx, c, params.VDCGroupID, params.VDCGroupName)
 	if err != nil {
-		return itypes.ApiRequestFirewallGroup{}, err
+		return itypes.APIRequestFirewallGroup{}, err
 	}
 
-	return itypes.ApiRequestFirewallGroup{
+	return itypes.APIRequestFirewallGroup{
 		Name:        params.Name,
 		Description: params.Description,
 		TypeValue:   itypes.FirewallGroupTypeVMCriteria,
-		VMCriteria:  toApiFirewallGroupVMCriteria(params.Criteria),
-		OwnerRef:    &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		VMCriteria:  toAPIFirewallGroupVMCriteria(params.Criteria),
+		OwnerRef:    &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 	}, nil
 }
 
@@ -210,21 +210,21 @@ func validateDynamicSecurityGroupCriteria(criteria []types.ParamsDynamicSecurity
 	return nil
 }
 
-// toApiFirewallGroupVMCriteria converts criteria params into firewall group VM criteria payload.
-func toApiFirewallGroupVMCriteria(criteria []types.ParamsDynamicSecurityGroupCriteria) []itypes.ApiFirewallGroupVMCriteria {
-	vmCriteria := make([]itypes.ApiFirewallGroupVMCriteria, 0, len(criteria))
+// toAPIFirewallGroupVMCriteria converts criteria params into firewall group VM criteria payload.
+func toAPIFirewallGroupVMCriteria(criteria []types.ParamsDynamicSecurityGroupCriteria) []itypes.APIFirewallGroupVMCriteria {
+	vmCriteria := make([]itypes.APIFirewallGroupVMCriteria, 0, len(criteria))
 
 	for _, c := range criteria {
-		rules := make([]itypes.ApiFirewallGroupVMCriteriaRule, 0, len(c.Rules))
+		rules := make([]itypes.APIFirewallGroupVMCriteriaRule, 0, len(c.Rules))
 		for _, r := range c.Rules {
-			rules = append(rules, itypes.ApiFirewallGroupVMCriteriaRule{
+			rules = append(rules, itypes.APIFirewallGroupVMCriteriaRule{
 				AttributeType:  r.RuleType,
 				Operator:       r.Operator,
 				AttributeValue: r.Value,
 			})
 		}
 
-		vmCriteria = append(vmCriteria, itypes.ApiFirewallGroupVMCriteria{VMCriteriaRule: rules})
+		vmCriteria = append(vmCriteria, itypes.APIFirewallGroupVMCriteria{VMCriteriaRule: rules})
 	}
 
 	return vmCriteria

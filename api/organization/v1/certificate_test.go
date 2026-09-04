@@ -26,7 +26,7 @@ func TestListCertificate(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.ListCertificate())
-	ms.SetResponse(endpoints.ListCertificate(), &itypes.ApiResponseListCertificate{Values: []itypes.ApiResponseCertificate{{
+	ms.SetResponse(endpoints.ListCertificate(), &itypes.APIResponseListCertificate{Values: []itypes.APIResponseCertificate{{
 		ID:          certificateID,
 		Alias:       "cert-1",
 		Description: "desc",
@@ -50,7 +50,7 @@ func TestGetCertificateByName(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.ListCertificate())
-	ms.SetResponse(endpoints.ListCertificate(), &itypes.ApiResponseListCertificate{Values: []itypes.ApiResponseCertificate{{
+	ms.SetResponse(endpoints.ListCertificate(), &itypes.APIResponseListCertificate{Values: []itypes.APIResponseCertificate{{
 		ID:          certificateID,
 		Alias:       "cert-1",
 		Description: "desc",
@@ -72,7 +72,7 @@ func TestGetCertificateByNameNotFound(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.ListCertificate())
-	ms.SetResponse(endpoints.ListCertificate(), &itypes.ApiResponseListCertificate{Values: []itypes.ApiResponseCertificate{}}, nil)
+	ms.SetResponse(endpoints.ListCertificate(), &itypes.APIResponseListCertificate{Values: []itypes.APIResponseCertificate{}}, nil)
 
 	resp, err := client.GetCertificate(t.Context(), types.ParamsGetCertificate{Name: "missing-cert"})
 
@@ -87,7 +87,7 @@ func TestGetCertificateByNameMultipleMatches(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.ListCertificate())
-	ms.SetResponse(endpoints.ListCertificate(), &itypes.ApiResponseListCertificate{Values: []itypes.ApiResponseCertificate{
+	ms.SetResponse(endpoints.ListCertificate(), &itypes.APIResponseListCertificate{Values: []itypes.APIResponseCertificate{
 		{ID: generator.MustGenerate("{urn:certificateLibraryItem}"), Alias: "cert-1", Certificate: "-----BEGIN CERTIFICATE-----one-----END CERTIFICATE-----"},
 		{ID: generator.MustGenerate("{urn:certificateLibraryItem}"), Alias: "cert-1", Certificate: "-----BEGIN CERTIFICATE-----two-----END CERTIFICATE-----"},
 	}}, nil)
@@ -107,7 +107,7 @@ func TestCreateCertificate(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.CreateCertificate())
-	ms.SetResponse(endpoints.CreateCertificate(), &itypes.ApiResponseCertificate{
+	ms.SetResponse(endpoints.CreateCertificate(), &itypes.APIResponseCertificate{
 		ID:          certificateID,
 		Alias:       "cert-1",
 		Description: "desc",
@@ -135,7 +135,7 @@ func TestCreateCertificateRejectsDuplicateAlias(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.ListCertificate())
-	ms.SetResponse(endpoints.ListCertificate(), &itypes.ApiResponseListCertificate{Values: []itypes.ApiResponseCertificate{{
+	ms.SetResponse(endpoints.ListCertificate(), &itypes.APIResponseListCertificate{Values: []itypes.APIResponseCertificate{{
 		ID:          certificateID,
 		Alias:       "cert-1",
 		Description: "desc",
@@ -175,7 +175,7 @@ func TestUpdateCertificate(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetCertificate())
-	ms.SetResponse(endpoints.GetCertificate(), &itypes.ApiResponseCertificate{
+	ms.SetResponse(endpoints.GetCertificate(), &itypes.APIResponseCertificate{
 		ID:          certificateID,
 		Alias:       "cert-1",
 		Description: "old-desc",
@@ -206,7 +206,7 @@ func TestUpdateCertificateKeepsImmutableContent(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetCertificate())
-	ms.SetResponse(endpoints.GetCertificate(), &itypes.ApiResponseCertificate{
+	ms.SetResponse(endpoints.GetCertificate(), &itypes.APIResponseCertificate{
 		ID:          certificateID,
 		Alias:       "cert-1",
 		Description: "old-desc",
@@ -233,7 +233,7 @@ func TestDeleteCertificate(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetCertificate())
-	ms.SetResponse(endpoints.GetCertificate(), &itypes.ApiResponseCertificate{
+	ms.SetResponse(endpoints.GetCertificate(), &itypes.APIResponseCertificate{
 		ID:          certificateID,
 		Alias:       "cert-1",
 		Description: "desc",
@@ -253,7 +253,7 @@ func TestDeleteCertificateByNameNotFound(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.ListCertificate())
-	ms.SetResponse(endpoints.ListCertificate(), &itypes.ApiResponseListCertificate{Values: []itypes.ApiResponseCertificate{}}, nil)
+	ms.SetResponse(endpoints.ListCertificate(), &itypes.APIResponseListCertificate{Values: []itypes.APIResponseCertificate{}}, nil)
 
 	err := client.DeleteCertificate(t.Context(), types.ParamsDeleteCertificate{Name: "missing-cert"})
 

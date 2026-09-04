@@ -19,8 +19,8 @@ import (
 )
 
 const (
-	opGetProtectionLevel    = "NetBackup.GetProtectionLevel"
-	opListProtectionLevels  = "NetBackup.ListProtectionLevels"
+	opGetProtectionLevel   = "NetBackup.GetProtectionLevel"
+	opListProtectionLevels = "NetBackup.ListProtectionLevels"
 )
 
 // GetProtectionLevel returns a NetBackup protection level by ID.

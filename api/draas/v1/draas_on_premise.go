@@ -19,9 +19,9 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
-// ListOnPremiseIp lists on-premise IP addresses allowed for organization DRaaS offer.
-func (c *Client) ListOnPremiseIp(ctx context.Context) (*types.ModelListDraasOnPremise, error) {
-	ep := endpoints.ListDraasOnPremiseIp()
+// ListOnPremiseIP lists on-premise IP addresses allowed for organization DRaaS offer.
+func (c *Client) ListOnPremiseIP(ctx context.Context) (*types.ModelListDraasOnPremise, error) {
+	ep := endpoints.ListDraasOnPremiseIP()
 
 	resp, err := c.c.Do(
 		ctx,
@@ -31,12 +31,12 @@ func (c *Client) ListOnPremiseIp(ctx context.Context) (*types.ModelListDraasOnPr
 		return nil, fmt.Errorf("failed to list Draas OnPremiseIP: %w", err)
 	}
 
-	return resp.Result().(*itypes.ApiResponseListDraasOnPremise).ToModel(), nil
+	return resp.Result().(*itypes.APIResponseListDraasOnPremise).ToModel(), nil
 }
 
-// AddOnPremiseIp adds on-premise IPv4 address to organization DRaaS offer.
-func (c *Client) AddOnPremiseIp(ctx context.Context, params types.ParamsAddDraasOnPremiseIP) error {
-	ep := endpoints.AddDraasOnPremiseIp()
+// AddOnPremiseIP adds on-premise IPv4 address to organization DRaaS offer.
+func (c *Client) AddOnPremiseIP(ctx context.Context, params types.ParamsAddDraasOnPremiseIP) error {
+	ep := endpoints.AddDraasOnPremiseIP()
 
 	_, err := c.c.Do(
 		ctx,
@@ -50,9 +50,9 @@ func (c *Client) AddOnPremiseIp(ctx context.Context, params types.ParamsAddDraas
 	return nil
 }
 
-// RemoveOnPremiseIp removes on-premise IP address from organization DRaaS offer.
-func (c *Client) RemoveOnPremiseIp(ctx context.Context, params types.ParamsRemoveDraasOnPremiseIP) error {
-	ep := endpoints.RemoveDraasOnPremiseIp()
+// RemoveOnPremiseIP removes on-premise IP address from organization DRaaS offer.
+func (c *Client) RemoveOnPremiseIP(ctx context.Context, params types.ParamsRemoveDraasOnPremiseIP) error {
+	ep := endpoints.RemoveDraasOnPremiseIP()
 
 	_, err := c.c.Do(
 		ctx,

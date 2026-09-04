@@ -20,18 +20,18 @@ import (
 )
 
 const (
-	opListVdcGroup          = "VdcGroup.List"
-	opGetVdcGroup           = "VdcGroup.Get"
-	opCreateVdcGroup        = "VdcGroup.Create"
-	opUpdateVdcGroup        = "VdcGroup.Update"
-	opDeleteVdcGroup        = "VdcGroup.Delete"
-	opAddVdcToVdcGroup      = "VdcGroup.Vdc.Add"
-	opRemoveVdcFromVdcGroup = "VdcGroup.Vdc.Remove"
+	opListVDCGroup          = "VDCGroup.List"
+	opGetVDCGroup           = "VDCGroup.Get"
+	opCreateVDCGroup        = "VDCGroup.Create"
+	opUpdateVDCGroup        = "VDCGroup.Update"
+	opDeleteVDCGroup        = "VDCGroup.Delete"
+	opAddVDCToVDCGroup      = "VDCGroup.Vdc.Add"
+	opRemoveVDCFromVDCGroup = "VDCGroup.Vdc.Remove"
 )
 
-// ListVdcGroup lists VDC groups visible to current organization.
-func (c *Client) ListVdcGroup(ctx context.Context, params types.ParamsListVdcGroup) (*types.ModelListVdcGroup, error) {
-	ep := endpoints.ListVdcGroup()
+// ListVDCGroup lists VDC groups visible to current organization.
+func (c *Client) ListVDCGroup(ctx context.Context, params types.ParamsListVDCGroup) (*types.ModelListVDCGroup, error) {
+	ep := endpoints.ListVDCGroup()
 
 	query := ""
 	if params.Name != "" {
@@ -47,30 +47,27 @@ func (c *Client) ListVdcGroup(ctx context.Context, params types.ParamsListVdcGro
 		cav.WithQueryParam(ep.QueryParams[0], query),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("%s: list: %w", opListVdcGroup, err)
+		return nil, fmt.Errorf("%s: list: %w", opListVDCGroup, err)
 	}
 
-	return resp.Result().(*itypes.ApiResponseListVdcGroup).ToModel(), nil
+	return resp.Result().(*itypes.APIResponseListVDCGroup).ToModel(), nil
 }
 
-// GetVdcGroup returns a VDC group by ID or name.
-func (c *Client) GetVdcGroup(ctx context.Context, params types.ParamsGetVdcGroup) (*types.ModelGetVdcGroup, error) {
-	vdcgroups, err := c.ListVdcGroup(ctx, types.ParamsListVdcGroup{
-		ID:   params.ID,
-		Name: params.Name,
-	})
+// GetVDCGroup returns a VDC group by ID or name.
+func (c *Client) GetVDCGroup(ctx context.Context, params types.ParamsGetVDCGroup) (*types.ModelGetVDCGroup, error) {
+	vdcgroups, err := c.ListVDCGroup(ctx, types.ParamsListVDCGroup(params))
 	if err != nil {
-		return nil, fmt.Errorf("%s: list: %w", opGetVdcGroup, err)
+		return nil, fmt.Errorf("%s: list: %w", opGetVDCGroup, err)
 	}
 
-	if vdcgroups == nil || len(vdcgroups.VdcGroups) == 0 {
-		return nil, fmt.Errorf("%s: vdc group not found", opGetVdcGroup)
+	if vdcgroups == nil || len(vdcgroups.VDCGroups) == 0 {
+		return nil, fmt.Errorf("%s: vdc group not found", opGetVDCGroup)
 	}
 
-	matches := vdcgroups.VdcGroups
+	matches := vdcgroups.VDCGroups
 	if params.ID != "" || params.Name != "" {
-		matches = make([]types.ModelGetVdcGroup, 0, len(vdcgroups.VdcGroups))
-		for _, vdcGroup := range vdcgroups.VdcGroups {
+		matches = make([]types.ModelGetVDCGroup, 0, len(vdcgroups.VDCGroups))
+		for _, vdcGroup := range vdcgroups.VDCGroups {
 			if params.ID != "" && vdcGroup.ID != params.ID {
 				continue
 			}
@@ -82,42 +79,42 @@ func (c *Client) GetVdcGroup(ctx context.Context, params types.ParamsGetVdcGroup
 	}
 
 	if len(matches) == 0 {
-		return nil, fmt.Errorf("%s: vdc group not found", opGetVdcGroup)
+		return nil, fmt.Errorf("%s: vdc group not found", opGetVDCGroup)
 	}
 
 	if len(matches) > 1 {
-		return nil, fmt.Errorf("%s: multiple vdc groups found", opGetVdcGroup)
+		return nil, fmt.Errorf("%s: multiple vdc groups found", opGetVDCGroup)
 	}
 
 	return &matches[0], nil
 }
 
-// CreateVdcGroup creates a VDC group.
-func (c *Client) CreateVdcGroup(ctx context.Context, params types.ParamsCreateVdcGroup) (*types.ModelGetVdcGroup, error) {
-	epList := endpoints.ListVdcGroup()
+// CreateVDCGroup creates a VDC group.
+func (c *Client) CreateVDCGroup(ctx context.Context, params types.ParamsCreateVDCGroup) (*types.ModelGetVDCGroup, error) {
+	epList := endpoints.ListVDCGroup()
 	respList, err := c.c.Do(
 		ctx,
 		epList,
 		cav.WithQueryParam(epList.QueryParams[0], fmt.Sprintf("name==%s", params.Name)),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("%s: list existing: %w", opCreateVdcGroup, err)
+		return nil, fmt.Errorf("%s: list existing: %w", opCreateVDCGroup, err)
 	}
 
-	listed := respList.Result().(*itypes.ApiResponseListVdcGroup).ToModel()
-	for _, existing := range listed.VdcGroups {
+	listed := respList.Result().(*itypes.APIResponseListVDCGroup).ToModel()
+	for _, existing := range listed.VDCGroups {
 		if existing.Name == params.Name {
-			return nil, fmt.Errorf("%s: vdc group already exists", opCreateVdcGroup)
+			return nil, fmt.Errorf("%s: vdc group already exists", opCreateVDCGroup)
 		}
 	}
 
 	cd := cav.GetExtraDataFromContext(respList.Request.Context())
-	vdcs, err := resolveVdcGroupParticipatingVdcs(ctx, c, params.Vdcs, cd.SiteID)
+	vdcs, err := resolveVDCGroupParticipatingVdcs(ctx, c, params.VDCs, cd.SiteID)
 	if err != nil {
-		return nil, fmt.Errorf("%s: resolve vdcs: %w", opCreateVdcGroup, err)
+		return nil, fmt.Errorf("%s: resolve vdcs: %w", opCreateVDCGroup, err)
 	}
 
-	body := itypes.ApiRequestCreateVdcGroup{
+	body := itypes.APIRequestCreateVDCGroup{
 		OrgID:               cd.OrganizationID,
 		Name:                params.Name,
 		Description:         params.Description,
@@ -126,35 +123,35 @@ func (c *Client) CreateVdcGroup(ctx context.Context, params types.ParamsCreateVd
 		Type:                "LOCAL",
 	}
 
-	if _, err := c.c.Do(ctx, endpoints.CreateVdcGroup(), cav.SetBody(body)); err != nil {
-		return nil, fmt.Errorf("%s: create: %w", opCreateVdcGroup, err)
+	if _, err := c.c.Do(ctx, endpoints.CreateVDCGroup(), cav.SetBody(body)); err != nil {
+		return nil, fmt.Errorf("%s: create: %w", opCreateVDCGroup, err)
 	}
 
 	model := body.ToModel()
 	return &model, nil
 }
 
-// UpdateVdcGroup updates VDC group metadata or membership.
+// UpdateVDCGroup updates VDC group metadata or membership.
 //
 // When params.Vdcs is set, it becomes full desired membership.
 // VDCs omitted from params.Vdcs are removed from group.
-func (c *Client) UpdateVdcGroup(ctx context.Context, params types.ParamsUpdateVdcGroup) (*types.ModelGetVdcGroup, error) {
-	current, err := c.GetVdcGroup(ctx, types.ParamsGetVdcGroup{ID: params.ID, Name: params.Name})
+func (c *Client) UpdateVDCGroup(ctx context.Context, params types.ParamsUpdateVDCGroup) (*types.ModelGetVDCGroup, error) {
+	current, err := c.GetVDCGroup(ctx, types.ParamsGetVDCGroup{ID: params.ID, Name: params.Name})
 	if err != nil {
-		return nil, fmt.Errorf("%s: resolve target: %w", opUpdateVdcGroup, err)
+		return nil, fmt.Errorf("%s: resolve target: %w", opUpdateVDCGroup, err)
 	}
 
-	epList := endpoints.ListVdcGroup()
+	epList := endpoints.ListVDCGroup()
 	param := cav.WithQueryParam(epList.QueryParams[0], fmt.Sprintf("id==%s", current.ID))
 	respList, err := c.c.Do(ctx, epList, param)
 	if err != nil {
-		return nil, fmt.Errorf("%s: list target: %w", opUpdateVdcGroup, err)
+		return nil, fmt.Errorf("%s: list target: %w", opUpdateVDCGroup, err)
 	}
 
 	cd := cav.GetExtraDataFromContext(respList.Request.Context())
-	rL := respList.Result().(*itypes.ApiResponseListVdcGroup)
+	rL := respList.Result().(*itypes.APIResponseListVDCGroup)
 	if len(rL.Values) == 0 {
-		return nil, fmt.Errorf("%s: target not found", opUpdateVdcGroup)
+		return nil, fmt.Errorf("%s: target not found", opUpdateVDCGroup)
 	}
 
 	selected := rL.Values[0]
@@ -165,8 +162,8 @@ func (c *Client) UpdateVdcGroup(ctx context.Context, params types.ParamsUpdateVd
 		}
 	}
 
-	body := itypes.ApiRequestUpdateVdcGroup{
-		Id:    current.ID,
+	body := itypes.APIRequestUpdateVDCGroup{
+		ID:    current.ID,
 		OrgID: selected.OrgID,
 		Name: func() string {
 			if params.Name != "" {
@@ -187,40 +184,40 @@ func (c *Client) UpdateVdcGroup(ctx context.Context, params types.ParamsUpdateVd
 	if len(params.Vdcs) == 0 {
 		body.Vdcs = selected.Vdcs
 	} else {
-		body.Vdcs, err = resolveVdcGroupParticipatingVdcs(ctx, c, params.Vdcs, cd.SiteID)
+		body.Vdcs, err = resolveVDCGroupParticipatingVdcs(ctx, c, params.Vdcs, cd.SiteID)
 		if err != nil {
-			return nil, fmt.Errorf("%s: resolve vdcs: %w", opUpdateVdcGroup, err)
+			return nil, fmt.Errorf("%s: resolve vdcs: %w", opUpdateVDCGroup, err)
 		}
 	}
 
-	ep := endpoints.UpdateVdcGroup()
+	ep := endpoints.UpdateVDCGroup()
 	if _, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], current.ID), cav.SetBody(body)); err != nil {
-		return nil, fmt.Errorf("%s: update: %w", opUpdateVdcGroup, err)
+		return nil, fmt.Errorf("%s: update: %w", opUpdateVDCGroup, err)
 	}
 
 	model := body.ToModel()
 	return &model, nil
 }
 
-// DeleteVdcGroup deletes a VDC group.
-func (c *Client) DeleteVdcGroup(ctx context.Context, params types.ParamsDeleteVdcGroup) error {
+// DeleteVDCGroup deletes a VDC group.
+func (c *Client) DeleteVDCGroup(ctx context.Context, params types.ParamsDeleteVDCGroup) error {
 	id := params.ID
 	if id == "" {
-		vdcGroup, err := c.GetVdcGroup(ctx, types.ParamsGetVdcGroup{Name: params.Name})
+		vdcGroup, err := c.GetVDCGroup(ctx, types.ParamsGetVDCGroup{Name: params.Name})
 		if err != nil {
-			return fmt.Errorf("%s: resolve target: %w", opDeleteVdcGroup, err)
+			return fmt.Errorf("%s: resolve target: %w", opDeleteVDCGroup, err)
 		}
 		id = vdcGroup.ID
 	}
 
-	ep := endpoints.DeleteVdcGroup()
+	ep := endpoints.DeleteVDCGroup()
 	if _, err := c.c.Do(
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], id),
 		cav.WithQueryParam(ep.QueryParams[0], fmt.Sprintf("%t", params.Force)),
 	); err != nil {
-		return fmt.Errorf("%s: delete: %w", opDeleteVdcGroup, err)
+		return fmt.Errorf("%s: delete: %w", opDeleteVDCGroup, err)
 	}
 
 	return nil

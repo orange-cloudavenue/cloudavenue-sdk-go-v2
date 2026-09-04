@@ -18,47 +18,47 @@ const (
 )
 
 type (
-	// ApiResponseListFirewallGroup is shared list payload for firewall group resources.
-	ApiResponseListFirewallGroup struct {
-		Values []ApiResponseFirewallGroup `json:"values" fakesize:"3"`
+	// APIResponseListFirewallGroup is shared list payload for firewall group resources.
+	APIResponseListFirewallGroup struct {
+		Values []APIResponseFirewallGroup `json:"values" fakesize:"3"`
 	}
 
-	// ApiResponseFirewallGroup is shared get/create payload for firewall group resources.
-	ApiResponseFirewallGroup struct {
+	// APIResponseFirewallGroup is shared get/create payload for firewall group resources.
+	APIResponseFirewallGroup struct {
 		ID          string                       `json:"id,omitempty" fake:"{urn:firewallGroup}"`
 		Name        string                       `json:"name" fake:"mockfirewallgroup-{word}"`
 		Description string                       `json:"description,omitempty" fake:"{sentence}"`
 		IPAddresses []string                     `json:"ipAddresses,omitempty"`
-		Members     []ApiObjectReference         `json:"members,omitempty"`
-		VMCriteria  []ApiFirewallGroupVMCriteria `json:"vmCriteria,omitempty"`
-		OwnerRef    *ApiObjectReference          `json:"ownerRef,omitempty"`
+		Members     []APIObjectReference         `json:"members,omitempty"`
+		VMCriteria  []APIFirewallGroupVMCriteria `json:"vmCriteria,omitempty"`
+		OwnerRef    *APIObjectReference          `json:"ownerRef,omitempty"`
 		TypeValue   string                       `json:"typeValue,omitempty"`
 	}
 
-	ApiFirewallGroupVMCriteria struct {
-		VMCriteriaRule []ApiFirewallGroupVMCriteriaRule `json:"rules,omitempty"`
+	APIFirewallGroupVMCriteria struct {
+		VMCriteriaRule []APIFirewallGroupVMCriteriaRule `json:"rules,omitempty"`
 	}
 
-	ApiFirewallGroupVMCriteriaRule struct {
+	APIFirewallGroupVMCriteriaRule struct {
 		AttributeType  string `json:"attributeType,omitempty"`
 		AttributeValue string `json:"attributeValue,omitempty"`
 		Operator       string `json:"operator,omitempty"`
 	}
 
-	// ApiRequestFirewallGroup is shared create/update request payload for firewall group resources.
-	ApiRequestFirewallGroup struct {
+	// APIRequestFirewallGroup is shared create/update request payload for firewall group resources.
+	APIRequestFirewallGroup struct {
 		ID          string                       `json:"id,omitempty" fake:"{urn:firewallGroup}"`
 		Name        string                       `json:"name" fake:"mockfirewallgroup-{word}"`
 		Description string                       `json:"description,omitempty" fake:"{sentence}"`
 		IPAddresses []string                     `json:"ipAddresses,omitempty"`
-		Members     []ApiObjectReference         `json:"members,omitempty"`
-		VMCriteria  []ApiFirewallGroupVMCriteria `json:"vmCriteria,omitempty"`
-		OwnerRef    *ApiObjectReference          `json:"ownerRef,omitempty"`
+		Members     []APIObjectReference         `json:"members,omitempty"`
+		VMCriteria  []APIFirewallGroupVMCriteria `json:"vmCriteria,omitempty"`
+		OwnerRef    *APIObjectReference          `json:"ownerRef,omitempty"`
 		TypeValue   string                       `json:"typeValue,omitempty"`
 	}
 )
 
-func (r *ApiRequestFirewallGroup) ToModel() types.ModelGetFirewallGroup {
+func (r *APIRequestFirewallGroup) ToModel() types.ModelGetFirewallGroup {
 	m := types.ModelGetFirewallGroup{
 		ID:          r.ID,
 		Name:        r.Name,
@@ -94,7 +94,7 @@ func (r *ApiRequestFirewallGroup) ToModel() types.ModelGetFirewallGroup {
 	return m
 }
 
-func (r *ApiResponseListFirewallGroup) ToModel() *types.ModelListFirewallGroup {
+func (r *APIResponseListFirewallGroup) ToModel() *types.ModelListFirewallGroup {
 	model := &types.ModelListFirewallGroup{
 		FirewallGroups: make([]types.ModelGetFirewallGroup, 0),
 	}
@@ -106,7 +106,7 @@ func (r *ApiResponseListFirewallGroup) ToModel() *types.ModelListFirewallGroup {
 	return model
 }
 
-func (r *ApiResponseFirewallGroup) ToModel() types.ModelGetFirewallGroup {
+func (r *APIResponseFirewallGroup) ToModel() types.ModelGetFirewallGroup {
 	m := types.ModelGetFirewallGroup{
 		ID:          r.ID,
 		Name:        r.Name,

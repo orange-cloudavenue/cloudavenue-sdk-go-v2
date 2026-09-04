@@ -28,24 +28,24 @@ func TestCreateNetworkContextProfile(t *testing.T) {
 
 	client, ms := newClient(t)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
-		Values: []itypes.ApiResponseListVdcGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.SetResponse(endpoints.ListVDCGroup(), &itypes.APIResponseListVDCGroup{
+		Values: []itypes.APIResponseListVDCGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
 	}, nil)
 
 	ms.CleanResponse(endpoints.ListNetworkContextProfile())
-	ms.SetResponse(endpoints.ListNetworkContextProfile(), &itypes.ApiResponseListNetworkContextProfile{
-		Values: []itypes.ApiResponseNetworkContextProfile{{
+	ms.SetResponse(endpoints.ListNetworkContextProfile(), &itypes.APIResponseListNetworkContextProfile{
+		Values: []itypes.APIResponseNetworkContextProfile{{
 			ID:              profileID,
 			Name:            "ncp-1",
 			Description:     "desc",
 			Scope:           types.NetworkContextProfileScopeTenant,
-			ContextEntityId: vdcGroupID,
-			OrgRef:          &itypes.ApiObjectReference{ID: orgID},
-			Attributes: []itypes.ApiNetworkContextProfileAttribute{{
+			ContextEntityID: vdcGroupID,
+			OrgRef:          &itypes.APIObjectReference{ID: orgID},
+			Attributes: []itypes.APINetworkContextProfileAttribute{{
 				Type:   types.NetworkContextProfileAttributeTypeAppID,
 				Values: []string{"HTTP"},
-				SubAttributes: []itypes.ApiNetworkContextProfileSubAttribute{{
+				SubAttributes: []itypes.APINetworkContextProfileSubAttribute{{
 					Type:   types.NetworkContextProfileSubAttributeTypeTLSVersion,
 					Values: []string{"TLS_V13"},
 				}},
@@ -56,7 +56,7 @@ func TestCreateNetworkContextProfile(t *testing.T) {
 	resp, err := client.CreateNetworkContextProfile(t.Context(), types.ParamsCreateNetworkContextProfile{
 		Name:         "ncp-1",
 		Description:  "desc",
-		VdcGroupName: vdcGroupName,
+		VDCGroupName: vdcGroupName,
 		Attributes: []types.ParamsNetworkContextProfileAttribute{{
 			Type:   types.NetworkContextProfileAttributeTypeAppID,
 			Values: []string{"HTTP"},
@@ -80,7 +80,7 @@ func TestCreateNetworkContextProfile(t *testing.T) {
 	assert.Equal(t, types.NetworkContextProfileSubAttributeTypeTLSVersion, resp.Attributes[0].SubAttributes[0].Type)
 	assert.Equal(t, []string{"TLS_V13"}, resp.Attributes[0].SubAttributes[0].Values)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
+	ms.CleanResponse(endpoints.ListVDCGroup())
 	ms.CleanResponse(endpoints.ListNetworkContextProfile())
 }
 
@@ -92,27 +92,27 @@ func TestListNetworkContextProfile(t *testing.T) {
 
 	client, ms := newClient(t)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
-		Values: []itypes.ApiResponseListVdcGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.SetResponse(endpoints.ListVDCGroup(), &itypes.APIResponseListVDCGroup{
+		Values: []itypes.APIResponseListVDCGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
 	}, nil)
 
 	ms.CleanResponse(endpoints.ListNetworkContextProfile())
-	ms.SetResponse(endpoints.ListNetworkContextProfile(), &itypes.ApiResponseListNetworkContextProfile{
-		Values: []itypes.ApiResponseNetworkContextProfile{{
+	ms.SetResponse(endpoints.ListNetworkContextProfile(), &itypes.APIResponseListNetworkContextProfile{
+		Values: []itypes.APIResponseNetworkContextProfile{{
 			ID:              profileID,
 			Name:            "ncp-1",
 			Scope:           types.NetworkContextProfileScopeTenant,
-			ContextEntityId: vdcGroupID,
-			OrgRef:          &itypes.ApiObjectReference{ID: orgID},
-			Attributes: []itypes.ApiNetworkContextProfileAttribute{{
+			ContextEntityID: vdcGroupID,
+			OrgRef:          &itypes.APIObjectReference{ID: orgID},
+			Attributes: []itypes.APINetworkContextProfileAttribute{{
 				Type:   types.NetworkContextProfileAttributeTypeAppID,
 				Values: []string{"HTTP"},
 			}},
 		}},
 	}, nil)
 
-	resp, err := client.ListNetworkContextProfile(t.Context(), types.ParamsListNetworkContextProfile{VdcGroupName: vdcGroupName})
+	resp, err := client.ListNetworkContextProfile(t.Context(), types.ParamsListNetworkContextProfile{VDCGroupName: vdcGroupName})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
@@ -121,7 +121,7 @@ func TestListNetworkContextProfile(t *testing.T) {
 	assert.Equal(t, orgID, resp.NetworkContextProfiles[0].OrgID)
 	assert.Equal(t, types.NetworkContextProfileAttributeTypeAppID, resp.NetworkContextProfiles[0].Attributes[0].Type)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
+	ms.CleanResponse(endpoints.ListVDCGroup())
 	ms.CleanResponse(endpoints.ListNetworkContextProfile())
 }
 
@@ -132,12 +132,12 @@ func TestGetNetworkContextProfile(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetNetworkContextProfile())
-	ms.SetResponse(endpoints.GetNetworkContextProfile(), &itypes.ApiResponseNetworkContextProfile{
+	ms.SetResponse(endpoints.GetNetworkContextProfile(), &itypes.APIResponseNetworkContextProfile{
 		ID:     profileID,
 		Name:   "ncp-1",
 		Scope:  types.NetworkContextProfileScopeTenant,
-		OrgRef: &itypes.ApiObjectReference{ID: orgID},
-		Attributes: []itypes.ApiNetworkContextProfileAttribute{{
+		OrgRef: &itypes.APIObjectReference{ID: orgID},
+		Attributes: []itypes.APINetworkContextProfileAttribute{{
 			Type:   types.NetworkContextProfileAttributeTypeDomainName,
 			Values: []string{"example.com"},
 		}},
@@ -162,14 +162,14 @@ func TestUpdateNetworkContextProfile(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetNetworkContextProfile())
-	ms.SetResponse(endpoints.GetNetworkContextProfile(), &itypes.ApiResponseNetworkContextProfile{
+	ms.SetResponse(endpoints.GetNetworkContextProfile(), &itypes.APIResponseNetworkContextProfile{
 		ID:              profileID,
 		Name:            "ncp-1",
 		Description:     "old-desc",
 		Scope:           types.NetworkContextProfileScopeTenant,
-		ContextEntityId: vdcGroupID,
-		OrgRef:          &itypes.ApiObjectReference{ID: orgID},
-		Attributes: []itypes.ApiNetworkContextProfileAttribute{{
+		ContextEntityID: vdcGroupID,
+		OrgRef:          &itypes.APIObjectReference{ID: orgID},
+		Attributes: []itypes.APINetworkContextProfileAttribute{{
 			Type:   types.NetworkContextProfileAttributeTypeAppID,
 			Values: []string{"HTTP"},
 		}},
@@ -207,10 +207,10 @@ func TestDeleteNetworkContextProfile(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetNetworkContextProfile())
-	ms.SetResponse(endpoints.GetNetworkContextProfile(), &itypes.ApiResponseNetworkContextProfile{
+	ms.SetResponse(endpoints.GetNetworkContextProfile(), &itypes.APIResponseNetworkContextProfile{
 		ID:              profileID,
 		Name:            "ncp-1",
-		ContextEntityId: vdcGroupID,
+		ContextEntityID: vdcGroupID,
 		Scope:           types.NetworkContextProfileScopeTenant,
 	}, nil)
 	ms.CleanResponse(endpoints.DeleteNetworkContextProfile())
@@ -229,14 +229,14 @@ func TestGetNetworkContextProfileAttributes(t *testing.T) {
 
 	client, ms := newClient(t)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
-		Values: []itypes.ApiResponseListVdcGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.SetResponse(endpoints.ListVDCGroup(), &itypes.APIResponseListVDCGroup{
+		Values: []itypes.APIResponseListVDCGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
 	}, nil)
 
 	ms.CleanResponse(endpoints.GetNetworkContextProfileAttributes())
-	ms.SetResponse(endpoints.GetNetworkContextProfileAttributes(), &itypes.ApiNetworkContextProfileAttributesResponse{
-		Attributes: []itypes.ApiNetworkContextProfileAttribute{
+	ms.SetResponse(endpoints.GetNetworkContextProfileAttributes(), &itypes.APINetworkContextProfileAttributesResponse{
+		Attributes: []itypes.APINetworkContextProfileAttribute{
 			{
 				Type:   types.NetworkContextProfileAttributeTypeAppID,
 				Values: []string{"HTTP", "DNS"},
@@ -249,7 +249,7 @@ func TestGetNetworkContextProfileAttributes(t *testing.T) {
 	}, nil)
 
 	resp, err := client.GetNetworkContextProfileAttributes(t.Context(), types.ParamsGetNetworkContextProfileAttributes{
-		VdcGroupName: vdcGroupName,
+		VDCGroupName: vdcGroupName,
 	})
 
 	assert.NoError(t, err)
@@ -257,6 +257,6 @@ func TestGetNetworkContextProfileAttributes(t *testing.T) {
 	assert.Equal(t, []string{"HTTP", "DNS"}, resp.AppIDValues)
 	assert.Equal(t, []string{"example.com", "orange.com"}, resp.DomainNameValues)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
+	ms.CleanResponse(endpoints.ListVDCGroup())
 	ms.CleanResponse(endpoints.GetNetworkContextProfileAttributes())
 }

@@ -13,37 +13,33 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
 
-// ListVdcNetwork - List Org VDC Networks (routed and isolated)
+// ListVDCNetwork - List Org VDC Networks (routed and isolated)
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/get/
-func ListVdcNetwork() *cav.Endpoint {
-	return cav.MustGetEndpoint("ListVdcNetwork")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/get/ 
+func ListVDCNetwork() *cav.Endpoint {
+	return cav.MustGetEndpoint("ListVDCNetwork")
 }
-
-// GetVdcNetwork - Get an Org VDC Network (routed or isolated)
+// GetVDCNetwork - Get an Org VDC Network (routed or isolated)
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/get/
-func GetVdcNetwork() *cav.Endpoint {
-	return cav.MustGetEndpoint("GetVdcNetwork")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/get/ 
+func GetVDCNetwork() *cav.Endpoint {
+	return cav.MustGetEndpoint("GetVDCNetwork")
 }
-
-// CreateVdcNetwork - Create an Org VDC Network (routed or isolated)
+// CreateVDCNetwork - Create an Org VDC Network (routed or isolated)
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/post/
-func CreateVdcNetwork() *cav.Endpoint {
-	return cav.MustGetEndpoint("CreateVdcNetwork")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/post/ 
+func CreateVDCNetwork() *cav.Endpoint {
+	return cav.MustGetEndpoint("CreateVDCNetwork")
 }
-
-// UpdateVdcNetwork - Update an Org VDC Network (routed or isolated)
+// UpdateVDCNetwork - Update an Org VDC Network (routed or isolated)
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/put/
-func UpdateVdcNetwork() *cav.Endpoint {
-	return cav.MustGetEndpoint("UpdateVdcNetwork")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/put/ 
+func UpdateVDCNetwork() *cav.Endpoint {
+	return cav.MustGetEndpoint("UpdateVDCNetwork")
 }
-
-// DeleteVdcNetwork - Delete an Org VDC Network (routed or isolated)
+// DeleteVDCNetwork - Delete an Org VDC Network (routed or isolated)
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/delete/
-func DeleteVdcNetwork() *cav.Endpoint {
-	return cav.MustGetEndpoint("DeleteVdcNetwork")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/delete/ 
+func DeleteVDCNetwork() *cav.Endpoint {
+	return cav.MustGetEndpoint("DeleteVDCNetwork")
 }

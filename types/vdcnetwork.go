@@ -10,8 +10,8 @@
 package types
 
 const (
-	VdcNetworkTypeRouted   = "NAT_ROUTED"
-	VdcNetworkTypeIsolated = "ISOLATED"
+	VDCNetworkTypeRouted   = "NAT_ROUTED"
+	VDCNetworkTypeIsolated = "ISOLATED"
 )
 
 type (
@@ -33,10 +33,10 @@ type (
 		DNSSuffix string
 
 		// IPRanges is the list of static IP pools available in this subnet.
-		IPRanges []ParamsVdcNetworkIPRange
+		IPRanges []ParamsVDCNetworkIPRange
 	}
 
-	ParamsVdcNetworkIPRange struct {
+	ParamsVDCNetworkIPRange struct {
 		// StartAddress is the first IP address of the range.
 		StartAddress string
 
@@ -45,50 +45,50 @@ type (
 	}
 
 	// * List
-	ParamsListVdcNetwork struct {
-		// VdcGroupID is the ID of the Vdc Group owning the Org VDC Networks.
-		VdcGroupID string
+	ParamsListVDCNetwork struct {
+		// VDCGroupID is the ID of the Vdc Group owning the Org VDC Networks.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning the Org VDC Networks.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning the Org VDC Networks.
+		VDCGroupName string
 	}
 
 	// * Isolated networks
-	ParamsGetVdcNetworkIsolated struct {
+	ParamsGetVDCNetworkIsolated struct {
 		// ID is the unique identifier of the Org VDC Network.
 		ID string
 
 		// Name is the name of the Org VDC Network.
 		Name string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Org VDC Network.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Org VDC Network.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Org VDC Network.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Org VDC Network.
+		VDCGroupName string
 	}
 
-	ParamsCreateVdcNetworkIsolated struct {
+	ParamsCreateVDCNetworkIsolated struct {
 		// Name is the name of the Org VDC Network.
 		Name string
 
 		// Description is the description of the Org VDC Network.
 		Description string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Org VDC Network.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Org VDC Network.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Org VDC Network.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Org VDC Network.
+		VDCGroupName string
 
 		// Subnet is the subnet configuration of the Org VDC Network.
 		Subnet ParamsSubnet
 
-		// GuestVlanTaggingAllowed defines if guest VLAN tagging is allowed on this network.
-		GuestVlanTaggingAllowed *bool
+		// GuestVLANTaggingAllowed defines if guest VLAN tagging is allowed on this network.
+		GuestVLANTaggingAllowed *bool
 	}
 
-	ParamsUpdateVdcNetworkIsolated struct {
+	ParamsUpdateVDCNetworkIsolated struct {
 		// ID is the unique identifier of the Org VDC Network to update.
 		ID string
 
@@ -101,57 +101,57 @@ type (
 		// Subnet is the new subnet configuration of the Org VDC Network.
 		Subnet *ParamsSubnet
 
-		// GuestVlanTaggingAllowed defines if guest VLAN tagging is allowed on this network.
-		GuestVlanTaggingAllowed *bool
+		// GuestVLANTaggingAllowed defines if guest VLAN tagging is allowed on this network.
+		GuestVLANTaggingAllowed *bool
 	}
 
-	ParamsDeleteVdcNetworkIsolated struct {
+	ParamsDeleteVDCNetworkIsolated struct {
 		// ID is the unique identifier of the Org VDC Network to delete.
 		ID string
 
 		// Name is the name of the Org VDC Network to delete.
 		Name string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Org VDC Network.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Org VDC Network.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Org VDC Network.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Org VDC Network.
+		VDCGroupName string
 	}
 
 	// * Routed networks
-	ParamsGetVdcNetworkRouted struct {
+	ParamsGetVDCNetworkRouted struct {
 		// ID is the unique identifier of the Org VDC Network.
 		ID string
 
 		// Name is the name of the Org VDC Network.
 		Name string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Org VDC Network.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Org VDC Network.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Org VDC Network.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Org VDC Network.
+		VDCGroupName string
 	}
 
-	ParamsCreateVdcNetworkRouted struct {
+	ParamsCreateVDCNetworkRouted struct {
 		// Name is the name of the Org VDC Network.
 		Name string
 
 		// Description is the description of the Org VDC Network.
 		Description string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Org VDC Network.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Org VDC Network.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Org VDC Network.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Org VDC Network.
+		VDCGroupName string
 
 		// Subnet is the subnet configuration of the Org VDC Network.
 		Subnet ParamsSubnet
 
-		// GuestVlanTaggingAllowed defines if guest VLAN tagging is allowed on this network.
-		GuestVlanTaggingAllowed *bool
+		// GuestVLANTaggingAllowed defines if guest VLAN tagging is allowed on this network.
+		GuestVLANTaggingAllowed *bool
 
 		// EdgeGatewayID is the ID of the Edge Gateway this network is connected to.
 		EdgeGatewayID string
@@ -160,7 +160,7 @@ type (
 		EdgeGatewayName string
 	}
 
-	ParamsUpdateVdcNetworkRouted struct {
+	ParamsUpdateVDCNetworkRouted struct {
 		// ID is the unique identifier of the Org VDC Network to update.
 		ID string
 
@@ -173,8 +173,8 @@ type (
 		// Subnet is the new subnet configuration of the Org VDC Network.
 		Subnet *ParamsSubnet
 
-		// GuestVlanTaggingAllowed defines if guest VLAN tagging is allowed on this network.
-		GuestVlanTaggingAllowed *bool
+		// GuestVLANTaggingAllowed defines if guest VLAN tagging is allowed on this network.
+		GuestVLANTaggingAllowed *bool
 
 		// EdgeGatewayID is the new ID of the Edge Gateway this network is connected to.
 		EdgeGatewayID string
@@ -183,55 +183,55 @@ type (
 		EdgeGatewayName string
 	}
 
-	ParamsDeleteVdcNetworkRouted struct {
+	ParamsDeleteVDCNetworkRouted struct {
 		// ID is the unique identifier of the Org VDC Network to delete.
 		ID string
 
 		// Name is the name of the Org VDC Network to delete.
 		Name string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Org VDC Network.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Org VDC Network.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Org VDC Network.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Org VDC Network.
+		VDCGroupName string
 	}
 
 	// * Model (shared shape for Isolated and Routed networks)
-	ModelListVdcNetwork struct {
-		VdcNetworks []ModelGetVdcNetwork `documentation:"List of Org VDC Networks"`
+	ModelListVDCNetwork struct {
+		VDCNetworks []ModelGetVDCNetwork `documentation:"List of Org VDC Networks"`
 	}
 
-	ModelGetVdcNetwork struct {
+	ModelGetVDCNetwork struct {
 		ID          string `documentation:"ID of the Org VDC Network"`
 		Name        string `documentation:"Name of the Org VDC Network"`
 		Description string `documentation:"Description of the Org VDC Network"`
 		Status      string `documentation:"Status of the Org VDC Network"`
 		NetworkType string `documentation:"Type of the Org VDC Network (NAT_ROUTED or ISOLATED)"`
 
-		OwnerID   string `documentation:"ID of the owner (VDC or VdcGroup) of the Org VDC Network"`
-		OwnerName string `documentation:"Name of the owner (VDC or VdcGroup) of the Org VDC Network"`
+		OwnerID   string `documentation:"ID of the owner (VDC or VDCGroup) of the Org VDC Network"`
+		OwnerName string `documentation:"Name of the owner (VDC or VDCGroup) of the Org VDC Network"`
 
-		Subnet ModelVdcNetworkSubnet `documentation:"Subnet configuration of the Org VDC Network"`
+		Subnet ModelVDCNetworkSubnet `documentation:"Subnet configuration of the Org VDC Network"`
 
-		GuestVlanTaggingAllowed *bool `documentation:"Defines if guest VLAN tagging is allowed on this network"`
-		Shared                  *bool `documentation:"Defines if this network is shared across the VdcGroup"`
+		GuestVLANTaggingAllowed *bool `documentation:"Defines if guest VLAN tagging is allowed on this network"`
+		Shared                  *bool `documentation:"Defines if this network is shared across the VDCGroup"`
 
 		EdgeGatewayID   string `documentation:"ID of the Edge Gateway this network is connected to (only for routed networks)"`
 		EdgeGatewayName string `documentation:"Name of the Edge Gateway this network is connected to (only for routed networks)"`
 	}
 
-	ModelVdcNetworkSubnet struct {
+	ModelVDCNetworkSubnet struct {
 		Gateway      string `documentation:"Gateway IP address of the subnet"`
 		PrefixLength int    `documentation:"Prefix length of the subnet"`
 		DNSServer1   string `documentation:"Primary DNS server for the subnet"`
 		DNSServer2   string `documentation:"Secondary DNS server for the subnet"`
 		DNSSuffix    string `documentation:"DNS suffix for the subnet"`
 
-		IPRanges []ModelVdcNetworkIPRange `documentation:"List of static IP pools available in this subnet"`
+		IPRanges []ModelVDCNetworkIPRange `documentation:"List of static IP pools available in this subnet"`
 	}
 
-	ModelVdcNetworkIPRange struct {
+	ModelVDCNetworkIPRange struct {
 		StartAddress string `documentation:"First IP address of the range"`
 		EndAddress   string `documentation:"Last IP address of the range"`
 	}

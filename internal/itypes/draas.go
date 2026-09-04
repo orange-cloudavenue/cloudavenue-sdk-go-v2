@@ -14,11 +14,11 @@ import (
 )
 
 type (
-	ApiResponseListDraasOnPremise []string
-	ApiRequestAddDraasOnPremiseIP string
+	APIResponseListDraasOnPremise []string
+	APIRequestAddDraasOnPremiseIP string
 )
 
-func (r ApiResponseListDraasOnPremise) ToModel() *types.ModelListDraasOnPremise {
+func (r APIResponseListDraasOnPremise) ToModel() *types.ModelListDraasOnPremise {
 	return &types.ModelListDraasOnPremise{
 		IPs: []string(r),
 	}

@@ -27,7 +27,7 @@ const (
 
 var logger = xlog.GetGlobalLogger()
 
-func NewClient(opts ...OptionFunc) (cav.Client, *MockServer, error) {
+func NewClient(opts ...OptionFunc) (cav.Client, *Server, error) {
 	Options := &Options{}
 	for _, opt := range opts {
 		if err := opt(Options); err != nil {

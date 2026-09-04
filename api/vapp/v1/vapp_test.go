@@ -44,8 +44,8 @@ func TestListVApp(t *testing.T) {
 			expectedErr:        false,
 		},
 		{
-			name:       "List VApps with empty VDC ID",
-			vdcID:      "",
+			name:        "List VApps with empty VDC ID",
+			vdcID:       "",
 			expectedErr: true,
 		},
 		{
@@ -64,8 +64,8 @@ func TestListVApp(t *testing.T) {
 			client, ms := newClient(t)
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
-				ms.CleanResponse(endpoints.ListVapp())
-				ms.SetResponse(endpoints.ListVapp(), tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.ListVApp())
+				ms.SetResponse(endpoints.ListVApp(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			resp, err := client.ListVApp(t.Context(), tt.vdcID)
@@ -117,7 +117,7 @@ func TestGetVApp(t *testing.T) {
 				},
 			},
 			mockListResponseStatus: 200,
-			expectedErr:             false,
+			expectedErr:            false,
 		},
 		{
 			name: "Error 401 Unauthorized",
@@ -143,13 +143,13 @@ func TestGetVApp(t *testing.T) {
 			client, ms := newClient(t)
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
-				ms.CleanResponse(endpoints.GetVapp())
-				ms.SetResponse(endpoints.GetVapp(), tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.GetVApp())
+				ms.SetResponse(endpoints.GetVApp(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			if tt.mockListResponse != nil || tt.mockListResponseStatus != 0 {
-				ms.CleanResponse(endpoints.ListVapp())
-				ms.SetResponse(endpoints.ListVapp(), tt.mockListResponse, &tt.mockListResponseStatus)
+				ms.CleanResponse(endpoints.ListVApp())
+				ms.SetResponse(endpoints.ListVApp(), tt.mockListResponse, &tt.mockListResponseStatus)
 			}
 
 			resp, err := client.GetVApp(t.Context(), tt.params)
@@ -199,7 +199,7 @@ func TestCreateVApp(t *testing.T) {
 				},
 			},
 			mockListResponseStatus: 200,
-			expectedErr:             false,
+			expectedErr:            false,
 		},
 		{
 			name: "Create VApp with missing required parameters",
@@ -225,18 +225,18 @@ func TestCreateVApp(t *testing.T) {
 			client, ms := newClient(t)
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
-				ms.CleanResponse(endpoints.CreateVapp())
-				ms.SetResponse(endpoints.CreateVapp(), tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.CreateVApp())
+				ms.SetResponse(endpoints.CreateVApp(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			if tt.mockGetResponse != nil || tt.mockGetResponseStatus != 0 {
-				ms.CleanResponse(endpoints.GetVapp())
-				ms.SetResponse(endpoints.GetVapp(), tt.mockGetResponse, &tt.mockGetResponseStatus)
+				ms.CleanResponse(endpoints.GetVApp())
+				ms.SetResponse(endpoints.GetVApp(), tt.mockGetResponse, &tt.mockGetResponseStatus)
 			}
 
 			if tt.mockListResponse != nil || tt.mockListResponseStatus != 0 {
-				ms.CleanResponse(endpoints.ListVapp())
-				ms.SetResponse(endpoints.ListVapp(), tt.mockListResponse, &tt.mockListResponseStatus)
+				ms.CleanResponse(endpoints.ListVApp())
+				ms.SetResponse(endpoints.ListVApp(), tt.mockListResponse, &tt.mockListResponseStatus)
 			}
 
 			resp, err := client.CreateVApp(t.Context(), tt.params)
@@ -295,18 +295,18 @@ func TestDeleteVApp(t *testing.T) {
 			client, ms := newClient(t)
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
-				ms.CleanResponse(endpoints.DeleteVapp())
-				ms.SetResponse(endpoints.DeleteVapp(), tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.DeleteVApp())
+				ms.SetResponse(endpoints.DeleteVApp(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			if tt.mockGetResponseStatus != 0 {
-				ms.CleanResponse(endpoints.GetVapp())
-				ms.SetResponse(endpoints.GetVapp(), nil, &tt.mockGetResponseStatus)
+				ms.CleanResponse(endpoints.GetVApp())
+				ms.SetResponse(endpoints.GetVApp(), nil, &tt.mockGetResponseStatus)
 			}
 
 			if tt.mockListResponse != nil || tt.mockListResponseStatus != 0 {
-				ms.CleanResponse(endpoints.ListVapp())
-				ms.SetResponse(endpoints.ListVapp(), tt.mockListResponse, &tt.mockListResponseStatus)
+				ms.CleanResponse(endpoints.ListVApp())
+				ms.SetResponse(endpoints.ListVApp(), tt.mockListResponse, &tt.mockListResponseStatus)
 			}
 
 			err := client.DeleteVApp(t.Context(), tt.params)

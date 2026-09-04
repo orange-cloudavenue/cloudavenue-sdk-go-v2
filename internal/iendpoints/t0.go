@@ -27,7 +27,7 @@ func init() {
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendInfrapi,
 		PathTemplate:     "/api/customers/v2.0/network",
-		ResponseType:     itypes.ApiResponseT0s{},
+		ResponseType:     itypes.APIResponseT0s{},
 
 		QueryParams: []cav.QueryParam{
 			// Query parameters are not used in this endpoint, but can be added
@@ -45,7 +45,7 @@ func init() {
 				Description: "The name of the Edge Gateway",
 				Required:    false,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "resource_name=edgegateway")
+					return validators.New().Var(value, ruleResourceNameEdgeGateway)
 				},
 			},
 			{
@@ -53,7 +53,7 @@ func init() {
 				Description: "The ID of the Edge Gateway",
 				Required:    false,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=edgegateway")
+					return validators.New().Var(value, urnEdgeGateway)
 				},
 			},
 		},

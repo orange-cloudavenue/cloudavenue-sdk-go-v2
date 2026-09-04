@@ -21,6 +21,8 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
+const oseSessionKeyOrganizationID = "organizationID"
+
 var _ subClientInterface = &ose{}
 
 type ose struct {
@@ -73,7 +75,7 @@ func (o *ose) parseAPIError(operation string, resp *resty.Response) *errors.APIE
 	return &errors.APIError{
 		Operation:  operation,
 		StatusCode: resp.StatusCode(),
-		Message:    "Unknown error occurred",
+		Message:    unknownErrorMessage,
 		Duration:   resp.Duration(),
 		Endpoint:   resp.Request.URL,
 		Method:     resp.Request.Method,
@@ -94,7 +96,7 @@ func (o *ose) ContextData(_ context.Context) ContextData {
 
 	extra := o.getCredential().getExtraData()
 	return ContextData{
-		OrganizationID: extra["organizationID"],
+		OrganizationID: extra[oseSessionKeyOrganizationID],
 		SiteID:         extra["siteID"],
 	}
 }
@@ -138,8 +140,8 @@ func (o *ose) GetS3Credentials(ctx context.Context, orgID, username string) (acc
 	resp, err := hC.R().
 		SetContext(ctx).
 		SetPathParams(map[string]string{
-			"organizationID": orgID,
-			"userName":       username,
+			oseSessionKeyOrganizationID: orgID,
+			"userName":                  username,
 		}).
 		SetResult(&creds).
 		Get("/api/v1/core/tenants/{organizationID}/users/{userName}/credentials")

@@ -16,7 +16,6 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
-//go:generate command-generator
 type (
 	Client struct {
 		c      cav.Client

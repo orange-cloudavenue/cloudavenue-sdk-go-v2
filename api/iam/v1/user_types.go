@@ -23,8 +23,8 @@ type ParamsCreateLocalUser struct {
 	Telephone       string
 	Description     string
 	IsEnabled       bool
-	DeployedVmQuota int
-	StoredVmQuota   int
+	DeployedVMQuota int
+	StoredVMQuota   int
 }
 
 // Validate checks ParamsCreateLocalUser structural constraints.
@@ -88,8 +88,8 @@ type ParamsUpdateUser struct {
 	Telephone       string
 	Description     string
 	IsEnabled       *bool
-	DeployedVmQuota int
-	StoredVmQuota   int
+	DeployedVMQuota int
+	StoredVMQuota   int
 }
 
 // Validate checks ParamsUpdateUser structural constraints.
@@ -198,10 +198,10 @@ type ModelUser struct {
 	IsEnabled bool `documentation:"Indicates if the user is enabled"`
 
 	// Deployed VM quota for the user
-	DeployedVmQuota int `documentation:"Deployed VM quota for the user"`
+	DeployedVMQuota int `documentation:"Deployed VM quota for the user"`
 
 	// Stored VM quota for the user
-	StoredVmQuota int `documentation:"Stored VM quota for the user"`
+	StoredVMQuota int `documentation:"Stored VM quota for the user"`
 
 	// Provider type of the user (e.g., INTEGRATED, SAML)
 	ProviderType string `documentation:"Provider type of the user"`

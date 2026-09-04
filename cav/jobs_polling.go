@@ -11,8 +11,9 @@ package cav
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
-	"math/rand/v2"
+	"math/big"
 	"time"
 
 	"resty.dev/v3"
@@ -80,5 +81,11 @@ func withJitter(interval, jitter time.Duration) time.Duration {
 		return interval
 	}
 
-	return interval + time.Duration(rand.Int64N(int64(jitter)*2+1)) - jitter
+	maxJitter := int64(jitter)*2 + 1
+	n, err := rand.Int(rand.Reader, big.NewInt(maxJitter))
+	if err != nil {
+		return interval
+	}
+
+	return interval + time.Duration(n.Int64()) - jitter
 }

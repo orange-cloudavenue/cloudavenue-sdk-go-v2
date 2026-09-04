@@ -13,50 +13,50 @@ import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 
 type (
 	// * List
-	ApiResponseListNetworkContextProfile struct {
-		Values []ApiResponseNetworkContextProfile `json:"values" fakesize:"3"`
+	APIResponseListNetworkContextProfile struct {
+		Values []APIResponseNetworkContextProfile `json:"values" fakesize:"3"`
 	}
 
 	// * Get / Create / Update / shared model
-	ApiResponseNetworkContextProfile struct {
+	APIResponseNetworkContextProfile struct {
 		ID              string                              `json:"id,omitempty" fake:"{uuid}"`
 		Name            string                              `json:"name,omitempty" fake:"mocknetworkcontextprofile-{word}"`
 		Description     string                              `json:"description,omitempty" fake:"{sentence}"`
 		Scope           string                              `json:"scope,omitempty"`
-		OrgRef          *ApiObjectReference                 `json:"orgRef,omitempty"`
-		ContextEntityId string                              `json:"contextEntityId,omitempty"`
-		Attributes      []ApiNetworkContextProfileAttribute `json:"attributes,omitempty"`
+		OrgRef          *APIObjectReference                 `json:"orgRef,omitempty"`
+		ContextEntityID string                              `json:"contextEntityId,omitempty"`
+		Attributes      []APINetworkContextProfileAttribute `json:"attributes,omitempty"`
 	}
 
-	ApiNetworkContextProfileAttribute struct {
+	APINetworkContextProfileAttribute struct {
 		Type          string                                 `json:"type"`
 		Values        []string                               `json:"values,omitempty"`
-		SubAttributes []ApiNetworkContextProfileSubAttribute `json:"subAttributes,omitempty"`
+		SubAttributes []APINetworkContextProfileSubAttribute `json:"subAttributes,omitempty"`
 	}
 
-	ApiNetworkContextProfileSubAttribute struct {
+	APINetworkContextProfileSubAttribute struct {
 		Type   string   `json:"type"`
 		Values []string `json:"values,omitempty"`
 	}
 
-	// * Create / Update request (same shape as ApiResponseNetworkContextProfile)
-	ApiRequestNetworkContextProfile struct {
+	// * Create / Update request (same shape as APIResponseNetworkContextProfile)
+	APIRequestNetworkContextProfile struct {
 		ID              string                              `json:"id,omitempty"`
 		Name            string                              `json:"name,omitempty"`
 		Description     string                              `json:"description,omitempty"`
 		Scope           string                              `json:"scope,omitempty"`
-		OrgRef          *ApiObjectReference                 `json:"orgRef,omitempty"`
-		ContextEntityId string                              `json:"contextEntityId,omitempty"`
-		Attributes      []ApiNetworkContextProfileAttribute `json:"attributes,omitempty"`
+		OrgRef          *APIObjectReference                 `json:"orgRef,omitempty"`
+		ContextEntityID string                              `json:"contextEntityId,omitempty"`
+		Attributes      []APINetworkContextProfileAttribute `json:"attributes,omitempty"`
 	}
 
 	// * Attributes static reference catalog (live, server-computed)
-	ApiNetworkContextProfileAttributesResponse struct {
-		Attributes []ApiNetworkContextProfileAttribute `json:"attributes,omitempty"`
+	APINetworkContextProfileAttributesResponse struct {
+		Attributes []APINetworkContextProfileAttribute `json:"attributes,omitempty"`
 	}
 )
 
-func (r *ApiResponseListNetworkContextProfile) ToModel() *types.ModelListNetworkContextProfile {
+func (r *APIResponseListNetworkContextProfile) ToModel() *types.ModelListNetworkContextProfile {
 	model := &types.ModelListNetworkContextProfile{
 		NetworkContextProfiles: make([]types.ModelGetNetworkContextProfile, 0),
 	}
@@ -68,7 +68,7 @@ func (r *ApiResponseListNetworkContextProfile) ToModel() *types.ModelListNetwork
 	return model
 }
 
-func (r *ApiResponseNetworkContextProfile) ToModel() types.ModelGetNetworkContextProfile {
+func (r *APIResponseNetworkContextProfile) ToModel() types.ModelGetNetworkContextProfile {
 	m := types.ModelGetNetworkContextProfile{
 		ID:          r.ID,
 		Name:        r.Name,
@@ -99,7 +99,7 @@ func (r *ApiResponseNetworkContextProfile) ToModel() types.ModelGetNetworkContex
 	return m
 }
 
-func (r *ApiRequestNetworkContextProfile) ToModel() types.ModelGetNetworkContextProfile {
+func (r *APIRequestNetworkContextProfile) ToModel() types.ModelGetNetworkContextProfile {
 	m := types.ModelGetNetworkContextProfile{
 		ID:          r.ID,
 		Name:        r.Name,

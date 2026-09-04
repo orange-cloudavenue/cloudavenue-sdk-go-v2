@@ -26,8 +26,8 @@ func init() {
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/ssl/certificateLibrary",
-		QueryParams:      []cav.QueryParam{{Name: "filter", Description: "Filter to apply to the list of certificates."}, {Name: "pageSize", Description: "The number of items per page.", Value: "100"}},
-		ResponseType:     itypes.ApiResponseListCertificate{},
+		QueryParams:      []cav.QueryParam{{Name: queryParamFilter, Description: "Filter to apply to the list of certificates."}, {Name: queryParamPageSize, Description: descPageSize, Value: pageSize100}},
+		ResponseType:     itypes.APIResponseListCertificate{},
 	}.Register()
 
 	cav.Endpoint{
@@ -36,16 +36,16 @@ func init() {
 		Description:      "Get a certificate library item",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/ssl/certificateLibrary/{id}",
+		PathTemplate:     pathCertificateLibrary,
 		PathParams: []cav.PathParam{{
 			Name:        "id",
-			Description: "ID of the certificate library item",
+			Description: descCertificateLibraryItemID,
 			Required:    true,
 			ValidatorFunc: func(value string) error {
-				return validators.New().Var(value, "urn=certificateLibraryItem")
+				return validators.New().Var(value, urnCertificateLibraryItem)
 			},
 		}},
-		ResponseType: itypes.ApiResponseCertificate{},
+		ResponseType: itypes.APIResponseCertificate{},
 	}.Register()
 
 	cav.Endpoint{
@@ -55,8 +55,8 @@ func init() {
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/ssl/certificateLibrary",
-		BodyRequestType:  itypes.ApiRequestCertificate{},
-		ResponseType:     itypes.ApiResponseCertificate{},
+		BodyRequestType:  itypes.APIRequestCertificate{},
+		ResponseType:     itypes.APIResponseCertificate{},
 	}.Register()
 
 	cav.Endpoint{
@@ -65,17 +65,17 @@ func init() {
 		Description:      "Update a certificate library item",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/ssl/certificateLibrary/{id}",
+		PathTemplate:     pathCertificateLibrary,
 		PathParams: []cav.PathParam{{
 			Name:        "id",
-			Description: "ID of the certificate library item",
+			Description: descCertificateLibraryItemID,
 			Required:    true,
 			ValidatorFunc: func(value string) error {
-				return validators.New().Var(value, "urn=certificateLibraryItem")
+				return validators.New().Var(value, urnCertificateLibraryItem)
 			},
 		}},
-		BodyRequestType: itypes.ApiRequestCertificate{},
-		ResponseType:    itypes.ApiResponseCertificate{},
+		BodyRequestType: itypes.APIRequestCertificate{},
+		ResponseType:    itypes.APIResponseCertificate{},
 	}.Register()
 
 	cav.Endpoint{
@@ -84,13 +84,13 @@ func init() {
 		Description:      "Delete a certificate library item",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/ssl/certificateLibrary/{id}",
+		PathTemplate:     pathCertificateLibrary,
 		PathParams: []cav.PathParam{{
 			Name:        "id",
-			Description: "ID of the certificate library item",
+			Description: descCertificateLibraryItemID,
 			Required:    true,
 			ValidatorFunc: func(value string) error {
-				return validators.New().Var(value, "urn=certificateLibraryItem")
+				return validators.New().Var(value, urnCertificateLibraryItem)
 			},
 		}},
 	}.Register()

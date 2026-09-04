@@ -76,7 +76,7 @@ func TestGetEdgeGatewayServices(t *testing.T) {
 			params: &types.ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgegateway}"),
 			},
-			mockResponse:       &itypes.ApiResponseNetworkServices{},
+			mockResponse:       &itypes.APIResponseNetworkServices{},
 			mockResponseStatus: http.StatusOK,
 			expectedErr:        true,
 		},
@@ -254,11 +254,11 @@ func TestDisableCloudavenueServices(t *testing.T) {
 			params: types.ParamsEdgeGateway{
 				ID: validEdgeGWID,
 			},
-			mockGetNetworkServicesResponse: &itypes.ApiResponseNetworkServices{
+			mockGetNetworkServicesResponse: &itypes.APIResponseNetworkServices{
 				{
 					Type: "tier-0-vrf",
 					Name: "test-t0",
-					Children: []itypes.ApiResponseNetworkServicesChildren{
+					Children: []itypes.APIResponseNetworkServicesChildren{
 						{
 							Type: "edge-gateway",
 							Name: validEdgeGWName,
@@ -268,7 +268,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
-							Children: []itypes.ApiResponseNetworkServicesSubChildren{
+							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
 									Name:      "cav-services",
@@ -287,8 +287,8 @@ func TestDisableCloudavenueServices(t *testing.T) {
 			params: types.ParamsEdgeGateway{
 				Name: validEdgeGWName,
 			},
-			mockQueryResponse: &itypes.ApiResponseQueryEdgeGateway{
-				Record: []itypes.ApiResponseQueryEdgeGatewayRecord{
+			mockQueryResponse: &itypes.APIResponseQueryEdgeGateway{
+				Record: []itypes.APIResponseQueryEdgeGatewayRecord{
 					{
 						ID:   validEdgeGWID,
 						HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
@@ -297,10 +297,10 @@ func TestDisableCloudavenueServices(t *testing.T) {
 				},
 			},
 			mockQueryResponseStatus: http.StatusOK,
-			mockGetNetworkServicesResponse: &itypes.ApiResponseNetworkServices{
+			mockGetNetworkServicesResponse: &itypes.APIResponseNetworkServices{
 				{
 					Type: "tier-0-vrf",
-					Children: []itypes.ApiResponseNetworkServicesChildren{
+					Children: []itypes.APIResponseNetworkServicesChildren{
 						{
 							Type: "edge-gateway",
 							Name: validEdgeGWName,
@@ -310,7 +310,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
-							Children: []itypes.ApiResponseNetworkServicesSubChildren{
+							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
 									Name:      "cav-services",
@@ -346,10 +346,10 @@ func TestDisableCloudavenueServices(t *testing.T) {
 			params: types.ParamsEdgeGateway{
 				ID: validEdgeGWID,
 			},
-			mockGetNetworkServicesResponse: &itypes.ApiResponseNetworkServices{
+			mockGetNetworkServicesResponse: &itypes.APIResponseNetworkServices{
 				{
 					Type: "tier-0-vrf",
-					Children: []itypes.ApiResponseNetworkServicesChildren{
+					Children: []itypes.APIResponseNetworkServicesChildren{
 						{
 							Type: "edge-gateway",
 							Name: validEdgeGWName,
@@ -359,7 +359,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
-							Children: []itypes.ApiResponseNetworkServicesSubChildren{
+							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
 									Name:      "cav-services",
@@ -379,10 +379,10 @@ func TestDisableCloudavenueServices(t *testing.T) {
 			params: types.ParamsEdgeGateway{
 				ID: validEdgeGWID,
 			},
-			mockGetNetworkServicesResponse: &itypes.ApiResponseNetworkServices{
+			mockGetNetworkServicesResponse: &itypes.APIResponseNetworkServices{
 				{
 					Type: "tier-0-vrf",
-					Children: []itypes.ApiResponseNetworkServicesChildren{
+					Children: []itypes.APIResponseNetworkServicesChildren{
 						{
 							Type: "edge-gateway",
 							Name: validEdgeGWName,
@@ -392,7 +392,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
-							Children: []itypes.ApiResponseNetworkServicesSubChildren{
+							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
 									Name:      "cav-services",
@@ -424,8 +424,8 @@ func TestDisableCloudavenueServices(t *testing.T) {
 				epQuery := endpoints.QueryEdgeGateway()
 				ms.CleanResponse(epQuery)
 				ms.SetResponse(epQuery, tt.mockQueryResponse, &tt.mockQueryResponseStatus)
-				ms.CleanResponse(endpoints.ListVdc())
-				ms.SetResponse(endpoints.ListVdc(), tt.mockQueryResponse, &tt.mockQueryResponseStatus)
+				ms.CleanResponse(endpoints.ListVDC())
+				ms.SetResponse(endpoints.ListVDC(), tt.mockQueryResponse, &tt.mockQueryResponseStatus)
 			}
 
 			epGetNetworkServices := endpoints.GetEdgeGatewayServices()
@@ -447,7 +447,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 
 			ms.CleanResponse(ep)
 			ms.CleanResponse(endpoints.QueryEdgeGateway())
-			ms.CleanResponse(endpoints.ListVdc())
+			ms.CleanResponse(endpoints.ListVDC())
 			ms.CleanResponse(endpoints.GetEdgeGatewayServices())
 			ms.CleanResponse(endpoints.ListT0())
 		})
@@ -475,10 +475,10 @@ func TestGetCloudavenueServices(t *testing.T) {
 			params: types.ParamsEdgeGateway{
 				ID: validEdgeGWID,
 			},
-			mockGetNetworkServicesResponse: &itypes.ApiResponseNetworkServices{
+			mockGetNetworkServicesResponse: &itypes.APIResponseNetworkServices{
 				{
 					Type: "tier-0-vrf",
-					Children: []itypes.ApiResponseNetworkServicesChildren{
+					Children: []itypes.APIResponseNetworkServicesChildren{
 						{
 							Type: "edge-gateway",
 							Name: validEdgeGWName,
@@ -488,7 +488,7 @@ func TestGetCloudavenueServices(t *testing.T) {
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
-							Children: []itypes.ApiResponseNetworkServicesSubChildren{
+							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
 									Name:      "cav-services",
@@ -507,8 +507,8 @@ func TestGetCloudavenueServices(t *testing.T) {
 			params: types.ParamsEdgeGateway{
 				Name: validEdgeGWName,
 			},
-			mockQueryResponse: &itypes.ApiResponseQueryEdgeGateway{
-				Record: []itypes.ApiResponseQueryEdgeGatewayRecord{
+			mockQueryResponse: &itypes.APIResponseQueryEdgeGateway{
+				Record: []itypes.APIResponseQueryEdgeGatewayRecord{
 					{
 						ID:   validEdgeGWID,
 						HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
@@ -517,10 +517,10 @@ func TestGetCloudavenueServices(t *testing.T) {
 				},
 			},
 			mockQueryResponseStatus: http.StatusOK,
-			mockGetNetworkServicesResponse: &itypes.ApiResponseNetworkServices{
+			mockGetNetworkServicesResponse: &itypes.APIResponseNetworkServices{
 				{
 					Type: "tier-0-vrf",
-					Children: []itypes.ApiResponseNetworkServicesChildren{
+					Children: []itypes.APIResponseNetworkServicesChildren{
 						{
 							Type: "edge-gateway",
 							Name: validEdgeGWName,
@@ -530,7 +530,7 @@ func TestGetCloudavenueServices(t *testing.T) {
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
-							Children: []itypes.ApiResponseNetworkServicesSubChildren{
+							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
 									Name:      "cav-services",
@@ -577,8 +577,8 @@ func TestGetCloudavenueServices(t *testing.T) {
 				epQuery := endpoints.QueryEdgeGateway()
 				ms.CleanResponse(epQuery)
 				ms.SetResponse(epQuery, tt.mockQueryResponse, &tt.mockQueryResponseStatus)
-				ms.CleanResponse(endpoints.ListVdc())
-				ms.SetResponse(endpoints.ListVdc(), tt.mockQueryResponse, &tt.mockQueryResponseStatus)
+				ms.CleanResponse(endpoints.ListVDC())
+				ms.SetResponse(endpoints.ListVDC(), tt.mockQueryResponse, &tt.mockQueryResponseStatus)
 			}
 
 			epGetNetworkServices := endpoints.GetEdgeGatewayServices()
@@ -600,7 +600,7 @@ func TestGetCloudavenueServices(t *testing.T) {
 			}
 
 			ms.CleanResponse(endpoints.QueryEdgeGateway())
-			ms.CleanResponse(endpoints.ListVdc())
+			ms.CleanResponse(endpoints.ListVDC())
 			ms.CleanResponse(endpoints.GetEdgeGatewayServices())
 			ms.CleanResponse(endpoints.ListT0())
 		})

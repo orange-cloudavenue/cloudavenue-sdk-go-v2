@@ -11,16 +11,18 @@ package cav
 
 import "errors"
 
+const sessionKeyOrganizationID = "organizationID"
+
 // getSession returns session data for cache persistence.
 func (c *cloudavenueCredential) getSession() map[string]string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
 	return map[string]string{
-		"organization":   c.organization,
-		"organizationID": c.organizationID,
-		"siteID":         c.siteID,
-		"bearer":         c.bearer,
+		"organization":           c.organization,
+		sessionKeyOrganizationID: c.organizationID,
+		"siteID":                 c.siteID,
+		"bearer":                 c.bearer,
 	}
 }
 
@@ -36,7 +38,7 @@ func (c *cloudavenueCredential) restoreSession(data map[string]string) error {
 	defer c.mu.Unlock()
 	c.organization = data["organization"]
 	c.bearer = data["bearer"]
-	c.organizationID = data["organizationID"]
+	c.organizationID = data[sessionKeyOrganizationID]
 	c.siteID = data["siteID"]
 
 	return nil
@@ -48,7 +50,7 @@ func (c *cloudavenueCredential) getExtraData() map[string]string {
 	defer c.mu.RUnlock()
 
 	return map[string]string{
-		"organizationID": c.organizationID,
-		"siteID":         c.siteID,
+		sessionKeyOrganizationID: c.organizationID,
+		"siteID":                 c.siteID,
 	}
 }

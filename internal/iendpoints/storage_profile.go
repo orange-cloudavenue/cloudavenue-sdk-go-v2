@@ -34,7 +34,7 @@ func init() {
 		PathTemplate:     "/api/query/",
 		QueryParams: []cav.QueryParam{
 			{
-				Name:        "filter",
+				Name:        queryParamFilter,
 				Description: "Filter to apply to the list of VDC Storage Profile. Format: key==value. Supported keys: vdc, vdcName, name, id.",
 				ValidatorFunc: func(value string) error {
 					// Support multiple filters separated by ';'
@@ -42,21 +42,21 @@ func init() {
 					for filter := range filters {
 						valueSplit := strings.Split(filter, "==")
 						if len(valueSplit) != 2 {
-							return errors.New("filter must be in the format 'key==value' or 'key1==value1;key2==value2'")
+							return errors.New(errFilterFormatMultiple)
 						}
 						switch valueSplit[0] {
-						case "vdc":
-							if err := validators.New().Var(valueSplit[1], "urn=vdc"); err != nil {
+						case queryParamVDC:
+							if err := validators.New().Var(valueSplit[1], urnVDC); err != nil {
 								return err
 							}
-						case "vdcName", "name":
+						case "vdcName", sortAscName:
 							// No specific format required
 						case "id":
-							if err := validators.New().Var(valueSplit[1], "urn=vdcstorageProfile"); err != nil {
+							if err := validators.New().Var(valueSplit[1], urnVDCStorageProfile); err != nil {
 								return err
 							}
 						default:
-							return fmt.Errorf("filter key '%s' is not allowed", valueSplit[0])
+							return fmt.Errorf(errFilterKeyNotAllowed, valueSplit[0])
 						}
 					}
 					return nil
@@ -68,10 +68,10 @@ func init() {
 					for _, filter := range filters {
 						valueSplit := strings.Split(filter, "==")
 						if len(valueSplit) != 2 {
-							return "", errors.New("filter must be in the format 'key==value' or 'key1==value1;key2==value2'")
+							return "", errors.New(errFilterFormatMultiple)
 						}
 						switch valueSplit[0] {
-						case "vdc":
+						case queryParamVDC:
 							v, err := extractor.ExtractUUID(valueSplit[1])
 							if err != nil {
 								return "", err
@@ -80,7 +80,7 @@ func init() {
 						case "vdcName":
 							v := valueSplit[1]
 							transformed = append(transformed, fmt.Sprintf("vdcName==%s", v))
-						case "name":
+						case sortAscName:
 							v := valueSplit[1]
 							transformed = append(transformed, fmt.Sprintf("name==%s", v))
 						case "id":
@@ -90,33 +90,33 @@ func init() {
 							}
 							transformed = append(transformed, fmt.Sprintf("id==%s", v))
 						default:
-							return "", fmt.Errorf("filter key '%s' is not allowed", valueSplit[0])
+							return "", fmt.Errorf(errFilterKeyNotAllowed, valueSplit[0])
 						}
 					}
 					return strings.Join(transformed, ";"), nil
 				},
 			},
 			{
-				Name:        "pageSize",
-				Description: "The number of items per page.",
-				Value:       "30",
+				Name:        queryParamPageSize,
+				Description: descPageSize,
+				Value:       pageSize30,
 			},
 			{
-				Name:        "format",
-				Description: "The format of the response.",
-				Value:       "records",
+				Name:        queryParamFormat,
+				Description: descFormatResponse,
+				Value:       formatRecords,
 			},
 			{
-				Name:        "type",
-				Description: "The type of object to query",
-				Value:       "orgVdcStorageProfile",
+				Name:        queryParamType,
+				Description: descTypeOfObjectQuery,
+				Value:       typeOrgVDCStorageProfile,
 			},
 			{
-				Name:        "sortAsc",
+				Name:        queryParamSortAsc,
 				Description: "Sort the results in ascending order.",
-				Value:       "name",
+				Value:       sortAscName,
 			},
 		},
-		ResponseType: itypes.ApiResponseListStorageProfiles{},
+		ResponseType: itypes.APIResponseListStorageProfiles{},
 	}.Register()
 }

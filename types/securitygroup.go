@@ -11,11 +11,11 @@ package types
 
 type (
 	ParamsListSecurityGroup struct {
-		// VdcGroupID is the ID of the Vdc Group owning the Security Groups.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning the Security Groups.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning the Security Groups.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning the Security Groups.
+		VDCGroupName string
 	}
 
 	ParamsGetSecurityGroup struct {
@@ -25,11 +25,11 @@ type (
 		// Name is the name of the Security Group.
 		Name string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Security Group.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Security Group.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Security Group.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Security Group.
+		VDCGroupName string
 	}
 
 	ParamsCreateSecurityGroup struct {
@@ -39,11 +39,11 @@ type (
 		// Description is the description of the Security Group.
 		Description string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Security Group.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Security Group.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Security Group.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Security Group.
+		VDCGroupName string
 
 		// Members is the list of Org VDC network references to attach to this Security Group.
 		Members []ParamsFirewallGroupMember
@@ -67,11 +67,11 @@ type (
 		// Description is the new description of the Security Group.
 		Description string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Security Group.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Security Group.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Security Group.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Security Group.
+		VDCGroupName string
 
 		// Members is the list of Org VDC network references to attach to this Security Group.
 		Members []ParamsFirewallGroupMember
@@ -84,10 +84,10 @@ type (
 		// Name is the name of the Security Group to delete.
 		Name string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Security Group.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Security Group.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Security Group.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Security Group.
+		VDCGroupName string
 	}
 )

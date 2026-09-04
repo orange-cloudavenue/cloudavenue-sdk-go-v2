@@ -32,7 +32,7 @@ func (c *Client) CreatePublicIP(ctx context.Context, params types.ParamsEdgeGate
 		return nil, fmt.Errorf("id or name is required")
 	}
 
-	ep := endpoints.CreatePublicIp()
+	ep := endpoints.CreatePublicIP()
 
 	if params.ID == "" {
 		var err error
@@ -42,15 +42,15 @@ func (c *Client) CreatePublicIP(ctx context.Context, params types.ParamsEdgeGate
 		}
 	}
 
-	edgeId, err := extractor.ExtractUUID(params.ID)
+	edgeID, err := extractor.ExtractUUID(params.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	body := itypes.ApiRequestEdgegatewayPublicIP{
+	body := itypes.APIRequestEdgegatewayPublicIP{
 		NetworkType:   "internet",
-		EdgeGatewayID: edgeId,
-		Properties: itypes.ApiRequestEdgegatewayPublicIPProperties{
+		EdgeGatewayID: edgeID,
+		Properties: itypes.APIRequestEdgegatewayPublicIPProperties{
 			Announced: true,
 		},
 	}
@@ -159,7 +159,7 @@ func (c *Client) GetPublicIP(ctx context.Context, params types.ParamsGetEdgeGate
 		return nil, fmt.Errorf("error retrieving network services for edge gateway %s: %w", params.ID, err)
 	}
 
-	data := resp.Result().(*itypes.ApiResponseNetworkServices).ToModel(types.ParamsEdgeGateway{
+	data := resp.Result().(*itypes.APIResponseNetworkServices).ToModel(types.ParamsEdgeGateway{
 		ID:   params.ID,
 		Name: params.Name,
 	})
@@ -190,12 +190,12 @@ func (c *Client) DeletePublicIP(ctx context.Context, params types.ParamsDeleteEd
 	}
 
 	ep := endpoints.DisableCloudavenueServices()
-	ipId := fmt.Sprintf("ip-%s", strings.ReplaceAll(params.IP, ".", "-"))
+	ipID := fmt.Sprintf("ip-%s", strings.ReplaceAll(params.IP, ".", "-"))
 
 	_, err := c.c.Do(
 		ctx,
 		ep,
-		cav.WithPathParam(ep.PathParams[0], ipId),
+		cav.WithPathParam(ep.PathParams[0], ipID),
 	)
 
 	return err

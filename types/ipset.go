@@ -11,11 +11,11 @@ package types
 
 type (
 	ParamsListIPSet struct {
-		// VdcGroupID is the ID of the Vdc Group owning the IP Sets.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning the IP Sets.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning the IP Sets.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning the IP Sets.
+		VDCGroupName string
 	}
 
 	ParamsGetIPSet struct {
@@ -25,11 +25,11 @@ type (
 		// Name is the name of the IP Set.
 		Name string
 
-		// VdcGroupID is the ID of the Vdc Group owning this IP Set.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this IP Set.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this IP Set.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this IP Set.
+		VDCGroupName string
 	}
 
 	ParamsCreateIPSet struct {
@@ -39,11 +39,11 @@ type (
 		// Description is the description of the IP Set.
 		Description string
 
-		// VdcGroupID is the ID of the Vdc Group owning this IP Set.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this IP Set.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this IP Set.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this IP Set.
+		VDCGroupName string
 
 		// IPAddresses is the list of IP addresses, ranges, or CIDRs (IPv4 or IPv6) in this IP Set.
 		IPAddresses []string
@@ -59,11 +59,11 @@ type (
 		// Description is the new description of the IP Set.
 		Description string
 
-		// VdcGroupID is the ID of the Vdc Group owning this IP Set.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this IP Set.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this IP Set.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this IP Set.
+		VDCGroupName string
 
 		// IPAddresses is the list of IP addresses, ranges, or CIDRs (IPv4 or IPv6) in this IP Set.
 		IPAddresses []string
@@ -76,10 +76,10 @@ type (
 		// Name is the name of the IP Set to delete.
 		Name string
 
-		// VdcGroupID is the ID of the Vdc Group owning this IP Set.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this IP Set.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this IP Set.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this IP Set.
+		VDCGroupName string
 	}
 )

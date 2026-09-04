@@ -13,23 +13,21 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
 
-// ListDraasOnPremiseIp - List of on premise IP addresses allowed for this organization's draas offer
+// ListDraasOnPremiseIP - List of on premise IP addresses allowed for this organization's draas offer
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/VCDA/getVcdaIPs
-func ListDraasOnPremiseIp() *cav.Endpoint {
-	return cav.MustGetEndpoint("ListDraasOnPremiseIp")
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/VCDA/getVcdaIPs 
+func ListDraasOnPremiseIP() *cav.Endpoint {
+	return cav.MustGetEndpoint("ListDraasOnPremiseIP")
 }
-
-// AddDraasOnPremiseIp - Allow a new on premise IP address for this organization's draas offer
+// AddDraasOnPremiseIP - Allow a new on premise IP address for this organization's draas offer
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/VCDA/postVcdaIPs
-func AddDraasOnPremiseIp() *cav.Endpoint {
-	return cav.MustGetEndpoint("AddDraasOnPremiseIp")
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/VCDA/postVcdaIPs 
+func AddDraasOnPremiseIP() *cav.Endpoint {
+	return cav.MustGetEndpoint("AddDraasOnPremiseIP")
 }
-
-// RemoveDraasOnPremiseIp - Remove an on premise IP address from this organization's draas offer
+// RemoveDraasOnPremiseIP - Remove an on premise IP address from this organization's draas offer
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/VCDA/deleteVcdaIPs
-func RemoveDraasOnPremiseIp() *cav.Endpoint {
-	return cav.MustGetEndpoint("RemoveDraasOnPremiseIp")
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/VCDA/deleteVcdaIPs 
+func RemoveDraasOnPremiseIP() *cav.Endpoint {
+	return cav.MustGetEndpoint("RemoveDraasOnPremiseIP")
 }

@@ -20,7 +20,7 @@ import (
 
 // AppPortProfile is a distinct NSX-T resource from FirewallGroup: it is not
 // owned by a single OwnerRef, but instead carries both an OrgRef (Org ID) and
-// a ContextEntityId (VDC, VdcGroup, or NSX-T Manager URN depending on Scope).
+// a ContextEntityID (VDC, VDCGroup, or NSX-T Manager URN depending on Scope).
 // Unlike FirewallGroup, List/Create use the bare resource path (no
 // "/summaries" suffix). Create/Update/Delete are synchronous (no async job).
 func init() {
@@ -34,16 +34,16 @@ func init() {
 		PathTemplate:     "/cloudapi/1.0.0/applicationPortProfiles",
 		QueryParams: []cav.QueryParam{
 			{
-				Name:        "filter",
+				Name:        queryParamFilter,
 				Description: "Filter to apply to the list of Application Port Profiles. Format: key==value;key==value. Allowed keys: scope, _context, name, id.",
 			},
 			{
-				Name:        "pageSize",
-				Description: "The number of items per page.",
-				Value:       "100",
+				Name:        queryParamPageSize,
+				Description: descPageSize,
+				Value:       pageSize100,
 			},
 		},
-		ResponseType: itypes.ApiResponseListAppPortProfile{},
+		ResponseType: itypes.APIResponseListAppPortProfile{},
 	}.Register()
 
 	// GetAppPortProfile
@@ -53,18 +53,18 @@ func init() {
 		Description:      "Get an Application Port Profile",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/applicationPortProfiles/{appPortProfileId}",
+		PathTemplate:     pathApplicationPortProfiles,
 		PathParams: []cav.PathParam{
 			{
-				Name:        "appPortProfileId",
+				Name:        pathParamAppPortProfileID,
 				Description: "ID of the Application Port Profile to get",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=applicationPortProfile")
+					return validators.New().Var(value, urnApplicationPortProfile)
 				},
 			},
 		},
-		ResponseType: itypes.ApiResponseAppPortProfile{},
+		ResponseType: itypes.APIResponseAppPortProfile{},
 	}.Register()
 
 	// CreateAppPortProfile
@@ -75,8 +75,8 @@ func init() {
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/applicationPortProfiles",
-		BodyRequestType:  itypes.ApiRequestAppPortProfile{},
-		ResponseType:     itypes.ApiResponseAppPortProfile{},
+		BodyRequestType:  itypes.APIRequestAppPortProfile{},
+		ResponseType:     itypes.APIResponseAppPortProfile{},
 	}.Register()
 
 	// UpdateAppPortProfile
@@ -86,19 +86,19 @@ func init() {
 		Description:      "Update an Application Port Profile",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/applicationPortProfiles/{appPortProfileId}",
+		PathTemplate:     pathApplicationPortProfiles,
 		PathParams: []cav.PathParam{
 			{
-				Name:        "appPortProfileId",
+				Name:        pathParamAppPortProfileID,
 				Description: "ID of the Application Port Profile to update",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=applicationPortProfile")
+					return validators.New().Var(value, urnApplicationPortProfile)
 				},
 			},
 		},
-		BodyRequestType: itypes.ApiRequestAppPortProfile{},
-		ResponseType:    itypes.ApiResponseAppPortProfile{},
+		BodyRequestType: itypes.APIRequestAppPortProfile{},
+		ResponseType:    itypes.APIResponseAppPortProfile{},
 	}.Register()
 
 	// DeleteAppPortProfile
@@ -108,14 +108,14 @@ func init() {
 		Description:      "Delete an Application Port Profile",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/applicationPortProfiles/{appPortProfileId}",
+		PathTemplate:     pathApplicationPortProfiles,
 		PathParams: []cav.PathParam{
 			{
-				Name:        "appPortProfileId",
+				Name:        pathParamAppPortProfileID,
 				Description: "ID of the Application Port Profile to delete",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=applicationPortProfile")
+					return validators.New().Var(value, urnApplicationPortProfile)
 				},
 			},
 		},

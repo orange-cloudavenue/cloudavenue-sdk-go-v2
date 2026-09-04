@@ -33,15 +33,15 @@ func init() {
 		PathTemplate:     "/cloudapi/1.0.0/edgeGateways/{edgeId}",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "edgeId",
-				Description: "The ID of the edge gateway.",
+				Name:        pathParamEdgeID,
+				Description: descEdgeGatewayID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=edgegateway")
+					return validators.New().Var(value, urnEdgeGateway)
 				},
 			},
 		},
-		ResponseType: itypes.ApiResponseEdgegateway{},
+		ResponseType: itypes.APIResponseEdgegateway{},
 	}.Register()
 
 	// QueryEdgeGateway
@@ -52,15 +52,15 @@ func init() {
 		Description:      "Query EdgeGateway",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/api/query",
+		PathTemplate:     pathQueryAPI,
 		QueryParams: []cav.QueryParam{
 			{
-				Name:        "type",
-				Description: "The type of object to query",
-				Value:       "edgeGateway",
+				Name:        queryParamType,
+				Description: descTypeOfObjectQuery,
+				Value:       typeEdgeGateway,
 			},
 			{
-				Name:        "filter",
+				Name:        queryParamFilter,
 				Description: "The filter to apply to the query",
 				Required:    false,
 				ValidatorFunc: func(value string) error {
@@ -76,7 +76,7 @@ func init() {
 		},
 		PathParams:      nil,
 		BodyRequestType: nil,
-		ResponseType:    itypes.ApiResponseQueryEdgeGateway{},
+		ResponseType:    itypes.APIResponseQueryEdgeGateway{},
 	}.Register()
 
 	// CreateEdgeGateway
@@ -97,7 +97,7 @@ func init() {
 				},
 				TransformFunc: func(value string) (string, error) {
 					switch value {
-					case "vdc":
+					case queryParamVDC:
 						return "vdcs", nil
 					case "vdcgroup":
 						return "vdc-groups", nil
@@ -106,13 +106,13 @@ func init() {
 				},
 			},
 			{
-				Name:        "vdc-name",
+				Name:        pathParamVDCName,
 				Description: "The name of the VDC where the edge gateway will be created.",
 				Required:    true,
 			},
 		},
 		QueryParams:     nil,
-		BodyRequestType: itypes.ApiRequestEdgeGateway{},
+		BodyRequestType: itypes.APIRequestEdgeGateway{},
 		ResponseType:    cav.CerberusJobCreatedAPIResponse{},
 	}.Register()
 
@@ -126,16 +126,13 @@ func init() {
 		PathTemplate:     "/api/customers/v2.0/edges/{edgeId}",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "edgeId",
-				Description: "The ID of the edge gateway.",
+				Name:        pathParamEdgeID,
+				Description: descEdgeGatewayID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "required,urn=edgegateway")
+					return validators.New().Var(value, ruleRequiredURNEdgeGateway)
 				},
-				TransformFunc: func(value string) (string, error) {
-					// Transform the value to a uuidv4 format
-					return extractor.ExtractUUID(value)
-				},
+				TransformFunc: extractor.ExtractUUID,
 			},
 		},
 		QueryParams:     nil,
@@ -154,11 +151,11 @@ func init() {
 		PathParams:       nil,
 		QueryParams: []cav.QueryParam{
 			{
-				Name:        "pageSize",
+				Name:        queryParamPageSize,
 				Description: "The number of items to return per page.",
-				Value:       "128",
+				Value:       pageSize128,
 			},
 		},
-		ResponseType: itypes.ApiResponseEdgegateways{},
+		ResponseType: itypes.APIResponseEdgegateways{},
 	}.Register()
 }

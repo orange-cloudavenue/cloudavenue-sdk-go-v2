@@ -24,8 +24,8 @@ func init() {
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/ssl/trustedCertificates",
-		QueryParams:      []cav.QueryParam{{Name: "filter", Description: "Filter to apply to the list of trusted certificates."}, {Name: "pageSize", Description: "The number of items per page.", Value: "100"}},
-		ResponseType:     itypes.ApiResponseListTrustedCertificate{},
+		QueryParams:      []cav.QueryParam{{Name: queryParamFilter, Description: "Filter to apply to the list of trusted certificates."}, {Name: queryParamPageSize, Description: descPageSize, Value: pageSize100}},
+		ResponseType:     itypes.APIResponseListTrustedCertificate{},
 	}.Register()
 
 	cav.Endpoint{
@@ -34,13 +34,13 @@ func init() {
 		Description:      "Get a trusted certificate",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/ssl/trustedCertificates/{trustedCertificate}",
+		PathTemplate:     pathTrustedCertificates,
 		PathParams: []cav.PathParam{{
-			Name:        "trustedCertificate",
-			Description: "ID of the trusted certificate",
+			Name:        pathParamTrustedCertificate,
+			Description: descTrustedCertificateID,
 			Required:    true,
 		}},
-		ResponseType: itypes.ApiResponseTrustedCertificate{},
+		ResponseType: itypes.APIResponseTrustedCertificate{},
 	}.Register()
 
 	cav.Endpoint{
@@ -50,8 +50,8 @@ func init() {
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/ssl/trustedCertificates",
-		BodyRequestType:  itypes.ApiRequestTrustedCertificate{},
-		ResponseType:     itypes.ApiResponseTrustedCertificate{},
+		BodyRequestType:  itypes.APIRequestTrustedCertificate{},
+		ResponseType:     itypes.APIResponseTrustedCertificate{},
 	}.Register()
 
 	cav.Endpoint{
@@ -60,14 +60,14 @@ func init() {
 		Description:      "Update a trusted certificate",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/ssl/trustedCertificates/{trustedCertificate}",
+		PathTemplate:     pathTrustedCertificates,
 		PathParams: []cav.PathParam{{
-			Name:        "trustedCertificate",
-			Description: "ID of the trusted certificate",
+			Name:        pathParamTrustedCertificate,
+			Description: descTrustedCertificateID,
 			Required:    true,
 		}},
-		BodyRequestType: itypes.ApiRequestTrustedCertificate{},
-		ResponseType:    itypes.ApiResponseTrustedCertificate{},
+		BodyRequestType: itypes.APIRequestTrustedCertificate{},
+		ResponseType:    itypes.APIResponseTrustedCertificate{},
 	}.Register()
 
 	cav.Endpoint{
@@ -76,10 +76,10 @@ func init() {
 		Description:      "Delete a trusted certificate",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/ssl/trustedCertificates/{trustedCertificate}",
+		PathTemplate:     pathTrustedCertificates,
 		PathParams: []cav.PathParam{{
-			Name:        "trustedCertificate",
-			Description: "ID of the trusted certificate",
+			Name:        pathParamTrustedCertificate,
+			Description: descTrustedCertificateID,
 			Required:    true,
 		}},
 	}.Register()

@@ -35,7 +35,7 @@ func IsAppPortProfileURN(idOrName string) bool {
 	return urn.IsAppPortProfile(idOrName)
 }
 
-func FindAppPortProfile(ctx context.Context, c cav.Client, idOrName, vdcGroupID string) (*itypes.ApiResponseAppPortProfile, error) {
+func FindAppPortProfile(ctx context.Context, c cav.Client, idOrName, vdcGroupID string) (*itypes.APIResponseAppPortProfile, error) {
 	if IsAppPortProfileURN(idOrName) {
 		ep := endpoints.GetAppPortProfile()
 
@@ -48,10 +48,10 @@ func FindAppPortProfile(ctx context.Context, c cav.Client, idOrName, vdcGroupID 
 			return nil, err
 		}
 
-		return resp.Result().(*itypes.ApiResponseAppPortProfile), nil
+		return resp.Result().(*itypes.APIResponseAppPortProfile), nil
 	}
 
-	var found []itypes.ApiResponseAppPortProfile
+	var found []itypes.APIResponseAppPortProfile
 	for _, scope := range appPortProfileScopes {
 		ep := endpoints.ListAppPortProfile()
 
@@ -64,7 +64,7 @@ func FindAppPortProfile(ctx context.Context, c cav.Client, idOrName, vdcGroupID 
 			continue
 		}
 
-		list := resp.Result().(*itypes.ApiResponseListAppPortProfile)
+		list := resp.Result().(*itypes.APIResponseListAppPortProfile)
 		if len(list.Values) == 0 {
 			continue
 		}
@@ -106,10 +106,10 @@ func ValidateAppPortProfileApplicationPorts(ports []types.ParamsAppPortProfilePo
 	return nil
 }
 
-func ToApiAppPortProfilePorts(ports []types.ParamsAppPortProfilePort) []itypes.ApiAppPortProfilePort {
-	out := make([]itypes.ApiAppPortProfilePort, 0, len(ports))
+func ToAPIAppPortProfilePorts(ports []types.ParamsAppPortProfilePort) []itypes.APIAppPortProfilePort {
+	out := make([]itypes.APIAppPortProfilePort, 0, len(ports))
 	for _, p := range ports {
-		out = append(out, itypes.ApiAppPortProfilePort{
+		out = append(out, itypes.APIAppPortProfilePort{
 			Protocol:         p.Protocol,
 			DestinationPorts: p.DestinationPorts,
 		})

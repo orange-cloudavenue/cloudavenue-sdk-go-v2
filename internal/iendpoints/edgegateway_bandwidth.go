@@ -30,20 +30,17 @@ func init() {
 		PathTemplate:     "/api/customers/v2.0/edges/{edgeId}",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "edgeId",
-				Description: "The ID of the edge gateway.",
+				Name:        pathParamEdgeID,
+				Description: descEdgeGatewayID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "required,urn=edgegateway")
+					return validators.New().Var(value, ruleRequiredURNEdgeGateway)
 				},
-				TransformFunc: func(value string) (string, error) {
-					// Transform the value to a uuidv4 format
-					return extractor.ExtractUUID(value)
-				},
+				TransformFunc: extractor.ExtractUUID,
 			},
 		},
 		QueryParams:     nil,
-		BodyRequestType: itypes.ApiRequestBandwidth{},
+		BodyRequestType: itypes.APIRequestBandwidth{},
 		ResponseType:    cav.Job{},
 	}.Register()
 }

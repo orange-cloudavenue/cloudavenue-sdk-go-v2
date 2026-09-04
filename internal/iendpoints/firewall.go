@@ -27,111 +27,111 @@ import (
 // policy at the time these endpoints were introduced. All operations are
 // synchronous (no async job).
 func init() {
-	// GetDfwPolicies
+	// GetDFWPolicies
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/get/",
-		Name:             "GetDfwPolicies",
+		Name:             "GetDFWPolicies",
 		Description:      "Get the Distributed Firewall policies (enabled state and default policy) of a VDC Group",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}/dfwPolicies",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "vdcGroupId",
-				Description: "ID of the VDC Group",
+				Name:        pathParamVDCGroupID,
+				Description: descVDCGroupID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=vdcGroup")
+					return validators.New().Var(value, urnVDCGroup)
 				},
 			},
 		},
-		ResponseType: itypes.ApiDfwPolicies{},
+		ResponseType: itypes.APIDFWPolicies{},
 	}.Register()
 
-	// UpdateDfwPolicies
+	// UpdateDFWPolicies
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/put/",
-		Name:             "UpdateDfwPolicies",
+		Name:             "UpdateDFWPolicies",
 		Description:      "Update the Distributed Firewall policies (enabled state) of a VDC Group",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}/dfwPolicies",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "vdcGroupId",
-				Description: "ID of the VDC Group",
+				Name:        pathParamVDCGroupID,
+				Description: descVDCGroupID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=vdcGroup")
+					return validators.New().Var(value, urnVDCGroup)
 				},
 			},
 		},
-		BodyRequestType: itypes.ApiDfwPolicies{},
-		ResponseType:    itypes.ApiDfwPolicies{},
+		BodyRequestType: itypes.APIDFWPolicies{},
+		ResponseType:    itypes.APIDFWPolicies{},
 	}.Register()
 
-	// UpdateDfwDefaultPolicy
+	// UpdateDFWDefaultPolicy
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/default/put/",
-		Name:             "UpdateDfwDefaultPolicy",
+		Name:             "UpdateDFWDefaultPolicy",
 		Description:      "Update the default Distributed Firewall policy of a VDC Group",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}/dfwPolicies/default",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "vdcGroupId",
-				Description: "ID of the VDC Group",
+				Name:        pathParamVDCGroupID,
+				Description: descVDCGroupID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=vdcGroup")
+					return validators.New().Var(value, urnVDCGroup)
 				},
 			},
 		},
-		BodyRequestType: itypes.ApiDfwDefaultPolicy{},
-		ResponseType:    itypes.ApiDfwDefaultPolicy{},
+		BodyRequestType: itypes.APIDfwDefaultPolicy{},
+		ResponseType:    itypes.APIDfwDefaultPolicy{},
 	}.Register()
 
-	// GetDfwRules
+	// GetDFWRules
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/default/rules/get/",
-		Name:             "GetDfwRules",
+		Name:             "GetDFWRules",
 		Description:      "Get the Distributed Firewall rules of a VDC Group",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}/dfwPolicies/default/rules",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "vdcGroupId",
-				Description: "ID of the VDC Group",
+				Name:        pathParamVDCGroupID,
+				Description: descVDCGroupID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=vdcGroup")
+					return validators.New().Var(value, urnVDCGroup)
 				},
 			},
 		},
-		ResponseType: itypes.ApiDistributedFirewallRules{},
+		ResponseType: itypes.APIDistributedFirewallRules{},
 	}.Register()
 
-	// UpdateDfwRules
+	// UpdateDFWRules
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/default/rules/put/",
-		Name:             "UpdateDfwRules",
+		Name:             "UpdateDFWRules",
 		Description:      "Replace (bulk) the Distributed Firewall rules of a VDC Group",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}/dfwPolicies/default/rules",
 		PathParams: []cav.PathParam{
 			{
-				Name:        "vdcGroupId",
-				Description: "ID of the VDC Group",
+				Name:        pathParamVDCGroupID,
+				Description: descVDCGroupID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "urn=vdcGroup")
+					return validators.New().Var(value, urnVDCGroup)
 				},
 			},
 		},
-		BodyRequestType: itypes.ApiDistributedFirewallRules{},
-		ResponseType:    itypes.ApiDistributedFirewallRules{},
+		BodyRequestType: itypes.APIDistributedFirewallRules{},
+		ResponseType:    itypes.APIDistributedFirewallRules{},
 	}.Register()
 }

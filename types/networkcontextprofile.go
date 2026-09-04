@@ -73,11 +73,11 @@ var NetworkContextProfileAppIDValues = []string{
 
 type (
 	ParamsListNetworkContextProfile struct {
-		// VdcGroupID is the ID of the Vdc Group owning the Network Context Profiles to list.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning the Network Context Profiles to list.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning the Network Context Profiles to list.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning the Network Context Profiles to list.
+		VDCGroupName string
 	}
 
 	ParamsGetNetworkContextProfile struct {
@@ -87,12 +87,12 @@ type (
 		// Name is the name of the Network Context Profile.
 		Name string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Network Context Profile. Required
+		// VDCGroupID is the ID of the Vdc Group owning this Network Context Profile. Required
 		// when Name is used to look up the profile.
-		VdcGroupID string
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Network Context Profile.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Network Context Profile.
+		VDCGroupName string
 	}
 
 	ParamsCreateNetworkContextProfile struct {
@@ -102,11 +102,11 @@ type (
 		// Description is the description of the Network Context Profile.
 		Description string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Network Context Profile.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Network Context Profile.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Network Context Profile.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Network Context Profile.
+		VDCGroupName string
 
 		// Attributes is the list of Layer 7 attributes (APP_ID or DOMAIN_NAME) for this profile.
 		Attributes []ParamsNetworkContextProfileAttribute
@@ -153,19 +153,19 @@ type (
 		// Name is the name of the Network Context Profile to delete.
 		Name string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Network Context Profile.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Network Context Profile.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Network Context Profile.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Network Context Profile.
+		VDCGroupName string
 	}
 
 	ParamsGetNetworkContextProfileAttributes struct {
-		// VdcGroupID is the ID of the Vdc Group to fetch the live attribute catalog for.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group to fetch the live attribute catalog for.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group to fetch the live attribute catalog for.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group to fetch the live attribute catalog for.
+		VDCGroupName string
 	}
 
 	// * List

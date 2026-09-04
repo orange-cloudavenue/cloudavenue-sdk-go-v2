@@ -35,11 +35,11 @@ var AppPortProfileProtocols = []string{
 
 type (
 	ParamsListAppPortProfile struct {
-		// VdcGroupID is the ID of the Vdc Group owning the Application Port Profiles.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning the Application Port Profiles.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning the Application Port Profiles.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning the Application Port Profiles.
+		VDCGroupName string
 	}
 
 	ParamsGetAppPortProfile struct {
@@ -49,11 +49,11 @@ type (
 		// Name is the name of the Application Port Profile.
 		Name string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Application Port Profile.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Application Port Profile.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Application Port Profile.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Application Port Profile.
+		VDCGroupName string
 	}
 
 	ParamsCreateAppPortProfile struct {
@@ -63,11 +63,11 @@ type (
 		// Description is the description of the Application Port Profile.
 		Description string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Application Port Profile.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Application Port Profile.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Application Port Profile.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Application Port Profile.
+		VDCGroupName string
 
 		// ApplicationPorts is the list of protocol/destination-ports pairs for this Application Port Profile.
 		ApplicationPorts []ParamsAppPortProfilePort
@@ -102,11 +102,11 @@ type (
 		// Name is the name of the Application Port Profile to delete.
 		Name string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Application Port Profile.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Application Port Profile.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Application Port Profile.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Application Port Profile.
+		VDCGroupName string
 	}
 
 	// * List
