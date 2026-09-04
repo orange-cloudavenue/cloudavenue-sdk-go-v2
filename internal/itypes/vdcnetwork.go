@@ -26,7 +26,7 @@ type (
 		OwnerRef                *APIObjectReference      `json:"ownerRef,omitempty"`
 		NetworkType             string                   `json:"networkType"`
 		Connection              *APIVDCNetworkConnection `json:"connection,omitempty"`
-		GuestVLANTaggingAllowed *bool                    `json:"guestVLANTaggingAllowed"`
+		GuestVLANTaggingAllowed *bool                    `json:"guestVLANTaggingAllowed"` //nolint:tagliatelle
 		Subnets                 APIVDCNetworkSubnets     `json:"subnets"`
 		Shared                  *bool                    `json:"shared,omitempty"`
 	}
@@ -67,7 +67,7 @@ type (
 		OwnerRef                *APIObjectReference      `json:"ownerRef,omitempty"`
 		NetworkType             string                   `json:"networkType"`
 		Connection              *APIVDCNetworkConnection `json:"connection,omitempty"`
-		GuestVLANTaggingAllowed *bool                    `json:"guestVLANTaggingAllowed"`
+		GuestVLANTaggingAllowed *bool                    `json:"guestVLANTaggingAllowed"` //nolint:tagliatelle
 		Subnets                 APIVDCNetworkSubnets     `json:"subnets"`
 		Shared                  *bool                    `json:"shared,omitempty"`
 	}

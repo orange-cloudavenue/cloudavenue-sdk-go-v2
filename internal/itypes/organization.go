@@ -39,7 +39,7 @@ type (
 		OrgVDCCount    int    `json:"orgVdcCount" fake:"{number:1,5}"`
 		CatalogCount   int    `json:"catalogCount" fake:"{number:1,5}"`
 		VAppCount      int    `json:"vappCount" fake:"{number:1,5}"`
-		RunningVMCount int    `json:"runningVMCount" fake:"{number:1,5}"`
+		RunningVMCount int    `json:"runningVMCount" fake:"{number:1,5}"` //nolint:tagliatelle
 		UserCount      int    `json:"userCount" fake:"{number:1,5}"`
 		DiskCount      int    `json:"diskCount" fake:"{number:1,5}"`
 		CanPublish     bool   `json:"canPublish" fake:"false"`
