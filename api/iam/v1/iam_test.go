@@ -409,8 +409,8 @@ func TestUpdateUserPreservesExistingFields(t *testing.T) {
 			Telephone:       "0000",
 			Description:     "current description",
 			IsEnabled:       true,
-			DeployedVmQuota: 4,
-			StoredVmQuota:   7,
+			DeployedVMQuota: 4,
+			StoredVMQuota:   7,
 			Role:            itypes.Reference{Name: "Organization Administrator"},
 		})
 	})
@@ -423,8 +423,8 @@ func TestUpdateUserPreservesExistingFields(t *testing.T) {
 		assert.Equal(t, "1234567890", body.Telephone)
 		assert.Equal(t, "user1@example.com", body.EmailAddress)
 		assert.True(t, body.IsEnabled)
-		assert.Equal(t, 4, body.DeployedVmQuota)
-		assert.Equal(t, 7, body.StoredVmQuota)
+		assert.Equal(t, 4, body.DeployedVMQuota)
+		assert.Equal(t, 7, body.StoredVMQuota)
 		xmlResponse(w, body)
 	})
 

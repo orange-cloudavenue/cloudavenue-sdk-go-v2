@@ -137,8 +137,8 @@ func mergeUpdateUserParams(current *ModelUser, params ParamsUpdateUser) ParamsUp
 		EmailAddress:    current.EmailAddress,
 		Telephone:       current.Telephone,
 		Description:     current.Description,
-		DeployedVmQuota: current.DeployedVmQuota,
-		StoredVmQuota:   current.StoredVmQuota,
+		DeployedVMQuota: current.DeployedVMQuota,
+		StoredVMQuota:   current.StoredVMQuota,
 		IsEnabled:       &current.IsEnabled,
 	}
 
@@ -163,11 +163,11 @@ func mergeUpdateUserParams(current *ModelUser, params ParamsUpdateUser) ParamsUp
 	if params.Description != "" {
 		merged.Description = params.Description
 	}
-	if params.DeployedVmQuota != 0 {
-		merged.DeployedVmQuota = params.DeployedVmQuota
+	if params.DeployedVMQuota != 0 {
+		merged.DeployedVMQuota = params.DeployedVMQuota
 	}
-	if params.StoredVmQuota != 0 {
-		merged.StoredVmQuota = params.StoredVmQuota
+	if params.StoredVMQuota != 0 {
+		merged.StoredVMQuota = params.StoredVMQuota
 	}
 	if params.IsEnabled != nil {
 		merged.IsEnabled = params.IsEnabled

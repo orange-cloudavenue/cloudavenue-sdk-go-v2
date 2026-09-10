@@ -142,17 +142,17 @@ func TestGetBandwidthReturnsNotFoundWhenT0LookupDoesNotContainRequestedEdgeGatew
 	epSharedPath := endpoints.GetEdgeGatewayServices()
 	status := 200
 
-	child := itypes.ApiResponseT0Children{
+	child := itypes.APIResponseT0Children{
 		Type: "edge-gateway",
 		Name: "another-edge-gateway",
 	}
 	child.Properties.RateLimit = 5
 	child.Properties.EdgeUUID = "urn:vcloud:gateway:existing-edge-gw-id"
 
-	resp := &itypes.ApiResponseT0s{{
+	resp := &itypes.APIResponseT0s{{
 		Type:     "tier-0-vrf",
 		Name:     "test-t0",
-		Children: []itypes.ApiResponseT0Children{child},
+		Children: []itypes.APIResponseT0Children{child},
 	}}
 
 	ms.CleanResponse(ep)
