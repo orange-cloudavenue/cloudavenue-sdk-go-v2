@@ -17,14 +17,14 @@ import (
 
 type (
 
-	// * ApiResponse
-	ApiResponseNetworkServices []struct {
+	// * APIResponse
+	APIResponseNetworkServices []struct {
 		Type     string                               `json:"type" fake:"tier-0-vrf"`
 		Name     string                               `json:"name" fake:"{resource_name:t0}"`
-		Children []ApiResponseNetworkServicesChildren `json:"children,omitempty" fakesize:"1"`
+		Children []APIResponseNetworkServicesChildren `json:"children,omitempty" fakesize:"1"`
 	}
 
-	ApiResponseNetworkServicesChildren struct {
+	APIResponseNetworkServicesChildren struct {
 		Type        string `json:"type" fake:"edge-gateway"`
 		Name        string `json:"name,omitempty"`
 		DisplayName string `json:"displayName,omitempty"`
@@ -33,10 +33,10 @@ type (
 			RateLimit int    `json:"rateLimit,omitempty"`
 			EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"` // The UUID of the edge gateway
 		} `json:"properties"`
-		Children  []ApiResponseNetworkServicesSubChildren `json:"children,omitempty" fakesize:"6"`
+		Children  []APIResponseNetworkServicesSubChildren `json:"children,omitempty" fakesize:"6"`
 		ServiceID string                                  `json:"serviceId,omitempty"`
 	}
-	ApiResponseNetworkServicesSubChildren struct {
+	APIResponseNetworkServicesSubChildren struct {
 		Type        string `json:"type" fake:"{randomstring:[load-balancer,service]}"`
 		Name        string `json:"name,omitempty" fake:"{randomstring:[cav-services,internet]}"`
 		DisplayName string `json:"displayName,omitempty" fake:"{word}"`
@@ -55,9 +55,9 @@ type (
 		ServiceID string `json:"serviceId,omitempty"`
 	}
 
-	// * ApiRequest
+	// * APIRequest
 
-	ApiRequestNetworkServicesCavSvc struct {
+	APIRequestNetworkServicesCavSvc struct {
 		// NetworkType
 		NetworkType string `json:"networkType" default:"cav-services" validate:"required"` // The type of network service to create (load-balancer, service, internet)
 
@@ -71,7 +71,7 @@ type (
 	}
 )
 
-func (ap *ApiResponseNetworkServices) ToModel(params types.ParamsEdgeGateway) *types.ModelEdgeGatewayServices {
+func (ap *APIResponseNetworkServices) ToModel(params types.ParamsEdgeGateway) *types.ModelEdgeGatewayServices {
 	if ap == nil || len(*ap) == 0 {
 		return nil
 	}

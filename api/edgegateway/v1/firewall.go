@@ -28,7 +28,7 @@ const (
 	opDeleteEdgeGatewayFirewall = "EdgeGateway.Firewall.Delete"
 )
 
-func resolveEdgeGatewayVdcGroupOwnerRef(ctx context.Context, c *Client, edgeGatewayID, edgeGatewayName string) (*itypes.ApiObjectReference, error) {
+func resolveEdgeGatewayVDCGroupOwnerRef(ctx context.Context, c *Client, edgeGatewayID, edgeGatewayName string) (*itypes.APIObjectReference, error) {
 	ownerRef, err := resolveEdgeGatewayOwnerRef(ctx, c.c, edgeGatewayID, edgeGatewayName)
 	if err != nil {
 		return nil, err
@@ -40,18 +40,18 @@ func resolveEdgeGatewayVdcGroupOwnerRef(ctx context.Context, c *Client, edgeGate
 	return ownerRef, nil
 }
 
-func edgeGatewayToAPIObjectReferences(members []types.ParamsFirewallGroupMember) []itypes.ApiObjectReference {
-	refs := make([]itypes.ApiObjectReference, 0, len(members))
+func edgeGatewayToAPIObjectReferences(members []types.ParamsFirewallGroupMember) []itypes.APIObjectReference {
+	refs := make([]itypes.APIObjectReference, 0, len(members))
 	for _, member := range members {
-		refs = append(refs, itypes.ApiObjectReference{ID: member.ID, Name: member.Name})
+		refs = append(refs, itypes.APIObjectReference{ID: member.ID, Name: member.Name})
 	}
 	return refs
 }
 
-func edgeGatewayToAPIDistributedFirewallRules(rules []types.ParamsFirewallRule) []itypes.ApiDistributedFirewallRule {
-	out := make([]itypes.ApiDistributedFirewallRule, 0, len(rules))
+func edgeGatewayToAPIDistributedFirewallRules(rules []types.ParamsFirewallRule) []itypes.APIDistributedFirewallRule {
+	out := make([]itypes.APIDistributedFirewallRule, 0, len(rules))
 	for _, rule := range rules {
-		out = append(out, itypes.ApiDistributedFirewallRule{
+		out = append(out, itypes.APIDistributedFirewallRule{
 			ID:                        rule.ID,
 			Name:                      rule.Name,
 			Description:               rule.Description,
@@ -62,7 +62,7 @@ func edgeGatewayToAPIDistributedFirewallRules(rules []types.ParamsFirewallRule) 
 			NetworkContextProfiles:    edgeGatewayToAPIObjectReferences(rule.NetworkContextProfiles),
 			Direction:                 rule.Direction,
 			Enabled:                   rule.Enabled,
-			IpProtocol:                rule.IPProtocol,
+			IPProtocol:                rule.IPProtocol,
 			Logging:                   rule.Logging,
 			ActionValue:               rule.Action,
 			SourceGroupsExcluded:      rule.SourceGroupsExcluded,
@@ -72,20 +72,20 @@ func edgeGatewayToAPIDistributedFirewallRules(rules []types.ParamsFirewallRule) 
 	return out
 }
 
-func edgeGatewayDfwEnableOrDisable(ctx context.Context, c *Client, vdcGroupID string, enable bool) error {
-	epGet := endpoints.GetDfwPolicies()
+func edgeGatewayDFWEnableOrDisable(ctx context.Context, c *Client, vdcGroupID string, enable bool) error {
+	epGet := endpoints.GetDFWPolicies()
 	resp, err := c.c.Do(ctx, epGet, cav.WithPathParam(epGet.PathParams[0], vdcGroupID))
 	if err != nil {
 		return err
 	}
 
-	policies := resp.Result().(*itypes.ApiDfwPolicies)
+	policies := resp.Result().(*itypes.APIDFWPolicies)
 	isEnabled := policies.DefaultPolicy != nil && policies.DefaultPolicy.Enabled != nil && *policies.DefaultPolicy.Enabled
 	if isEnabled == enable {
 		return nil
 	}
 
-	defaultPolicy := itypes.ApiDfwDefaultPolicy{Enabled: &enable}
+	defaultPolicy := itypes.APIDfwDefaultPolicy{Enabled: &enable}
 	if policies.DefaultPolicy != nil {
 		defaultPolicy.Description = policies.DefaultPolicy.Description
 		defaultPolicy.ID = policies.DefaultPolicy.ID
@@ -96,7 +96,7 @@ func edgeGatewayDfwEnableOrDisable(ctx context.Context, c *Client, vdcGroupID st
 		defaultPolicy.Name = "Default"
 	}
 
-	epUpdate := endpoints.UpdateDfwDefaultPolicy()
+	epUpdate := endpoints.UpdateDFWDefaultPolicy()
 	_, err = c.c.Do(
 		ctx,
 		epUpdate,
@@ -106,58 +106,58 @@ func edgeGatewayDfwEnableOrDisable(ctx context.Context, c *Client, vdcGroupID st
 	return err
 }
 
-func edgeGatewayFirewallRulesBody(rules []types.ParamsFirewallRule) itypes.ApiDistributedFirewallRules {
-	return itypes.ApiDistributedFirewallRules{Values: edgeGatewayToAPIDistributedFirewallRules(rules)}
+func edgeGatewayFirewallRulesBody(rules []types.ParamsFirewallRule) itypes.APIDistributedFirewallRules {
+	return itypes.APIDistributedFirewallRules{Values: edgeGatewayToAPIDistributedFirewallRules(rules)}
 }
 
 // GetFirewall returns distributed firewall state for an edge gateway owner VDC group.
 func (c *Client) GetFirewall(ctx context.Context, params types.ParamsGetEdgeGatewayFirewall) (*types.ModelGetFirewall, error) {
-	ownerRef, err := resolveEdgeGatewayVdcGroupOwnerRef(ctx, c, params.EdgeGatewayID, params.EdgeGatewayName)
+	ownerRef, err := resolveEdgeGatewayVDCGroupOwnerRef(ctx, c, params.EdgeGatewayID, params.EdgeGatewayName)
 	if err != nil {
 		return nil, fmt.Errorf("%s: resolve edge gateway: %w", opGetEdgeGatewayFirewall, err)
 	}
 
-	epPolicies := endpoints.GetDfwPolicies()
+	epPolicies := endpoints.GetDFWPolicies()
 	respPolicies, err := c.c.Do(ctx, epPolicies, cav.WithPathParam(epPolicies.PathParams[0], ownerRef.ID))
 	if err != nil {
 		return nil, fmt.Errorf("%s: get policies: %w", opGetEdgeGatewayFirewall, err)
 	}
 
-	policies := respPolicies.Result().(*itypes.ApiDfwPolicies)
+	policies := respPolicies.Result().(*itypes.APIDFWPolicies)
 	enabled := policies.DefaultPolicy != nil && policies.DefaultPolicy.Enabled != nil && *policies.DefaultPolicy.Enabled
 
-	epRules := endpoints.GetDfwRules()
+	epRules := endpoints.GetDFWRules()
 	respRules, err := c.c.Do(ctx, epRules, cav.WithPathParam(epRules.PathParams[0], ownerRef.ID))
 	if err != nil {
 		return nil, fmt.Errorf("%s: get rules: %w", opGetEdgeGatewayFirewall, err)
 	}
 
-	rules := respRules.Result().(*itypes.ApiDistributedFirewallRules)
+	rules := respRules.Result().(*itypes.APIDistributedFirewallRules)
 	return &types.ModelGetFirewall{Enabled: enabled, Rules: rules.ToModel()}, nil
 }
 
 // CreateFirewall activates distributed firewalling and sets initial rules.
 func (c *Client) CreateFirewall(ctx context.Context, params types.ParamsCreateEdgeGatewayFirewall) (*types.ModelGetFirewall, error) {
-	ownerRef, err := resolveEdgeGatewayVdcGroupOwnerRef(ctx, c, params.EdgeGatewayID, params.EdgeGatewayName)
+	ownerRef, err := resolveEdgeGatewayVDCGroupOwnerRef(ctx, c, params.EdgeGatewayID, params.EdgeGatewayName)
 	if err != nil {
 		return nil, fmt.Errorf("%s: resolve edge gateway: %w", opCreateEdgeGatewayFirewall, err)
 	}
 
-	epPolicies := endpoints.UpdateDfwPolicies()
+	epPolicies := endpoints.UpdateDFWPolicies()
 	if _, err := c.c.Do(
 		ctx,
 		epPolicies,
 		cav.WithPathParam(epPolicies.PathParams[0], ownerRef.ID),
-		cav.SetBody(itypes.ApiDfwPolicies{Enabled: true}),
+		cav.SetBody(itypes.APIDFWPolicies{Enabled: true}),
 	); err != nil {
 		return nil, fmt.Errorf("%s: activate: %w", opCreateEdgeGatewayFirewall, err)
 	}
 
-	if err := edgeGatewayDfwEnableOrDisable(ctx, c, ownerRef.ID, params.Enabled); err != nil {
+	if err := edgeGatewayDFWEnableOrDisable(ctx, c, ownerRef.ID, params.Enabled); err != nil {
 		return nil, fmt.Errorf("%s: set enabled state: %w", opCreateEdgeGatewayFirewall, err)
 	}
 
-	epRules := endpoints.UpdateDfwRules()
+	epRules := endpoints.UpdateDFWRules()
 	respRules, err := c.c.Do(
 		ctx,
 		epRules,
@@ -168,7 +168,7 @@ func (c *Client) CreateFirewall(ctx context.Context, params types.ParamsCreateEd
 		return nil, fmt.Errorf("%s: update rules: %w", opCreateEdgeGatewayFirewall, err)
 	}
 
-	rules, ok := respRules.Result().(*itypes.ApiDistributedFirewallRules)
+	rules, ok := respRules.Result().(*itypes.APIDistributedFirewallRules)
 	if !ok || rules == nil {
 		return nil, fmt.Errorf("%s: unexpected rules response type %T", opCreateEdgeGatewayFirewall, respRules.Result())
 	}
@@ -178,16 +178,16 @@ func (c *Client) CreateFirewall(ctx context.Context, params types.ParamsCreateEd
 
 // UpdateFirewall replaces distributed firewall rules and enabled state.
 func (c *Client) UpdateFirewall(ctx context.Context, params types.ParamsUpdateEdgeGatewayFirewall) (*types.ModelGetFirewall, error) {
-	ownerRef, err := resolveEdgeGatewayVdcGroupOwnerRef(ctx, c, params.EdgeGatewayID, params.EdgeGatewayName)
+	ownerRef, err := resolveEdgeGatewayVDCGroupOwnerRef(ctx, c, params.EdgeGatewayID, params.EdgeGatewayName)
 	if err != nil {
 		return nil, fmt.Errorf("%s: resolve edge gateway: %w", opUpdateEdgeGatewayFirewall, err)
 	}
 
-	if err := edgeGatewayDfwEnableOrDisable(ctx, c, ownerRef.ID, params.Enabled); err != nil {
+	if err := edgeGatewayDFWEnableOrDisable(ctx, c, ownerRef.ID, params.Enabled); err != nil {
 		return nil, fmt.Errorf("%s: set enabled state: %w", opUpdateEdgeGatewayFirewall, err)
 	}
 
-	epRules := endpoints.UpdateDfwRules()
+	epRules := endpoints.UpdateDFWRules()
 	respRules, err := c.c.Do(
 		ctx,
 		epRules,
@@ -198,7 +198,7 @@ func (c *Client) UpdateFirewall(ctx context.Context, params types.ParamsUpdateEd
 		return nil, fmt.Errorf("%s: update rules: %w", opUpdateEdgeGatewayFirewall, err)
 	}
 
-	rules, ok := respRules.Result().(*itypes.ApiDistributedFirewallRules)
+	rules, ok := respRules.Result().(*itypes.APIDistributedFirewallRules)
 	if !ok || rules == nil {
 		return nil, fmt.Errorf("%s: unexpected rules response type %T", opUpdateEdgeGatewayFirewall, respRules.Result())
 	}
@@ -208,31 +208,31 @@ func (c *Client) UpdateFirewall(ctx context.Context, params types.ParamsUpdateEd
 
 // DeleteFirewall clears distributed firewall rules and deactivates the feature.
 func (c *Client) DeleteFirewall(ctx context.Context, params types.ParamsDeleteEdgeGatewayFirewall) error {
-	ownerRef, err := resolveEdgeGatewayVdcGroupOwnerRef(ctx, c, params.EdgeGatewayID, params.EdgeGatewayName)
+	ownerRef, err := resolveEdgeGatewayVDCGroupOwnerRef(ctx, c, params.EdgeGatewayID, params.EdgeGatewayName)
 	if err != nil {
 		return fmt.Errorf("%s: resolve edge gateway: %w", opDeleteEdgeGatewayFirewall, err)
 	}
 
-	epRules := endpoints.UpdateDfwRules()
+	epRules := endpoints.UpdateDFWRules()
 	if _, err = c.c.Do(
 		ctx,
 		epRules,
 		cav.WithPathParam(epRules.PathParams[0], ownerRef.ID),
-		cav.SetBody(itypes.ApiDistributedFirewallRules{}),
+		cav.SetBody(itypes.APIDistributedFirewallRules{}),
 	); err != nil {
 		return fmt.Errorf("%s: clear rules: %w", opDeleteEdgeGatewayFirewall, err)
 	}
 
-	if err := edgeGatewayDfwEnableOrDisable(ctx, c, ownerRef.ID, false); err != nil {
+	if err := edgeGatewayDFWEnableOrDisable(ctx, c, ownerRef.ID, false); err != nil {
 		return fmt.Errorf("%s: disable default policy: %w", opDeleteEdgeGatewayFirewall, err)
 	}
 
-	epPolicies := endpoints.UpdateDfwPolicies()
+	epPolicies := endpoints.UpdateDFWPolicies()
 	if _, err = c.c.Do(
 		ctx,
 		epPolicies,
 		cav.WithPathParam(epPolicies.PathParams[0], ownerRef.ID),
-		cav.SetBody(itypes.ApiDfwPolicies{Enabled: false}),
+		cav.SetBody(itypes.APIDFWPolicies{Enabled: false}),
 	); err != nil {
 		return fmt.Errorf("%s: deactivate: %w", opDeleteEdgeGatewayFirewall, err)
 	}

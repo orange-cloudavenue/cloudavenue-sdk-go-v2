@@ -12,8 +12,8 @@ package vapp
 import (
 	"context"
 	"fmt"
-	"path"
 	"net/url"
+	"path"
 	"strings"
 	"time"
 
@@ -74,11 +74,11 @@ func extractVMwareJob(resp *cav.Response, action string) (cav.Job, error) {
 }
 
 const (
-	opListVapp   = "Vapp.List"
-	opGetVapp    = "Vapp.Get"
-	opCreateVapp = "Vapp.Create"
-	opUpdateVapp = "Vapp.Update"
-	opDeleteVapp = "Vapp.Delete"
+	opListVApp   = "VApp.List"
+	opGetVApp    = "VApp.Get"
+	opCreateVApp = "VApp.Create"
+	opUpdateVApp = "VApp.Update"
+	opDeleteVApp = "VApp.Delete"
 )
 
 type getVAppByIDParams struct {
@@ -91,8 +91,8 @@ type createVAppParams struct {
 }
 
 type updateVAppByIDParams struct {
-	ID    string
-	Body  itypes.APIRequestUpdateVApp
+	ID   string
+	Body itypes.APIRequestUpdateVApp
 }
 
 type deleteVAppByIDParams struct {
@@ -105,9 +105,9 @@ type listVAppParams struct {
 
 var (
 	listVAppOp = cav.Operation[listVAppParams, *itypes.APIResponseListVApp]{
-		Name:     opListVapp,
+		Name:     opListVApp,
 		Backend:  cav.BackendVMware,
-		Endpoint: endpoints.ListVapp(),
+		Endpoint: endpoints.ListVApp(),
 		Validate: func(p listVAppParams) error {
 			if p.VDCID == "" {
 				return fmt.Errorf("vdc id is required")
@@ -115,7 +115,7 @@ var (
 			return nil
 		},
 		RequestOptions: func(p listVAppParams) ([]cav.EndpointRequestOption, error) {
-			ep := endpoints.ListVapp()
+			ep := endpoints.ListVApp()
 			return []cav.EndpointRequestOption{
 				cav.WithQueryParam(ep.QueryParams[0], fmt.Sprintf("id==%s", p.VDCID)),
 				cav.WithQueryParam(ep.QueryParams[1], "100"),
@@ -133,9 +133,9 @@ var (
 		},
 	}
 	getVAppByIDOp = cav.Operation[getVAppByIDParams, *itypes.APIResponseGetVApp]{
-		Name:     opGetVapp,
+		Name:     opGetVApp,
 		Backend:  cav.BackendVMware,
-		Endpoint: endpoints.GetVapp(),
+		Endpoint: endpoints.GetVApp(),
 		Validate: func(p getVAppByIDParams) error {
 			if p.ID == "" {
 				return fmt.Errorf("id is required")
@@ -144,7 +144,7 @@ var (
 			return nil
 		},
 		RequestOptions: func(p getVAppByIDParams) ([]cav.EndpointRequestOption, error) {
-			ep := endpoints.GetVapp()
+			ep := endpoints.GetVApp()
 			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
 		},
 		Extract: func(resp *cav.Response, _ getVAppByIDParams) (*itypes.APIResponseGetVApp, error) {
@@ -157,9 +157,9 @@ var (
 		},
 	}
 	createVAppOp = cav.Operation[createVAppParams, cav.Job]{
-		Name:     opCreateVapp,
+		Name:     opCreateVApp,
 		Backend:  cav.BackendVMware,
-		Endpoint: endpoints.CreateVapp(),
+		Endpoint: endpoints.CreateVApp(),
 		Validate: func(p createVAppParams) error {
 			if p.VDCID == "" || p.Body.Name == "" {
 				return fmt.Errorf("vdc id and name are required")
@@ -168,7 +168,7 @@ var (
 			return nil
 		},
 		RequestOptions: func(p createVAppParams) ([]cav.EndpointRequestOption, error) {
-			ep := endpoints.CreateVapp()
+			ep := endpoints.CreateVApp()
 			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.VDCID)}, nil
 		},
 		Transform: func(p createVAppParams) (any, error) {
@@ -179,9 +179,9 @@ var (
 		},
 	}
 	updateVAppByIDOp = cav.Operation[updateVAppByIDParams, cav.Job]{
-		Name:     opUpdateVapp,
+		Name:     opUpdateVApp,
 		Backend:  cav.BackendVMware,
-		Endpoint: endpoints.UpdateVapp(),
+		Endpoint: endpoints.UpdateVApp(),
 		Validate: func(p updateVAppByIDParams) error {
 			if p.ID == "" {
 				return fmt.Errorf("id is required")
@@ -190,7 +190,7 @@ var (
 			return nil
 		},
 		RequestOptions: func(p updateVAppByIDParams) ([]cav.EndpointRequestOption, error) {
-			ep := endpoints.UpdateVapp()
+			ep := endpoints.UpdateVApp()
 			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
 		},
 		Transform: func(p updateVAppByIDParams) (any, error) {
@@ -201,9 +201,9 @@ var (
 		},
 	}
 	deleteVAppByIDOp = cav.Operation[deleteVAppByIDParams, cav.Job]{
-		Name:     opDeleteVapp,
+		Name:     opDeleteVApp,
 		Backend:  cav.BackendVMware,
-		Endpoint: endpoints.DeleteVapp(),
+		Endpoint: endpoints.DeleteVApp(),
 		Validate: func(p deleteVAppByIDParams) error {
 			if p.ID == "" {
 				return fmt.Errorf("id is required")
@@ -212,7 +212,7 @@ var (
 			return nil
 		},
 		RequestOptions: func(p deleteVAppByIDParams) ([]cav.EndpointRequestOption, error) {
-			ep := endpoints.DeleteVapp()
+			ep := endpoints.DeleteVApp()
 			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
 		},
 		Extract: func(resp *cav.Response, _ deleteVAppByIDParams) (cav.Job, error) {
@@ -241,7 +241,7 @@ var (
 	undeployVAppOp = cav.Operation[getVAppByIDParams, cav.Job]{
 		Name:     "VApp.Undeploy",
 		Backend:  cav.BackendVMware,
-		Endpoint: endpoints.UndeployVapp(),
+		Endpoint: endpoints.UndeployVApp(),
 		Validate: func(p getVAppByIDParams) error {
 			if p.ID == "" {
 				return fmt.Errorf("id is required")
@@ -250,7 +250,7 @@ var (
 			return nil
 		},
 		RequestOptions: func(p getVAppByIDParams) ([]cav.EndpointRequestOption, error) {
-			ep := endpoints.UndeployVapp()
+			ep := endpoints.UndeployVApp()
 			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
 		},
 		Transform: func(p getVAppByIDParams) (any, error) {
@@ -265,12 +265,12 @@ var (
 // ListVApp lists VApps in a VDC.
 func (c *Client) ListVApp(ctx context.Context, vdcID string) ([]*types.ModelVApp, error) {
 	if vdcID == "" {
-		return nil, fmt.Errorf("%s: vdc id is required", opListVapp)
+		return nil, fmt.Errorf("%s: vdc id is required", opListVApp)
 	}
 
 	resp, err := cav.Execute(ctx, c.c, listVAppOp, listVAppParams{VDCID: vdcID})
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", opListVapp, err)
+		return nil, fmt.Errorf("%s: %w", opListVApp, err)
 	}
 
 	vapps := make([]*types.ModelVApp, 0, len(resp.Records))
@@ -285,11 +285,11 @@ func (c *Client) ListVApp(ctx context.Context, vdcID string) ([]*types.ModelVApp
 // GetVApp returns detailed information for a VApp by ID or name.
 func (c *Client) GetVApp(ctx context.Context, params types.ParamsGetVApp) (*types.ModelVApp, error) {
 	if err := params.Validate(); err != nil {
-		return nil, fmt.Errorf("%s: validate: %w", opGetVapp, err)
+		return nil, fmt.Errorf("%s: validate: %w", opGetVApp, err)
 	}
 
 	if params.ID == "" {
-		ep := endpoints.ListVapp()
+		ep := endpoints.ListVApp()
 		opts := []cav.EndpointRequestOption{
 			cav.WithQueryParam(ep.QueryParams[0], fmt.Sprintf("name==%s", params.Name)),
 			cav.WithQueryParam(ep.QueryParams[1], "100"),
@@ -299,12 +299,12 @@ func (c *Client) GetVApp(ctx context.Context, params types.ParamsGetVApp) (*type
 
 		rawResp, err := c.c.Do(ctx, ep, opts...)
 		if err != nil {
-			return nil, fmt.Errorf("%s: list: %w", opGetVapp, err)
+			return nil, fmt.Errorf("%s: list: %w", opGetVApp, err)
 		}
 
 		list, ok := rawResp.Result().(*itypes.APIResponseListVApp)
 		if !ok || list == nil {
-			return nil, fmt.Errorf("%s: unexpected list response type %T", opGetVapp, rawResp.Result())
+			return nil, fmt.Errorf("%s: unexpected list response type %T", opGetVApp, rawResp.Result())
 		}
 
 		for _, vapp := range list.Records {
@@ -314,12 +314,12 @@ func (c *Client) GetVApp(ctx context.Context, params types.ParamsGetVApp) (*type
 			}
 		}
 
-		return nil, fmt.Errorf("%s: no VApp found with name %q", opGetVapp, params.Name)
+		return nil, fmt.Errorf("%s: no VApp found with name %q", opGetVApp, params.Name)
 	}
 
 	resp, err := cav.Execute(ctx, c.c, getVAppByIDOp, getVAppByIDParams{ID: params.ID})
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", opGetVapp, err)
+		return nil, fmt.Errorf("%s: %w", opGetVApp, err)
 	}
 
 	m := resp.ToModel()
@@ -329,7 +329,7 @@ func (c *Client) GetVApp(ctx context.Context, params types.ParamsGetVApp) (*type
 // CreateVApp creates a VApp and returns the created VApp.
 func (c *Client) CreateVApp(ctx context.Context, params types.ParamsCreateVApp) (*types.ModelVApp, error) {
 	if err := params.Validate(); err != nil {
-		return nil, fmt.Errorf("%s: validate: %w", opCreateVapp, err)
+		return nil, fmt.Errorf("%s: validate: %w", opCreateVApp, err)
 	}
 
 	body := itypes.APIRequestCreateVApp{
@@ -339,16 +339,16 @@ func (c *Client) CreateVApp(ctx context.Context, params types.ParamsCreateVApp) 
 
 	job, err := cav.Execute(ctx, c.c, createVAppOp, createVAppParams{VDCID: params.VDCID, Body: body})
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", opCreateVapp, err)
+		return nil, fmt.Errorf("%s: %w", opCreateVApp, err)
 	}
 
-	if err := awaitVAppJob(ctx, c.c, opCreateVapp, job.ID); err != nil {
+	if err := awaitVAppJob(ctx, c.c, opCreateVApp, job.ID); err != nil {
 		return nil, err
 	}
 
 	m, err := c.GetVApp(ctx, types.ParamsGetVApp{Name: params.Name})
 	if err != nil {
-		return nil, fmt.Errorf("%s: get created: %w", opCreateVapp, err)
+		return nil, fmt.Errorf("%s: get created: %w", opCreateVApp, err)
 	}
 
 	return m, nil
@@ -357,13 +357,13 @@ func (c *Client) CreateVApp(ctx context.Context, params types.ParamsCreateVApp) 
 // UpdateVApp updates a VApp and returns the updated VApp.
 func (c *Client) UpdateVApp(ctx context.Context, params types.ParamsUpdateVApp) (*types.ModelVApp, error) {
 	if err := params.Validate(); err != nil {
-		return nil, fmt.Errorf("%s: validate: %w", opUpdateVapp, err)
+		return nil, fmt.Errorf("%s: validate: %w", opUpdateVApp, err)
 	}
 
 	if params.ID == "" {
 		vapp, err := c.GetVApp(ctx, types.ParamsGetVApp{Name: params.Name})
 		if err != nil {
-			return nil, fmt.Errorf("%s: get current: %w", opUpdateVapp, err)
+			return nil, fmt.Errorf("%s: get current: %w", opUpdateVApp, err)
 		}
 		params.ID = vapp.ID
 	}
@@ -384,16 +384,16 @@ func (c *Client) UpdateVApp(ctx context.Context, params types.ParamsUpdateVApp) 
 
 	job, err := cav.Execute(ctx, c.c, updateVAppByIDOp, updateVAppByIDParams{ID: params.ID, Body: body})
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", opUpdateVapp, err)
+		return nil, fmt.Errorf("%s: %w", opUpdateVApp, err)
 	}
 
-	if err := awaitVAppJob(ctx, c.c, opUpdateVapp, job.ID); err != nil {
+	if err := awaitVAppJob(ctx, c.c, opUpdateVApp, job.ID); err != nil {
 		return nil, err
 	}
 
 	m, err := c.GetVApp(ctx, types.ParamsGetVApp{ID: params.ID})
 	if err != nil {
-		return nil, fmt.Errorf("%s: get updated: %w", opUpdateVapp, err)
+		return nil, fmt.Errorf("%s: get updated: %w", opUpdateVApp, err)
 	}
 
 	return m, nil
@@ -405,13 +405,13 @@ func (c *Client) UpdateVApp(ctx context.Context, params types.ParamsUpdateVApp) 
 // 3. Delete
 func (c *Client) DeleteVApp(ctx context.Context, params types.ParamsDeleteVApp) error {
 	if err := params.Validate(); err != nil {
-		return fmt.Errorf("%s: validate: %w", opDeleteVapp, err)
+		return fmt.Errorf("%s: validate: %w", opDeleteVApp, err)
 	}
 
 	if params.ID == "" {
 		vapp, err := c.GetVApp(ctx, types.ParamsGetVApp{Name: params.Name})
 		if err != nil {
-			return fmt.Errorf("%s: get current: %w", opDeleteVapp, err)
+			return fmt.Errorf("%s: get current: %w", opDeleteVApp, err)
 		}
 		params.ID = vapp.ID
 	}
@@ -419,27 +419,27 @@ func (c *Client) DeleteVApp(ctx context.Context, params types.ParamsDeleteVApp) 
 	// Step 1: Remove all networks
 	job, err := cav.Execute(ctx, c.c, removeAllNetworksOp, getVAppByIDParams{ID: params.ID})
 	if err != nil {
-		return fmt.Errorf("%s: remove all networks: %w", opDeleteVapp, err)
+		return fmt.Errorf("%s: remove all networks: %w", opDeleteVApp, err)
 	}
-	if err := awaitVAppJob(ctx, c.c, opDeleteVapp, job.ID); err != nil {
-		return fmt.Errorf("%s: remove all networks: %w", opDeleteVapp, err)
+	if err := awaitVAppJob(ctx, c.c, opDeleteVApp, job.ID); err != nil {
+		return fmt.Errorf("%s: remove all networks: %w", opDeleteVApp, err)
 	}
 
 	// Step 2: Try undeploy (ignore if already undeployed)
 	job, err = cav.Execute(ctx, c.c, undeployVAppOp, getVAppByIDParams{ID: params.ID})
 	if err != nil {
 		c.logger.Debug("Undeploy failed, continuing with delete", "error", err)
-	} else if err := awaitVAppJob(ctx, c.c, opDeleteVapp, job.ID); err != nil {
+	} else if err := awaitVAppJob(ctx, c.c, opDeleteVApp, job.ID); err != nil {
 		c.logger.Debug("Await undeploy failed, continuing with delete", "error", err)
 	}
 
 	// Step 3: Delete
 	job, err = cav.Execute(ctx, c.c, deleteVAppByIDOp, deleteVAppByIDParams{ID: params.ID})
 	if err != nil {
-		return fmt.Errorf("%s: delete: %w", opDeleteVapp, err)
+		return fmt.Errorf("%s: delete: %w", opDeleteVApp, err)
 	}
-	if err := awaitVAppJob(ctx, c.c, opDeleteVapp, job.ID); err != nil {
-		return fmt.Errorf("%s: delete: %w", opDeleteVapp, err)
+	if err := awaitVAppJob(ctx, c.c, opDeleteVApp, job.ID); err != nil {
+		return fmt.Errorf("%s: delete: %w", opDeleteVApp, err)
 	}
 
 	return nil

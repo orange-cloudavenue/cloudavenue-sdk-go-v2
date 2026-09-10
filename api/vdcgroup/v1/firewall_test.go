@@ -28,47 +28,47 @@ func TestCreateFirewall(t *testing.T) {
 
 	client, ms := newClient(t)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
-		Values: []itypes.ApiResponseListVdcGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.SetResponse(endpoints.ListVDCGroup(), &itypes.APIResponseListVDCGroup{
+		Values: []itypes.APIResponseListVDCGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
 	}, nil)
 
-	ms.CleanResponse(endpoints.UpdateDfwPolicies())
-	ms.SetResponse(endpoints.UpdateDfwPolicies(), &itypes.ApiDfwPolicies{Enabled: true}, nil)
+	ms.CleanResponse(endpoints.UpdateDFWPolicies())
+	ms.SetResponse(endpoints.UpdateDFWPolicies(), &itypes.APIDFWPolicies{Enabled: true}, nil)
 
-	ms.CleanResponse(endpoints.GetDfwPolicies())
-	ms.SetResponse(endpoints.GetDfwPolicies(), &itypes.ApiDfwPolicies{
+	ms.CleanResponse(endpoints.GetDFWPolicies())
+	ms.SetResponse(endpoints.GetDFWPolicies(), &itypes.APIDFWPolicies{
 		Enabled: true,
-		DefaultPolicy: &itypes.ApiDfwDefaultPolicy{
+		DefaultPolicy: &itypes.APIDfwDefaultPolicy{
 			ID:      "default-policy",
 			Name:    "Default",
 			Enabled: &enabledFalse,
 		},
 	}, nil)
 
-	ms.CleanResponse(endpoints.UpdateDfwDefaultPolicy())
-	ms.SetResponse(endpoints.UpdateDfwDefaultPolicy(), &itypes.ApiDfwDefaultPolicy{
+	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
+	ms.SetResponse(endpoints.UpdateDFWDefaultPolicy(), &itypes.APIDfwDefaultPolicy{
 		ID:      "default-policy",
 		Name:    "Default",
 		Enabled: &enabledTrue,
 	}, nil)
 
-	ms.CleanResponse(endpoints.UpdateDfwRules())
-	ms.SetResponse(endpoints.UpdateDfwRules(), &itypes.ApiDistributedFirewallRules{
-		Values: []itypes.ApiDistributedFirewallRule{{
+	ms.CleanResponse(endpoints.UpdateDFWRules())
+	ms.SetResponse(endpoints.UpdateDFWRules(), &itypes.APIDistributedFirewallRules{
+		Values: []itypes.APIDistributedFirewallRule{{
 			ID:          "rule-1",
 			Name:        "allow-web",
 			Description: "allow web traffic",
 			Enabled:     true,
 			Direction:   types.FirewallRuleDirectionInOut,
-			IpProtocol:  types.FirewallRuleIPProtocolIPv4,
+			IPProtocol:  types.FirewallRuleIPProtocolIPv4,
 			ActionValue: types.FirewallRuleActionAllow,
 			Logging:     true,
 		}},
 	}, nil)
 
 	resp, err := client.CreateFirewall(t.Context(), types.ParamsCreateFirewall{
-		VdcGroupName: vdcGroupName,
+		VDCGroupName: vdcGroupName,
 		Enabled:      true,
 		Rules: []types.ParamsFirewallRule{{
 			Name:        "allow-web",
@@ -89,11 +89,11 @@ func TestCreateFirewall(t *testing.T) {
 	assert.Equal(t, "allow-web", resp.Rules[0].Name)
 	assert.Equal(t, types.FirewallRuleActionAllow, resp.Rules[0].Action)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.CleanResponse(endpoints.UpdateDfwPolicies())
-	ms.CleanResponse(endpoints.GetDfwPolicies())
-	ms.CleanResponse(endpoints.UpdateDfwDefaultPolicy())
-	ms.CleanResponse(endpoints.UpdateDfwRules())
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.CleanResponse(endpoints.UpdateDFWPolicies())
+	ms.CleanResponse(endpoints.GetDFWPolicies())
+	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
+	ms.CleanResponse(endpoints.UpdateDFWRules())
 }
 
 func TestGetFirewall(t *testing.T) {
@@ -103,36 +103,36 @@ func TestGetFirewall(t *testing.T) {
 
 	client, ms := newClient(t)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
-		Values: []itypes.ApiResponseListVdcGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.SetResponse(endpoints.ListVDCGroup(), &itypes.APIResponseListVDCGroup{
+		Values: []itypes.APIResponseListVDCGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
 	}, nil)
 
-	ms.CleanResponse(endpoints.GetDfwPolicies())
-	ms.SetResponse(endpoints.GetDfwPolicies(), &itypes.ApiDfwPolicies{
+	ms.CleanResponse(endpoints.GetDFWPolicies())
+	ms.SetResponse(endpoints.GetDFWPolicies(), &itypes.APIDFWPolicies{
 		Enabled: true,
-		DefaultPolicy: &itypes.ApiDfwDefaultPolicy{
+		DefaultPolicy: &itypes.APIDfwDefaultPolicy{
 			ID:      "default-policy",
 			Name:    "Default",
 			Enabled: &enabledTrue,
 		},
 	}, nil)
 
-	ms.CleanResponse(endpoints.GetDfwRules())
-	ms.SetResponse(endpoints.GetDfwRules(), &itypes.ApiDistributedFirewallRules{
-		Values: []itypes.ApiDistributedFirewallRule{{
+	ms.CleanResponse(endpoints.GetDFWRules())
+	ms.SetResponse(endpoints.GetDFWRules(), &itypes.APIDistributedFirewallRules{
+		Values: []itypes.APIDistributedFirewallRule{{
 			ID:          "rule-1",
 			Name:        "allow-web",
 			Description: "allow web traffic",
 			Enabled:     true,
 			Direction:   types.FirewallRuleDirectionInOut,
-			IpProtocol:  types.FirewallRuleIPProtocolIPv4,
+			IPProtocol:  types.FirewallRuleIPProtocolIPv4,
 			ActionValue: types.FirewallRuleActionAllow,
 			Logging:     true,
 		}},
 	}, nil)
 
-	resp, err := client.GetFirewall(t.Context(), types.ParamsGetFirewall{VdcGroupName: vdcGroupName})
+	resp, err := client.GetFirewall(t.Context(), types.ParamsGetFirewall{VDCGroupName: vdcGroupName})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
@@ -141,9 +141,9 @@ func TestGetFirewall(t *testing.T) {
 	assert.Equal(t, "rule-1", resp.Rules[0].ID)
 	assert.Equal(t, types.FirewallRuleActionAllow, resp.Rules[0].Action)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.CleanResponse(endpoints.GetDfwPolicies())
-	ms.CleanResponse(endpoints.GetDfwRules())
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.CleanResponse(endpoints.GetDFWPolicies())
+	ms.CleanResponse(endpoints.GetDFWRules())
 }
 
 func TestUpdateFirewall(t *testing.T) {
@@ -154,44 +154,44 @@ func TestUpdateFirewall(t *testing.T) {
 
 	client, ms := newClient(t)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
-		Values: []itypes.ApiResponseListVdcGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.SetResponse(endpoints.ListVDCGroup(), &itypes.APIResponseListVDCGroup{
+		Values: []itypes.APIResponseListVDCGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
 	}, nil)
 
-	ms.CleanResponse(endpoints.GetDfwPolicies())
-	ms.SetResponse(endpoints.GetDfwPolicies(), &itypes.ApiDfwPolicies{
+	ms.CleanResponse(endpoints.GetDFWPolicies())
+	ms.SetResponse(endpoints.GetDFWPolicies(), &itypes.APIDFWPolicies{
 		Enabled: true,
-		DefaultPolicy: &itypes.ApiDfwDefaultPolicy{
+		DefaultPolicy: &itypes.APIDfwDefaultPolicy{
 			ID:      "default-policy",
 			Name:    "Default",
 			Enabled: &enabledTrue,
 		},
 	}, nil)
 
-	ms.CleanResponse(endpoints.UpdateDfwDefaultPolicy())
-	ms.SetResponse(endpoints.UpdateDfwDefaultPolicy(), &itypes.ApiDfwDefaultPolicy{
+	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
+	ms.SetResponse(endpoints.UpdateDFWDefaultPolicy(), &itypes.APIDfwDefaultPolicy{
 		ID:      "default-policy",
 		Name:    "Default",
 		Enabled: &enabledFalse,
 	}, nil)
 
-	ms.CleanResponse(endpoints.UpdateDfwRules())
-	ms.SetResponse(endpoints.UpdateDfwRules(), &itypes.ApiDistributedFirewallRules{
-		Values: []itypes.ApiDistributedFirewallRule{{
+	ms.CleanResponse(endpoints.UpdateDFWRules())
+	ms.SetResponse(endpoints.UpdateDFWRules(), &itypes.APIDistributedFirewallRules{
+		Values: []itypes.APIDistributedFirewallRule{{
 			ID:          "rule-2",
 			Name:        "deny-web",
 			Description: "deny web traffic",
 			Enabled:     true,
 			Direction:   types.FirewallRuleDirectionOut,
-			IpProtocol:  types.FirewallRuleIPProtocolIPv6,
+			IPProtocol:  types.FirewallRuleIPProtocolIPv6,
 			ActionValue: types.FirewallRuleActionDrop,
 			Logging:     false,
 		}},
 	}, nil)
 
 	resp, err := client.UpdateFirewall(t.Context(), types.ParamsUpdateFirewall{
-		VdcGroupName: vdcGroupName,
+		VDCGroupName: vdcGroupName,
 		Enabled:      false,
 		Rules: []types.ParamsFirewallRule{{
 			Name:        "deny-web",
@@ -211,10 +211,10 @@ func TestUpdateFirewall(t *testing.T) {
 	assert.Equal(t, "deny-web", resp.Rules[0].Name)
 	assert.Equal(t, types.FirewallRuleActionDrop, resp.Rules[0].Action)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.CleanResponse(endpoints.GetDfwPolicies())
-	ms.CleanResponse(endpoints.UpdateDfwDefaultPolicy())
-	ms.CleanResponse(endpoints.UpdateDfwRules())
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.CleanResponse(endpoints.GetDFWPolicies())
+	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
+	ms.CleanResponse(endpoints.UpdateDFWRules())
 }
 
 func TestDeleteFirewall(t *testing.T) {
@@ -225,37 +225,37 @@ func TestDeleteFirewall(t *testing.T) {
 
 	client, ms := newClient(t)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
-		Values: []itypes.ApiResponseListVdcGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.SetResponse(endpoints.ListVDCGroup(), &itypes.APIResponseListVDCGroup{
+		Values: []itypes.APIResponseListVDCGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
 	}, nil)
 
-	ms.CleanResponse(endpoints.UpdateDfwRules())
-	ms.CleanResponse(endpoints.GetDfwPolicies())
-	ms.SetResponse(endpoints.GetDfwPolicies(), &itypes.ApiDfwPolicies{
+	ms.CleanResponse(endpoints.UpdateDFWRules())
+	ms.CleanResponse(endpoints.GetDFWPolicies())
+	ms.SetResponse(endpoints.GetDFWPolicies(), &itypes.APIDFWPolicies{
 		Enabled: true,
-		DefaultPolicy: &itypes.ApiDfwDefaultPolicy{
+		DefaultPolicy: &itypes.APIDfwDefaultPolicy{
 			ID:      "default-policy",
 			Name:    "Default",
 			Enabled: &enabledTrue,
 		},
 	}, nil)
-	ms.CleanResponse(endpoints.UpdateDfwDefaultPolicy())
-	ms.SetResponse(endpoints.UpdateDfwDefaultPolicy(), &itypes.ApiDfwDefaultPolicy{
+	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
+	ms.SetResponse(endpoints.UpdateDFWDefaultPolicy(), &itypes.APIDfwDefaultPolicy{
 		ID:      "default-policy",
 		Name:    "Default",
 		Enabled: &enabledFalse,
 	}, nil)
-	ms.CleanResponse(endpoints.UpdateDfwPolicies())
-	ms.SetResponse(endpoints.UpdateDfwPolicies(), &itypes.ApiDfwPolicies{Enabled: false}, nil)
+	ms.CleanResponse(endpoints.UpdateDFWPolicies())
+	ms.SetResponse(endpoints.UpdateDFWPolicies(), &itypes.APIDFWPolicies{Enabled: false}, nil)
 
-	err := client.DeleteFirewall(t.Context(), types.ParamsDeleteFirewall{VdcGroupName: vdcGroupName})
+	err := client.DeleteFirewall(t.Context(), types.ParamsDeleteFirewall{VDCGroupName: vdcGroupName})
 
 	assert.NoError(t, err)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.CleanResponse(endpoints.UpdateDfwRules())
-	ms.CleanResponse(endpoints.GetDfwPolicies())
-	ms.CleanResponse(endpoints.UpdateDfwDefaultPolicy())
-	ms.CleanResponse(endpoints.UpdateDfwPolicies())
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.CleanResponse(endpoints.UpdateDFWRules())
+	ms.CleanResponse(endpoints.GetDFWPolicies())
+	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
+	ms.CleanResponse(endpoints.UpdateDFWPolicies())
 }

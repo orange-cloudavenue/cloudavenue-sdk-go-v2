@@ -15,10 +15,9 @@ import (
 	"slices"
 	"time"
 
-	"resty.dev/v3"
-
 	"github.com/orange-cloudavenue/common-go/validators"
 	"golang.org/x/sync/errgroup"
+	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
@@ -28,10 +27,10 @@ import (
 )
 
 const (
-	opCreateEdgeGatewaySubmit          = "EdgeGateway.Create.Submit"
-	opUpdateEdgeGatewayBandwidthCreate = "EdgeGateway.Create.UpdateBandwidth"
-	opListVDCByOwnerName               = "EdgeGateway.Create.ListVDCByOwnerName"
-	opListVDCGroupByOwnerName          = "EdgeGateway.Create.ListVDCGroupByOwnerName"
+	opCreateEdgeGatewaySubmit           = "EdgeGateway.Create.Submit"
+	opUpdateEdgeGatewayBandwidthCreate  = "EdgeGateway.Create.UpdateBandwidth"
+	opListVDCByOwnerName                = "EdgeGateway.Create.ListVDCByOwnerName"
+	opListVDCGroupByOwnerName           = "EdgeGateway.Create.ListVDCGroupByOwnerName"
 	defaultSharedT0EdgeGatewayBandwidth = 5
 )
 
@@ -80,7 +79,7 @@ var (
 			}, nil
 		},
 		Transform: func(p createEdgeGatewaySubmitParams) (any, error) {
-			return itypes.ApiRequestEdgeGateway{T0Name: p.T0Name}, nil
+			return itypes.APIRequestEdgeGateway{T0Name: p.T0Name}, nil
 		},
 		Extract: func(resp *cav.Response, _ createEdgeGatewaySubmitParams) (string, error) {
 			created, ok := resp.Result().(*cav.CerberusJobCreatedAPIResponse)
@@ -116,16 +115,16 @@ var (
 			}, nil
 		},
 		Transform: func(p updateCreatedEdgeGatewayBandwidthParams) (any, error) {
-			return itypes.ApiRequestBandwidth{Bandwidth: p.Bandwidth}, nil
+			return itypes.APIRequestBandwidth{Bandwidth: p.Bandwidth}, nil
 		},
 		Extract: func(_ *cav.Response, _ updateCreatedEdgeGatewayBandwidthParams) (struct{}, error) {
 			return struct{}{}, nil
 		},
 	}
-	listVDCByOwnerNameOp = cav.Operation[listVDCByOwnerNameParams, *itypes.ApiResponseListVDC]{
+	listVDCByOwnerNameOp = cav.Operation[listVDCByOwnerNameParams, *itypes.APIResponseListVDC]{
 		Name:     opListVDCByOwnerName,
 		Backend:  cav.BackendVMware,
-		Endpoint: endpoints.ListVdc(),
+		Endpoint: endpoints.ListVDC(),
 		Validate: func(p listVDCByOwnerNameParams) error {
 			if p.OwnerName == "" {
 				return fmt.Errorf("owner name is required")
@@ -134,13 +133,13 @@ var (
 			return nil
 		},
 		RequestOptions: func(p listVDCByOwnerNameParams) ([]cav.EndpointRequestOption, error) {
-			ep := endpoints.ListVdc()
+			ep := endpoints.ListVDC()
 			return []cav.EndpointRequestOption{
 				cav.WithQueryParam(ep.QueryParams[0], "name=="+p.OwnerName),
 			}, nil
 		},
-		Extract: func(resp *cav.Response, _ listVDCByOwnerNameParams) (*itypes.ApiResponseListVDC, error) {
-			list, ok := resp.Result().(*itypes.ApiResponseListVDC)
+		Extract: func(resp *cav.Response, _ listVDCByOwnerNameParams) (*itypes.APIResponseListVDC, error) {
+			list, ok := resp.Result().(*itypes.APIResponseListVDC)
 			if !ok || list == nil {
 				return nil, fmt.Errorf("unexpected list VDC response type %T", resp.Result())
 			}
@@ -148,10 +147,10 @@ var (
 			return list, nil
 		},
 	}
-	listVDCGroupByOwnerNameOp = cav.Operation[listVDCGroupByOwnerNameParams, *itypes.ApiResponseListVdcGroup]{
+	listVDCGroupByOwnerNameOp = cav.Operation[listVDCGroupByOwnerNameParams, *itypes.APIResponseListVDCGroup]{
 		Name:     opListVDCGroupByOwnerName,
 		Backend:  cav.BackendVMware,
-		Endpoint: endpoints.ListVdcGroup(),
+		Endpoint: endpoints.ListVDCGroup(),
 		Validate: func(p listVDCGroupByOwnerNameParams) error {
 			if p.OwnerName == "" {
 				return fmt.Errorf("owner name is required")
@@ -160,13 +159,13 @@ var (
 			return nil
 		},
 		RequestOptions: func(p listVDCGroupByOwnerNameParams) ([]cav.EndpointRequestOption, error) {
-			ep := endpoints.ListVdcGroup()
+			ep := endpoints.ListVDCGroup()
 			return []cav.EndpointRequestOption{
 				cav.WithQueryParam(ep.QueryParams[0], "name=="+p.OwnerName),
 			}, nil
 		},
-		Extract: func(resp *cav.Response, _ listVDCGroupByOwnerNameParams) (*itypes.ApiResponseListVdcGroup, error) {
-			list, ok := resp.Result().(*itypes.ApiResponseListVdcGroup)
+		Extract: func(resp *cav.Response, _ listVDCGroupByOwnerNameParams) (*itypes.APIResponseListVDCGroup, error) {
+			list, ok := resp.Result().(*itypes.APIResponseListVDCGroup)
 			if !ok || list == nil {
 				return nil, fmt.Errorf("unexpected list VDC group response type %T", resp.Result())
 			}
@@ -243,8 +242,8 @@ func (c *Client) CreateEdgeGateway(ctx context.Context, params types.ParamsCreat
 }
 
 type createEdgeGatewayDependencies struct {
-	vdcs      *itypes.ApiResponseListVDC
-	vdcGroups *itypes.ApiResponseListVdcGroup
+	vdcs      *itypes.APIResponseListVDC
+	vdcGroups *itypes.APIResponseListVDCGroup
 	t0s       *types.ModelT0s
 }
 
@@ -319,8 +318,8 @@ func extractCreatedEdgeGatewayName(job *resty.Response) (string, error) {
 	return "", errors.New("created edge gateway name not found in job response")
 }
 
-func resolveEdgeGatewayCreateOwner(vdcs *itypes.ApiResponseListVDC, vdcGroups *itypes.ApiResponseListVdcGroup, ownerName string) (string, string, error) {
-	matchingVDCs := make([]itypes.ApiResponseListVDCRecord, 0)
+func resolveEdgeGatewayCreateOwner(vdcs *itypes.APIResponseListVDC, vdcGroups *itypes.APIResponseListVDCGroup, ownerName string) (string, string, error) {
+	matchingVDCs := make([]itypes.APIResponseListVDCRecord, 0)
 	if vdcs != nil {
 		for _, record := range vdcs.Records {
 			if record.Name == ownerName {
@@ -329,7 +328,7 @@ func resolveEdgeGatewayCreateOwner(vdcs *itypes.ApiResponseListVDC, vdcGroups *i
 		}
 	}
 
-	matchingVDCGroups := make([]itypes.ApiResponseListVdcGroupDetails, 0)
+	matchingVDCGroups := make([]itypes.APIResponseListVDCGroupDetails, 0)
 	if vdcGroups != nil {
 		for _, group := range vdcGroups.Values {
 			if group.Name == ownerName {

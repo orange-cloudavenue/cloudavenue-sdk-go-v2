@@ -22,7 +22,7 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 )
 
-func newClient(t *testing.T) (*Client, *mock.MockServer) {
+func newClient(t *testing.T) (*Client, *mock.Server) {
 	t.Helper()
 
 	mC, ms, err := mock.NewClient()
@@ -132,9 +132,9 @@ func TestGetUser(t *testing.T) {
 			expectedErr:        true,
 		},
 		{
-			name: "Get User Missing ID and Name",
-			params: ParamsGetUser{},
-			expectedErr:        true,
+			name:        "Get User Missing ID and Name",
+			params:      ParamsGetUser{},
+			expectedErr: true,
 		},
 	}
 
@@ -194,8 +194,8 @@ func TestCreateLocalUser(t *testing.T) {
 				FullName:        "New User",
 				EmailAddress:    "newuser@example.com",
 				IsEnabled:       true,
-				DeployedVmQuota: 10,
-				StoredVmQuota:   10,
+				DeployedVMQuota: 10,
+				StoredVMQuota:   10,
 			},
 			expectedErr: false,
 		},
@@ -376,10 +376,10 @@ func TestUpdateUser(t *testing.T) {
 				ms.CleanResponse(endpoints.UpdateUser())
 				ms.SetResponseFunc(endpoints.UpdateUser(), func(w http.ResponseWriter, r *http.Request) {
 					user := itypes.User{
-						Name:     "user1",
-						FullName: tt.params.FullName,
+						Name:      "user1",
+						FullName:  tt.params.FullName,
 						Telephone: tt.params.Telephone,
-						Role:     itypes.Reference{Name: "Organization Administrator"},
+						Role:      itypes.Reference{Name: "Organization Administrator"},
 					}
 					xmlResponse(w, user)
 				})
@@ -409,8 +409,8 @@ func TestUpdateUserPreservesExistingFields(t *testing.T) {
 			Telephone:       "0000",
 			Description:     "current description",
 			IsEnabled:       true,
-			DeployedVmQuota: 4,
-			StoredVmQuota:   7,
+			DeployedVMQuota: 4,
+			StoredVMQuota:   7,
 			Role:            itypes.Reference{Name: "Organization Administrator"},
 		})
 	})
@@ -423,8 +423,8 @@ func TestUpdateUserPreservesExistingFields(t *testing.T) {
 		assert.Equal(t, "1234567890", body.Telephone)
 		assert.Equal(t, "user1@example.com", body.EmailAddress)
 		assert.True(t, body.IsEnabled)
-		assert.Equal(t, 4, body.DeployedVmQuota)
-		assert.Equal(t, 7, body.StoredVmQuota)
+		assert.Equal(t, 4, body.DeployedVMQuota)
+		assert.Equal(t, 7, body.StoredVMQuota)
 		xmlResponse(w, body)
 	})
 
@@ -540,9 +540,9 @@ func TestEnableUser(t *testing.T) {
 				ms.CleanResponse(endpoints.EnableUser())
 				ms.SetResponseFunc(endpoints.EnableUser(), func(w http.ResponseWriter, r *http.Request) {
 					user := itypes.User{
-						Name:     "user1",
+						Name:      "user1",
 						IsEnabled: true,
-						Role:     itypes.Reference{Name: "Organization Administrator"},
+						Role:      itypes.Reference{Name: "Organization Administrator"},
 					}
 					xmlResponse(w, user)
 				})
@@ -600,9 +600,9 @@ func TestDisableUser(t *testing.T) {
 				ms.CleanResponse(endpoints.DisableUser())
 				ms.SetResponseFunc(endpoints.DisableUser(), func(w http.ResponseWriter, r *http.Request) {
 					user := itypes.User{
-						Name:     "user1",
+						Name:      "user1",
 						IsEnabled: false,
-						Role:     itypes.Reference{Name: "Organization Administrator"},
+						Role:      itypes.Reference{Name: "Organization Administrator"},
 					}
 					xmlResponse(w, user)
 				})
@@ -660,9 +660,9 @@ func TestUnlockUser(t *testing.T) {
 				ms.CleanResponse(endpoints.UnlockUser())
 				ms.SetResponseFunc(endpoints.UnlockUser(), func(w http.ResponseWriter, r *http.Request) {
 					user := itypes.User{
-						Name:     "user1",
+						Name:      "user1",
 						IsEnabled: true,
-						Role:     itypes.Reference{Name: "Organization Administrator"},
+						Role:      itypes.Reference{Name: "Organization Administrator"},
 					}
 					xmlResponse(w, user)
 				})

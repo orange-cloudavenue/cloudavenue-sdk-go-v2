@@ -10,6 +10,8 @@
 package iendpoints
 
 import (
+	"github.com/orange-cloudavenue/common-go/extractor"
+
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 )
@@ -19,14 +21,14 @@ import (
 func init() {
 	const pathVAppByID = "/api/vapp/{vapp-id}"
 
-	// ListVapp
+	// ListVApp
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-VApp.html",
-		Name:             "ListVapp",
+		Name:             "ListVApp",
 		Description:      "List VApps",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/api/query",
+		PathTemplate:     pathQueryAPI,
 		QueryParams: []cav.QueryParam{
 			{
 				Name:          queryParamFilter,
@@ -41,10 +43,10 @@ func init() {
 		ResponseType: itypes.APIResponseListVApp{},
 	}.Register()
 
-	// GetVapp
+	// GetVApp
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-VApp.html",
-		Name:             "GetVapp",
+		Name:             "GetVApp",
 		Description:      "Get VApp",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
@@ -55,16 +57,16 @@ func init() {
 				Description:   descVAppID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVApp),
-				TransformFunc: extractUUID,
+				TransformFunc: extractor.ExtractUUID,
 			},
 		},
 		ResponseType: itypes.APIResponseGetVApp{},
 	}.Register()
 
-	// CreateVapp
+	// CreateVApp
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-VApp.html",
-		Name:             "CreateVapp",
+		Name:             "CreateVApp",
 		Description:      "Create a new VApp",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
@@ -75,17 +77,17 @@ func init() {
 				Description:   descVDCID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVDC),
-				TransformFunc: extractUUID,
+				TransformFunc: extractor.ExtractUUID,
 			},
 		},
 		BodyRequestType: itypes.APIRequestCreateVApp{},
 		ResponseType:    cav.Job{},
 	}.Register()
 
-	// UpdateVapp
+	// UpdateVApp
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-VApp.html",
-		Name:             "UpdateVapp",
+		Name:             "UpdateVApp",
 		Description:      "Update an existing VApp",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
@@ -96,17 +98,17 @@ func init() {
 				Description:   descVAppID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVApp),
-				TransformFunc: extractUUID,
+				TransformFunc: extractor.ExtractUUID,
 			},
 		},
 		BodyRequestType: itypes.APIRequestUpdateVApp{},
 		ResponseType:    cav.Job{},
 	}.Register()
 
-	// DeleteVapp
+	// DeleteVApp
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/DELETE-VApp.html",
-		Name:             "DeleteVapp",
+		Name:             "DeleteVApp",
 		Description:      "Delete an existing VApp",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
@@ -117,7 +119,7 @@ func init() {
 				Description:   descVAppID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVApp),
-				TransformFunc: extractUUID,
+				TransformFunc: extractor.ExtractUUID,
 			},
 		},
 		ResponseType: cav.Job{},
@@ -137,16 +139,16 @@ func init() {
 				Description:   descVAppID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVApp),
-				TransformFunc: extractUUID,
+				TransformFunc: extractor.ExtractUUID,
 			},
 		},
 		ResponseType: cav.Job{},
 	}.Register()
 
-	// UndeployVapp
+	// UndeployVApp
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-VApp-Undeploy.html",
-		Name:             "UndeployVapp",
+		Name:             "UndeployVApp",
 		Description:      "Undeploy a VApp",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
@@ -157,7 +159,7 @@ func init() {
 				Description:   descVAppID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVApp),
-				TransformFunc: extractUUID,
+				TransformFunc: extractor.ExtractUUID,
 			},
 		},
 		BodyRequestType: itypes.APIRequestUndeployVApp{},

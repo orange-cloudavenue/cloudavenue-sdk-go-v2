@@ -45,11 +45,11 @@ var DynamicSecurityGroupAllowedOperators = map[string][]string{
 
 type (
 	ParamsListDynamicSecurityGroup struct {
-		// VdcGroupID is the ID of the Vdc Group owning the Dynamic Security Groups to list.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning the Dynamic Security Groups to list.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning the Dynamic Security Groups to list.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning the Dynamic Security Groups to list.
+		VDCGroupName string
 	}
 
 	ParamsGetDynamicSecurityGroup struct {
@@ -59,11 +59,11 @@ type (
 		// Name is the name of the Dynamic Security Group.
 		Name string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Dynamic Security Group.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Dynamic Security Group.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Dynamic Security Group.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Dynamic Security Group.
+		VDCGroupName string
 	}
 
 	ParamsCreateDynamicSecurityGroup struct {
@@ -73,11 +73,11 @@ type (
 		// Description is the description of the Dynamic Security Group.
 		Description string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Dynamic Security Group.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Dynamic Security Group.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Dynamic Security Group.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Dynamic Security Group.
+		VDCGroupName string
 
 		// Criteria is the list of criteria (max 3) that determine VM membership. A VM belongs to
 		// the group if it matches at least one criteria (logical OR between criteria).
@@ -112,11 +112,11 @@ type (
 		// Description is the new description of the Dynamic Security Group.
 		Description string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Dynamic Security Group.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Dynamic Security Group.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Dynamic Security Group.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Dynamic Security Group.
+		VDCGroupName string
 
 		// Criteria is the list of criteria (max 3) that determine VM membership.
 		Criteria []ParamsDynamicSecurityGroupCriteria
@@ -129,10 +129,10 @@ type (
 		// Name is the name of the Dynamic Security Group to delete.
 		Name string
 
-		// VdcGroupID is the ID of the Vdc Group owning this Dynamic Security Group.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning this Dynamic Security Group.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning this Dynamic Security Group.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning this Dynamic Security Group.
+		VDCGroupName string
 	}
 )

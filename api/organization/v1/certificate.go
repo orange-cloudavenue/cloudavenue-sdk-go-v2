@@ -45,7 +45,7 @@ func (c *Client) ListCertificate(ctx context.Context, params types.ParamsListCer
 		return nil, fmt.Errorf("%s: list: %w", opListCertificate, err)
 	}
 
-	return resp.Result().(*itypes.ApiResponseListCertificate).ToModel(), nil
+	return resp.Result().(*itypes.APIResponseListCertificate).ToModel(), nil
 }
 
 // GetCertificate gets certificate library item by URN or alias.
@@ -71,7 +71,7 @@ func (c *Client) CreateCertificate(ctx context.Context, params types.ParamsCreat
 		Endpoint: endpoints.CreateCertificate(),
 		Validate: validateCreateCertificateParams,
 		Transform: func(p types.ParamsCreateCertificate) (any, error) {
-			return itypes.ApiRequestCertificate{
+			return itypes.APIRequestCertificate{
 				Alias:                p.Name,
 				Description:          p.Description,
 				Certificate:          p.Certificate,
@@ -80,7 +80,7 @@ func (c *Client) CreateCertificate(ctx context.Context, params types.ParamsCreat
 			}, nil
 		},
 		Extract: func(resp *cav.Response, _ types.ParamsCreateCertificate) (*types.ModelGetCertificate, error) {
-			certificate, ok := resp.Result().(*itypes.ApiResponseCertificate)
+			certificate, ok := resp.Result().(*itypes.APIResponseCertificate)
 			if !ok || certificate == nil {
 				return nil, fmt.Errorf("%s: unexpected create response type %T", opCreateCertificate, resp.Result())
 			}
@@ -102,7 +102,7 @@ func (c *Client) UpdateCertificate(ctx context.Context, params types.ParamsUpdat
 		return nil, fmt.Errorf("%s: resolve: %w", opUpdateCertificate, err)
 	}
 
-	body := itypes.ApiRequestCertificate{
+	body := itypes.APIRequestCertificate{
 		ID:          current.ID,
 		Alias:       current.Alias,
 		Certificate: current.Certificate,
@@ -139,14 +139,14 @@ func (c *Client) DeleteCertificate(ctx context.Context, params types.ParamsDelet
 	return nil
 }
 
-func findCertificate(ctx context.Context, c *Client, id, name string) (*itypes.ApiResponseCertificate, error) {
+func findCertificate(ctx context.Context, c *Client, id, name string) (*itypes.APIResponseCertificate, error) {
 	if id != "" {
 		ep := endpoints.GetCertificate()
 		resp, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], id))
 		if err != nil {
 			return nil, err
 		}
-		return resp.Result().(*itypes.ApiResponseCertificate), nil
+		return resp.Result().(*itypes.APIResponseCertificate), nil
 	}
 
 	if name == "" {
@@ -159,7 +159,7 @@ func findCertificate(ctx context.Context, c *Client, id, name string) (*itypes.A
 		return nil, err
 	}
 
-	list := resp.Result().(*itypes.ApiResponseListCertificate)
+	list := resp.Result().(*itypes.APIResponseListCertificate)
 	if len(list.Values) == 0 {
 		return nil, &pkgerrors.APIError{Operation: "GetCertificate", StatusCode: 404, Message: fmt.Sprintf("certificate %q not found", name)}
 	}
