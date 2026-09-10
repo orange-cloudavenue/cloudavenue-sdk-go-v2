@@ -14,9 +14,11 @@ import (
 
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+	pkgerrors "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
@@ -132,4 +134,39 @@ func Test_GetEdgeGatewayBandwidth(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetBandwidthReturnsNotFoundWhenT0LookupDoesNotContainRequestedEdgeGateway(t *testing.T) {
+	eC, ms := newClient(t)
+	ep := endpoints.ListT0()
+	epSharedPath := endpoints.GetEdgeGatewayServices()
+	status := 200
+
+	child := itypes.ApiResponseT0Children{
+		Type: "edge-gateway",
+		Name: "another-edge-gateway",
+	}
+	child.Properties.RateLimit = 5
+	child.Properties.EdgeUUID = "urn:vcloud:gateway:existing-edge-gw-id"
+
+	resp := &itypes.ApiResponseT0s{{
+		Type:     "tier-0-vrf",
+		Name:     "test-t0",
+		Children: []itypes.ApiResponseT0Children{child},
+	}}
+
+	ms.CleanResponse(ep)
+	ms.CleanResponse(epSharedPath)
+	ms.SetResponse(ep, resp, &status)
+	ms.SetResponse(epSharedPath, resp, &status)
+
+	result, err := eC.GetBandwidth(t.Context(), types.ParamsEdgeGateway{
+		ID: "urn:vcloud:gateway:missing-edge-gw-id",
+	})
+
+	require.Nil(t, result)
+	var apiErr *pkgerrors.APIError
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, 404, apiErr.StatusCode)
+	assert.Contains(t, apiErr.Message, "not found")
 }
