@@ -18,7 +18,26 @@ import (
 	"resty.dev/v3"
 )
 
-func getJobStatus(ctx context.Context, c Client, jobID string) (*resty.Response, BackendTarget, error) {
+func getJobStatus(ctx context.Context, c Client, jobID string, backend BackendTarget) (*resty.Response, BackendTarget, error) {
+	if backend != 0 {
+		endpointName, err := getJobEndpointName(backend)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		ep, err := GetEndpoint(endpointName)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		resp, err := c.DoWithBackend(ctx, backend, ep, buildJobRequestOptions(ep.Backend, ep, jobID)...)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		return resp, backend, nil
+	}
+
 	endpointNames := []string{"GetJobCerberus", "GetJobVmware"}
 
 	var lastErr error
@@ -39,6 +58,17 @@ func getJobStatus(ctx context.Context, c Client, jobID string) (*resty.Response,
 	}
 
 	return nil, 0, fmt.Errorf("no job endpoint found: %w", lastErr)
+}
+
+func getJobEndpointName(backend BackendTarget) (string, error) {
+	switch backend {
+	case BackendInfrapi:
+		return "GetJobCerberus", nil
+	case BackendVMware:
+		return "GetJobVmware", nil
+	default:
+		return "", fmt.Errorf("backend %d does not support jobs", backend)
+	}
 }
 
 func buildJobRequestOptions(backend BackendTarget, endpoint *Endpoint, jobID string) []EndpointRequestOption {

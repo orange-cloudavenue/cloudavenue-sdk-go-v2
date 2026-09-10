@@ -152,8 +152,8 @@ func (c *client) NewRequestWithBackend(ctx context.Context, backend BackendTarge
 
 	var (
 		retryCount       = 5
-		retryWaitTime    = 60 * time.Second
-		retryMaxWaitTime = 5 * time.Second
+		retryWaitTime    = 5 * time.Second
+		retryMaxWaitTime = 60 * time.Second
 		retryConditions  = make([]resty.RetryConditionFunc, 0)
 		retryIdempotent  = false
 	)
