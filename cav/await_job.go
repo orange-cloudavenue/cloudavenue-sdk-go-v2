@@ -30,6 +30,15 @@ type JobPollOptions struct {
 // The extract callback receives the raw response to allow extraction of
 // resource data from the raw response (e.g. created resource names).
 func AwaitJob[R any](ctx context.Context, c Client, jobID string, opts JobPollOptions, extract func(resp *resty.Response) (R, error)) (R, error) {
+	return awaitJob(ctx, c, 0, jobID, opts, extract)
+}
+
+// AwaitJobOnBackend polls a job on a known backend and avoids probing unrelated backends.
+func AwaitJobOnBackend[R any](ctx context.Context, c Client, backend BackendTarget, jobID string, opts JobPollOptions, extract func(resp *resty.Response) (R, error)) (R, error) {
+	return awaitJob(ctx, c, backend, jobID, opts, extract)
+}
+
+func awaitJob[R any](ctx context.Context, c Client, backend BackendTarget, jobID string, opts JobPollOptions, extract func(resp *resty.Response) (R, error)) (R, error) {
 	var zero R
 
 	if err := context.Cause(ctx); err != nil {
@@ -52,7 +61,7 @@ func AwaitJob[R any](ctx context.Context, c Client, jobID string, opts JobPollOp
 		return zero, fmt.Errorf("await job %s: polling interval must be greater than 0", jobID)
 	}
 
-	ctx, cancel := context.WithCancelCause(ctx)
+	pollCtx, cancel := context.WithCancelCause(ctx)
 	defer cancel(nil)
 
 	timer := time.AfterFunc(opts.Timeout, func() { cancel(pkgerrors.ErrJobTimeout) })
@@ -61,17 +70,17 @@ func AwaitJob[R any](ctx context.Context, c Client, jobID string, opts JobPollOp
 
 	for {
 		select {
-		case <-ctx.Done():
-			return zero, context.Cause(ctx)
+		case <-pollCtx.Done():
+			return zero, context.Cause(pollCtx)
 		case <-time.After(withJitter(opts.PollingInterval, opts.Jitter)):
 		}
 
-		resp, backend, err := getJobStatus(ctx, c, jobID)
+		resp, resolvedBackend, err := getJobStatus(pollCtx, c, jobID, backend)
 		if err != nil {
 			return zero, fmt.Errorf("await job %s: %w", jobID, err)
 		}
 
-		job, err := parseJobResponse(&Response{Raw: resp}, backend)
+		job, err := parseJobResponse(&Response{Raw: resp}, resolvedBackend)
 		if err != nil {
 			return zero, fmt.Errorf("await job %s: parse job status: %w", jobID, err)
 		}

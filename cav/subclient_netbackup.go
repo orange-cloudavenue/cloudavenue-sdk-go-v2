@@ -103,8 +103,7 @@ func (n *netbackup) ContextData(_ context.Context) ContextData {
 	}
 
 	return ContextData{
-		OrganizationID: n.getAccessToken(),
-		SiteID:         n.getBaseURL(),
+		SiteID: n.getBaseURL(),
 	}
 }
 
