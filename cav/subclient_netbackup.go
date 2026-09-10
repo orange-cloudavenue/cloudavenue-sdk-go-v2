@@ -7,7 +7,6 @@
  * or see the "LICENSE" file for more details.
  */
 
-//nolint:tagliatelle
 package cav
 
 import (

@@ -7,7 +7,6 @@
  * or see the "LICENSE" file for more details.
  */
 
-//nolint:tagliatelle
 package itypes
 
 import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
