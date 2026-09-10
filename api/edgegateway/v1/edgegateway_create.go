@@ -27,10 +27,10 @@ import (
 )
 
 const (
-	opCreateEdgeGatewaySubmit          = "EdgeGateway.Create.Submit"
-	opUpdateEdgeGatewayBandwidthCreate = "EdgeGateway.Create.UpdateBandwidth"
-	opListVDCByOwnerName               = "EdgeGateway.Create.ListVDCByOwnerName"
-	opListVDCGroupByOwnerName          = "EdgeGateway.Create.ListVDCGroupByOwnerName"
+	opCreateEdgeGatewaySubmit           = "EdgeGateway.Create.Submit"
+	opUpdateEdgeGatewayBandwidthCreate  = "EdgeGateway.Create.UpdateBandwidth"
+	opListVDCByOwnerName                = "EdgeGateway.Create.ListVDCByOwnerName"
+	opListVDCGroupByOwnerName           = "EdgeGateway.Create.ListVDCGroupByOwnerName"
 	defaultSharedT0EdgeGatewayBandwidth = 5
 )
 

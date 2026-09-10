@@ -15,7 +15,7 @@ import (
 
 // ListT0 - List T0
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/getNetworkHierarchy 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/getNetworkHierarchy
 func ListT0() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListT0")
 }
