@@ -132,7 +132,7 @@ type APIRequestCreateVApp struct {
 type APIRequestUpdateVApp struct {
 	XMLNS                         string `json:"xmlns" fake:"http://www.vmware.com/vcloud/v1.5"`
 	Name                          string `json:"name,omitempty" fake:"mockvapp-{word}"`
-	Description                   string `json:"description,omitempty" fake:"{sentence}"`
+	Description                   *string `json:"description,omitempty" fake:"{sentence}"`
 	LeaseSettings                 *APIRequestLeaseSettings `json:"leaseSettings,omitempty"`
 }
 

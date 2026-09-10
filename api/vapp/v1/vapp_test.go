@@ -10,6 +10,8 @@
 package vapp
 
 import (
+	"encoding/json"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -248,6 +250,101 @@ func TestCreateVApp(t *testing.T) {
 			assert.NotNil(t, resp, "Expected response to be not nil")
 		})
 	}
+}
+
+func TestUpdateVAppPreservesExistingDescription(t *testing.T) {
+	client, ms := newClient(t)
+	vappID := "urn:vcloud:vapp:12345678-1234-4b8d-89ab-123456789012"
+	deploymentLease := 3600
+	storageLease := 7200
+	getCalls := 0
+
+	ms.CleanResponse(endpoints.GetVapp())
+	ms.SetResponseFunc(endpoints.GetVapp(), func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		resp := &itypes.APIResponseGetVApp{
+			ID:          vappID,
+			Name:        "test-vapp-1",
+			Description: "current description",
+			LeaseSettings: itypes.APIResponseLeaseSettings{
+				DeploymentLeaseInSeconds: deploymentLease,
+				StorageLeaseInSeconds:    storageLease,
+			},
+		}
+		if getCalls > 0 {
+			resp.LeaseSettings.DeploymentLeaseInSeconds = 1800
+		}
+		getCalls++
+		assert.NoError(t, json.NewEncoder(w).Encode(resp))
+	})
+
+	ms.CleanResponse(endpoints.UpdateVapp())
+	ms.SetResponseFunc(endpoints.UpdateVapp(), func(w http.ResponseWriter, r *http.Request) {
+		var body itypes.APIRequestUpdateVApp
+		assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
+		if assert.NotNil(t, body.Description) {
+			assert.Equal(t, "current description", *body.Description)
+		}
+		if assert.NotNil(t, body.LeaseSettings) && assert.NotNil(t, body.LeaseSettings.DeploymentLeaseInSeconds) {
+			assert.Equal(t, 1800, *body.LeaseSettings.DeploymentLeaseInSeconds)
+		}
+		if assert.NotNil(t, body.LeaseSettings) && assert.NotNil(t, body.LeaseSettings.StorageLeaseInSeconds) {
+			assert.Equal(t, storageLease, *body.LeaseSettings.StorageLeaseInSeconds)
+		}
+		w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
+		w.WriteHeader(http.StatusAccepted)
+	})
+
+	resp, err := client.UpdateVApp(t.Context(), types.ParamsUpdateVApp{ID: vappID, DeploymentLeaseInSeconds: new(1800)})
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.Equal(t, "current description", resp.Description)
+	assert.NotNil(t, resp.DeploymentLeaseInSeconds)
+	assert.Equal(t, 1800, *resp.DeploymentLeaseInSeconds)
+
+	ms.CleanResponse(endpoints.GetVapp())
+	ms.CleanResponse(endpoints.UpdateVapp())
+}
+
+func TestUpdateVAppCanClearDescription(t *testing.T) {
+	client, ms := newClient(t)
+	vappID := "urn:vcloud:vapp:12345678-1234-4b8d-89ab-123456789012"
+	empty := ""
+	getCalls := 0
+
+	ms.CleanResponse(endpoints.GetVapp())
+	ms.SetResponseFunc(endpoints.GetVapp(), func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		resp := &itypes.APIResponseGetVApp{
+			ID:          vappID,
+			Name:        "test-vapp-1",
+			Description: "current description",
+		}
+		if getCalls > 0 {
+			resp.Description = empty
+		}
+		getCalls++
+		assert.NoError(t, json.NewEncoder(w).Encode(resp))
+	})
+
+	ms.CleanResponse(endpoints.UpdateVapp())
+	ms.SetResponseFunc(endpoints.UpdateVapp(), func(w http.ResponseWriter, r *http.Request) {
+		var body itypes.APIRequestUpdateVApp
+		assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
+		if assert.NotNil(t, body.Description) {
+			assert.Equal(t, empty, *body.Description)
+		}
+		w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
+		w.WriteHeader(http.StatusAccepted)
+	})
+
+	resp, err := client.UpdateVApp(t.Context(), types.ParamsUpdateVApp{ID: vappID, Description: &empty})
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.Equal(t, empty, resp.Description)
+
+	ms.CleanResponse(endpoints.GetVapp())
+	ms.CleanResponse(endpoints.UpdateVapp())
 }
 
 func TestDeleteVApp(t *testing.T) {
