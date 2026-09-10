@@ -128,6 +128,54 @@ func modelUserToIAMXML(params any) (itypes.User, error) {
 	return u, nil
 }
 
+func mergeUpdateUserParams(current *ModelUser, params ParamsUpdateUser) ParamsUpdateUser {
+	merged := ParamsUpdateUser{
+		ID:              params.ID,
+		Name:            current.Name,
+		RoleName:        current.RoleName,
+		FullName:        current.FullName,
+		EmailAddress:    current.EmailAddress,
+		Telephone:       current.Telephone,
+		Description:     current.Description,
+		DeployedVmQuota: current.DeployedVmQuota,
+		StoredVmQuota:   current.StoredVmQuota,
+		IsEnabled:       &current.IsEnabled,
+	}
+
+	if params.Name != "" {
+		merged.Name = params.Name
+	}
+	if params.Password != "" {
+		merged.Password = params.Password
+	}
+	if params.RoleName != "" {
+		merged.RoleName = params.RoleName
+	}
+	if params.FullName != "" {
+		merged.FullName = params.FullName
+	}
+	if params.EmailAddress != "" {
+		merged.EmailAddress = params.EmailAddress
+	}
+	if params.Telephone != "" {
+		merged.Telephone = params.Telephone
+	}
+	if params.Description != "" {
+		merged.Description = params.Description
+	}
+	if params.DeployedVmQuota != 0 {
+		merged.DeployedVmQuota = params.DeployedVmQuota
+	}
+	if params.StoredVmQuota != 0 {
+		merged.StoredVmQuota = params.StoredVmQuota
+	}
+	if params.IsEnabled != nil {
+		merged.IsEnabled = params.IsEnabled
+	}
+
+	return merged
+}
+
 // ListUsers lists all users in the organization.
 func (c *Client) ListUsers(ctx context.Context) ([]*ModelUser, error) {
 	ep := endpoints.ListUsers()
@@ -262,7 +310,14 @@ func (c *Client) UpdateUser(ctx context.Context, params ParamsUpdateUser) (*Mode
 		idOrName = params.Name
 	}
 
-	body, err := modelUserToIAMXML(params)
+	// VMware user updates expect a full XML payload. Merge caller changes into the
+	// current user to avoid zeroing fields omitted from ParamsUpdateUser.
+	current, err := c.GetUser(ctx, ParamsGetUser{ID: params.ID, Name: idOrName})
+	if err != nil {
+		return nil, fmt.Errorf("%s: get current: %w", opUpdateUser, err)
+	}
+
+	body, err := modelUserToIAMXML(mergeUpdateUserParams(current, params))
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", opUpdateUser, err)
 	}

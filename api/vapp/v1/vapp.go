@@ -12,6 +12,9 @@ package vapp
 import (
 	"context"
 	"fmt"
+	"path"
+	"net/url"
+	"strings"
 	"time"
 
 	"resty.dev/v3"
@@ -21,6 +24,54 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
+
+func awaitVAppJob(ctx context.Context, c cav.Client, opName, jobID string) error {
+	_, err := cav.AwaitJobOnBackend(ctx, c, cav.BackendVMware, jobID, cav.JobPollOptions{
+		Timeout:         30 * time.Second,
+		PollingInterval: 1 * time.Second,
+	}, func(_ *resty.Response) (struct{}, error) {
+		return struct{}{}, nil
+	})
+	if err != nil {
+		return fmt.Errorf("%s: await job: %w", opName, err)
+	}
+	return nil
+}
+
+func networkHrefPath(networkHREF string) string {
+	parsed, err := url.Parse(networkHREF)
+	if err != nil || parsed.Path == "" {
+		return networkHREF
+	}
+	return parsed.Path
+}
+
+func extractVMwareJob(resp *cav.Response, action string) (cav.Job, error) {
+	if job, ok := resp.Result().(*cav.Job); ok && job != nil && job.ID != "" {
+		return *job, nil
+	}
+
+	if resp == nil || resp.Raw == nil {
+		return cav.Job{}, fmt.Errorf("unexpected %s response: missing raw response", action)
+	}
+
+	location := resp.Raw.Header().Get("Location")
+	if location == "" {
+		return cav.Job{}, fmt.Errorf("unexpected %s response: missing job location", action)
+	}
+
+	parsed, err := url.Parse(location)
+	if err != nil {
+		return cav.Job{}, fmt.Errorf("unexpected %s response: parse location: %w", action, err)
+	}
+
+	jobID := path.Base(parsed.Path)
+	if jobID == "" || jobID == "." || jobID == "/" {
+		return cav.Job{}, fmt.Errorf("unexpected %s response: missing job id in location %q", action, location)
+	}
+
+	return cav.Job{ID: jobID}, nil
+}
 
 const (
 	opListVapp   = "Vapp.List"
@@ -124,12 +175,7 @@ var (
 			return p.Body, nil
 		},
 		Extract: func(resp *cav.Response, _ createVAppParams) (cav.Job, error) {
-			job, ok := resp.Result().(*cav.Job)
-			if !ok || job == nil {
-				return cav.Job{}, fmt.Errorf("unexpected create response type %T", resp.Result())
-			}
-
-			return *job, nil
+			return extractVMwareJob(resp, "create")
 		},
 	}
 	updateVAppByIDOp = cav.Operation[updateVAppByIDParams, cav.Job]{
@@ -151,12 +197,7 @@ var (
 			return p.Body, nil
 		},
 		Extract: func(resp *cav.Response, _ updateVAppByIDParams) (cav.Job, error) {
-			job, ok := resp.Result().(*cav.Job)
-			if !ok || job == nil {
-				return cav.Job{}, fmt.Errorf("unexpected update response type %T", resp.Result())
-			}
-
-			return *job, nil
+			return extractVMwareJob(resp, "update")
 		},
 	}
 	deleteVAppByIDOp = cav.Operation[deleteVAppByIDParams, cav.Job]{
@@ -175,12 +216,7 @@ var (
 			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
 		},
 		Extract: func(resp *cav.Response, _ deleteVAppByIDParams) (cav.Job, error) {
-			job, ok := resp.Result().(*cav.Job)
-			if !ok || job == nil {
-				return cav.Job{}, fmt.Errorf("unexpected delete response type %T", resp.Result())
-			}
-
-			return *job, nil
+			return extractVMwareJob(resp, "delete")
 		},
 	}
 	removeAllNetworksOp = cav.Operation[getVAppByIDParams, cav.Job]{
@@ -199,12 +235,7 @@ var (
 			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
 		},
 		Extract: func(resp *cav.Response, _ getVAppByIDParams) (cav.Job, error) {
-			job, ok := resp.Result().(*cav.Job)
-			if !ok || job == nil {
-				return cav.Job{}, fmt.Errorf("unexpected remove networks response type %T", resp.Result())
-			}
-
-			return *job, nil
+			return extractVMwareJob(resp, "remove networks")
 		},
 	}
 	undeployVAppOp = cav.Operation[getVAppByIDParams, cav.Job]{
@@ -226,12 +257,7 @@ var (
 			return itypes.APIRequestUndeployVApp{UndeployPowerOff: true}, nil
 		},
 		Extract: func(resp *cav.Response, _ getVAppByIDParams) (cav.Job, error) {
-			job, ok := resp.Result().(*cav.Job)
-			if !ok || job == nil {
-				return cav.Job{}, fmt.Errorf("unexpected undeploy response type %T", resp.Result())
-			}
-
-			return *job, nil
+			return extractVMwareJob(resp, "undeploy")
 		},
 	}
 )
@@ -316,14 +342,8 @@ func (c *Client) CreateVApp(ctx context.Context, params types.ParamsCreateVApp) 
 		return nil, fmt.Errorf("%s: %w", opCreateVapp, err)
 	}
 
-	_, err = cav.AwaitJob(ctx, c.c, job.ID, cav.JobPollOptions{
-		Timeout:         30 * time.Second,
-		PollingInterval: 1 * time.Second,
-	}, func(_ *resty.Response) (struct{}, error) {
-		return struct{}{}, nil
-	})
-	if err != nil {
-		return nil, fmt.Errorf("%s: await job: %w", opCreateVapp, err)
+	if err := awaitVAppJob(ctx, c.c, opCreateVapp, job.ID); err != nil {
+		return nil, err
 	}
 
 	m, err := c.GetVApp(ctx, types.ParamsGetVApp{Name: params.Name})
@@ -367,14 +387,8 @@ func (c *Client) UpdateVApp(ctx context.Context, params types.ParamsUpdateVApp) 
 		return nil, fmt.Errorf("%s: %w", opUpdateVapp, err)
 	}
 
-	_, err = cav.AwaitJob(ctx, c.c, job.ID, cav.JobPollOptions{
-		Timeout:         30 * time.Second,
-		PollingInterval: 1 * time.Second,
-	}, func(_ *resty.Response) (struct{}, error) {
-		return struct{}{}, nil
-	})
-	if err != nil {
-		return nil, fmt.Errorf("%s: await job: %w", opUpdateVapp, err)
+	if err := awaitVAppJob(ctx, c.c, opUpdateVapp, job.ID); err != nil {
+		return nil, err
 	}
 
 	m, err := c.GetVApp(ctx, types.ParamsGetVApp{ID: params.ID})
@@ -403,18 +417,28 @@ func (c *Client) DeleteVApp(ctx context.Context, params types.ParamsDeleteVApp) 
 	}
 
 	// Step 1: Remove all networks
-	if _, err := cav.Execute(ctx, c.c, removeAllNetworksOp, getVAppByIDParams{ID: params.ID}); err != nil {
+	job, err := cav.Execute(ctx, c.c, removeAllNetworksOp, getVAppByIDParams{ID: params.ID})
+	if err != nil {
+		return fmt.Errorf("%s: remove all networks: %w", opDeleteVapp, err)
+	}
+	if err := awaitVAppJob(ctx, c.c, opDeleteVapp, job.ID); err != nil {
 		return fmt.Errorf("%s: remove all networks: %w", opDeleteVapp, err)
 	}
 
 	// Step 2: Try undeploy (ignore if already undeployed)
-	_, err := cav.Execute(ctx, c.c, undeployVAppOp, getVAppByIDParams{ID: params.ID})
+	job, err = cav.Execute(ctx, c.c, undeployVAppOp, getVAppByIDParams{ID: params.ID})
 	if err != nil {
 		c.logger.Debug("Undeploy failed, continuing with delete", "error", err)
+	} else if err := awaitVAppJob(ctx, c.c, opDeleteVapp, job.ID); err != nil {
+		c.logger.Debug("Await undeploy failed, continuing with delete", "error", err)
 	}
 
 	// Step 3: Delete
-	if _, err := cav.Execute(ctx, c.c, deleteVAppByIDOp, deleteVAppByIDParams{ID: params.ID}); err != nil {
+	job, err = cav.Execute(ctx, c.c, deleteVAppByIDOp, deleteVAppByIDParams{ID: params.ID})
+	if err != nil {
+		return fmt.Errorf("%s: delete: %w", opDeleteVapp, err)
+	}
+	if err := awaitVAppJob(ctx, c.c, opDeleteVapp, job.ID); err != nil {
 		return fmt.Errorf("%s: delete: %w", opDeleteVapp, err)
 	}
 
@@ -424,14 +448,13 @@ func (c *Client) DeleteVApp(ctx context.Context, params types.ParamsDeleteVApp) 
 // IsVAppOrgNetwork checks if a network is an org network.
 // This is a helper preserved from v1 SDK.
 func IsVAppOrgNetwork(networkHREF string) bool {
-	// In vCD, org networks have a specific pattern in their HREF
-	// This is a simplified check - adjust based on actual vCD API behavior
-	return len(networkHREF) > 0 && networkHREF[0] == '/'
+	path := networkHrefPath(networkHREF)
+	return strings.Contains(path, "/api/network/") || strings.Contains(path, "/network/")
 }
 
 // IsVAppNetwork checks if a network is a vApp network.
 // This is a helper preserved from v1 SDK.
 func IsVAppNetwork(networkHREF string) bool {
-	// In vCD, vApp networks typically contain "vapp-" in their HREF
-	return len(networkHREF) > 0 && networkHREF[0] != '/'
+	path := strings.ToLower(networkHrefPath(networkHREF))
+	return strings.Contains(path, "vappnetwork")
 }
