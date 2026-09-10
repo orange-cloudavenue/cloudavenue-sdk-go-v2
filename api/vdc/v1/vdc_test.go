@@ -412,6 +412,50 @@ func TestUpdateVDC(t *testing.T) {
 	}
 }
 
+func TestValidateCreateVDCParamsBusinessRules(t *testing.T) {
+	tests := []struct {
+		name   string
+		params types.ParamsCreateVDC
+		wantErr string
+	}{
+		{
+			name: "rejects invalid billing model for service class",
+			params: types.ParamsCreateVDC{
+				Name:                generator.MustGenerate("{resource_name:vdc}"),
+				ServiceClass:        "VOIP",
+				DisponibilityClass:  "ONE-ROOM",
+				BillingModel:        "PAYG",
+				StorageBillingModel: "PAYG",
+				Vcpu:                5,
+				Memory:              16,
+				StorageProfiles: []types.ParamsCreateVDCStorageProfile{{Class: "silver", Limit: 100, Default: true}},
+			},
+			wantErr: `billing model "PAYG" is not allowed for service class "VOIP"`,
+		},
+		{
+			name: "rejects invalid vcpu range for payg",
+			params: types.ParamsCreateVDC{
+				Name:                generator.MustGenerate("{resource_name:vdc}"),
+				ServiceClass:        "STD",
+				DisponibilityClass:  "ONE-ROOM",
+				BillingModel:        "PAYG",
+				StorageBillingModel: "PAYG",
+				Vcpu:                2,
+				Memory:              16,
+				StorageProfiles: []types.ParamsCreateVDCStorageProfile{{Class: "silver", Limit: 100, Default: true}},
+			},
+			wantErr: `vcpu must be between 5 and 200 for billing model "PAYG"`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateCreateVDCParams(tt.params)
+			assert.EqualError(t, err, tt.wantErr)
+		})
+	}
+}
+
 func TestDeleteVDC(t *testing.T) {
 	tests := []struct {
 		name               string

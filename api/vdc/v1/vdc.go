@@ -12,6 +12,7 @@ package vdc
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	"golang.org/x/sync/errgroup"
 
@@ -190,6 +191,11 @@ func (c *Client) UpdateVDC(ctx context.Context, params types.ParamsUpdateVDC) (*
 
 		apiR.VDC.Name = vdc.Name
 		if params.Vcpu != nil {
+			if vdc.Properties.BillingModel != "" {
+				if err := validateVCPUForBillingModel(vdc.Properties.BillingModel, *params.Vcpu); err != nil {
+					return nil, fmt.Errorf("%s: validate: %w", opUpdateVDC, err)
+				}
+			}
 			apiR.VDC.CPUAllocated = serviceClassToCPUInMhz(vdc.Properties.ServiceClass) * *params.Vcpu
 		}
 	}
@@ -243,6 +249,9 @@ func validateCreateVDCParams(params types.ParamsCreateVDC) error {
 	if len(params.StorageProfiles) == 0 {
 		return fmt.Errorf("missing required parameters")
 	}
+	if err := validateVDCBusinessRules(params.ServiceClass, params.DisponibilityClass, params.BillingModel, params.StorageBillingModel, params.Vcpu); err != nil {
+		return err
+	}
 
 	haveOneDefaultStorageProfile := false
 	for _, sp := range params.StorageProfiles {
@@ -265,6 +274,47 @@ func validateUpdateVDCParams(params types.ParamsUpdateVDC) error {
 	if params.Description == nil && params.Vcpu == nil && params.Memory == nil {
 		return fmt.Errorf("missing required parameters")
 	}
+	return nil
+}
+
+func validateVDCBusinessRules(serviceClass, disponibilityClass, billingModel, storageBillingModel string, vcpu int) error {
+	if !slices.Contains([]string{"ECO", "STD", "HP", "VOIP"}, serviceClass) {
+		return fmt.Errorf("invalid service class %q", serviceClass)
+	}
+	if !slices.Contains([]string{"ONE-ROOM", "DUAL-ROOM", "HA-DUAL-ROOM"}, disponibilityClass) {
+		return fmt.Errorf("invalid disponibility class %q", disponibilityClass)
+	}
+
+	allowedBillingModels := map[string][]string{
+		"ECO":  {"PAYG", "DRAAS", "RESERVED"},
+		"STD":  {"PAYG", "DRAAS", "RESERVED"},
+		"HP":   {"PAYG", "RESERVED"},
+		"VOIP": {"RESERVED"},
+	}
+	if !slices.Contains(allowedBillingModels[serviceClass], billingModel) {
+		return fmt.Errorf("billing model %q is not allowed for service class %q", billingModel, serviceClass)
+	}
+	if !slices.Contains([]string{"PAYG", "RESERVED"}, storageBillingModel) {
+		return fmt.Errorf("invalid storage billing model %q", storageBillingModel)
+	}
+
+	return validateVCPUForBillingModel(billingModel, vcpu)
+}
+
+func validateVCPUForBillingModel(billingModel string, vcpu int) error {
+	switch billingModel {
+	case "PAYG", "DRAAS":
+		if vcpu < 5 || vcpu > 200 {
+			return fmt.Errorf("vcpu must be between 5 and 200 for billing model %q", billingModel)
+		}
+	case "RESERVED":
+		if vcpu < 2 || vcpu > 1136 {
+			return fmt.Errorf("vcpu must be between 2 and 1136 for billing model %q", billingModel)
+		}
+	default:
+		return fmt.Errorf("invalid billing model %q", billingModel)
+	}
+
 	return nil
 }
 
