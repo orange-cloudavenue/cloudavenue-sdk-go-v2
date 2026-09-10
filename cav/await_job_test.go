@@ -75,6 +75,11 @@ func TestAwaitJobOnBackendUnsupportedBackend(t *testing.T) {
 	require.EqualError(t, err, "await job job-id: backend 4 does not support jobs")
 }
 
+func TestGetJobEndpointNameUnsupportedBackend(t *testing.T) {
+	_, err := getJobEndpointName(BackendNetBackup)
+	require.EqualError(t, err, "backend 4 does not support jobs")
+}
+
 func TestClassifyStatusCode(t *testing.T) {
 	require.ErrorIs(t, classifyStatusCode(404), pkgerrors.ErrNotFound)
 	require.NoError(t, classifyStatusCode(500))
