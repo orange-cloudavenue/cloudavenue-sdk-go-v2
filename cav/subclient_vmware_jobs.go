@@ -73,7 +73,7 @@ func (v *vmware) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts [
 		return job, err
 	}
 
-	ep, err := GetEndpoint("GetJobVmware")
+	ep, err := GetEndpoint(getJobVMwareEndpointName)
 	if err != nil {
 		return nil, errors.New("failed to get endpoint for GetJobVmware: " + err.Error())
 	}
