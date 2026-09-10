@@ -319,6 +319,18 @@ func TestDeleteVApp(t *testing.T) {
 	}
 }
 
+func TestIsVAppOrgNetwork(t *testing.T) {
+	assert.True(t, IsVAppOrgNetwork("https://example.com/api/network/1234"))
+	assert.True(t, IsVAppOrgNetwork("/api/network/1234"))
+	assert.False(t, IsVAppOrgNetwork("https://example.com/api/vAppNetwork/vappNetwork-1234"))
+}
+
+func TestIsVAppNetwork(t *testing.T) {
+	assert.True(t, IsVAppNetwork("https://example.com/api/vAppNetwork/vappNetwork-1234"))
+	assert.True(t, IsVAppNetwork("/api/vAppNetwork/vappNetwork-1234"))
+	assert.False(t, IsVAppNetwork("https://example.com/api/network/1234"))
+}
+
 func Test_NewClient_ClientNil(t *testing.T) {
 	c, err := New(nil)
 	assert.Nil(t, c, "Expected nil client when input is nil")

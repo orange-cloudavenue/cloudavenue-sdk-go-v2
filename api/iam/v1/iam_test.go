@@ -397,6 +397,47 @@ func TestUpdateUser(t *testing.T) {
 	}
 }
 
+func TestUpdateUserPreservesExistingFields(t *testing.T) {
+	client, ms := newClient(t)
+
+	ms.CleanResponse(endpoints.GetUser())
+	ms.SetResponseFunc(endpoints.GetUser(), func(w http.ResponseWriter, r *http.Request) {
+		xmlResponse(w, itypes.User{
+			Name:            "user1",
+			FullName:        "Current Name",
+			EmailAddress:    "user1@example.com",
+			Telephone:       "0000",
+			Description:     "current description",
+			IsEnabled:       true,
+			DeployedVmQuota: 4,
+			StoredVmQuota:   7,
+			Role:            itypes.Reference{Name: "Organization Administrator"},
+		})
+	})
+
+	ms.CleanResponse(endpoints.UpdateUser())
+	ms.SetResponseFunc(endpoints.UpdateUser(), func(w http.ResponseWriter, r *http.Request) {
+		var body itypes.User
+		assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
+		assert.Equal(t, "Current Name", body.FullName)
+		assert.Equal(t, "1234567890", body.Telephone)
+		assert.Equal(t, "user1@example.com", body.EmailAddress)
+		assert.True(t, body.IsEnabled)
+		assert.Equal(t, 4, body.DeployedVmQuota)
+		assert.Equal(t, 7, body.StoredVmQuota)
+		xmlResponse(w, body)
+	})
+
+	result, err := client.UpdateUser(t.Context(), ParamsUpdateUser{
+		ID:        generator.MustGenerate("{urn:user}"),
+		Telephone: "1234567890",
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, "1234567890", result.Telephone)
+	assert.True(t, result.IsEnabled)
+}
+
 func TestDeleteUser(t *testing.T) {
 	tests := []struct {
 		name               string
