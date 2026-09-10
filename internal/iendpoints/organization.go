@@ -10,8 +10,6 @@
 package iendpoints
 
 import (
-	"time"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 )
@@ -21,13 +19,13 @@ import (
 func init() {
 	// Get Organization from Vmware Cloud Director
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v38.1/cloudapi/1.0.0/orgs/get/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgs/get/",
 		Name:             "GetOrganizationDetails",
 		Description:      "Get organizations details from VMware Cloud Director",
 		Method:           cav.MethodGET,
-		SubClient:        cav.ClientVmware,
+		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/orgs",
-		BodyResponseType: itypes.ApiResponseGetOrgs{},
+		ResponseType:     itypes.ApiResponseGetOrgs{},
 	}.Register()
 
 	// GetOrganization from infraAPI
@@ -36,9 +34,9 @@ func init() {
 		Name:             "GetOrganization",
 		Description:      "Get your organization information",
 		Method:           cav.MethodGET,
-		SubClient:        cav.ClientCerberus,
+		Backend:          cav.BackendInfrapi,
 		PathTemplate:     "/api/customers/v2.0/configurations",
-		BodyResponseType: itypes.ApiResponseGetOrg{},
+		ResponseType:     itypes.ApiResponseGetOrg{},
 	}.Register()
 
 	// UpdateOrganization
@@ -47,10 +45,9 @@ func init() {
 		Name:             "UpdateOrganization",
 		Description:      "Update an existing organization",
 		Method:           cav.MethodPUT,
-		SubClient:        cav.ClientCerberus,
+		Backend:          cav.BackendInfrapi,
 		PathTemplate:     "/api/customers/v2.0/configurations",
 		BodyRequestType:  itypes.ApiRequestUpdateOrg{},
-		BodyResponseType: cav.Job{},
-		JobOptions:       &cav.JobOptions{PollInterval: 2 * time.Second},
+		ResponseType:     cav.Job{},
 	}.Register()
 }

@@ -10,14 +10,13 @@
 package cav
 
 import (
-	"context"
 	"strings"
 
+	"github.com/orange-cloudavenue/common-go/urn"
+	"github.com/orange-cloudavenue/common-go/validators"
 	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
-	"github.com/orange-cloudavenue/common-go/urn"
-	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 func init() {
@@ -25,8 +24,8 @@ func init() {
 		Name:             "GetJobVmware",
 		Description:      "Get VMware Job",
 		Method:           MethodGET,
-		SubClient:        ClientVmware,
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/38.1/doc/types/TaskType.html",
+		Backend:          BackendVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/types/TaskType.html",
 		PathTemplate:     "/api/task/{taskId}",
 		PathParams: []PathParam{
 			{
@@ -38,34 +37,16 @@ func init() {
 				},
 			},
 		},
-		QueryParams: []QueryParam{},
-		RequestFunc: nil, // Will be set later in the Register function.
-		requestInternalFunc: func(ctx context.Context, client *resty.Client, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error) {
-			r := client.R().
-				SetContext(ctx).
-				SetHeader("Accept", "application/*+json;version="+vmwareVCDVersion)
-
-			for _, opt := range opts {
-				if err := opt(endpoint, r); err != nil {
-					return nil, err
-				}
-			}
-
-			if isMockClient {
-				return r.Get(endpoint.MockPath())
-			}
-
-			return r.Get(endpoint.PathTemplate)
-		},
-		BodyRequestType:  nil, // No request body for this endpoint.
-		BodyResponseType: vmwareJobAPIResponse{},
+		QueryParams:     []QueryParam{},
+		BodyRequestType: nil, // No request body for this endpoint.
+		ResponseType:    vmwareJobAPIResponse{},
 	}.Register()
 }
 
-// Ensure vmware implements the jobs interface.
+// Ensure vmware implements jobsInterface.
 var _ jobsInterface = &vmware{}
 
-// vmwareJobAPIResponse represents an asynchronous operation in VCD.
+// vmwareJobAPIResponse describes VMware task response.
 type vmwareJobAPIResponse struct {
 	HREF             string       `json:"href,omitempty" fake:"{href_uuid}"` // The URI of the entity.
 	ID               string       `json:"id,omitempty" fake:"{uuid}"`        // The entity identifier, expressed in URN format. The value of this attribute uniquely identifies the entity, persists for the life of the entity, and is never reused.
@@ -85,7 +66,7 @@ type vmwareJobAPIResponse struct {
 	Details          string       `json:"details,omitempty"`                 // Detailed message about the task. Also contained by the Owner entity when task status is preRunning.
 }
 
-// JobRefresh is a function type that defines how to refresh a job status.
+// JobRefresh refreshes VMware job status.
 func (v *vmware) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts []EndpointRequestOption) (job *Job, err error) {
 	job, err = v.JobParser(resp)
 	if err != nil {
@@ -97,13 +78,24 @@ func (v *vmware) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts [
 		return nil, errors.New("failed to get endpoint for GetJobVmware: " + err.Error())
 	}
 
-	reqOpts = append(reqOpts,
-		SetCustomRestyOption(func(r *resty.Request) { r.SetError(&vmwareError{}) }),
+	reqOpts = append(
+		reqOpts,
+		SetCustomRestyOption(func(r *resty.Request) { r.SetResultError(&vmwareError{}) }),
 		WithPathParam(ep.PathParams[0], urn.ExtractUUID(job.ID)),
 		OverrideSetResult(vmwareJobAPIResponse{}),
 	)
 
-	respR, err := ep.requestInternalFunc(resp.Request.Context(), httpC, ep, reqOpts...)
+	r := httpC.R().
+		SetContext(resp.Request.Context()).
+		SetHeader("Accept", "application/*+json;version="+vmwareVCDVersion)
+
+	for _, opt := range reqOpts {
+		if err := opt(ep, r); err != nil {
+			return nil, err
+		}
+	}
+
+	respR, err := r.Get(ep.PathTemplate)
 	if err != nil {
 		return nil, errors.New("failed to refresh job status: " + err.Error())
 	}
@@ -111,26 +103,19 @@ func (v *vmware) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts [
 	return v.JobParser(respR)
 }
 
-// JobParser parses the job response body and extracts the job information.
+// JobParser parses VMware job data from response.
 func (v *vmware) JobParser(resp *resty.Response) (job *Job, err error) {
 	if resp == nil {
 		return job, errors.New("no response to parse")
 	}
 
-	// If the response is not of type VmwareJobAPIResponse, find the HREF in the header
+	// Job creation responses expose task location in header instead of body.
 	if href := resp.Header().Get("Location"); href != "" {
 		job = &Job{
 			ID: func() string {
-				// Extract the job ID from the HREF.
-				// The ID is the last segment of the HREF URL.
 				parts := strings.Split(href, "/")
 				if len(parts) > 0 {
-					// If the last part is a UUID, return it.
 					if validators.New().Var(parts[len(parts)-1], "uuid4") == nil {
-						// Return the last part as the job ID.
-						// This is the expected format for VMware job IDs.
-						// Example: /api/task/d3c42a20-96b9-4452-91dd-f71b71dfe314
-						// If the last part is not a UUID, return an empty string.
 						return parts[len(parts)-1]
 					}
 				}
@@ -168,6 +153,7 @@ func (v *vmware) JobParser(resp *resty.Response) (job *Job, err error) {
 				Message:       apiR.Error.Message,
 				Duration:      resp.Duration(),
 				Endpoint:      apiR.HREF,
+				Err:           classifyStatusCode(apiR.Error.StatusCode),
 			}
 		}
 
@@ -178,16 +164,16 @@ func (v *vmware) JobParser(resp *resty.Response) (job *Job, err error) {
 		return nil, err
 	}
 
-	return nil, errors.New("failed to parse vmware job response, unexpected type or empty response")
+	return nil, errors.New("failed to parse vmware job response: unexpected type or empty response")
 }
 
-// Status returns the job status from the response body.
+// JobStatusParser maps VMware status strings to JobStatus.
 func (v *vmware) JobStatusParser(status string) (s JobStatus, err error) {
 	switch status {
 	case "queued":
 		s = JobQueued
 	case "preRunning":
-		s = JobRunning // preRunning is considered as running
+		s = JobRunning
 	case "running":
 		s = JobRunning
 	case "success":

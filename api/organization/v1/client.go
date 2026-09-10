@@ -16,6 +16,7 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
+//go:generate command-generator
 type (
 	Client struct {
 		c      cav.Client
@@ -23,14 +24,14 @@ type (
 	}
 )
 
-// New creates a new organization client.
+// New creates organization client.
 func New(c cav.Client) (*Client, error) {
 	if c == nil {
 		return nil, errors.ErrClientNotInitialized
 	}
 
 	orgLogger := c.Logger().WithGroup("organization")
-	orgLogger.Debug("Successfully creating new client")
+	orgLogger.Debug("created client")
 
 	return &Client{
 		c:      c,

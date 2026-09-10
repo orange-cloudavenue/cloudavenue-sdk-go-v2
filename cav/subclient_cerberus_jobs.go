@@ -10,16 +10,15 @@
 package cav
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"strings"
 
+	"github.com/orange-cloudavenue/common-go/urn"
+	"github.com/orange-cloudavenue/common-go/validators"
 	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
-	"github.com/orange-cloudavenue/common-go/urn"
-	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 //go:generate endpoint-generator -path subclient_cerberus_jobs.go -filename zz_cav_cerberus_jobs.go -output cav_cerberus_jobs.go
@@ -29,7 +28,7 @@ func init() {
 		Name:             "GetJobCerberus",
 		Description:      "Get Cerberus Job",
 		Method:           MethodGET,
-		SubClient:        ClientCerberus,
+		Backend:          BackendInfrapi,
 		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Jobs/getJobById",
 		PathTemplate:     "/api/customers/v1.0/jobs/{taskId}",
 		PathParams: []PathParam{
@@ -42,40 +41,25 @@ func init() {
 				},
 			},
 		},
-		QueryParams: []QueryParam{},
-		RequestFunc: nil, // Will be set later in the Register function.
-		requestInternalFunc: func(ctx context.Context, client *resty.Client, endpoint *Endpoint, opts ...EndpointRequestOption) (*resty.Response, error) {
-			r := client.R().
-				SetContext(ctx).
-				SetHeader("Accept", "application/json;version="+cerberusVCDVersion)
-
-			for _, opt := range opts {
-				if err := opt(endpoint, r); err != nil {
-					return nil, err
-				}
-			}
-
-			if isMockClient {
-				return r.Get(endpoint.MockPath())
-			}
-
-			return r.Get(endpoint.PathTemplate)
-		},
-		BodyRequestType:  nil, // No request body for this endpoint.
-		BodyResponseType: CerberusJobAPIResponse{},
+		QueryParams:     []QueryParam{},
+		BodyRequestType: nil, // No request body for this endpoint.
+		ResponseType:    CerberusJobAPIResponse{},
 	}.Register()
 }
 
-// Ensure cerberus implements the jobs interface.
+// Ensure cerberus implements jobsInterface.
 var _ jobsInterface = &cerberus{}
 
-// cerberusJobCreatedAPIResponse represents the response body when a job is created
+// cerberusJobCreatedAPIResponse is returned when Cerberus creates job.
 type cerberusJobCreatedAPIResponse struct {
 	ID      string `json:"jobId" fake:"{uuid}"`
 	Message string `json:"message" fake:"{sentence}"`
 }
 
-// cerberusJobAPIResponse represents an asynchronous operation in VCD.
+// CerberusJobCreatedAPIResponse aliases cerberusJobCreatedAPIResponse.
+type CerberusJobCreatedAPIResponse = cerberusJobCreatedAPIResponse
+
+// CerberusJobAPIResponse describes Cerberus job lookup response.
 type CerberusJobAPIResponse []struct {
 	Actions     []CerberusJobAPIResponseAction `json:"actions" fakesize:"3"`
 	Description string                         `json:"description" fake:"{sentence}"`
@@ -89,7 +73,7 @@ type CerberusJobAPIResponseAction struct {
 	Details string `json:"details" fake:"{sentence}"`
 }
 
-// JobRefresh is a function type that defines how to refresh a job status.
+// JobRefresh refreshes Cerberus job status.
 func (v *cerberus) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts []EndpointRequestOption) (job *Job, err error) {
 	job, err = v.JobParser(resp)
 	if err != nil {
@@ -101,16 +85,28 @@ func (v *cerberus) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts
 		return nil, errors.New("failed to get endpoint for JobCerberus: " + err.Error())
 	}
 
-	reqOpts = append(reqOpts,
+	reqOpts = append(
+		reqOpts,
 		SetCustomRestyOption(
 			func(r *resty.Request) {
-				r.SetError(&cerberusError{})
+				r.SetResultError(&cerberusError{})
 				r.SetResult(&CerberusJobAPIResponse{})
-			}),
+			},
+		),
 		WithPathParam(ep.PathParams[0], urn.ExtractUUID(job.ID)),
 	)
 
-	respR, err := ep.requestInternalFunc(resp.Request.Context(), httpC, ep, reqOpts...)
+	r := httpC.R().
+		SetContext(resp.Request.Context()).
+		SetHeader("Accept", "application/json;version="+cerberusVCDVersion)
+
+	for _, opt := range reqOpts {
+		if err := opt(ep, r); err != nil {
+			return nil, err
+		}
+	}
+
+	respR, err := r.Get(ep.PathTemplate)
 	if err != nil {
 		return nil, errors.New("failed to refresh job status: " + err.Error())
 	}
@@ -118,17 +114,13 @@ func (v *cerberus) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts
 	return v.JobParser(respR)
 }
 
-// JobParser parses the job response body and extracts the job information.
+// JobParser parses Cerberus job data from response.
 func (v *cerberus) JobParser(resp *resty.Response) (job *Job, err error) {
 	if resp == nil {
 		return job, errors.New("no response to parse")
 	}
 
-	// The created job have different response structure
-	// Cerberus does not respect the API convention for job creation.
-	// It returns a HTTP 201 status code with a different response body.
-	//
-	// ! This is untestable because resp.Bytes() is indefinable in the mock.
+	// Cerberus returns a different body shape for HTTP 201 job creation responses.
 	if resp.StatusCode() == http.StatusCreated {
 		jobCreated := &cerberusJobCreatedAPIResponse{}
 		if err := json.Unmarshal(resp.Bytes(), jobCreated); err == nil {
@@ -149,11 +141,11 @@ func (v *cerberus) JobParser(resp *resty.Response) (job *Job, err error) {
 				Message:       "The job response is empty",
 				Duration:      resp.Duration(),
 				Endpoint:      resp.Request.URL,
+				Err:           classifyStatusCode(resp.StatusCode()),
 			}
 		}
 
 		job = &Job{
-			// The taskId is used as the job ID.
 			ID:          resp.Request.PathParams["taskId"],
 			Name:        (*apiR)[0].Name,
 			Description: (*apiR)[0].Description,
@@ -175,6 +167,7 @@ func (v *cerberus) JobParser(resp *resty.Response) (job *Job, err error) {
 				Message:       (*apiR)[0].Description,
 				Duration:      resp.Duration(),
 				Endpoint:      resp.Request.URL,
+				Err:           errors.ErrJobFailed,
 			}
 		}
 
@@ -185,10 +178,10 @@ func (v *cerberus) JobParser(resp *resty.Response) (job *Job, err error) {
 		return nil, err
 	}
 
-	return nil, errors.New("failed to parse cerberus job response, unexpected type or empty response")
+	return nil, errors.New("failed to parse cerberus job response: unexpected type or empty response")
 }
 
-// Status returns the job status from the response body.
+// JobStatusParser maps Cerberus status strings to JobStatus.
 func (v *cerberus) JobStatusParser(status string) (s JobStatus, err error) {
 	// CREATED, PENDING, IN_PROGRESS, FAILED, DONE
 	switch strings.ToLower(status) {

@@ -10,12 +10,11 @@
 package iendpoints
 
 import (
-	"time"
+	"github.com/orange-cloudavenue/common-go/extractor"
+	"github.com/orange-cloudavenue/common-go/validators"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
-	"github.com/orange-cloudavenue/common-go/extractor"
-	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 //go:generate endpoint-generator -path edgegateway_bandwidth.go -output edgegateway_bandwidth
@@ -27,7 +26,7 @@ func init() {
 		Name:             "UpdateEdgeGatewayBandwidth",
 		Description:      "Update EdgeGateway Bandwidth",
 		Method:           cav.MethodPUT,
-		SubClient:        cav.ClientCerberus,
+		Backend:          cav.BackendInfrapi,
 		PathTemplate:     "/api/customers/v2.0/edges/{edgeId}",
 		PathParams: []cav.PathParam{
 			{
@@ -43,11 +42,8 @@ func init() {
 				},
 			},
 		},
-		QueryParams:      nil,
-		BodyRequestType:  itypes.ApiRequestBandwidth{},
-		BodyResponseType: cav.Job{},
-		JobOptions: &cav.JobOptions{
-			PollInterval: time.Second * 1,
-		},
+		QueryParams:     nil,
+		BodyRequestType: itypes.ApiRequestBandwidth{},
+		ResponseType:    cav.Job{},
 	}.Register()
 }

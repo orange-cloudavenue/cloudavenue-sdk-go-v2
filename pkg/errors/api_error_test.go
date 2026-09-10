@@ -10,6 +10,7 @@
 package errors
 
 import (
+	stderrors "errors"
 	"testing"
 	"time"
 )
@@ -41,5 +42,17 @@ func TestAPIError_IsNotFound(t *testing.T) {
 	apiErr.StatusCode = 500
 	if apiErr.IsNotFound() {
 		t.Error("APIError.IsNotFound() = true, want false")
+	}
+
+	apiErr.Err = ErrNotFound
+	if !apiErr.IsNotFound() {
+		t.Error("APIError.IsNotFound() with wrapped ErrNotFound = false, want true")
+	}
+}
+
+func TestAPIError_Unwrap(t *testing.T) {
+	apiErr := &APIError{Err: ErrJobFailed}
+	if !stderrors.Is(apiErr, ErrJobFailed) {
+		t.Error("errors.Is(apiErr, ErrJobFailed) = false, want true")
 	}
 }

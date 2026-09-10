@@ -13,17 +13,20 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
-	"github.com/orange-cloudavenue/common-go/generator"
 )
 
 func TestListEdgegatewayPublicIP(t *testing.T) {
-	// Define test cases
+	validEdgeGWName := generator.MustGenerate("{resource_name:edgegateway}")
+	validEdgeGWID := "urn:vcloud:gateway:ed0a243a-374b-4306-ab25-9c3787cbdb4c"
+	validIP := generator.MustGenerate("{ipv4address}")
+
 	tests := []struct {
 		name   string
 		params types.ParamsEdgeGateway
@@ -36,9 +39,44 @@ func TestListEdgegatewayPublicIP(t *testing.T) {
 		{
 			name: "Valid request",
 			params: types.ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgegateway}"),
+				ID: validEdgeGWID,
 			},
-			expectedErr: false,
+			mockResponse: &itypes.ApiResponseNetworkServices{
+				{
+					Type: "tier-0-vrf",
+					Children: []itypes.ApiResponseNetworkServicesChildren{
+						{
+							Type: "edge-gateway",
+							Name: validEdgeGWName,
+							Properties: struct {
+								RateLimit int    `json:"rateLimit,omitempty"`
+								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+							}{
+								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
+							},
+							Children: []itypes.ApiResponseNetworkServicesSubChildren{
+								{
+									Type:      "service",
+									Name:      "internet",
+									ServiceID: "test-publicip-id",
+									Properties: struct {
+										ClassOfService     string   `json:"classOfService,omitempty"`
+										MaxVirtualServices int      `json:"maxVirtualServices,omitempty"`
+										IP                 string   `json:"ip,omitempty" fake:"{ipv4address}"`
+										Announced          bool     `json:"announced,omitempty" fake:"true"`
+										Ranges             []string `json:"ranges,omitempty" fake:"{ipv4address}/{intrange:24,32}"`
+									}{
+										IP:        validIP,
+										Announced: true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			mockResponseStatus: http.StatusOK,
+			expectedErr:        false,
 		},
 		{
 			name: "Invalid request",
@@ -51,22 +89,24 @@ func TestListEdgegatewayPublicIP(t *testing.T) {
 		{
 			name: "Error 404 Not Found",
 			params: types.ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgegateway}"),
+				ID: validEdgeGWID,
 			},
-			mockResponseStatus: 404,
+			mockResponseStatus: http.StatusNotFound,
 			expectedErr:        true,
 		},
 	}
 
-	// Run test cases
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.mockResponseStatus != 0 {
-				endpoints.GetEdgeGatewayServices().CleanMockResponse()
-				endpoints.GetEdgeGatewayServices().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+			client, ms := newClient(t)
+			epServices := endpoints.GetEdgeGatewayServices()
+			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
+				statusCode := tt.mockResponseStatus
+				ms.CleanResponse(epServices)
+				ms.SetResponse(epServices, tt.mockResponse, &statusCode)
+				ms.CleanResponse(endpoints.ListT0())
+				ms.SetResponse(endpoints.ListT0(), tt.mockResponse, &statusCode)
 			}
-
-			client := newClient(t)
 
 			resp, err := client.ListPublicIP(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -80,12 +120,18 @@ func TestListEdgegatewayPublicIP(t *testing.T) {
 				assert.NotEmpty(t, ip.ID, "Public IP ID should not be empty")
 				assert.NotEmpty(t, ip.IP, "Public IP Address should not be empty")
 			}
+
+			ms.CleanResponse(endpoints.GetEdgeGatewayServices())
+			ms.CleanResponse(endpoints.ListT0())
 		})
 	}
 }
 
 func TestGetEdgegatewayPublicIP(t *testing.T) {
-	// Define test cases
+	validEdgeGWName := generator.MustGenerate("{resource_name:edgegateway}")
+	validEdgeGWID := "urn:vcloud:gateway:ed0a243a-374b-4306-ab25-9c3787cbdb4c"
+	validIP := generator.MustGenerate("{ipv4address}")
+
 	tests := []struct {
 		name   string
 		params types.ParamsGetEdgeGatewayPublicIP
@@ -101,26 +147,106 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 		{
 			name: "Valid request",
 			params: types.ParamsGetEdgeGatewayPublicIP{
-				ID: generator.MustGenerate("{urn:edgegateway}"),
-				IP: generator.MustGenerate("{ipv4address}"),
+				ID: validEdgeGWID,
+				IP: validIP,
 			},
-			expectedErr: false,
+			mockResponse: &itypes.ApiResponseNetworkServices{
+				{
+					Type: "tier-0-vrf",
+					Children: []itypes.ApiResponseNetworkServicesChildren{
+						{
+							Type: "edge-gateway",
+							Name: validEdgeGWName,
+							Properties: struct {
+								RateLimit int    `json:"rateLimit,omitempty"`
+								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+							}{
+								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
+							},
+							Children: []itypes.ApiResponseNetworkServicesSubChildren{
+								{
+									Type:      "service",
+									Name:      "internet",
+									ServiceID: "test-publicip-id",
+									Properties: struct {
+										ClassOfService     string   `json:"classOfService,omitempty"`
+										MaxVirtualServices int      `json:"maxVirtualServices,omitempty"`
+										IP                 string   `json:"ip,omitempty" fake:"{ipv4address}"`
+										Announced          bool     `json:"announced,omitempty" fake:"true"`
+										Ranges             []string `json:"ranges,omitempty" fake:"{ipv4address}/{intrange:24,32}"`
+									}{
+										IP:        validIP,
+										Announced: true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			mockResponseStatus: http.StatusOK,
+			expectedErr:        false,
 		},
 		{
 			name: "Valid request by name",
 			params: types.ParamsGetEdgeGatewayPublicIP{
-				IP:   generator.MustGenerate("{ipv4address}"),
-				Name: generator.MustGenerate("{resource_name:edgegateway}"),
+				IP:   validIP,
+				Name: validEdgeGWName,
 			},
-			expectedErr: false,
+			mockListResponse: &itypes.ApiResponseQueryEdgeGateway{
+				Record: []itypes.ApiResponseQueryEdgeGatewayRecord{
+					{
+						ID:   validEdgeGWID,
+						HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
+						Name: validEdgeGWName,
+					},
+				},
+			},
+			mockListResponseStatus: http.StatusOK,
+			mockResponse: &itypes.ApiResponseNetworkServices{
+				{
+					Type: "tier-0-vrf",
+					Children: []itypes.ApiResponseNetworkServicesChildren{
+						{
+							Type: "edge-gateway",
+							Name: validEdgeGWName,
+							Properties: struct {
+								RateLimit int    `json:"rateLimit,omitempty"`
+								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+							}{
+								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
+							},
+							Children: []itypes.ApiResponseNetworkServicesSubChildren{
+								{
+									Type:      "service",
+									Name:      "internet",
+									ServiceID: "test-publicip-id",
+									Properties: struct {
+										ClassOfService     string   `json:"classOfService,omitempty"`
+										MaxVirtualServices int      `json:"maxVirtualServices,omitempty"`
+										IP                 string   `json:"ip,omitempty" fake:"{ipv4address}"`
+										Announced          bool     `json:"announced,omitempty" fake:"true"`
+										Ranges             []string `json:"ranges,omitempty" fake:"{ipv4address}/{intrange:24,32}"`
+									}{
+										IP:        validIP,
+										Announced: true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			mockResponseStatus: http.StatusOK,
+			expectedErr:        false,
 		},
 		{
 			name: "Failed request by name",
 			params: types.ParamsGetEdgeGatewayPublicIP{
-				IP:   generator.MustGenerate("{ipv4address}"),
-				Name: generator.MustGenerate("{resource_name:edgegateway}"),
+				IP:   validIP,
+				Name: validEdgeGWName,
 			},
-			mockListResponseStatus: 404,
+			mockListResponseStatus: http.StatusNotFound,
 			expectedErr:            true,
 		},
 		{
@@ -134,17 +260,17 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 		{
 			name: "Error 404 Not Found",
 			params: types.ParamsGetEdgeGatewayPublicIP{
-				ID: generator.MustGenerate("{urn:edgegateway}"),
-				IP: generator.MustGenerate("{ipv4address}"),
+				ID: validEdgeGWID,
+				IP: validIP,
 			},
-			mockResponseStatus: 404,
+			mockResponseStatus: http.StatusNotFound,
 			expectedErr:        true,
 		},
 		{
 			name: "Simulate empty response",
 			params: types.ParamsGetEdgeGatewayPublicIP{
-				ID: generator.MustGenerate("{urn:edgegateway}"),
-				IP: generator.MustGenerate("{ipv4address}"),
+				ID: validEdgeGWID,
+				IP: validIP,
 			},
 			mockResponse:       &itypes.ApiResponseNetworkServices{},
 			mockResponseStatus: http.StatusOK,
@@ -152,20 +278,26 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 		},
 	}
 
-	// Run test cases
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.mockResponseStatus != 0 {
-				endpoints.GetEdgeGatewayServices().CleanMockResponse()
-				endpoints.GetEdgeGatewayServices().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+			client, ms := newClient(t)
+			epServices := endpoints.GetEdgeGatewayServices()
+			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
+				statusCode := tt.mockResponseStatus
+				ms.CleanResponse(epServices)
+				ms.SetResponse(epServices, tt.mockResponse, &statusCode)
+				ms.CleanResponse(endpoints.ListT0())
+				ms.SetResponse(endpoints.ListT0(), tt.mockResponse, &statusCode)
 			}
 
-			if tt.mockListResponseStatus != 0 {
-				endpoints.QueryEdgeGateway().CleanMockResponse()
-				endpoints.QueryEdgeGateway().SetMockResponse(tt.mockListResponse, &tt.mockListResponseStatus)
+			epQuery := endpoints.QueryEdgeGateway()
+			if tt.mockListResponse != nil || tt.mockListResponseStatus != 0 {
+				listStatusCode := tt.mockListResponseStatus
+				ms.CleanResponse(epQuery)
+				ms.SetResponse(epQuery, tt.mockListResponse, &listStatusCode)
+				ms.CleanResponse(endpoints.ListVdc())
+				ms.SetResponse(endpoints.ListVdc(), tt.mockListResponse, &listStatusCode)
 			}
-
-			client := newClient(t)
 
 			resp, err := client.GetPublicIP(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -175,12 +307,20 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 			assert.NoError(t, err, "Unexpected error: %v", err)
 			assert.NotNil(t, resp, "Response should not be nil")
 			assert.Equal(t, tt.params.IP, resp.IP, "Public IP Address should match")
+
+			ms.CleanResponse(endpoints.GetEdgeGatewayServices())
+			ms.CleanResponse(endpoints.ListT0())
+			ms.CleanResponse(endpoints.QueryEdgeGateway())
+			ms.CleanResponse(endpoints.ListVdc())
 		})
 	}
 }
 
 func TestCreateEdgegatewayPublicIP(t *testing.T) {
-	// Define test cases
+	validEdgeGWName := generator.MustGenerate("{resource_name:edgegateway}")
+	validEdgeGWID := "urn:vcloud:gateway:ed0a243a-374b-4306-ab25-9c3787cbdb4c"
+	validIP := "195.25.101.7"
+
 	tests := []struct {
 		name   string
 		params types.ParamsEdgeGateway
@@ -194,23 +334,21 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 		mockListResponse       any
 		mockListResponseStatus int
 
+		mockGetNetworkServicesResponse       any
+		mockGetNetworkServicesResponseStatus int
+
 		expectedErr bool
 	}{
 		{
 			name: "Valid request",
 			params: types.ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgegateway}"),
+				ID: validEdgeGWID,
 			},
 			mockJobResponse: &cav.CerberusJobAPIResponse{
 				{
 					Actions: []cav.CerberusJobAPIResponseAction{
-						//  {
-						//     "details": "195.25.101.7",
-						//     "name": "reserve_ip for Org cav01ev01ocb0006205 for public ip",
-						//     "status": "DONE"
-						//  },
 						{
-							Details: generator.MustGenerate("{ipv4address}"),
+							Details: validIP,
 							Name:    "reserve_ip for Org cav01ev01ocb0001234 for public ip",
 							Status:  "DONE",
 						},
@@ -221,23 +359,63 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 				},
 			},
 			mockJobResponseStatus: 200,
-			expectedErr:           false,
+			mockGetNetworkServicesResponse: &itypes.ApiResponseNetworkServices{
+				{
+					Type: "tier-0-vrf",
+					Children: []itypes.ApiResponseNetworkServicesChildren{
+						{
+							Type: "edge-gateway",
+							Name: validEdgeGWName,
+							Properties: struct {
+								RateLimit int    `json:"rateLimit,omitempty"`
+								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+							}{
+								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
+							},
+							Children: []itypes.ApiResponseNetworkServicesSubChildren{
+								{
+									Type:      "service",
+									Name:      "internet",
+									ServiceID: "test-publicip-id",
+									Properties: struct {
+										ClassOfService     string   `json:"classOfService,omitempty"`
+										MaxVirtualServices int      `json:"maxVirtualServices,omitempty"`
+										IP                 string   `json:"ip,omitempty" fake:"{ipv4address}"`
+										Announced          bool     `json:"announced,omitempty" fake:"true"`
+										Ranges             []string `json:"ranges,omitempty" fake:"{ipv4address}/{intrange:24,32}"`
+									}{
+										IP:        validIP,
+										Announced: true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			mockGetNetworkServicesResponseStatus: http.StatusOK,
+			expectedErr:                          false,
 		},
 		{
 			name: "Valid request by name",
 			params: types.ParamsEdgeGateway{
-				Name: generator.MustGenerate("{resource_name:edgegateway}"),
+				Name: validEdgeGWName,
 			},
+			mockListResponse: &itypes.ApiResponseQueryEdgeGateway{
+				Record: []itypes.ApiResponseQueryEdgeGatewayRecord{
+					{
+						ID:   validEdgeGWID,
+						HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
+						Name: validEdgeGWName,
+					},
+				},
+			},
+			mockListResponseStatus: http.StatusOK,
 			mockJobResponse: &cav.CerberusJobAPIResponse{
 				{
 					Actions: []cav.CerberusJobAPIResponseAction{
-						//  {
-						//     "details": "195.25.101.7",
-						//     "name": "reserve_ip for Org cav01ev01ocb0006205 for public ip",
-						//     "status": "DONE"
-						//  },
 						{
-							Details: generator.MustGenerate("{ipv4address}"),
+							Details: validIP,
 							Name:    "reserve_ip for Org cav01ev01ocb0001234 for public ip",
 							Status:  "DONE",
 						},
@@ -248,20 +426,56 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 				},
 			},
 			mockJobResponseStatus: 200,
-			expectedErr:           false,
+			mockGetNetworkServicesResponse: &itypes.ApiResponseNetworkServices{
+				{
+					Type: "tier-0-vrf",
+					Children: []itypes.ApiResponseNetworkServicesChildren{
+						{
+							Type: "edge-gateway",
+							Name: validEdgeGWName,
+							Properties: struct {
+								RateLimit int    `json:"rateLimit,omitempty"`
+								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+							}{
+								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
+							},
+							Children: []itypes.ApiResponseNetworkServicesSubChildren{
+								{
+									Type:      "service",
+									Name:      "internet",
+									ServiceID: "test-publicip-id",
+									Properties: struct {
+										ClassOfService     string   `json:"classOfService,omitempty"`
+										MaxVirtualServices int      `json:"maxVirtualServices,omitempty"`
+										IP                 string   `json:"ip,omitempty" fake:"{ipv4address}"`
+										Announced          bool     `json:"announced,omitempty" fake:"true"`
+										Ranges             []string `json:"ranges,omitempty" fake:"{ipv4address}/{intrange:24,32}"`
+									}{
+										IP:        validIP,
+										Announced: true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			mockGetNetworkServicesResponseStatus: http.StatusOK,
+			expectedErr:                          false,
 		},
 		{
 			name: "Failed request by name",
 			params: types.ParamsEdgeGateway{
-				Name: generator.MustGenerate("{resource_name:edgegateway}"),
+				Name: validEdgeGWName,
 			},
-			mockListResponseStatus: 404,
+			mockListResponse:       nil,
+			mockListResponseStatus: http.StatusNotFound,
 			expectedErr:            true,
 		},
 		{
 			name: "Job failed",
 			params: types.ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgegateway}"),
+				ID: validEdgeGWID,
 			},
 			mockJobResponseStatus: 400,
 			expectedErr:           true,
@@ -276,7 +490,7 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 		{
 			name: "Error 404 Not Found",
 			params: types.ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgegateway}"),
+				ID: validEdgeGWID,
 			},
 			mockResponseStatus: 404,
 			expectedErr:        true,
@@ -286,22 +500,35 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 	// Run test cases
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+			epCreatePublicIp := endpoints.CreatePublicIp()
 			if tt.mockResponseStatus != 0 {
-				endpoints.CreatePublicIp().CleanMockResponse()
-				endpoints.CreatePublicIp().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				statusCode := tt.mockResponseStatus
+				ms.SetResponse(epCreatePublicIp, tt.mockResponse, &statusCode)
 			}
 
-			if tt.mockListResponseStatus != 0 {
-				endpoints.QueryEdgeGateway().CleanMockResponse()
-				endpoints.QueryEdgeGateway().SetMockResponse(tt.mockListResponse, &tt.mockListResponseStatus)
+			epQuery := endpoints.QueryEdgeGateway()
+			if tt.mockListResponse != nil || tt.mockListResponseStatus != 0 {
+				listStatusCode := tt.mockListResponseStatus
+				ms.SetResponse(epQuery, tt.mockListResponse, &listStatusCode)
+				ms.CleanResponse(endpoints.ListVdc())
+				ms.SetResponse(endpoints.ListVdc(), tt.mockListResponse, &listStatusCode)
 			}
 
+			epGetJob := endpoints.GetJobCerberus()
 			if tt.mockJobResponseStatus != 0 {
-				endpoints.GetJobCerberus().CleanMockResponse()
-				endpoints.GetJobCerberus().SetMockResponse(tt.mockJobResponse, &tt.mockJobResponseStatus)
+				jobStatusCode := tt.mockJobResponseStatus
+				ms.SetResponse(epGetJob, tt.mockJobResponse, &jobStatusCode)
 			}
 
-			client := newClient(t)
+			epGetNetworkServices := endpoints.GetEdgeGatewayServices()
+			if tt.mockGetNetworkServicesResponse != nil || tt.mockGetNetworkServicesResponseStatus != 0 {
+				statusCode := tt.mockGetNetworkServicesResponseStatus
+				ms.CleanResponse(epGetNetworkServices)
+				ms.SetResponse(epGetNetworkServices, tt.mockGetNetworkServicesResponse, &statusCode)
+				ms.CleanResponse(endpoints.ListT0())
+				ms.SetResponse(endpoints.ListT0(), tt.mockGetNetworkServicesResponse, &statusCode)
+			}
 
 			resp, err := client.CreatePublicIP(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -352,12 +579,12 @@ func TestDeleteEdgegatewayPublicIP(t *testing.T) {
 	// Run test cases
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+			epDisable := endpoints.DisableCloudavenueServices()
 			if tt.mockResponseStatus != 0 {
-				endpoints.DisableCloudavenueServices().CleanMockResponse()
-				endpoints.DisableCloudavenueServices().SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
+				statusCode := tt.mockResponseStatus
+				ms.SetResponse(epDisable, tt.mockResponse, &statusCode)
 			}
-
-			client := newClient(t)
 
 			err := client.DeletePublicIP(t.Context(), tt.params)
 			if tt.expectedErr {
