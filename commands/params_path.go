@@ -91,11 +91,12 @@ func GetValueAtPath(params interface{}, path string) (interface{}, error) {
 		}
 	}
 
+	if val.Kind() == reflect.Ptr && val.IsNil() {
+		return nil, errors.New("final value is nil pointer")
+	}
+
 	// Dereference if final value is a pointer
 	val = derefValue(val)
-	if val.Kind() == reflect.Ptr && val.IsNil() {
-		return nil, errors.New("getvalueatpath: final value is nil pointer")
-	}
 
 	return val.Interface(), nil
 }

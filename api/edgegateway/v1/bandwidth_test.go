@@ -70,8 +70,6 @@ func Test_GetEdgeGatewayBandwidth(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			eC := newClient(t)
-
 			// Set up mock response
 			ep := endpoints.ListT0()
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
@@ -79,6 +77,8 @@ func Test_GetEdgeGatewayBandwidth(t *testing.T) {
 				ep.CleanMockResponse()
 				ep.SetMockResponse(tt.mockResponse, &tt.mockResponseStatus)
 			}
+
+			eC := newClient(t)
 
 			result, err := eC.GetBandwidth(t.Context(), tt.params)
 

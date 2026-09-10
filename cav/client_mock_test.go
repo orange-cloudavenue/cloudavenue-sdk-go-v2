@@ -37,22 +37,23 @@ func newMockClient() (Client, error) {
 	mux := chi.NewRouter()
 
 	for _, ep := range endpoints {
+		epCopy := *ep
 		if ep.MockResponseFuncIsDefined() {
-			xlogger.Debug("Registering mock responseFunc for endpoint", slog.String("endpoint", ep.Name), slog.String("method", ep.Method.String()))
-			mux.MethodFunc(ep.Method.String(), ep.MockPath(), ep.GetMockResponseFunc(ep))
+			xlogger.Debug("Registering mock responseFunc for endpoint", slog.String("endpoint", epCopy.Name), slog.String("method", epCopy.Method.String()))
+			mux.MethodFunc(epCopy.Method.String(), epCopy.MockPath(), GetDefaultMockResponseFunc(&epCopy))
 			continue
 		}
 
-		if ep.Method == MethodGET {
-			mux.MethodFunc(ep.Method.String(), ep.MockPath(), GetDefaultMockResponseFunc(ep))
+		if epCopy.Method == MethodGET {
+			mux.MethodFunc(epCopy.Method.String(), epCopy.MockPath(), GetDefaultMockResponseFunc(&epCopy))
 			continue
 		}
 
 		// Methods POST/PUT/PATCH/DELETE require a body
-		if ep.BodyResponseType != nil {
+		if epCopy.BodyResponseType != nil {
 			// If the request body type is defined, we need to check if it is a pointer
 			// and dereference it to get the actual type
-			reflectBodyType := reflect.TypeOf(ep.BodyResponseType)
+			reflectBodyType := reflect.TypeOf(epCopy.BodyResponseType)
 			if reflectBodyType.Kind() == reflect.Ptr {
 				// If the request body type is a pointer, we need to dereference it
 				reflectBodyType = reflectBodyType.Elem()
@@ -60,14 +61,18 @@ func newMockClient() (Client, error) {
 
 			if reflectBodyType == reflect.TypeOf(Job{}) {
 				statusAccepted := http.StatusAccepted
-				ep.SetMockResponseFunc(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+				epCopy.SetMockResponseFunc(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 					w.Header().Add("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
 					w.WriteHeader(statusAccepted)
 				}))
 			}
 		}
 
-		mux.MethodFunc(ep.Method.String(), ep.MockPath(), GetDefaultMockResponseFunc(ep))
+		mux.MethodFunc(epCopy.Method.String(), epCopy.MockPath(), GetDefaultMockResponseFunc(&epCopy))
+	}
+
+	for _, ep := range endpoints {
+		ep.RestoreMockResponse()
 	}
 
 	hts := httptest.NewServer(mux)

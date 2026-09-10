@@ -52,8 +52,13 @@ func NewClient(opts ...OptionFunc) (cav.Client, error) {
 
 	// Here, for each endpoint, we build a response handler for the mock HTTP server
 	for _, ep := range endpoints {
-		logger.Debug("Registering mock endpoint", slog.String("name", ep.Name), slog.String("method", ep.Method.String()), slog.String("path", ep.MockPath()), slog.String("ID", ep.ID))
-		mux.MethodFunc(ep.Method.String(), ep.MockPath(), cav.GetDefaultMockResponseFunc(ep))
+		epCopy := *ep
+		logger.Debug("Registering mock endpoint", slog.String("name", epCopy.Name), slog.String("method", epCopy.Method.String()), slog.String("path", epCopy.MockPath()), slog.String("ID", epCopy.ID))
+		mux.MethodFunc(epCopy.Method.String(), epCopy.MockPath(), cav.GetDefaultMockResponseFunc(&epCopy))
+	}
+
+	for _, ep := range endpoints {
+		ep.RestoreMockResponse()
 	}
 
 	hts := httptest.NewServer(mux)

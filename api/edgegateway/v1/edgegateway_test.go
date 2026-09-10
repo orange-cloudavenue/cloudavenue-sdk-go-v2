@@ -132,12 +132,6 @@ func TestGetEdgeGateway_ContextDeadlineExceeded(t *testing.T) {
 }
 
 func TestRetrieveEdgeGatewayIDByName(t *testing.T) {
-	mC, err := mock.NewClient()
-	assert.Nil(t, err, "Error creating mock client")
-
-	eC, err := New(mC)
-	assert.Nil(t, err, "Error creating edgegateway client")
-
 	// Mock the QueryEdgeGateway endpoint
 	epQuery := endpoints.QueryEdgeGateway()
 
@@ -165,7 +159,10 @@ func TestRetrieveEdgeGatewayIDByName(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			epQuery.CleanMockResponse()
 			mock.SetMockResponse(epQuery, tt.queryResp, &tt.queryStatus)
+
+			eC := newClient(t)
 
 			id, err := eC.retrieveEdgeGatewayIDByName(t.Context(), tt.edgeName)
 			if tt.expectedErr {
