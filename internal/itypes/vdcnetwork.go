@@ -102,19 +102,25 @@ func (r *ApiResponseVdcNetwork) ToModel() types.ModelGetVdcNetwork {
 	}
 
 	if len(r.Subnets.Values) > 0 {
-		subnet := r.Subnets.Values[0]
-		m.Subnet = types.ModelVdcNetworkSubnet{
-			Gateway:      subnet.Gateway,
-			PrefixLength: subnet.PrefixLength,
-			DNSServer1:   subnet.DNSServer1,
-			DNSServer2:   subnet.DNSServer2,
-			DNSSuffix:    subnet.DNSSuffix,
-		}
-		for _, ipRange := range subnet.IPRanges.Values {
-			m.Subnet.IPRanges = append(m.Subnet.IPRanges, types.ModelVdcNetworkIPRange{
-				StartAddress: ipRange.StartAddress,
-				EndAddress:   ipRange.EndAddress,
-			})
+		m.Subnets = make([]types.ModelVdcNetworkSubnet, 0, len(r.Subnets.Values))
+		for i, subnet := range r.Subnets.Values {
+			modelSubnet := types.ModelVdcNetworkSubnet{
+				Gateway:      subnet.Gateway,
+				PrefixLength: subnet.PrefixLength,
+				DNSServer1:   subnet.DNSServer1,
+				DNSServer2:   subnet.DNSServer2,
+				DNSSuffix:    subnet.DNSSuffix,
+			}
+			for _, ipRange := range subnet.IPRanges.Values {
+				modelSubnet.IPRanges = append(modelSubnet.IPRanges, types.ModelVdcNetworkIPRange{
+					StartAddress: ipRange.StartAddress,
+					EndAddress:   ipRange.EndAddress,
+				})
+			}
+			m.Subnets = append(m.Subnets, modelSubnet)
+			if i == 0 {
+				m.Subnet = modelSubnet
+			}
 		}
 	}
 

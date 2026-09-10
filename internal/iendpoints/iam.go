@@ -75,7 +75,7 @@ func init() {
 				Required:    true,
 			},
 		},
-		BodyRequestType: itypes.User{},
+		BodyRequestType: itypes.UserRequest{},
 		ResponseType:    itypes.User{},
 	}.Register()
 
@@ -99,7 +99,7 @@ func init() {
 				Required:    true,
 			},
 		},
-		BodyRequestType: itypes.User{},
+		BodyRequestType: itypes.UserRequest{},
 		ResponseType:    itypes.User{},
 	}.Register()
 

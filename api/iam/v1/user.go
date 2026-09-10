@@ -70,12 +70,41 @@ func iamUserToModel(u itypes.User) *ModelUser {
 	}
 }
 
-// modelUserToIAMXML converts public params to internal itypes.User for XML marshaling.
-func modelUserToIAMXML(params any) (itypes.User, error) {
-	var u itypes.User
+// modelUserToIAMXML converts public params to XML payload for marshaling.
+func modelUserToIAMXML(params any) (itypes.UserRequest, error) {
+	var u itypes.UserRequest
 	switch p := params.(type) {
 	case ParamsCreateLocalUser:
-		u = itypes.User{
+		u = itypes.UserRequest{
+			Name:            p.Name,
+			Password:        p.Password,
+			FullName:        p.FullName,
+			EmailAddress:    p.EmailAddress,
+			Telephone:       p.Telephone,
+			Description:     p.Description,
+			IsEnabled:       &p.IsEnabled,
+			DeployedVmQuota: p.DeployedVmQuota,
+			StoredVmQuota:   p.StoredVmQuota,
+			ProviderType:    "INTEGRATED",
+			Role: itypes.Reference{
+				Name: p.RoleName,
+			},
+		}
+	case ParamsCreateSAMLUser:
+		u = itypes.UserRequest{
+			Name:         p.Name,
+			FullName:     p.FullName,
+			EmailAddress: p.EmailAddress,
+			Telephone:    p.Telephone,
+			Description:  p.Description,
+			IsEnabled:    &p.IsEnabled,
+			ProviderType: "SAML",
+			Role: itypes.Reference{
+				Name: p.RoleName,
+			},
+		}
+	case ParamsUpdateUser:
+		u = itypes.UserRequest{
 			Name:            p.Name,
 			Password:        p.Password,
 			FullName:        p.FullName,
@@ -85,45 +114,12 @@ func modelUserToIAMXML(params any) (itypes.User, error) {
 			IsEnabled:       p.IsEnabled,
 			DeployedVmQuota: p.DeployedVmQuota,
 			StoredVmQuota:   p.StoredVmQuota,
-			ProviderType:    "INTEGRATED",
-			Role: itypes.Reference{
-				Name: p.RoleName,
-			},
-		}
-	case ParamsCreateSAMLUser:
-		u = itypes.User{
-			Name:         p.Name,
-			FullName:     p.FullName,
-			EmailAddress: p.EmailAddress,
-			Telephone:    p.Telephone,
-			Description:  p.Description,
-			IsEnabled:    p.IsEnabled,
-			ProviderType: "SAML",
-			Role: itypes.Reference{
-				Name: p.RoleName,
-			},
-		}
-	case ParamsUpdateUser:
-		isEnabled := false
-		if p.IsEnabled != nil {
-			isEnabled = *p.IsEnabled
-		}
-		u = itypes.User{
-			Name:            p.Name,
-			Password:        p.Password,
-			FullName:        p.FullName,
-			EmailAddress:    p.EmailAddress,
-			Telephone:       p.Telephone,
-			Description:     p.Description,
-			IsEnabled:       isEnabled,
-			DeployedVmQuota: p.DeployedVmQuota,
-			StoredVmQuota:   p.StoredVmQuota,
 			Role: itypes.Reference{
 				Name: p.RoleName,
 			},
 		}
 	default:
-		return itypes.User{}, fmt.Errorf("unsupported params type %T", params)
+		return itypes.UserRequest{}, fmt.Errorf("unsupported params type %T", params)
 	}
 	return u, nil
 }

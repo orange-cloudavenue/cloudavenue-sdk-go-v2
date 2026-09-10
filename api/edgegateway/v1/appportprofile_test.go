@@ -221,6 +221,7 @@ func TestDeleteAppPortProfile(t *testing.T) {
 
 	assert.NoError(t, err)
 
+	ms.CleanResponse(endpoints.GetEdgeGateway())
 	ms.CleanResponse(endpoints.GetAppPortProfile())
 	ms.CleanResponse(endpoints.DeleteAppPortProfile())
 }
