@@ -63,6 +63,18 @@ func TestParseJobResponseUnsupportedClient(t *testing.T) {
 	require.EqualError(t, err, "backend 4 does not support jobs")
 }
 
+func TestAwaitJobOnBackendUnsupportedBackend(t *testing.T) {
+	client, err := newMockClient()
+	require.NoError(t, err)
+	defer func() { require.NoError(t, client.Close()) }()
+
+	_, err = AwaitJobOnBackend[string](t.Context(), client, BackendNetBackup, "job-id", JobPollOptions{
+		Timeout:         time.Second,
+		PollingInterval: time.Millisecond,
+	}, func(_ *resty.Response) (string, error) { return "", nil })
+	require.EqualError(t, err, "await job job-id: backend 4 does not support jobs")
+}
+
 func TestClassifyStatusCode(t *testing.T) {
 	require.ErrorIs(t, classifyStatusCode(404), pkgerrors.ErrNotFound)
 	require.NoError(t, classifyStatusCode(500))
