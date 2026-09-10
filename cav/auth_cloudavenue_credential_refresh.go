@@ -12,6 +12,7 @@ package cav
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"resty.dev/v3"
 )
@@ -44,7 +45,11 @@ func (c *cloudavenueCredential) Refresh(ctx context.Context) error {
 		"status", resp.StatusCode(),
 	)
 
-	c.storeRefreshSession(resp)
+	if err := c.storeRefreshSession(resp); err != nil {
+		c.clearBearer()
+		logger.ErrorContext(ctx, "Failed to store refreshed session", "error", err)
+		return err
+	}
 
 	return nil
 }
@@ -92,12 +97,17 @@ func (c *cloudavenueCredential) clearBearer() {
 }
 
 // storeRefreshSession updates cached session data from refresh response.
-func (c *cloudavenueCredential) storeRefreshSession(resp *resty.Response) {
-	session := resp.Result().(*apiResponseSessionVmware)
+func (c *cloudavenueCredential) storeRefreshSession(resp *resty.Response) error {
+	session, ok := resp.Result().(*apiResponseSessionVmware)
+	if !ok || session == nil {
+		return fmt.Errorf("unexpected session refresh response type %T", resp.Result())
+	}
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.bearer = resp.Header().Get(cloudavenueCredentialXVmwareAccessToken)
 	c.organizationID = session.Org.ID
 	c.siteID = session.Site.ID
+
+	return nil
 }

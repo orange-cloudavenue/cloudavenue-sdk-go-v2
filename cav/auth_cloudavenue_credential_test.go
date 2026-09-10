@@ -10,11 +10,14 @@
 package cav
 
 import (
+	"net/http"
 	"testing"
 
 	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/http-client"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/xlog"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
+	"github.com/stretchr/testify/assert"
+	"resty.dev/v3"
 )
 
 func Test_newCloudavenueCredential(t *testing.T) {
@@ -101,4 +104,18 @@ func Test_CloudavenueCredential_Refresh_with_Bearer(t *testing.T) {
 	// Simulate the refresh process
 	// Ignore the error for this test case, as we are just testing the method call
 	_ = auth.Refresh(t.Context())
+}
+
+func TestCloudavenueCredentialStoreRefreshSessionRejectsUnexpectedResult(t *testing.T) {
+	auth := &cloudavenueCredential{}
+
+	err := auth.storeRefreshSession(&resty.Response{
+		RawResponse: &http.Response{Header: http.Header{}},
+		Request:     &resty.Request{},
+	})
+
+	assert.EqualError(t, err, "unexpected session refresh response type <nil>")
+	assert.Empty(t, auth.bearer)
+	assert.Empty(t, auth.organizationID)
+	assert.Empty(t, auth.siteID)
 }
