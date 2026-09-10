@@ -5,10 +5,8 @@ info:
     \ infrastructure.\n\n## Authentication\n\nIn order to authenticate to this API,\
     \ you must first authenticate by clicking on the \"Authorize\" button and fill\
     \ the required parameters:\n- client_id: your username\n- client_secret: your\
-    \ password\n- organization: the organization holding your user\n\n Servers purpose:\
-    \ \n- https://api1.cloudavenue.orange-business.com: this server is intended to\
-    \ be used from internet \n- https://api1.cloudavenue-vdr.itn.intraorange: this\
-    \ server is intended to be used from inside orange internal network\n\nOnce done,\
+    \ password\n- organization: the organization holding your user\n\n Server:\
+    \ \n- https://api1.cloudavenue.orange-business.com\n\nOnce done,\
     \ click on the \"Authorize\" button, close the authentication modal and start\
     \ using the API!"
   version: 2.0.0
@@ -1296,7 +1294,6 @@ paths:
             example: '{"enabled": "true", "mail": "mail.test@example.com"}'
 servers:
 - url: https://api1.cloudavenue.orange-business.com
-- url: https://api1.cloudavenue-vdr.itn.intraorange
 security: []
 components:
   securitySchemes:
