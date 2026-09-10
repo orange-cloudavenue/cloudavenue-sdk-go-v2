@@ -160,10 +160,19 @@ func (c *client) NewRequestWithBackend(ctx context.Context, backend BackendTarge
 
 	switch endpoint.Method {
 	case MethodPOST, MethodPUT, MethodDELETE:
+		busyEntityRetries := 0
 		var conflictRetry resty.RetryConditionFunc = func(resp *resty.Response, _ error) bool {
 			if sc.idempotentRetryCondition()(resp, nil) {
-				// Extend retries for BUSY_ENTITY responses with unknown server-side resolution time.
-				resp.Request.RetryCount++
+				if busyEntityRetries >= retryCount {
+					return false
+				}
+
+				busyEntityRetries++
+
+				// Extend retries for BUSY_ENTITY responses, but keep a hard bound.
+				if resp != nil && resp.Request != nil {
+					resp.Request.RetryCount++
+				}
 				return true
 			}
 
