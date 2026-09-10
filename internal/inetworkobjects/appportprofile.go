@@ -52,6 +52,7 @@ func FindAppPortProfile(ctx context.Context, c cav.Client, idOrName, vdcGroupID 
 	}
 
 	var found []itypes.ApiResponseAppPortProfile
+	var lastErr error
 	for _, scope := range appPortProfileScopes {
 		ep := endpoints.ListAppPortProfile()
 
@@ -61,6 +62,12 @@ func FindAppPortProfile(ctx context.Context, c cav.Client, idOrName, vdcGroupID 
 			cav.WithQueryParam(ep.QueryParams[0], fmt.Sprintf("name==%s;scope==%s;_context==%s", idOrName, scope, vdcGroupID)),
 		)
 		if err != nil {
+			var apiErr *pkgerrors.APIError
+			if pkgerrors.As(err, &apiErr) && apiErr.IsNotFound() {
+				continue
+			}
+
+			lastErr = err
 			continue
 		}
 
@@ -76,6 +83,9 @@ func FindAppPortProfile(ctx context.Context, c cav.Client, idOrName, vdcGroupID 
 	}
 
 	if len(found) == 0 {
+		if lastErr != nil {
+			return nil, lastErr
+		}
 		return nil, &pkgerrors.APIError{Operation: "GetAppPortProfile", StatusCode: 404, Message: fmt.Sprintf("application port profile %q not found", idOrName)}
 	}
 
