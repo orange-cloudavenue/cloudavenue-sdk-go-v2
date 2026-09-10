@@ -10,16 +10,18 @@
 package httpclient
 
 import (
+	"sync/atomic"
+
 	"resty.dev/v3"
 )
 
-var DebugMode bool
+var DebugMode atomic.Bool
 
 func NewHTTPClient() *resty.Client {
 	return resty.New().
 		SetLogger(logger()).
 		SetHeader("User-Agent", "GoCloudAvenueSDK/2.0").
 		SetResponseBodyUnlimitedReads(true).
-		SetDebug(DebugMode).
-		SetTrace(DebugMode)
+		SetDebug(DebugMode.Load()).
+		SetTrace(DebugMode.Load())
 }

@@ -71,7 +71,7 @@ func WithLogger(customLogger *slog.Logger) ClientOption {
 		xlog.SetGlobalLogger(customLogger)
 		xlogger = customLogger
 		if xlogger.Enabled(context.Background(), slog.LevelDebug) {
-			httpclient.DebugMode = true
+			httpclient.DebugMode.Store(true)
 		}
 		return nil
 	}
