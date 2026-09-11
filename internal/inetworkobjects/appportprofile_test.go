@@ -57,20 +57,20 @@ func (f fakeClient) Close() error {
 
 func TestFindAppPortProfileRejectsUnexpectedGetResponseType(t *testing.T) {
 	client := fakeClient{do: func(context.Context, *cav.Endpoint, ...cav.EndpointRequestOption) (*resty.Response, error) {
-		return &resty.Response{Request: &resty.Request{Result: &itypes.ApiResponseListAppPortProfile{}}}, nil
+		return &resty.Response{Request: &resty.Request{Result: &itypes.APIResponseListAppPortProfile{}}}, nil
 	}}
 
 	profile, err := FindAppPortProfile(t.Context(), client, generator.MustGenerate("{urn:applicationPortProfile}"), "")
 	require.Nil(t, profile)
-	require.EqualError(t, err, "unexpected get app port profile response type *itypes.ApiResponseListAppPortProfile")
+	require.EqualError(t, err, "unexpected get app port profile response type *itypes.APIResponseListAppPortProfile")
 }
 
 func TestFindAppPortProfileRejectsUnexpectedListResponseType(t *testing.T) {
 	client := fakeClient{do: func(context.Context, *cav.Endpoint, ...cav.EndpointRequestOption) (*resty.Response, error) {
-		return &resty.Response{Request: &resty.Request{Result: &itypes.ApiResponseAppPortProfile{}}}, nil
+		return &resty.Response{Request: &resty.Request{Result: &itypes.APIResponseAppPortProfile{}}}, nil
 	}}
 
 	profile, err := FindAppPortProfile(t.Context(), client, "app-1", "urn:vcloud:vdcGroup:12345678-1234-1234-1234-123456789012")
 	require.Nil(t, profile)
-	require.EqualError(t, err, "unexpected list app port profile response type *itypes.ApiResponseAppPortProfile")
+	require.EqualError(t, err, "unexpected list app port profile response type *itypes.APIResponseAppPortProfile")
 }
