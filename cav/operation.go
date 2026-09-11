@@ -109,9 +109,6 @@ func Execute[P, R any](ctx context.Context, c Client, op Operation[P, R], params
 
 	backend := op.Endpoint.Backend
 	if op.Backend != 0 {
-		if op.Backend != op.Endpoint.Backend {
-			return zero, fmt.Errorf("%s: operation backend %d does not match endpoint backend %d", op.Name, op.Backend, op.Endpoint.Backend)
-		}
 		backend = op.Backend
 	}
 

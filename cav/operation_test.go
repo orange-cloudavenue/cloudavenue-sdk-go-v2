@@ -10,10 +10,15 @@
 package cav
 
 import (
+	"context"
 	"fmt"
+	"log/slog"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"resty.dev/v3"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )
 
 type executeParams struct {
@@ -99,4 +104,58 @@ func TestPartialSuccessError(t *testing.T) {
 	wrapped := &PartialSuccessError[string]{Result: "id", Err: fmt.Errorf("patch failed")}
 	require.EqualError(t, wrapped, "patch failed")
 	require.EqualError(t, wrapped.Unwrap(), "patch failed")
+}
+
+type operationTestClient struct {
+	backend BackendTarget
+	called  bool
+}
+
+func (c *operationTestClient) NewRequest(_ context.Context, _ *Endpoint, _ ...RequestOption) (*resty.Request, error) {
+	return nil, fmt.Errorf("not implemented")
+}
+
+func (c *operationTestClient) NewRequestWithBackend(_ context.Context, _ BackendTarget, _ *Endpoint, _ ...RequestOption) (*resty.Request, error) {
+	return nil, fmt.Errorf("not implemented")
+}
+
+func (c *operationTestClient) Logger() *slog.Logger {
+	return slog.Default()
+}
+
+func (c *operationTestClient) Do(_ context.Context, _ *Endpoint, _ ...EndpointRequestOption) (*resty.Response, error) {
+	return nil, fmt.Errorf("not implemented")
+}
+
+func (c *operationTestClient) DoWithBackend(_ context.Context, backend BackendTarget, _ *Endpoint, _ ...EndpointRequestOption) (*resty.Response, error) {
+	c.called = true
+	c.backend = backend
+	return &resty.Response{Request: &resty.Request{}}, nil
+}
+
+func (c *operationTestClient) GetConsole() consoles.ConsoleName {
+	return consoles.ConsoleName("test")
+}
+
+func (c *operationTestClient) Close() error {
+	return nil
+}
+
+func TestExecuteOperationBackendOverridesEndpointBackend(t *testing.T) {
+	client := &operationTestClient{}
+
+	op := Operation[executeParams, executeResult]{
+		Name:     "Organization.Get",
+		Backend:  BackendInfrapi,
+		Endpoint: MustGetEndpoint("ExecuteOperationTest"),
+		Extract: func(_ *Response, p executeParams) (executeResult, error) {
+			return executeResult{Value: p.Name}, nil
+		},
+	}
+
+	result, err := Execute(t.Context(), client, op, executeParams{Name: "ok"})
+	require.NoError(t, err)
+	require.True(t, client.called)
+	require.Equal(t, BackendInfrapi, client.backend)
+	require.Equal(t, "ok", result.Value)
 }

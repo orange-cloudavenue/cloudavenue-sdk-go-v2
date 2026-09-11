@@ -67,13 +67,17 @@ func awaitJob[R any](ctx context.Context, c Client, backend BackendTarget, jobID
 	timer := time.AfterFunc(opts.Timeout, func() { cancel(pkgerrors.ErrJobTimeout) })
 	defer timer.Stop()
 	startedAt := time.Now()
+	firstPoll := true
 
 	for {
-		select {
-		case <-pollCtx.Done():
-			return zero, context.Cause(pollCtx)
-		case <-time.After(withJitter(opts.PollingInterval, opts.Jitter)):
+		if !firstPoll {
+			select {
+			case <-pollCtx.Done():
+				return zero, context.Cause(pollCtx)
+			case <-time.After(withJitter(opts.PollingInterval, opts.Jitter)):
+			}
 		}
+		firstPoll = false
 
 		resp, resolvedBackend, err := getJobStatus(pollCtx, c, jobID, backend)
 		if err != nil {
