@@ -373,7 +373,7 @@ func (c *Client) UpdateVApp(ctx context.Context, params types.ParamsUpdateVApp) 
 	if current == nil {
 		vapp, err := c.GetVApp(ctx, types.ParamsGetVApp{ID: params.ID})
 		if err != nil {
-			return nil, fmt.Errorf("%s: get current: %w", opUpdateVapp, err)
+			return nil, fmt.Errorf("%s: get current: %w", opUpdateVApp, err)
 		}
 		current = vapp
 	}

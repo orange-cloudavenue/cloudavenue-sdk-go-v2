@@ -259,8 +259,8 @@ func TestUpdateVAppPreservesExistingDescription(t *testing.T) {
 	storageLease := 7200
 	getCalls := 0
 
-	ms.CleanResponse(endpoints.GetVapp())
-	ms.SetResponseFunc(endpoints.GetVapp(), func(w http.ResponseWriter, r *http.Request) {
+	ms.CleanResponse(endpoints.GetVApp())
+	ms.SetResponseFunc(endpoints.GetVApp(), func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		resp := &itypes.APIResponseGetVApp{
 			ID:          vappID,
@@ -278,8 +278,8 @@ func TestUpdateVAppPreservesExistingDescription(t *testing.T) {
 		assert.NoError(t, json.NewEncoder(w).Encode(resp))
 	})
 
-	ms.CleanResponse(endpoints.UpdateVapp())
-	ms.SetResponseFunc(endpoints.UpdateVapp(), func(w http.ResponseWriter, r *http.Request) {
+	ms.CleanResponse(endpoints.UpdateVApp())
+	ms.SetResponseFunc(endpoints.UpdateVApp(), func(w http.ResponseWriter, r *http.Request) {
 		var body itypes.APIRequestUpdateVApp
 		assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
 		if assert.NotNil(t, body.Description) {
@@ -302,8 +302,8 @@ func TestUpdateVAppPreservesExistingDescription(t *testing.T) {
 	assert.NotNil(t, resp.DeploymentLeaseInSeconds)
 	assert.Equal(t, 1800, *resp.DeploymentLeaseInSeconds)
 
-	ms.CleanResponse(endpoints.GetVapp())
-	ms.CleanResponse(endpoints.UpdateVapp())
+	ms.CleanResponse(endpoints.GetVApp())
+	ms.CleanResponse(endpoints.UpdateVApp())
 }
 
 func TestUpdateVAppCanClearDescription(t *testing.T) {
@@ -312,8 +312,8 @@ func TestUpdateVAppCanClearDescription(t *testing.T) {
 	empty := ""
 	getCalls := 0
 
-	ms.CleanResponse(endpoints.GetVapp())
-	ms.SetResponseFunc(endpoints.GetVapp(), func(w http.ResponseWriter, r *http.Request) {
+	ms.CleanResponse(endpoints.GetVApp())
+	ms.SetResponseFunc(endpoints.GetVApp(), func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		resp := &itypes.APIResponseGetVApp{
 			ID:          vappID,
@@ -327,8 +327,8 @@ func TestUpdateVAppCanClearDescription(t *testing.T) {
 		assert.NoError(t, json.NewEncoder(w).Encode(resp))
 	})
 
-	ms.CleanResponse(endpoints.UpdateVapp())
-	ms.SetResponseFunc(endpoints.UpdateVapp(), func(w http.ResponseWriter, r *http.Request) {
+	ms.CleanResponse(endpoints.UpdateVApp())
+	ms.SetResponseFunc(endpoints.UpdateVApp(), func(w http.ResponseWriter, r *http.Request) {
 		var body itypes.APIRequestUpdateVApp
 		assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
 		if assert.NotNil(t, body.Description) {
@@ -343,8 +343,8 @@ func TestUpdateVAppCanClearDescription(t *testing.T) {
 	assert.NotNil(t, resp)
 	assert.Equal(t, empty, resp.Description)
 
-	ms.CleanResponse(endpoints.GetVapp())
-	ms.CleanResponse(endpoints.UpdateVapp())
+	ms.CleanResponse(endpoints.GetVApp())
+	ms.CleanResponse(endpoints.UpdateVApp())
 }
 
 func TestDeleteVApp(t *testing.T) {
