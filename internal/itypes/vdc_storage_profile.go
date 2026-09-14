@@ -19,7 +19,7 @@ type (
 
 	ApiResponseListStorageProfile struct {
 		HREF                    string `json:"href" fake:"{href_uuid}"`
-		ID                      string `json:"id" fake:"-"` // Because VMware returns an empty ID, we will extract it from the HREF
+		ID                      string `json:"id,omitempty" fake:"{urn:vdcstorageProfile}"`
 		Name                    string `json:"name" fake:"platinum3k_r1"`
 		IsEnabled               bool   `json:"isEnabled" fake:"true"`
 		IsDefaultStorageProfile bool   `json:"isDefaultStorageProfile" fake:"true"`

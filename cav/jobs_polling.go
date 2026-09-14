@@ -1,0 +1,119 @@
+/*
+ * SPDX-FileCopyrightText: Copyright (c) 2025 Orange
+ * SPDX-License-Identifier: Mozilla Public License 2.0
+ *
+ * This software is distributed under the MPL-2.0 license.
+ * the text of which is available at https://www.mozilla.org/en-US/MPL/2.0/
+ * or see the "LICENSE" file for more details.
+ */
+
+package cav
+
+import (
+	"context"
+	"fmt"
+	"math/rand/v2"
+	"time"
+
+	"resty.dev/v3"
+)
+
+const (
+	getJobCerberusEndpointName = "GetJobCerberus"
+	getJobVMwareEndpointName   = "GetJobVmware"
+)
+
+func getJobStatus(ctx context.Context, c Client, jobID string, backend BackendTarget) (*resty.Response, BackendTarget, error) {
+	if backend != 0 {
+		endpointName, err := getJobEndpointName(backend)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		ep, err := GetEndpoint(endpointName)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		resp, err := c.DoWithBackend(ctx, backend, ep, buildJobRequestOptions(ep.Backend, ep, jobID)...)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		return resp, backend, nil
+	}
+
+	endpointNames := []string{getJobCerberusEndpointName, getJobVMwareEndpointName}
+
+	var lastErr error
+	for _, endpointName := range endpointNames {
+		ep, err := GetEndpoint(endpointName)
+		if err != nil {
+			lastErr = err
+			continue
+		}
+
+		resp, err := c.Do(ctx, ep, buildJobRequestOptions(ep.Backend, ep, jobID)...)
+		if err != nil {
+			lastErr = err
+			continue
+		}
+
+		return resp, ep.Backend, nil
+	}
+
+	return nil, 0, fmt.Errorf("no job endpoint found: %w", lastErr)
+}
+
+func getJobEndpointName(backend BackendTarget) (string, error) {
+	switch backend {
+	case BackendInfrapi:
+		return getJobCerberusEndpointName, nil
+	case BackendVMware:
+		return getJobVMwareEndpointName, nil
+	default:
+		return "", fmt.Errorf("backend %d does not support jobs", backend)
+	}
+}
+
+func buildJobRequestOptions(backend BackendTarget, endpoint *Endpoint, jobID string) []EndpointRequestOption {
+	return []EndpointRequestOption{
+		WithPathParam(endpoint.PathParams[0], jobID),
+		SetCustomRestyOption(func(r *resty.Request) {
+			switch backend {
+			case BackendInfrapi:
+				r.SetResult(&CerberusJobAPIResponse{})
+				r.SetResultError(&cerberusError{})
+			case BackendVMware:
+				r.SetResult(&vmwareJobAPIResponse{})
+				r.SetResultError(&vmwareError{})
+			default:
+				r.SetResult(&CerberusJobAPIResponse{})
+				r.SetResultError(&cerberusError{})
+			}
+		}),
+	}
+}
+
+func parseJobResponse(resp *Response, backend BackendTarget) (*Job, error) {
+	if resp == nil || resp.Raw == nil {
+		return nil, fmt.Errorf("job response is nil")
+	}
+
+	switch backend {
+	case BackendInfrapi:
+		return (&cerberus{}).JobParser(resp.Raw)
+	case BackendVMware:
+		return (&vmware{}).JobParser(resp.Raw)
+	default:
+		return nil, fmt.Errorf("backend %d does not support jobs", backend)
+	}
+}
+
+func withJitter(interval, jitter time.Duration) time.Duration {
+	if jitter <= 0 {
+		return interval
+	}
+
+	return interval + time.Duration(rand.Int64N(int64(jitter)*2+1)) - jitter
+}

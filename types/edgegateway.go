@@ -33,7 +33,7 @@ type (
 		UplinkT0 *ModelObjectReference `documentation:"T0 router name that this edge gateway is connected to"`
 	}
 
-	// Bandwidth in Mbps.
+	// ModelBandwidth represents Bandwidth in Mbps.
 	ModelBandwidth int
 )
 

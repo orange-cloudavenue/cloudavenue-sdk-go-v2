@@ -13,12 +13,13 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 	"github.com/orange-cloudavenue/common-go/validators"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
 const (
-	// * Methods
+	// HTTP methods supported by endpoint registry.
 	MethodGET    Method = http.MethodGet
 	MethodPOST   Method = http.MethodPost
 	MethodPUT    Method = http.MethodPut
@@ -28,12 +29,10 @@ const (
 
 type (
 	endpointsMap struct {
-		// mu is a mutex to protect the endpoints map from concurrent access.
+		// mu protects Map from concurrent access.
 		mu sync.RWMutex
 
-		// Map is a nested map structure to hold endpoints.
-		// String keys is a endpoint.Name
-		// Map is capitalized to avoid confusion with the map golang.
+		// Map stores endpoints by registered name.
 		Map map[string]*Endpoint
 	}
 )
@@ -43,61 +42,33 @@ var endpoints = endpointsMap{
 	Map: make(map[string]*Endpoint),
 }
 
-// Register registers an endpoint in the Endpoints map.
+// Register validates and stores e in global endpoint registry.
 func (e Endpoint) Register() {
-	// logger is not used in Register method, because it is called
-	// by init() function, which is called before the logger is initialized.
-
 	if err := validators.New().Struct(&e); err != nil {
 		panic(err)
 	}
-	// Set the endpoint in the Endpoints map
 	endpoints.register(&e)
 }
 
-// register is a helper function to register an endpoint with the given parameters.
+// register stores endpoint in registry.
 func (e *endpointsMap) register(endpoint *Endpoint) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-
-	// RequestFunc is a function that will be used to make the request.
-	// If it is not set, we will use the default request function.
-	if endpoint.RequestFunc == nil {
-		switch endpoint.BodyResponseType.(type) {
-		case Job, *Job: // If the endpoint is a job, we use the job middleware.
-			endpoint.RequestFunc = defaultRequestFuncWithJob
-		default:
-			// Default RequestFunc
-			endpoint.RequestFunc = defaultRequestFunc
-		}
-	}
-
-	// Store mockResponseFunc in the internal to restore it later.
-	if endpoint.MockResponseFunc != nil {
-		endpoint.mockResponseFunc = endpoint.MockResponseFunc
-	}
-
-	// Store mockResponseData in the internal to restore it later.
-	if endpoint.MockResponseData != nil {
-		endpoint.mockResponseData = endpoint.MockResponseData
-	}
 
 	if _, ok := e.Map[endpoint.Name]; ok {
 		panic(errors.Newf("endpoint %q already registered", endpoint.Name))
 	}
 
-	// Store the endpoint in the map using the encoded key
 	e.Map[endpoint.Name] = endpoint
 }
 
-// GetEndpointsUncategorized retrieves all endpoints without categorization.
+// GetEndpointsUncategorized returns all registered endpoints.
 func GetEndpointsUncategorized() []*Endpoint {
 	endpoints.mu.RLock()
 	defer endpoints.mu.RUnlock()
 
 	var endpointsList []*Endpoint
 
-	// Iterate through the endpoints map and collect all endpoints
 	for _, endpoint := range endpoints.Map {
 		endpointsList = append(endpointsList, endpoint)
 	}
@@ -105,8 +76,7 @@ func GetEndpointsUncategorized() []*Endpoint {
 	return endpointsList
 }
 
-// MustGetEndpoint retrieves an endpoint from the name.
-// It panics if the endpoint is not found.
+// MustGetEndpoint returns named endpoint or panics.
 func MustGetEndpoint(name string) *Endpoint {
 	endpoint, err := GetEndpoint(name)
 	if err != nil {
@@ -115,7 +85,7 @@ func MustGetEndpoint(name string) *Endpoint {
 	return endpoint
 }
 
-// GetEndpoint retrieves an endpoint from the name.
+// GetEndpoint returns endpoint registered under name.
 func GetEndpoint(name string) (*Endpoint, error) {
 	endpoints.mu.RLock()
 	defer endpoints.mu.RUnlock()

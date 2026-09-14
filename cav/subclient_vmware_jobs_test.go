@@ -13,10 +13,9 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/stretchr/testify/assert"
 	"resty.dev/v3"
-
-	"github.com/orange-cloudavenue/common-go/generator"
 )
 
 func TestVmwareJobStatusParser(t *testing.T) {

@@ -66,7 +66,7 @@ type (
 	}
 
 	ApiResponseQueryEdgeGatewayRecord struct {
-		ID                  string `json:"-"`                                                 // The ID of the entity.
+		ID                  string `json:"id,omitempty" fake:"{urn:edgegateway}"`             // The ID of the entity.
 		HREF                string `json:"href,omitempty" fake:"{href_uuid}"`                 // The URI of the entity.
 		Type                string `json:"type,omitempty"`                                    // The MIME type of the entity.
 		Name                string `json:"name,omitempty" fake:"{resource_name:edgegateway}"` // EdgeGateway name.

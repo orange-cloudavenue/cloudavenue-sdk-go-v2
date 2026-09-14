@@ -13,13 +13,11 @@ import (
 	"fmt"
 	"regexp"
 
-	"resty.dev/v3"
+	"github.com/orange-cloudavenue/common-go/extractor"
+	"github.com/orange-cloudavenue/common-go/validators"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
-	"github.com/orange-cloudavenue/common-go/extractor"
-	"github.com/orange-cloudavenue/common-go/urn"
-	"github.com/orange-cloudavenue/common-go/validators"
 )
 
 //go:generate endpoint-generator -path edgegateway.go -output edgegateway
@@ -31,7 +29,7 @@ func init() {
 		Name:             "GetEdgeGateway",
 		Description:      "Get EdgeGateway",
 		Method:           cav.MethodGET,
-		SubClient:        cav.ClientVmware,
+		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/edgeGateways/{edgeId}",
 		PathParams: []cav.PathParam{
 			{
@@ -43,17 +41,17 @@ func init() {
 				},
 			},
 		},
-		BodyResponseType: itypes.ApiResponseEdgegateway{},
+		ResponseType: itypes.ApiResponseEdgegateway{},
 	}.Register()
 
 	// QueryEdgeGateway
 	cav.Endpoint{
 		// "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-ExecuteQuery.html"
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/38.1/doc/types/QueryResultEdgeGatewayRecordType.html",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/types/QueryResultEdgeGatewayRecordType.html",
 		Name:             "QueryEdgeGateway",
 		Description:      "Query EdgeGateway",
 		Method:           cav.MethodGET,
-		SubClient:        cav.ClientVmware,
+		Backend:          cav.BackendVMware,
 		PathTemplate:     "/api/query",
 		QueryParams: []cav.QueryParam{
 			{
@@ -76,33 +74,9 @@ func init() {
 				},
 			},
 		},
-		PathParams:       nil,
-		BodyRequestType:  nil,
-		BodyResponseType: itypes.ApiResponseQueryEdgeGateway{},
-		RequestMiddlewares: []resty.RequestMiddleware{
-			func(_ *resty.Client, req *resty.Request) error {
-				// Set the Accept header to application/*+json;version=38.1
-				req.SetHeader("Accept", "application/*+json;version=38.1")
-				return nil
-			},
-		},
-		ResponseMiddlewares: []resty.ResponseMiddleware{
-			func(_ *resty.Client, resp *resty.Response) error {
-				r := resp.Result().(*itypes.ApiResponseQueryEdgeGateway)
-
-				if len(r.Record) == 0 {
-					return fmt.Errorf("no edge gateways found")
-				}
-
-				id, err := extractor.ExtractUUID(r.Record[0].HREF)
-				if err != nil {
-					return err
-				}
-
-				r.Record[0].ID = urn.Normalize(urn.EdgeGateway, id).String()
-				return nil
-			},
-		},
+		PathParams:      nil,
+		BodyRequestType: nil,
+		ResponseType:    itypes.ApiResponseQueryEdgeGateway{},
 	}.Register()
 
 	// CreateEdgeGateway
@@ -111,7 +85,7 @@ func init() {
 		Name:             "CreateEdgeGateway",
 		Description:      "Create EdgeGateway",
 		Method:           cav.MethodPOST,
-		SubClient:        cav.ClientCerberus,
+		Backend:          cav.BackendInfrapi,
 		PathTemplate:     "/api/customers/v2.0/{vdc-type}/{vdc-name}/edges",
 		PathParams: []cav.PathParam{
 			{
@@ -137,9 +111,9 @@ func init() {
 				Required:    true,
 			},
 		},
-		QueryParams:      nil,
-		BodyRequestType:  itypes.ApiRequestEdgeGateway{},
-		BodyResponseType: cav.Job{},
+		QueryParams:     nil,
+		BodyRequestType: itypes.ApiRequestEdgeGateway{},
+		ResponseType:    cav.CerberusJobCreatedAPIResponse{},
 	}.Register()
 
 	// DeleteEdgeGateway
@@ -148,7 +122,7 @@ func init() {
 		Name:             "DeleteEdgeGateway",
 		Description:      "Delete EdgeGateway",
 		Method:           cav.MethodDELETE,
-		SubClient:        cav.ClientCerberus,
+		Backend:          cav.BackendInfrapi,
 		PathTemplate:     "/api/customers/v2.0/edges/{edgeId}",
 		PathParams: []cav.PathParam{
 			{
@@ -164,9 +138,9 @@ func init() {
 				},
 			},
 		},
-		QueryParams:      nil,
-		BodyRequestType:  nil,
-		BodyResponseType: cav.Job{},
+		QueryParams:     nil,
+		BodyRequestType: nil,
+		ResponseType:    cav.CerberusJobCreatedAPIResponse{},
 	}.Register()
 
 	// ListEdgeGateway
@@ -175,7 +149,7 @@ func init() {
 		Name:             "ListEdgeGateway",
 		Description:      "List EdgeGateways",
 		Method:           cav.MethodGET,
-		SubClient:        cav.ClientVmware,
+		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/edgeGateways",
 		PathParams:       nil,
 		QueryParams: []cav.QueryParam{
@@ -185,6 +159,6 @@ func init() {
 				Value:       "128",
 			},
 		},
-		BodyResponseType: itypes.ApiResponseEdgegateways{},
+		ResponseType: itypes.ApiResponseEdgegateways{},
 	}.Register()
 }

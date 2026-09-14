@@ -10,41 +10,47 @@
 package cav
 
 type (
-	// Job struct defines the job status.
+	// Job describes an asynchronous backend job.
 	Job struct {
-		// ID is the unique identifier of the job.
+		// ID is job identifier.
 		ID string
 
-		// Name is the name of the job.
+		// Name is job name.
 		Name string
 
-		// Description is a brief description of the job.
+		// Description summarizes job purpose or outcome.
 		Description string
 
-		// HREF is the URL to the job resource.
+		// HREF is job resource URL when backend exposes one.
 		HREF string
 
-		// Status is the current status of the job.
+		// Status is current job state.
 		Status JobStatus
 	}
 
-	JobStatus string // JobStatus represents the job status, e.g., "queued", "running", "success", "error", "aborted" etc.
+	// JobStatus represents backend job state.
+	JobStatus string
 )
 
 const (
-	JobQueued  JobStatus = "queued"  // Job is queued for execution.
-	JobRunning JobStatus = "running" // Job is currently running.
-	JobSuccess JobStatus = "success" // Job completed successfully.
-	JobError   JobStatus = "error"   // Job encountered an error during execution.
-	JobAborted JobStatus = "aborted" // Job was aborted by the user.
+	// JobQueued indicates job is waiting to run.
+	JobQueued JobStatus = "queued"
+	// JobRunning indicates job is in progress.
+	JobRunning JobStatus = "running"
+	// JobSuccess indicates job completed successfully.
+	JobSuccess JobStatus = "success"
+	// JobError indicates job completed with failure.
+	JobError JobStatus = "error"
+	// JobAborted indicates job was canceled.
+	JobAborted JobStatus = "aborted"
 )
 
-// IsTerminated checks if the job status is one of the terminal states (Success, Error, Aborted).
+// IsTerminated reports whether s is terminal.
 func (s JobStatus) IsTerminated() bool {
 	return s == JobSuccess || s == JobError || s == JobAborted
 }
 
-// String returns the string representation of the JobStatus.
+// String returns s as string.
 func (s JobStatus) String() string {
 	return string(s)
 }

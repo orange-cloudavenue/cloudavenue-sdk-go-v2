@@ -7,24 +7,16 @@
  * or see the "LICENSE" file for more details.
  */
 
-// Package consoles provides utilities for managing and retrieving information
-// about Cloud Avenue consoles, their locations, and associated services.
+// Package consoles provides CloudAvenue console metadata and lookup helpers.
 //
-// It defines types and constants representing the different consoles and their
-// locations, as well as the services available on each console. The package
-// includes functions to look up consoles by organization name, validate
-// organization names, and retrieve service endpoints and metadata.
+// Example:
 //
-// Example usage:
-//
-//	// Find the console for a given organization name
 //	console, ok := consoles.FindByOrganizationName("cav01ev01ocb1234567")
 //	if ok {
-//	    endpoint := console.GetAPIVCDEndpoint()
-//	    // Use the endpoint...
+//		endpoint := console.GetAPIVCDEndpoint()
+//		_ = endpoint
 //	}
 //
-// Thread safety:
-// All exported functions and methods are safe for concurrent use by multiple goroutines.
+// All exported functions and methods are safe for concurrent use.
 
 package consoles
