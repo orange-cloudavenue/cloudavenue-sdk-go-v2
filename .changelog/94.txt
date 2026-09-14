@@ -1,0 +1,3 @@
+```release-note:dependency
+deps: bumps github.com/quasilyte/go-ruleguard/dsl from 0.3.22 to 0.3.23
+```
