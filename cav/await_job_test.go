@@ -79,8 +79,19 @@ func TestAwaitJobOnBackendUnsupportedBackend(t *testing.T) {
 }
 
 func TestClassifyStatusCode(t *testing.T) {
+	require.ErrorIs(t, classifyStatusCode(400), pkgerrors.ErrBadRequest)
+	require.ErrorIs(t, classifyStatusCode(401), pkgerrors.ErrUnauthorized)
+	require.ErrorIs(t, classifyStatusCode(403), pkgerrors.ErrForbidden)
 	require.ErrorIs(t, classifyStatusCode(404), pkgerrors.ErrNotFound)
-	require.NoError(t, classifyStatusCode(500))
+	require.ErrorIs(t, classifyStatusCode(405), pkgerrors.ErrMethodNotAllowed)
+	require.ErrorIs(t, classifyStatusCode(408), pkgerrors.ErrRequestTimeout)
+	require.ErrorIs(t, classifyStatusCode(409), pkgerrors.ErrConflict)
+	require.ErrorIs(t, classifyStatusCode(429), pkgerrors.ErrTooManyRequests)
+	require.ErrorIs(t, classifyStatusCode(500), pkgerrors.ErrInternalServerError)
+	require.ErrorIs(t, classifyStatusCode(502), pkgerrors.ErrBadGateway)
+	require.ErrorIs(t, classifyStatusCode(503), pkgerrors.ErrServiceUnavailable)
+	require.ErrorIs(t, classifyStatusCode(504), pkgerrors.ErrGatewayTimeout)
+	require.NoError(t, classifyStatusCode(200))
 }
 
 type awaitJobTestClient struct {
