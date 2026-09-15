@@ -1,87 +1,134 @@
-
 # CloudAvenue SDK V2 Architecture
 
-This document provides a detailed overview of the project architecture, focusing on the main folders (from most to least important), and explains the design and role of Endpoints and Commands in `/api/`.
+## Overview
 
----
+The SDK follows a layered architecture where typed operations are expressed as Go methods on per-group clients, with two implementation strategies depending on complexity.
 
-## 1. Main Folders (Ordered by Importance)
+## Repository Layout
 
-### 1.1 `cav/`
+```
+cloudavenue-sdk-go-v2/
+├── cav/                    # Core SDK: Client, Endpoint registry, Operation[P,R], auth
+├── api/<group>/v1/         # Public API surface: Client + typed operations
+├── endpoints/zz_*.go       # Generated endpoint accessor wrappers
+├── internal/iendpoints/    # Endpoint definitions (init-registered, validated)
+├── internal/itypes/        # Internal request/response types (ApiRequest*, ApiResponse*)
+├── types/                  # Public models and params (Model*, Params*)
+├── pkg/                    # Shared utilities (consoles, errors)
+├── cmd/
+│   └── endpoint-generator/ # Generates endpoints/zz_*.go from internal/iendpoints/
+└── ruleguard/              # Custom lint rules enforcing naming conventions
+```
 
-**Core SDK logic.**
+## Layer Responsibilities
 
-- Main entry point for the SDK: manages authentication, configuration, and session lifecycle.
-- Hosts the main `Client` struct, which exposes sub-clients for each CloudAvenue service (e.g., VMware, Cerberus, Netbackup).
-- Handles endpoint discovery, service routing, and credential management.
-- Contains sub-client implementations and shared logic for all services.
+### `cav/` — Core Runtime
 
-### 1.2 `api/`
+- `Client` interface: entrypoint (`NewClient`), handles auth, session lifecycle, sub-client routing.
+- `Endpoint`: typed struct defining method, path, params, validators, body types, backend target.
+- `Endpoint` registry: global `init()` registration in `internal/iendpoints/`, accessed via `MustGetEndpoint(name)`.
+- `Operation[P,R]`: compile-time typed operation definition with `Validate`, `Transform`, `Extract`.
+- `Execute`: validates, transforms body, applies options, performs request, extracts typed result.
+- `Do` / `NewRequest`: lower-level request execution used by complex operations.
 
-**CloudAvenue API implementations.**
+### `internal/iendpoints/` — Endpoint Definitions
 
-- Organized by functional domain (e.g., `edgegateway/`, `vdc/`, `vdcgroup/`).
-- Each subdirectory exposes high-level methods for interacting with a specific API group.
-- Defines API types (requests, responses, models, params) and main `Client` for each group.
-- Implements endpoint logic and command registration for each resource.
+Each file declares endpoints via `init()` registration:
 
-### 1.3 `types/`
+```go
+func init() {
+    cav.Endpoint{
+        Name:             "GetEdgeGateway",
+        Description:      "Get EdgeGateway",
+        Method:           cav.MethodGET,
+        Backend:          cav.BackendVMware,
+        PathTemplate:     "/cloudapi/1.0.0/edgeGateways/{edgeId}",
+        PathParams:       []cav.PathParam{{Name: "edgeId", Required: true, ...}},
+        ResponseType:     itypes.ApiResponseEdgegateway{},
+    }.Register()
+}
+```
 
-**User-facing domain models and parameter types.**
+`endpoints/zz_*.go` are thin generated accessors (`GetEdgeGateway() *cav.Endpoint`) over these definitions.
 
-- Contains all exported types exposed to SDK users (e.g., `ModelEdgeGateway`, `ParamsEdgeGateway`).
-- Used for input/output in public SDK methods.
+### `api/<group>/v1/` — Public Operations
 
-### 1.4 `internal/`
+Each package exposes:
 
-**Internal helpers and implementation details.**
+- `client.go` — `Client` struct embedding `cav.Client`, constructor `New(cav.Client)`.
+- `<group>_commands.go` — all operations for the group.
 
-- Contains non-exported logic, utilities, and shared code not exposed to SDK users.
-- Includes `itypes/` for internal API types (e.g., `ApiResponseEdgeGateway`, `ApiRequestEdgeGateway`).
+Operations follow naming conventions (`Get`, `List`, `Create`, `Update`, `Delete`, `Enable`, `Disable`, `Add`, `Remove`).
 
-### 1.5 `cmd/`
+Two implementation patterns:
 
-**Command-line interface and generators.**
+**Typed delegation** (simple CRUD):
 
-- Hosts CLI tools, code generators, and developer utilities.
-- Used for development, testing, and automation.
+```go
+func (c *Client) GetEdgeGateway(ctx context.Context, params types.ParamsEdgeGateway) (*types.ModelEdgeGateway, error) {
+    ep := endpoints.GetEdgeGateway()
+    // validate, resolve, ...
+    resp, err := c.c.Do(ctx, ep, cav.WithPathParam(...))
+    return resp.Result().(*itypes.ApiResponseEdgegateway).ToModel(), nil
+}
+```
 
-### 1.6 `pkg/`
+**Direct orchestration** (complex multi-step):
 
-**Shared packages.**
+```go
+func (c *Client) CreateEdgeGateway(ctx context.Context, params types.ParamsCreateEdgeGateway) (*types.ModelEdgeGateway, error) {
+    // Parallel errgroup, custom body transforms, job extraction, etc.
+    _, err := c.c.Do(ctx, ep, cav.SetBody(reqBody), cav.WithJobExtractor(...))
+}
+```
 
-- Contains reusable libraries, helpers, and utilities used across the SDK.
+### `types/` and `internal/itypes/` — Type Split
 
-### 1.7 `ruleguard/`
+- `types/` — Public-facing `Params*` (input) and `Model*` (output). Safe to expose to SDK users.
+- `internal/itypes/` — Internal `ApiRequest*` and `ApiResponse*`. Match raw API payloads; converted to/from `types/` via `.ToModel()` / `.FromParams()`.
 
-**Custom lint rules.**
+### `cmd/` — Code Generation
 
-- Contains ruleguard scripts enforcing naming conventions and best practices.
+- `endpoint-generator` — reads `internal/iendpoints/*.go`, emits `endpoints/zz_*.go`.
 
----
+## Data Flow
 
-## 2. Endpoint and Commands in `/api/`
+```mermaid
+flowchart TD
+    A[User Code] --> B[API Client]
+    B --> C{Complexity?}
+    C -->|Simple CRUD| D[cav.Execute with Operation P,R]
+    C -->|Complex orchestration| E[c.c.Do directly]
+    D --> F[HTTP Request]
+    E --> F
+    F --> G[Response]
+    G --> H{Extract}
+    H -->|Execute| I[op.Extract to Model]
+    H -->|Do| J[resp.Result to Model]
+    I --> K[Return]
+    J --> K
+```
 
-### 2.1 Endpoint Design
+## Type Lifecycle
 
-- Each API group (e.g., `edgegateway`, `vdc`) defines endpoints as Go functions or methods that map to CloudAvenue REST API operations.
-- Endpoints are responsible for:
- 	- Building and sending HTTP requests.
- 	- Parsing and validating responses.
- 	- Mapping internal types (`ApiRequest*`, `ApiResponse*`) to user-facing models (`Model*`).
-- Endpoints are registered and managed by the main `Client` of each API group.
-- Endpoint logic is isolated per resource, making it easy to extend or maintain.
+```mermaid
+flowchart LR
+    A[Params Input] --> B[Operation Method]
+    B --> C{Valid?}
+    C -->|No| D[Error]
+    C -->|Yes| E[Build Request Options]
+    E --> F[c.c.Do]
+    F --> G[ApiResponse Internal]
+    G -->|ToModel| H[Model Output]
+    H --> I[Return]
+```
 
-### 2.2 Commands Design
+## Conventions
 
-- Commands represent high-level operations exposed to SDK users (e.g., `GetEdgeGateway`, `CreateVDC`).
-- Each command is implemented as a public method on the API group's `Client` struct.
-- Commands:
- 	- Accept user-supplied parameters (`Params*`).
- 	- Internally call the appropriate endpoint function.
- 	- Return user-facing models (`Model*`) or error.
-- Commands are documented and validated by custom linters to ensure naming and usage consistency.
+Naming conventions, lint rules, and coding standards are documented in [GUIDELINES.md](./GUIDELINES.md).
 
----
+## Design Decisions
 
-For more details, see the [CONTRIBUTING.md](./CONTRIBUTING.md) and [GUIDELINE.md](./GUIDELINE.md) files.
+- **Hybrid operation model**: `Operation[P,R]` + `cav.Execute` for simple, type-safe operations; `c.c.Do` for complex orchestration (parallel requests, custom transforms, job polling). `Operation[P,R]` provides `Validate`, `Transform`, and `Extract` hooks. Avoids forcing every method into a rigid generic container.
+- **Generated accessors, hand-written operations**: Endpoints are generated for discoverability; operations are hand-written because business logic (validation, resolution, orchestration) cannot be meaningfully generated.
+- **No command registry**: Removed `commands/` package dependency from `api/`. Runtime dispatch now stays in typed `api/` methods plus `cav.Execute`; `cmd/endpoint-generator` remains for endpoint accessor generation.
