@@ -24,13 +24,13 @@ type User struct {
 	Name            string    `xml:"name,attr"`
 	ID              string    `xml:"id,attr"`
 	Role            Reference `xml:"Role"`
-	Description     string    `xml:"Description,omitempty"`
+	Description     *string   `xml:"Description,omitempty"`
 	FullName        string    `xml:"FullName,omitempty"`
 	EmailAddress    string    `xml:"EmailAddress,omitempty"`
 	Telephone       string    `xml:"Telephone,omitempty"`
 	IsEnabled       bool      `xml:"IsEnabled,omitempty"`
-	DeployedVmQuota int       `xml:"DeployedVmQuota,omitempty"`
-	StoredVmQuota   int       `xml:"StoredVmQuota,omitempty"`
+	DeployedVmQuota *int      `xml:"DeployedVmQuota,omitempty"`
+	StoredVmQuota   *int      `xml:"StoredVmQuota,omitempty"`
 	Password        string    `xml:"Password,omitempty"`
 	ProviderType    string    `xml:"ProviderType,omitempty"`
 }
@@ -41,13 +41,13 @@ type UserRequest struct {
 	Name            string    `xml:"name,attr"`
 	ID              string    `xml:"id,attr"`
 	Role            Reference `xml:"Role"`
-	Description     string    `xml:"Description,omitempty"`
+	Description     *string   `xml:"Description,omitempty"`
 	FullName        string    `xml:"FullName,omitempty"`
 	EmailAddress    string    `xml:"EmailAddress,omitempty"`
 	Telephone       string    `xml:"Telephone,omitempty"`
 	IsEnabled       *bool     `xml:"IsEnabled,omitempty"`
-	DeployedVmQuota int       `xml:"DeployedVmQuota,omitempty"`
-	StoredVmQuota   int       `xml:"StoredVmQuota,omitempty"`
+	DeployedVmQuota *int      `xml:"DeployedVmQuota,omitempty"`
+	StoredVmQuota   *int      `xml:"StoredVmQuota,omitempty"`
 	Password        string    `xml:"Password,omitempty"`
 	ProviderType    string    `xml:"ProviderType,omitempty"`
 }
