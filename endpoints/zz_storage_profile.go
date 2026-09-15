@@ -15,7 +15,7 @@ import (
 
 // ListStorageProfile - List VDC Storage Profiles
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/queries/orgVdcStorageProfile.html
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/queries/orgVdcStorageProfile.html 
 func ListStorageProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListStorageProfile")
 }

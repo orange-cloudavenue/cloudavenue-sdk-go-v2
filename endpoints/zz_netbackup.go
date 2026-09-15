@@ -15,49 +15,43 @@ import (
 
 // GetNetbackupToken - Get NetBackup OAuth2 token using password grant
 //
-// DocumentationURL: https://backup.cloudavenue.orange-business.com/NetBackupSelfService/Api/auth/token
+// DocumentationURL: https://backup.cloudavenue.orange-business.com/NetBackupSelfService/Api/auth/token 
 func GetNetbackupToken() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetNetbackupToken")
 }
-
 // RefreshNetbackupToken - Refresh NetBackup OAuth2 token using refresh token grant
 //
-// DocumentationURL: https://backup.cloudavenue.orange-business.com/NetBackupSelfService/Api/auth/token
+// DocumentationURL: https://backup.cloudavenue.orange-business.com/NetBackupSelfService/Api/auth/token 
 func RefreshNetbackupToken() *cav.Endpoint {
 	return cav.MustGetEndpoint("RefreshNetbackupToken")
 }
-
 // ListNetbackupInventory - List NetBackup inventory
 //
-// DocumentationURL: https://backup.cloudavenue.orange-business.com/NetBackupSelfService/Api/inventory
+// DocumentationURL: https://backup.cloudavenue.orange-business.com/NetBackupSelfService/Api/inventory 
 func ListNetbackupInventory() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListNetbackupInventory")
 }
-
 // ListNetbackupMachines - List NetBackup machines
 //
-// DocumentationURL: https://backup.cloudavenue.orange-business.com/NetBackupSelfService/Api/machines
+// DocumentationURL: https://backup.cloudavenue.orange-business.com/NetBackupSelfService/Api/machines 
 func ListNetbackupMachines() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListNetbackupMachines")
 }
-
 // GetNetbackupProtectionLevel - Get NetBackup protection level by ID
 //
-// DocumentationURL: https://backup.cloudavenue.orange-business.com/NetBackupSelfService/Api/protection-levels/{id}
+// DocumentationURL: https://backup.cloudavenue.orange-business.com/NetBackupSelfService/Api/protection-levels/{id} 
 func GetNetbackupProtectionLevel() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetNetbackupProtectionLevel")
 }
-
 // ListNetbackupProtectionLevels - List NetBackup protection levels
 //
-// DocumentationURL: https://backup.cloudavenue.orange-business.com/NetBackupSelfService/Api/protection-levels
+// DocumentationURL: https://backup.cloudavenue.orange-business.com/NetBackupSelfService/Api/protection-levels 
 func ListNetbackupProtectionLevels() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListNetbackupProtectionLevels")
 }
-
 // ProtectNetbackupMachine - Protect a NetBackup machine
 //
-// DocumentationURL: https://backup.cloudavenue.orange-business.com/NetBackupSelfService/Api/machines/{id}/protect
+// DocumentationURL: https://backup.cloudavenue.orange-business.com/NetBackupSelfService/Api/machines/{id}/protect 
 func ProtectNetbackupMachine() *cav.Endpoint {
 	return cav.MustGetEndpoint("ProtectNetbackupMachine")
 }
