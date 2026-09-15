@@ -1,0 +1,47 @@
+```release-note:feature
+feat: add API domain packages and public types. Introduces typed API domain packages under api/ with versioned service groups (vdc, vdcgroup, vapp, edgegateway, network, organization) wrapping the core cav.Client. Adds user-facing model types under types/ and internal request/response type mappings under internal/itypes/.
+```
+
+```release-note:feature
+feat: add internal endpoint, type, and network object infrastructure. Adds internal endpoint definitions under internal/iendpoints/ for VMware vCD API operations. Introduces internal typed payload structures for network objects, IAM XML, and storage profiles. Adds typed endpoint constants, validators, and response types.
+```
+
+```release-note:breaking-change
+refactor(api): align all types and parameters to PascalCase. Renames across types/: VdcID→VDCID, VdcGroupName→VDCGroupName, VdcGroupID→VDCGroupID, VdcNetwork→VDCNetwork, Vapp→VAPP, VdcGroup→VDCGroup, Vdc→VDC, ModelVdcNetwork→ModelVDCNetwork, RunningVMCount→RunningVmCount, StorageLimitMB→StorageLimitMb, StorageUsedMB→StorageUsedMb, ContextEntityId→ContextEntityID, ApplicationPort→ApplicationPort, and similar across all resource types (EdgeGateway, Firewall, IPSet, SecurityGroup, NetworkContextProfile, AppPortProfile, DynamicSecurityGroup, Organization). Also renames endpoint operation constants, API method names, path/query param names, and generated endpoint types throughout api/, types/, internal/itypes/, internal/iendpoints/, endpoints/, and api/*/v1/.
+```
+
+```release-note:fix
+fix(cav): harden job polling. Replaces math/rand/v2 with crypto/rand (via math/big) in withJitter for cryptographically secure polling jitter. Adds awaitJobTestClient mock and TestAwaitJobPollsImmediately test verifying first poll fires immediately without delay.
+```
+
+```release-note:fix
+fix(api): preserve user updates and vApp jobs. UpdateUser now preserves existing quota values (DeployedVMQuota, StoredVMQuota) and other unchanged fields via mergeUpdateUserParams, preventing data loss on partial updates. Adds TestUpdateUserPreservesExistingFields. Adds TestIsVAppOrgNetwork and TestIsVAppNetwork for vApp URL identification.
+```
+
+```release-note:fix
+fix(cav): deduplicate job endpoint names. Job polling (cerberus, vmware subclients) now uses named endpoint constants (getJobCerberusEndpointName, getJobVMwareEndpointName) instead of inline string literals ("GetJobCerberus", "GetJobVmware").
+```
+
+```release-note:fix
+fix(edgegateway): guard missing bandwidth target. GetBandwidth now returns a descriptive 404 APIError when the referenced EdgeGateway/T0 is not found, instead of a nil pointer dereference.
+```
+
+```release-note:fix
+fix(vapp): align naming after restack. VApp test method names and endpoint references aligned to PascalCase (GetVApp, UpdateVApp) to match renamed API operations.
+```
+
+```release-note:fix
+fix(appportprofile): debug mode changed from bool to atomic.Bool for concurrency safety. App port profile and generated endpoint documentation URLs corrected (v39.1→39.1).
+```
+
+```release-note:chore
+chore: remove dead ruleguard/. Removes ruleguard directory (docs.go, rules_api.go, rules_commands.go) and suppresses tagliatelle false positives on JSON tags in netbackup.go and vdcnetwork.go that follow upstream API naming (snake_case/PascalCase) rather than Go style.
+```
+
+```release-note:feat
+feat: replace reflection-based command registry with typed delegation. Replaces the reflection-based command discovery system (cmd/devref, cmd/devtool, cmd/generator using AST/reflection) with fully typed command registry. Introduces APIError type hierarchy in pkg/errors with typed error classes (ErrBadRequest, ErrUnauthorized, ErrForbidden, ErrNotFound, etc.).
+```
+
+```release-note:chore
+chore: remove dead code and legacy tooling. Removes legacy command-line tooling: cmd/devref/old/, cmd/devtool/, cmd/generator/, and old devref binary code. Removes mock_header.txt and legacy command params. 41 files deleted, 6136 lines removed.
+```
