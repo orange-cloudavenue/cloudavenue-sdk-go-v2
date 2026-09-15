@@ -72,7 +72,7 @@ linters:
   settings:
     gosec:
       excludes:
-        - G115  # Potential integer overflow when converting between integer types
+        - G115 # Potential integer overflow when converting between integer types
     staticcheck:
       checks:
         - -QF1008
@@ -161,7 +161,7 @@ issues:
 formatters:
   enable:
     - gci
-    - gofmt
+    # - gofmt
     - gofumpt
   settings:
     gci:
