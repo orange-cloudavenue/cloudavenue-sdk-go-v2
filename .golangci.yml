@@ -151,6 +151,7 @@ linters:
       - third_party$
       - builtin$
       - examples$
+      - zz_.*\.go$
     rules:
       - linters:
           - goconst
@@ -191,3 +192,4 @@ formatters:
       - third_party$
       - builtin$
       - examples$
+      - zz_.*\.go$
