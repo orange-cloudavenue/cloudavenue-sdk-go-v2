@@ -151,11 +151,17 @@ func (c *client) NewRequestWithBackend(ctx context.Context, backend BackendTarge
 	ctxv = storeExtraDataInContext(ctxv, contextData)
 
 	var (
-		retryCount       = 5
-		retryWaitTime    = 5 * time.Second
+		// retryCount is the maximum number of retry attempts for failed requests.
+		retryCount = 5
+		// retryWaitTime is the initial backoff interval between retries.
+		retryWaitTime = 5 * time.Second
+		// retryMaxWaitTime caps the backoff interval to avoid excessively long waits.
 		retryMaxWaitTime = 60 * time.Second
-		retryConditions  = make([]resty.RetryConditionFunc, 0)
-		retryIdempotent  = false
+		// retryConditions holds custom retry predicate functions evaluated per response.
+		retryConditions = make([]resty.RetryConditionFunc, 0)
+		// retryIdempotent allows resty to retry non-idempotent methods (POST/PUT/DELETE)
+		// when a retry condition explicitly permits it.
+		retryIdempotent = false
 	)
 
 	switch endpoint.Method {
@@ -166,7 +172,6 @@ func (c *client) NewRequestWithBackend(ctx context.Context, backend BackendTarge
 				if busyEntityRetries >= retryCount {
 					return false
 				}
-
 				busyEntityRetries++
 
 				// Extend retries for BUSY_ENTITY responses, but keep a hard bound.

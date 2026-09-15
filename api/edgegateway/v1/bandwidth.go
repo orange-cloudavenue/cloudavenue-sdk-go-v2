@@ -11,7 +11,10 @@ package edgegateway
 
 import (
 	"context"
+	"fmt"
+	"net/http"
 
+	pkgerrors "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
@@ -32,6 +35,20 @@ func (c *Client) GetBandwidth(ctx context.Context, params types.ParamsEdgeGatewa
 		if eg.ID == params.ID || eg.Name == params.Name {
 			edgeGateway = &eg
 			break
+		}
+	}
+
+	if edgeGateway == nil {
+		return nil, &pkgerrors.APIError{
+			Operation:     "GetBandwidth",
+			StatusCode:    http.StatusNotFound,
+			StatusMessage: http.StatusText(http.StatusNotFound),
+			Message: func() string {
+				if params.ID != "" {
+					return fmt.Sprintf("edge gateway with ID %s not found in T0 %s", params.ID, t0.Name)
+				}
+				return fmt.Sprintf("edge gateway with name %s not found in T0 %s", params.Name, t0.Name)
+			}(),
 		}
 	}
 

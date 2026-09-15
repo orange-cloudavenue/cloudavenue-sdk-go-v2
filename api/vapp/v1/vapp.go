@@ -91,8 +91,8 @@ type createVAppParams struct {
 }
 
 type updateVAppByIDParams struct {
-	ID    string
-	Body  itypes.APIRequestUpdateVApp
+	ID   string
+	Body itypes.APIRequestUpdateVApp
 }
 
 type deleteVAppByIDParams struct {

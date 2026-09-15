@@ -132,9 +132,9 @@ func TestGetUser(t *testing.T) {
 			expectedErr:        true,
 		},
 		{
-			name: "Get User Missing ID and Name",
-			params: ParamsGetUser{},
-			expectedErr:        true,
+			name:        "Get User Missing ID and Name",
+			params:      ParamsGetUser{},
+			expectedErr: true,
 		},
 	}
 
@@ -194,8 +194,8 @@ func TestCreateLocalUser(t *testing.T) {
 				FullName:        "New User",
 				EmailAddress:    "newuser@example.com",
 				IsEnabled:       true,
-				DeployedVmQuota: 10,
-				StoredVmQuota:   10,
+				DeployedVmQuota: new(10),
+				StoredVmQuota:   new(10),
 			},
 			expectedErr: false,
 		},
@@ -376,10 +376,10 @@ func TestUpdateUser(t *testing.T) {
 				ms.CleanResponse(endpoints.UpdateUser())
 				ms.SetResponseFunc(endpoints.UpdateUser(), func(w http.ResponseWriter, r *http.Request) {
 					user := itypes.User{
-						Name:     "user1",
-						FullName: tt.params.FullName,
+						Name:      "user1",
+						FullName:  tt.params.FullName,
 						Telephone: tt.params.Telephone,
-						Role:     itypes.Reference{Name: "Organization Administrator"},
+						Role:      itypes.Reference{Name: "Organization Administrator"},
 					}
 					xmlResponse(w, user)
 				})
@@ -395,6 +395,59 @@ func TestUpdateUser(t *testing.T) {
 			assert.Equal(t, tt.params.FullName, result.FullName)
 		})
 	}
+}
+
+func TestUpdateUserPreservesExistingFields(t *testing.T) {
+	client, ms := newClient(t)
+
+	ms.CleanResponse(endpoints.GetUser())
+	ms.SetResponseFunc(endpoints.GetUser(), func(w http.ResponseWriter, r *http.Request) {
+		xmlResponse(w, itypes.User{
+			Name:            "user1",
+			FullName:        "Current Name",
+			EmailAddress:    "user1@example.com",
+			Telephone:       "0000",
+			Description:     new("current description"),
+			IsEnabled:       true,
+			DeployedVmQuota: new(4),
+			StoredVmQuota:   new(7),
+			Role:            itypes.Reference{Name: "Organization Administrator"},
+		})
+	})
+
+	ms.CleanResponse(endpoints.UpdateUser())
+	ms.SetResponseFunc(endpoints.UpdateUser(), func(w http.ResponseWriter, r *http.Request) {
+		var body itypes.UserRequest
+		assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
+		assert.Equal(t, "Current Name", body.FullName)
+		assert.Equal(t, "1234567890", body.Telephone)
+		assert.Equal(t, "user1@example.com", body.EmailAddress)
+		if assert.NotNil(t, body.IsEnabled) {
+			assert.True(t, *body.IsEnabled)
+		}
+		assert.Equal(t, 4, body.DeployedVmQuota)
+		assert.Equal(t, 7, body.StoredVmQuota)
+		xmlResponse(w, itypes.User{
+			Name:            body.Name,
+			FullName:        body.FullName,
+			EmailAddress:    body.EmailAddress,
+			Telephone:       body.Telephone,
+			Description:     body.Description,
+			IsEnabled:       body.IsEnabled != nil && *body.IsEnabled,
+			DeployedVmQuota: body.DeployedVmQuota,
+			StoredVmQuota:   body.StoredVmQuota,
+			Role:            body.Role,
+		})
+	})
+
+	result, err := client.UpdateUser(t.Context(), ParamsUpdateUser{
+		ID:        generator.MustGenerate("{urn:user}"),
+		Telephone: "1234567890",
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, "1234567890", result.Telephone)
+	assert.True(t, result.IsEnabled)
 }
 
 func TestUpdateUserCanDisableViaXMLPayload(t *testing.T) {
@@ -527,9 +580,9 @@ func TestEnableUser(t *testing.T) {
 				ms.CleanResponse(endpoints.EnableUser())
 				ms.SetResponseFunc(endpoints.EnableUser(), func(w http.ResponseWriter, r *http.Request) {
 					user := itypes.User{
-						Name:     "user1",
+						Name:      "user1",
 						IsEnabled: true,
-						Role:     itypes.Reference{Name: "Organization Administrator"},
+						Role:      itypes.Reference{Name: "Organization Administrator"},
 					}
 					xmlResponse(w, user)
 				})
@@ -587,9 +640,9 @@ func TestDisableUser(t *testing.T) {
 				ms.CleanResponse(endpoints.DisableUser())
 				ms.SetResponseFunc(endpoints.DisableUser(), func(w http.ResponseWriter, r *http.Request) {
 					user := itypes.User{
-						Name:     "user1",
+						Name:      "user1",
 						IsEnabled: false,
-						Role:     itypes.Reference{Name: "Organization Administrator"},
+						Role:      itypes.Reference{Name: "Organization Administrator"},
 					}
 					xmlResponse(w, user)
 				})
@@ -647,9 +700,9 @@ func TestUnlockUser(t *testing.T) {
 				ms.CleanResponse(endpoints.UnlockUser())
 				ms.SetResponseFunc(endpoints.UnlockUser(), func(w http.ResponseWriter, r *http.Request) {
 					user := itypes.User{
-						Name:     "user1",
+						Name:      "user1",
 						IsEnabled: true,
-						Role:     itypes.Reference{Name: "Organization Administrator"},
+						Role:      itypes.Reference{Name: "Organization Administrator"},
 					}
 					xmlResponse(w, user)
 				})

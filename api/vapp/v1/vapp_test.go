@@ -46,8 +46,8 @@ func TestListVApp(t *testing.T) {
 			expectedErr:        false,
 		},
 		{
-			name:       "List VApps with empty VDC ID",
-			vdcID:      "",
+			name:        "List VApps with empty VDC ID",
+			vdcID:       "",
 			expectedErr: true,
 		},
 		{
@@ -119,7 +119,7 @@ func TestGetVApp(t *testing.T) {
 				},
 			},
 			mockListResponseStatus: 200,
-			expectedErr:             false,
+			expectedErr:            false,
 		},
 		{
 			name: "Error 401 Unauthorized",
@@ -201,7 +201,7 @@ func TestCreateVApp(t *testing.T) {
 				},
 			},
 			mockListResponseStatus: 200,
-			expectedErr:             false,
+			expectedErr:            false,
 		},
 		{
 			name: "Create VApp with missing required parameters",
@@ -414,6 +414,18 @@ func TestDeleteVApp(t *testing.T) {
 			assert.Nil(t, err, "Unexpected error: %v", err)
 		})
 	}
+}
+
+func TestIsVAppOrgNetwork(t *testing.T) {
+	assert.True(t, IsVAppOrgNetwork("https://example.com/api/network/1234"))
+	assert.True(t, IsVAppOrgNetwork("/api/network/1234"))
+	assert.False(t, IsVAppOrgNetwork("https://example.com/api/vAppNetwork/vappNetwork-1234"))
+}
+
+func TestIsVAppNetwork(t *testing.T) {
+	assert.True(t, IsVAppNetwork("https://example.com/api/vAppNetwork/vappNetwork-1234"))
+	assert.True(t, IsVAppNetwork("/api/vAppNetwork/vappNetwork-1234"))
+	assert.False(t, IsVAppNetwork("https://example.com/api/network/1234"))
 }
 
 func Test_NewClient_ClientNil(t *testing.T) {

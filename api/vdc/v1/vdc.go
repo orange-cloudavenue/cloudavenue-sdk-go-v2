@@ -30,6 +30,45 @@ const (
 	opDeleteVDC = "VDC.Delete"
 )
 
+const (
+	ServiceClassECO              = "ECO"
+	ServiceClassSTD              = "STD"
+	ServiceClassHP               = "HP"
+	ServiceClassVOIP             = "VOIP"
+	DisponibilityClassOneRoom    = "ONE-ROOM"
+	DisponibilityClassDualRoom   = "DUAL-ROOM"
+	DisponibilityClassHADualRoom = "HA-DUAL-ROOM"
+)
+
+const (
+	BillingModelPAYG            = "PAYG"
+	BillingModelDRAAS           = "DRAAS"
+	BillingModelReserved        = "RESERVED"
+	StorageBillingModelPAYG     = "PAYG"
+	StorageBillingModelReserved = "RESERVED"
+)
+
+const (
+	vCPUMinPAYG      = 5
+	vCPUMaxPAYG      = 200
+	vCPUMinReserved  = 2
+	vCPUMaxReserved  = 1136
+	vCPUInMhzVOIP    = 3000
+	vCPUInMhzDefault = 2200
+)
+
+var (
+	validServiceClasses       = []string{ServiceClassECO, ServiceClassSTD, ServiceClassHP, ServiceClassVOIP}
+	validDisponibilityClasses = []string{DisponibilityClassOneRoom, DisponibilityClassDualRoom, DisponibilityClassHADualRoom}
+	validStorageBillingModels = []string{StorageBillingModelPAYG, StorageBillingModelReserved}
+	allowedBillingModels      = map[string][]string{
+		ServiceClassECO:  {BillingModelPAYG, BillingModelDRAAS, BillingModelReserved},
+		ServiceClassSTD:  {BillingModelPAYG, BillingModelDRAAS, BillingModelReserved},
+		ServiceClassHP:   {BillingModelPAYG, BillingModelReserved},
+		ServiceClassVOIP: {BillingModelReserved},
+	}
+)
+
 // ListVDC lists VDCs visible to current organization.
 func (c *Client) ListVDC(ctx context.Context, params types.ParamsListVDC) (*types.ModelListVDC, error) {
 	ep := endpoints.ListVdc()
@@ -56,7 +95,7 @@ func (c *Client) ListVDC(ctx context.Context, params types.ParamsListVDC) (*type
 
 // GetVDC returns detailed information for a VDC by ID or name.
 func (c *Client) GetVDC(ctx context.Context, params types.ParamsGetVDC) (*types.ModelGetVDC, error) {
-	results, err := c.ListVDC(ctx, types.ParamsListVDC{ID: params.ID, Name: params.Name})
+	results, err := c.ListVDC(ctx, types.ParamsListVDC(params))
 	if err != nil {
 		return nil, fmt.Errorf("%s: list: %w", opGetVDC, err)
 	}
@@ -278,23 +317,17 @@ func validateUpdateVDCParams(params types.ParamsUpdateVDC) error {
 }
 
 func validateVDCBusinessRules(serviceClass, disponibilityClass, billingModel, storageBillingModel string, vcpu int) error {
-	if !slices.Contains([]string{"ECO", "STD", "HP", "VOIP"}, serviceClass) {
+	if !slices.Contains(validServiceClasses, serviceClass) {
 		return fmt.Errorf("invalid service class %q", serviceClass)
 	}
-	if !slices.Contains([]string{"ONE-ROOM", "DUAL-ROOM", "HA-DUAL-ROOM"}, disponibilityClass) {
+	if !slices.Contains(validDisponibilityClasses, disponibilityClass) {
 		return fmt.Errorf("invalid disponibility class %q", disponibilityClass)
 	}
 
-	allowedBillingModels := map[string][]string{
-		"ECO":  {"PAYG", "DRAAS", "RESERVED"},
-		"STD":  {"PAYG", "DRAAS", "RESERVED"},
-		"HP":   {"PAYG", "RESERVED"},
-		"VOIP": {"RESERVED"},
-	}
 	if !slices.Contains(allowedBillingModels[serviceClass], billingModel) {
 		return fmt.Errorf("billing model %q is not allowed for service class %q", billingModel, serviceClass)
 	}
-	if !slices.Contains([]string{"PAYG", "RESERVED"}, storageBillingModel) {
+	if !slices.Contains(validStorageBillingModels, storageBillingModel) {
 		return fmt.Errorf("invalid storage billing model %q", storageBillingModel)
 	}
 
@@ -303,13 +336,13 @@ func validateVDCBusinessRules(serviceClass, disponibilityClass, billingModel, st
 
 func validateVCPUForBillingModel(billingModel string, vcpu int) error {
 	switch billingModel {
-	case "PAYG", "DRAAS":
-		if vcpu < 5 || vcpu > 200 {
-			return fmt.Errorf("vcpu must be between 5 and 200 for billing model %q", billingModel)
+	case BillingModelPAYG, BillingModelDRAAS:
+		if vcpu < vCPUMinPAYG || vcpu > vCPUMaxPAYG {
+			return fmt.Errorf("vcpu must be between %d and %d for billing model %q", vCPUMinPAYG, vCPUMaxPAYG, billingModel)
 		}
-	case "RESERVED":
-		if vcpu < 2 || vcpu > 1136 {
-			return fmt.Errorf("vcpu must be between 2 and 1136 for billing model %q", billingModel)
+	case BillingModelReserved:
+		if vcpu < vCPUMinReserved || vcpu > vCPUMaxReserved {
+			return fmt.Errorf("vcpu must be between %d and %d for billing model %q", vCPUMinReserved, vCPUMaxReserved, billingModel)
 		}
 	default:
 		return fmt.Errorf("invalid billing model %q", billingModel)
@@ -320,9 +353,9 @@ func validateVCPUForBillingModel(billingModel string, vcpu int) error {
 
 func serviceClassToCPUInMhz(serviceClass string) int {
 	switch serviceClass {
-	case "VOIP":
-		return 3000
+	case ServiceClassVOIP:
+		return vCPUInMhzVOIP
 	default:
-		return 2200
+		return vCPUInMhzDefault
 	}
 }
