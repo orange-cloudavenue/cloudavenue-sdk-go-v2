@@ -80,7 +80,7 @@ func (v *cerberus) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts
 		return job, err
 	}
 
-	ep, err := GetEndpoint("GetJobCerberus")
+	ep, err := GetEndpoint(getJobCerberusEndpointName)
 	if err != nil {
 		return nil, errors.New("failed to get endpoint for JobCerberus: " + err.Error())
 	}

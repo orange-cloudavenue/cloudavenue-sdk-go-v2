@@ -35,25 +35,25 @@ func TestCreateDynamicSecurityGroup(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.CreateFirewallGroup())
-	ms.SetResponse(endpoints.CreateFirewallGroup(), &itypes.ApiResponseFirewallGroup{ID: createdID}, nil)
+	ms.SetResponse(endpoints.CreateFirewallGroup(), &itypes.APIResponseFirewallGroup{ID: createdID}, nil)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
-		Values: []itypes.ApiResponseListVdcGroupDetails{{
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.SetResponse(endpoints.ListVDCGroup(), &itypes.APIResponseListVDCGroup{
+		Values: []itypes.APIResponseListVDCGroupDetails{{
 			ID:   vdcGroupID,
 			Name: vdcGroupName,
 		}},
 	}, nil)
 
 	ms.CleanResponse(endpoints.GetFirewallGroup())
-	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.ApiResponseFirewallGroup{
+	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.APIResponseFirewallGroup{
 		ID:          createdID,
 		Name:        "dsg-1",
 		Description: "desc",
 		TypeValue:   itypes.FirewallGroupTypeVMCriteria,
-		OwnerRef:    &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
-		VMCriteria: []itypes.ApiFirewallGroupVMCriteria{{
-			VMCriteriaRule: []itypes.ApiFirewallGroupVMCriteriaRule{{
+		OwnerRef:    &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		VMCriteria: []itypes.APIFirewallGroupVMCriteria{{
+			VMCriteriaRule: []itypes.APIFirewallGroupVMCriteriaRule{{
 				AttributeType:  types.DynamicSecurityGroupCriteriaRuleTypeVMTag,
 				Operator:       types.DynamicSecurityGroupCriteriaRuleOperatorEquals,
 				AttributeValue: "web",
@@ -64,7 +64,7 @@ func TestCreateDynamicSecurityGroup(t *testing.T) {
 	resp, err := client.CreateDynamicSecurityGroup(t.Context(), types.ParamsCreateDynamicSecurityGroup{
 		Name:         "dsg-1",
 		Description:  "desc",
-		VdcGroupName: vdcGroupName,
+		VDCGroupName: vdcGroupName,
 		Criteria:     criteria,
 	})
 
@@ -80,7 +80,7 @@ func TestCreateDynamicSecurityGroup(t *testing.T) {
 	assert.Equal(t, "web", resp.Criteria[0].Rules[0].Value)
 
 	ms.CleanResponse(endpoints.CreateFirewallGroup())
-	ms.CleanResponse(endpoints.ListVdcGroup())
+	ms.CleanResponse(endpoints.ListVDCGroup())
 	ms.CleanResponse(endpoints.GetFirewallGroup())
 }
 
@@ -91,20 +91,20 @@ func TestListDynamicSecurityGroup(t *testing.T) {
 
 	client, ms := newClient(t)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
-		Values: []itypes.ApiResponseListVdcGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.SetResponse(endpoints.ListVDCGroup(), &itypes.APIResponseListVDCGroup{
+		Values: []itypes.APIResponseListVDCGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
 	}, nil)
 
 	ms.CleanResponse(endpoints.ListFirewallGroup())
-	ms.SetResponse(endpoints.ListFirewallGroup(), &itypes.ApiResponseListFirewallGroup{
-		Values: []itypes.ApiResponseFirewallGroup{{
+	ms.SetResponse(endpoints.ListFirewallGroup(), &itypes.APIResponseListFirewallGroup{
+		Values: []itypes.APIResponseFirewallGroup{{
 			ID:        groupID,
 			Name:      "dsg-1",
 			TypeValue: itypes.FirewallGroupTypeVMCriteria,
-			OwnerRef:  &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
-			VMCriteria: []itypes.ApiFirewallGroupVMCriteria{{
-				VMCriteriaRule: []itypes.ApiFirewallGroupVMCriteriaRule{{
+			OwnerRef:  &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+			VMCriteria: []itypes.APIFirewallGroupVMCriteria{{
+				VMCriteriaRule: []itypes.APIFirewallGroupVMCriteriaRule{{
 					AttributeType:  types.DynamicSecurityGroupCriteriaRuleTypeVMTag,
 					Operator:       types.DynamicSecurityGroupCriteriaRuleOperatorEquals,
 					AttributeValue: "web",
@@ -113,7 +113,7 @@ func TestListDynamicSecurityGroup(t *testing.T) {
 		}},
 	}, nil)
 
-	resp, err := client.ListDynamicSecurityGroup(t.Context(), types.ParamsListDynamicSecurityGroup{VdcGroupName: vdcGroupName})
+	resp, err := client.ListDynamicSecurityGroup(t.Context(), types.ParamsListDynamicSecurityGroup{VDCGroupName: vdcGroupName})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
@@ -122,7 +122,7 @@ func TestListDynamicSecurityGroup(t *testing.T) {
 	assert.Len(t, resp.FirewallGroups[0].Criteria, 1)
 
 	ms.CleanResponse(endpoints.ListFirewallGroup())
-	ms.CleanResponse(endpoints.ListVdcGroup())
+	ms.CleanResponse(endpoints.ListVDCGroup())
 }
 
 func TestGetDynamicSecurityGroup(t *testing.T) {
@@ -131,12 +131,12 @@ func TestGetDynamicSecurityGroup(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetFirewallGroup())
-	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.ApiResponseFirewallGroup{
+	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.APIResponseFirewallGroup{
 		ID:        groupID,
 		Name:      "dsg-1",
 		TypeValue: itypes.FirewallGroupTypeVMCriteria,
-		VMCriteria: []itypes.ApiFirewallGroupVMCriteria{{
-			VMCriteriaRule: []itypes.ApiFirewallGroupVMCriteriaRule{{
+		VMCriteria: []itypes.APIFirewallGroupVMCriteria{{
+			VMCriteriaRule: []itypes.APIFirewallGroupVMCriteriaRule{{
 				AttributeType:  types.DynamicSecurityGroupCriteriaRuleTypeVMName,
 				Operator:       types.DynamicSecurityGroupCriteriaRuleOperatorContains,
 				AttributeValue: "web",

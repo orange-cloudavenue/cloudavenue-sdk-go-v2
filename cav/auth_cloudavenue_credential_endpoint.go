@@ -18,7 +18,7 @@ import (
 
 func init() {
 	Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/sessions/post/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/sessions/post/",
 		Name:             "SessionVmware",
 		Description:      "Create a new VMware session",
 		Method:           MethodPOST,

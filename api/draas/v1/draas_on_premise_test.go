@@ -49,15 +49,15 @@ func TestListDraasOnPremiseIP(t *testing.T) {
 			client, ms := newClient(t)
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
-				ms.CleanResponse(endpoints.ListDraasOnPremiseIp())
+				ms.CleanResponse(endpoints.ListDraasOnPremiseIP())
 				if tt.mockResponseStatus != 0 {
-					ms.SetResponse(endpoints.ListDraasOnPremiseIp(), tt.mockResponse, &tt.mockResponseStatus)
+					ms.SetResponse(endpoints.ListDraasOnPremiseIP(), tt.mockResponse, &tt.mockResponseStatus)
 				} else {
-					ms.SetResponse(endpoints.ListDraasOnPremiseIp(), tt.mockResponse, nil)
+					ms.SetResponse(endpoints.ListDraasOnPremiseIP(), tt.mockResponse, nil)
 				}
 			}
 
-			resp, err := client.ListOnPremiseIp(t.Context())
+			resp, err := client.ListOnPremiseIP(t.Context())
 			if tt.expectedErr {
 				assert.Error(t, err)
 				return
@@ -113,11 +113,11 @@ func TestAddDraasOnPremiseIP(t *testing.T) {
 			client, ms := newClient(t)
 
 			if tt.mockResponseStatus != 0 {
-				ms.CleanResponse(endpoints.AddDraasOnPremiseIp())
-				ms.SetResponse(endpoints.AddDraasOnPremiseIp(), tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.AddDraasOnPremiseIP())
+				ms.SetResponse(endpoints.AddDraasOnPremiseIP(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
-			err := client.AddOnPremiseIp(t.Context(), tt.params)
+			err := client.AddOnPremiseIP(t.Context(), tt.params)
 			if tt.expectedErr {
 				assert.Error(t, err)
 				return
@@ -168,11 +168,11 @@ func TestRemoveDraasOnPremiseIP(t *testing.T) {
 			client, ms := newClient(t)
 
 			if tt.mockResponseStatus != 0 {
-				ms.CleanResponse(endpoints.RemoveDraasOnPremiseIp())
-				ms.SetResponse(endpoints.RemoveDraasOnPremiseIp(), tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(endpoints.RemoveDraasOnPremiseIP())
+				ms.SetResponse(endpoints.RemoveDraasOnPremiseIP(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
-			err := client.RemoveOnPremiseIp(t.Context(), tt.params)
+			err := client.RemoveOnPremiseIP(t.Context(), tt.params)
 			if tt.expectedErr {
 				assert.Error(t, err)
 				return

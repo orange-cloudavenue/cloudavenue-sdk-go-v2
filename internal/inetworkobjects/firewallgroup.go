@@ -20,9 +20,9 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
-type FindFirewallGroupFunc func(ctx context.Context, idOrName, typeValue string) (*itypes.ApiResponseFirewallGroup, error)
+type FindFirewallGroupFunc func(ctx context.Context, idOrName, typeValue string) (*itypes.APIResponseFirewallGroup, error)
 
-func ListFirewallGroupsByType(ctx context.Context, c cav.Client, vdcGroupID, vdcGroupName, typeValue string, resolve ResolveVdcGroupFunc) (*types.ModelListFirewallGroup, error) {
+func ListFirewallGroupsByType(ctx context.Context, c cav.Client, vdcGroupID, vdcGroupName, typeValue string, resolve ResolveVDCGroupFunc) (*types.ModelListFirewallGroup, error) {
 	if vdcGroupID == "" {
 		ref, err := resolve(ctx, "", vdcGroupName)
 		if err != nil {
@@ -41,7 +41,7 @@ func ListFirewallGroupsByType(ctx context.Context, c cav.Client, vdcGroupID, vdc
 		return nil, err
 	}
 
-	return resp.Result().(*itypes.ApiResponseListFirewallGroup).ToModel(), nil
+	return resp.Result().(*itypes.APIResponseListFirewallGroup).ToModel(), nil
 }
 
 func GetFirewallGroupModel(ctx context.Context, id, name, typeValue string, find FindFirewallGroupFunc) (*types.ModelGetFirewallGroup, error) {
@@ -59,7 +59,7 @@ func GetFirewallGroupModel(ctx context.Context, id, name, typeValue string, find
 	return &model, nil
 }
 
-func ResolveFirewallGroupTarget(ctx context.Context, idOrName, typeValue string, find FindFirewallGroupFunc) (*itypes.ApiResponseFirewallGroup, error) {
+func ResolveFirewallGroupTarget(ctx context.Context, idOrName, typeValue string, find FindFirewallGroupFunc) (*itypes.APIResponseFirewallGroup, error) {
 	if idOrName == "" {
 		return nil, &pkgerrors.APIError{Operation: "ResolveFirewallGroup", StatusCode: 400, Message: "id or name is required"}
 	}
@@ -67,7 +67,7 @@ func ResolveFirewallGroupTarget(ctx context.Context, idOrName, typeValue string,
 	return find(ctx, idOrName, typeValue)
 }
 
-func PutFirewallGroup(ctx context.Context, c cav.Client, body itypes.ApiRequestFirewallGroup) error {
+func PutFirewallGroup(ctx context.Context, c cav.Client, body itypes.APIRequestFirewallGroup) error {
 	ep := endpoints.UpdateFirewallGroup()
 	_, err := c.Do(
 		ctx,

@@ -42,7 +42,7 @@ func edgeGatewayNetworkContextProfileFilterKey(ownerID string) (string, error) {
 	return "", fmt.Errorf("edge gateway owner must be a vdc or vdc group")
 }
 
-func resolveEdgeGatewayNetworkContextProfileContext(ctx context.Context, c *Client, edgeGatewayID, edgeGatewayName string) (*itypes.ApiObjectReference, string, string, error) {
+func resolveEdgeGatewayNetworkContextProfileContext(ctx context.Context, c *Client, edgeGatewayID, edgeGatewayName string) (*itypes.APIObjectReference, string, string, error) {
 	ep := endpoints.GetEdgeGateway()
 	identifier := edgeGatewayID
 	if identifier == "" {
@@ -54,7 +54,7 @@ func resolveEdgeGatewayNetworkContextProfileContext(ctx context.Context, c *Clie
 		return nil, "", "", err
 	}
 
-	edgeGateway := resp.Result().(*itypes.ApiResponseEdgegateway)
+	edgeGateway := resp.Result().(*itypes.APIResponseEdgegateway)
 	if edgeGateway.OwnerRef == nil {
 		return nil, "", "", fmt.Errorf("edge gateway owner is missing")
 	}
@@ -65,10 +65,10 @@ func resolveEdgeGatewayNetworkContextProfileContext(ctx context.Context, c *Clie
 	}
 
 	cd := cav.GetExtraDataFromContext(resp.Request.Context())
-	return &itypes.ApiObjectReference{ID: edgeGateway.OwnerRef.ID, Name: edgeGateway.OwnerRef.Name}, cd.OrganizationID, filterKey, nil
+	return &itypes.APIObjectReference{ID: edgeGateway.OwnerRef.ID, Name: edgeGateway.OwnerRef.Name}, cd.OrganizationID, filterKey, nil
 }
 
-func findEdgeGatewayNetworkContextProfile(ctx context.Context, c *Client, id, name, edgeGatewayID, edgeGatewayName string) (*itypes.ApiResponseNetworkContextProfile, error) {
+func findEdgeGatewayNetworkContextProfile(ctx context.Context, c *Client, id, name, edgeGatewayID, edgeGatewayName string) (*itypes.APIResponseNetworkContextProfile, error) {
 	if id != "" {
 		ep := endpoints.GetNetworkContextProfile()
 		resp, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], id))
@@ -76,7 +76,7 @@ func findEdgeGatewayNetworkContextProfile(ctx context.Context, c *Client, id, na
 			return nil, err
 		}
 
-		return resp.Result().(*itypes.ApiResponseNetworkContextProfile), nil
+		return resp.Result().(*itypes.APIResponseNetworkContextProfile), nil
 	}
 
 	ownerRef, _, filterKey, err := resolveEdgeGatewayNetworkContextProfileContext(ctx, c, edgeGatewayID, edgeGatewayName)
@@ -94,8 +94,8 @@ func findEdgeGatewayNetworkContextProfile(ctx context.Context, c *Client, id, na
 		return nil, err
 	}
 
-	list := resp.Result().(*itypes.ApiResponseListNetworkContextProfile)
-	var found []itypes.ApiResponseNetworkContextProfile
+	list := resp.Result().(*itypes.APIResponseListNetworkContextProfile)
+	var found []itypes.APIResponseNetworkContextProfile
 	for _, profile := range list.Values {
 		if profile.Name == name {
 			found = append(found, profile)
@@ -112,16 +112,16 @@ func findEdgeGatewayNetworkContextProfile(ctx context.Context, c *Client, id, na
 	return &found[0], nil
 }
 
-func toApiEdgeGatewayNetworkContextProfileAttributes(attrs []types.ParamsNetworkContextProfileAttribute) []itypes.ApiNetworkContextProfileAttribute {
-	out := make([]itypes.ApiNetworkContextProfileAttribute, 0, len(attrs))
+func toAPIEdgeGatewayNetworkContextProfileAttributes(attrs []types.ParamsNetworkContextProfileAttribute) []itypes.APINetworkContextProfileAttribute {
+	out := make([]itypes.APINetworkContextProfileAttribute, 0, len(attrs))
 	for _, attr := range attrs {
-		apiAttr := itypes.ApiNetworkContextProfileAttribute{
+		apiAttr := itypes.APINetworkContextProfileAttribute{
 			Type:   attr.Type,
 			Values: attr.Values,
 		}
 
 		for _, sub := range attr.SubAttributes {
-			apiAttr.SubAttributes = append(apiAttr.SubAttributes, itypes.ApiNetworkContextProfileSubAttribute{
+			apiAttr.SubAttributes = append(apiAttr.SubAttributes, itypes.APINetworkContextProfileSubAttribute{
 				Type:   sub.Type,
 				Values: sub.Values,
 			})
@@ -133,19 +133,19 @@ func toApiEdgeGatewayNetworkContextProfileAttributes(attrs []types.ParamsNetwork
 	return out
 }
 
-func createEdgeGatewayNetworkContextProfileBody(ctx context.Context, c *Client, params types.ParamsCreateEdgeGatewayNetworkContextProfile) (itypes.ApiRequestNetworkContextProfile, string, string, error) {
+func createEdgeGatewayNetworkContextProfileBody(ctx context.Context, c *Client, params types.ParamsCreateEdgeGatewayNetworkContextProfile) (itypes.APIRequestNetworkContextProfile, string, string, error) {
 	ownerRef, orgID, filterKey, err := resolveEdgeGatewayNetworkContextProfileContext(ctx, c, params.EdgeGatewayID, params.EdgeGatewayName)
 	if err != nil {
-		return itypes.ApiRequestNetworkContextProfile{}, "", "", err
+		return itypes.APIRequestNetworkContextProfile{}, "", "", err
 	}
 
-	return itypes.ApiRequestNetworkContextProfile{
+	return itypes.APIRequestNetworkContextProfile{
 		Name:            params.Name,
 		Description:     params.Description,
 		Scope:           types.NetworkContextProfileScopeTenant,
-		ContextEntityId: ownerRef.ID,
-		OrgRef:          &itypes.ApiObjectReference{ID: orgID},
-		Attributes:      toApiEdgeGatewayNetworkContextProfileAttributes(params.Attributes),
+		ContextEntityID: ownerRef.ID,
+		OrgRef:          &itypes.APIObjectReference{ID: orgID},
+		Attributes:      toAPIEdgeGatewayNetworkContextProfileAttributes(params.Attributes),
 	}, ownerRef.ID, filterKey, nil
 }
 
@@ -166,7 +166,7 @@ func (c *Client) ListNetworkContextProfile(ctx context.Context, params types.Par
 		return nil, fmt.Errorf("%s: list: %w", opListEdgeGatewayNetworkContextProfile, err)
 	}
 
-	return resp.Result().(*itypes.ApiResponseListNetworkContextProfile).ToModel(), nil
+	return resp.Result().(*itypes.APIResponseListNetworkContextProfile).ToModel(), nil
 }
 
 // GetNetworkContextProfile returns a network context profile by ID or name for an edge gateway owner.
@@ -222,15 +222,15 @@ func (c *Client) UpdateNetworkContextProfile(ctx context.Context, params types.P
 
 	attributes := current.Attributes
 	if len(params.Attributes) != 0 {
-		attributes = toApiEdgeGatewayNetworkContextProfileAttributes(params.Attributes)
+		attributes = toAPIEdgeGatewayNetworkContextProfileAttributes(params.Attributes)
 	}
 
-	body := itypes.ApiRequestNetworkContextProfile{
+	body := itypes.APIRequestNetworkContextProfile{
 		ID:              current.ID,
 		Name:            current.Name,
 		Description:     description,
 		Scope:           current.Scope,
-		ContextEntityId: current.ContextEntityId,
+		ContextEntityID: current.ContextEntityID,
 		OrgRef:          current.OrgRef,
 		Attributes:      attributes,
 	}
@@ -286,7 +286,7 @@ func (c *Client) GetNetworkContextProfileAttributes(ctx context.Context, params 
 	}
 
 	catalog := &types.ModelGetNetworkContextProfileAttributesCatalog{}
-	for _, attr := range resp.Result().(*itypes.ApiNetworkContextProfileAttributesResponse).Attributes {
+	for _, attr := range resp.Result().(*itypes.APINetworkContextProfileAttributesResponse).Attributes {
 		switch attr.Type {
 		case types.NetworkContextProfileAttributeTypeAppID:
 			catalog.AppIDValues = append(catalog.AppIDValues, attr.Values...)

@@ -22,8 +22,8 @@ type (
 		Description string `documentation:"Description of the Firewall Group"`
 		TypeValue   string `documentation:"Type of the Firewall Group (SECURITY_GROUP, IP_SET, VM_CRITERIA)"`
 
-		OwnerID   string `documentation:"ID of the owner (EdgeGateway or VdcGroup) of the Firewall Group"`
-		OwnerName string `documentation:"Name of the owner (EdgeGateway or VdcGroup) of the Firewall Group"`
+		OwnerID   string `documentation:"ID of the owner (EdgeGateway or VDCGroup) of the Firewall Group"`
+		OwnerName string `documentation:"Name of the owner (EdgeGateway or VDCGroup) of the Firewall Group"`
 
 		IPAddresses []string                          `documentation:"List of IP addresses (only for IP_SET Firewall Groups)"`
 		Members     []ModelGetFirewallGroupMember     `documentation:"List of members (only for SECURITY_GROUP Firewall Groups)"`

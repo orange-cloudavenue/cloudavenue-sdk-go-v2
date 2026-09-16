@@ -11,16 +11,16 @@ package inetworkobjects
 
 import "context"
 
-type VdcGroupRef struct {
+type VDCGroupRef struct {
 	ID   string
 	Name string
 }
 
-type ResolveVdcGroupFunc func(ctx context.Context, id, name string) (VdcGroupRef, error)
+type ResolveVDCGroupFunc func(ctx context.Context, id, name string) (VDCGroupRef, error)
 
-func ResolveVdcGroupRef(ctx context.Context, id, name string, resolve ResolveVdcGroupFunc) (VdcGroupRef, error) {
+func ResolveVDCGroupRef(ctx context.Context, id, name string, resolve ResolveVDCGroupFunc) (VDCGroupRef, error) {
 	if id != "" && name != "" {
-		return VdcGroupRef{ID: id, Name: name}, nil
+		return VDCGroupRef{ID: id, Name: name}, nil
 	}
 
 	return resolve(ctx, id, name)

@@ -22,7 +22,7 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
-func newFirewallGroupTestClient(t *testing.T) (*Client, *mock.MockServer) {
+func newFirewallGroupTestClient(t *testing.T) (*Client, *mock.Server) {
 	t.Helper()
 
 	results := reflect.ValueOf(newClient).Call([]reflect.Value{reflect.ValueOf(t)})
@@ -32,7 +32,7 @@ func newFirewallGroupTestClient(t *testing.T) (*Client, *mock.MockServer) {
 		return client, nil
 	}
 
-	ms, _ := results[1].Interface().(*mock.MockServer)
+	ms, _ := results[1].Interface().(*mock.Server)
 	return client, ms
 }
 
@@ -47,13 +47,13 @@ func TestUpdateSecurityGroup(t *testing.T) {
 	}
 
 	ms.CleanResponse(endpoints.GetFirewallGroup())
-	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.ApiResponseFirewallGroup{
+	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.APIResponseFirewallGroup{
 		ID:          fwGroupID,
 		Name:        "sg-1",
 		Description: "old-desc",
 		TypeValue:   itypes.FirewallGroupTypeSecurityGroup,
-		OwnerRef:    &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
-		Members: []itypes.ApiObjectReference{
+		OwnerRef:    &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		Members: []itypes.APIObjectReference{
 			{ID: generator.MustGenerate("{uuid}"), Name: "net-a"},
 		},
 	}, nil)
@@ -88,7 +88,7 @@ func TestDeleteSecurityGroup(t *testing.T) {
 	}
 
 	ms.CleanResponse(endpoints.GetFirewallGroup())
-	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.ApiResponseFirewallGroup{
+	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.APIResponseFirewallGroup{
 		ID:        fwGroupID,
 		Name:      "sg-1",
 		TypeValue: itypes.FirewallGroupTypeSecurityGroup,
@@ -115,7 +115,7 @@ func TestUpdateIPSet(t *testing.T) {
 	}
 
 	ms.CleanResponse(endpoints.GetFirewallGroup())
-	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.ApiResponseFirewallGroup{
+	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.APIResponseFirewallGroup{
 		ID:          fwGroupID,
 		Name:        "ipset-1",
 		Description: "old",
@@ -150,7 +150,7 @@ func TestDeleteIPSet(t *testing.T) {
 	}
 
 	ms.CleanResponse(endpoints.GetFirewallGroup())
-	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.ApiResponseFirewallGroup{
+	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.APIResponseFirewallGroup{
 		ID:        fwGroupID,
 		Name:      "ipset-1",
 		TypeValue: itypes.FirewallGroupTypeIPSet,
@@ -177,13 +177,13 @@ func TestUpdateDynamicSecurityGroup(t *testing.T) {
 	}
 
 	ms.CleanResponse(endpoints.GetFirewallGroup())
-	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.ApiResponseFirewallGroup{
+	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.APIResponseFirewallGroup{
 		ID:          fwGroupID,
 		Name:        "dsg-1",
 		Description: "old",
 		TypeValue:   itypes.FirewallGroupTypeVMCriteria,
-		VMCriteria: []itypes.ApiFirewallGroupVMCriteria{{
-			VMCriteriaRule: []itypes.ApiFirewallGroupVMCriteriaRule{{
+		VMCriteria: []itypes.APIFirewallGroupVMCriteria{{
+			VMCriteriaRule: []itypes.APIFirewallGroupVMCriteriaRule{{
 				AttributeType:  types.DynamicSecurityGroupCriteriaRuleTypeVMTag,
 				Operator:       types.DynamicSecurityGroupCriteriaRuleOperatorEquals,
 				AttributeValue: "old-tag",
@@ -225,7 +225,7 @@ func TestDeleteDynamicSecurityGroup(t *testing.T) {
 	}
 
 	ms.CleanResponse(endpoints.GetFirewallGroup())
-	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.ApiResponseFirewallGroup{
+	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.APIResponseFirewallGroup{
 		ID:        fwGroupID,
 		Name:      "dsg-1",
 		TypeValue: itypes.FirewallGroupTypeVMCriteria,

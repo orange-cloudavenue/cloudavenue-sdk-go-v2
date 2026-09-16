@@ -20,77 +20,77 @@ import (
 
 func init() {
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/ssl/certificateLibrary/get/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/certificateLibrary/get/",
 		Name:             "ListCertificate",
 		Description:      "List certificate library items",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/ssl/certificateLibrary",
-		QueryParams:      []cav.QueryParam{{Name: "filter", Description: "Filter to apply to the list of certificates."}, {Name: "pageSize", Description: "The number of items per page.", Value: "100"}},
-		ResponseType:     itypes.ApiResponseListCertificate{},
+		QueryParams:      []cav.QueryParam{{Name: queryParamFilter, Description: "Filter to apply to the list of certificates."}, {Name: queryParamPageSize, Description: descPageSize, Value: pageSize100}, {Name: queryParamPage, Description: descPage, Value: "1"}},
+		ResponseType:     itypes.APIResponseListCertificate{},
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/ssl/certificateLibrary/id/get/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/certificateLibrary/id/get/",
 		Name:             "GetCertificate",
 		Description:      "Get a certificate library item",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/ssl/certificateLibrary/{id}",
+		PathTemplate:     pathCertificateLibrary,
 		PathParams: []cav.PathParam{{
 			Name:        "id",
-			Description: "ID of the certificate library item",
+			Description: descCertificateLibraryItemID,
 			Required:    true,
 			ValidatorFunc: func(value string) error {
-				return validators.New().Var(value, "urn=certificateLibraryItem")
+				return validators.New().Var(value, urnCertificateLibraryItem)
 			},
 		}},
-		ResponseType: itypes.ApiResponseCertificate{},
+		ResponseType: itypes.APIResponseCertificate{},
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/ssl/certificateLibrary/post/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/certificateLibrary/post/",
 		Name:             "CreateCertificate",
 		Description:      "Create a certificate library item",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     "/cloudapi/1.0.0/ssl/certificateLibrary",
-		BodyRequestType:  itypes.ApiRequestCertificate{},
-		ResponseType:     itypes.ApiResponseCertificate{},
+		BodyRequestType:  itypes.APIRequestCertificate{},
+		ResponseType:     itypes.APIResponseCertificate{},
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/ssl/certificateLibrary/id/put/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/certificateLibrary/id/put/",
 		Name:             "UpdateCertificate",
 		Description:      "Update a certificate library item",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/ssl/certificateLibrary/{id}",
+		PathTemplate:     pathCertificateLibrary,
 		PathParams: []cav.PathParam{{
 			Name:        "id",
-			Description: "ID of the certificate library item",
+			Description: descCertificateLibraryItemID,
 			Required:    true,
 			ValidatorFunc: func(value string) error {
-				return validators.New().Var(value, "urn=certificateLibraryItem")
+				return validators.New().Var(value, urnCertificateLibraryItem)
 			},
 		}},
-		BodyRequestType: itypes.ApiRequestCertificate{},
-		ResponseType:    itypes.ApiResponseCertificate{},
+		BodyRequestType: itypes.APIRequestCertificate{},
+		ResponseType:    itypes.APIResponseCertificate{},
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/ssl/certificateLibrary/id/delete/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/certificateLibrary/id/delete/",
 		Name:             "DeleteCertificate",
 		Description:      "Delete a certificate library item",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/ssl/certificateLibrary/{id}",
+		PathTemplate:     pathCertificateLibrary,
 		PathParams: []cav.PathParam{{
 			Name:        "id",
-			Description: "ID of the certificate library item",
+			Description: descCertificateLibraryItemID,
 			Required:    true,
 			ValidatorFunc: func(value string) error {
-				return validators.New().Var(value, "urn=certificateLibraryItem")
+				return validators.New().Var(value, urnCertificateLibraryItem)
 			},
 		}},
 	}.Register()

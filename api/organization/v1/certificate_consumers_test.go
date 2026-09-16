@@ -25,9 +25,9 @@ func TestListCertificateConsumers(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetCertificate())
-	ms.SetResponse(endpoints.GetCertificate(), &itypes.ApiResponseCertificate{ID: certificateID, Alias: "cert-1", Certificate: "-----BEGIN CERTIFICATE-----mock-----END CERTIFICATE-----"}, nil)
+	ms.SetResponse(endpoints.GetCertificate(), &itypes.APIResponseCertificate{ID: certificateID, Alias: "cert-1", Certificate: "-----BEGIN CERTIFICATE-----mock-----END CERTIFICATE-----"}, nil)
 	ms.CleanResponse(endpoints.ListCertificateConsumers())
-	ms.SetResponse(endpoints.ListCertificateConsumers(), &itypes.ApiEntityReferences{Values: []itypes.ApiEntityReference{{ID: generator.MustGenerate("{urn:vdcGroup}"), Name: "vdcgroup-1"}}}, nil)
+	ms.SetResponse(endpoints.ListCertificateConsumers(), &itypes.APIEntityReferences{Values: []itypes.APIEntityReference{{ID: generator.MustGenerate("{urn:vdcGroup}"), Name: "vdcgroup-1"}}}, nil)
 
 	resp, err := client.ListCertificateConsumers(t.Context(), types.ParamsListCertificateConsumers{CertificateID: certificateID})
 
@@ -46,9 +46,9 @@ func TestAddCertificateConsumer(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetCertificate())
-	ms.SetResponse(endpoints.GetCertificate(), &itypes.ApiResponseCertificate{ID: certificateID, Alias: "cert-1", Certificate: "-----BEGIN CERTIFICATE-----mock-----END CERTIFICATE-----"}, nil)
+	ms.SetResponse(endpoints.GetCertificate(), &itypes.APIResponseCertificate{ID: certificateID, Alias: "cert-1", Certificate: "-----BEGIN CERTIFICATE-----mock-----END CERTIFICATE-----"}, nil)
 	ms.CleanResponse(endpoints.AddCertificateConsumer())
-	ms.SetResponse(endpoints.AddCertificateConsumer(), &itypes.ApiEntityReference{ID: consumerID, Name: "vdcgroup-1"}, nil)
+	ms.SetResponse(endpoints.AddCertificateConsumer(), &itypes.APIEntityReference{ID: consumerID, Name: "vdcgroup-1"}, nil)
 
 	resp, err := client.AddCertificateConsumer(t.Context(), types.ParamsAddCertificateConsumer{CertificateID: certificateID, ConsumerID: consumerID, ConsumerName: "vdcgroup-1"})
 
@@ -68,9 +68,9 @@ func TestSetCertificateConsumers(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetCertificate())
-	ms.SetResponse(endpoints.GetCertificate(), &itypes.ApiResponseCertificate{ID: certificateID, Alias: "cert-1", Certificate: "-----BEGIN CERTIFICATE-----mock-----END CERTIFICATE-----"}, nil)
+	ms.SetResponse(endpoints.GetCertificate(), &itypes.APIResponseCertificate{ID: certificateID, Alias: "cert-1", Certificate: "-----BEGIN CERTIFICATE-----mock-----END CERTIFICATE-----"}, nil)
 	ms.CleanResponse(endpoints.SetCertificateConsumers())
-	ms.SetResponse(endpoints.SetCertificateConsumers(), &itypes.ApiEntityReferences{Values: []itypes.ApiEntityReference{{ID: consumerID1, Name: "vdcgroup-1"}, {ID: consumerID2, Name: "edge-1"}}}, nil)
+	ms.SetResponse(endpoints.SetCertificateConsumers(), &itypes.APIEntityReferences{Values: []itypes.APIEntityReference{{ID: consumerID1, Name: "vdcgroup-1"}, {ID: consumerID2, Name: "edge-1"}}}, nil)
 
 	resp, err := client.SetCertificateConsumers(t.Context(), types.ParamsSetCertificateConsumers{
 		CertificateID: certificateID,

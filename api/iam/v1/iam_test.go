@@ -22,7 +22,7 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 )
 
-func newClient(t *testing.T) (*Client, *mock.MockServer) {
+func newClient(t *testing.T) (*Client, *mock.Server) {
 	t.Helper()
 
 	mC, ms, err := mock.NewClient()
@@ -194,8 +194,8 @@ func TestCreateLocalUser(t *testing.T) {
 				FullName:        "New User",
 				EmailAddress:    "newuser@example.com",
 				IsEnabled:       true,
-				DeployedVmQuota: new(10),
-				StoredVmQuota:   new(10),
+				DeployedVMQuota: new(10),
+				StoredVMQuota:   new(10),
 			},
 			expectedErr: false,
 		},
@@ -409,8 +409,8 @@ func TestUpdateUserPreservesExistingFields(t *testing.T) {
 			Telephone:       "0000",
 			Description:     new("current description"),
 			IsEnabled:       true,
-			DeployedVmQuota: new(4),
-			StoredVmQuota:   new(7),
+			DeployedVMQuota: new(4),
+			StoredVMQuota:   new(7),
 			Role:            itypes.Reference{Name: "Organization Administrator"},
 		})
 	})
@@ -425,8 +425,8 @@ func TestUpdateUserPreservesExistingFields(t *testing.T) {
 		if assert.NotNil(t, body.IsEnabled) {
 			assert.True(t, *body.IsEnabled)
 		}
-		assert.Equal(t, 4, body.DeployedVmQuota)
-		assert.Equal(t, 7, body.StoredVmQuota)
+		assert.Equal(t, new(4), body.DeployedVMQuota)
+		assert.Equal(t, new(7), body.StoredVMQuota)
 		xmlResponse(w, itypes.User{
 			Name:            body.Name,
 			FullName:        body.FullName,
@@ -434,8 +434,8 @@ func TestUpdateUserPreservesExistingFields(t *testing.T) {
 			Telephone:       body.Telephone,
 			Description:     body.Description,
 			IsEnabled:       body.IsEnabled != nil && *body.IsEnabled,
-			DeployedVmQuota: body.DeployedVmQuota,
-			StoredVmQuota:   body.StoredVmQuota,
+			DeployedVMQuota: body.DeployedVMQuota,
+			StoredVMQuota:   body.StoredVMQuota,
 			Role:            body.Role,
 		})
 	})

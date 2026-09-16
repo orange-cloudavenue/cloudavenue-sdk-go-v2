@@ -39,11 +39,11 @@ func (c *Client) ListStorageProfile(ctx context.Context, params types.ParamsList
 	if params.Class != "" {
 		filters = append(filters, "name=="+params.Class)
 	}
-	if params.VdcID != "" {
-		filters = append(filters, "vdc=="+params.VdcID)
+	if params.VDCID != "" {
+		filters = append(filters, "vdc=="+params.VDCID)
 	}
-	if params.VdcName != "" {
-		filters = append(filters, "vdcName=="+params.VdcName)
+	if params.VDCName != "" {
+		filters = append(filters, "vdcName=="+params.VDCName)
 	}
 
 	var value strings.Builder
@@ -59,7 +59,7 @@ func (c *Client) ListStorageProfile(ctx context.Context, params types.ParamsList
 		return nil, fmt.Errorf("%s: list: %w", opListStorageProfile, err)
 	}
 
-	model := resp.Result().(*itypes.ApiResponseListStorageProfiles).ToModel()
+	model := resp.Result().(*itypes.APIResponseListStorageProfiles).ToModel()
 	for _, vdc := range model.VDCS {
 		if vdc.ID == "" {
 			return nil, fmt.Errorf("%s: vdc ID is empty", opListStorageProfile)
@@ -85,23 +85,23 @@ func uniqueVDCFromStorageProfiles(list *types.ModelListStorageProfiles) (*types.
 
 // AddStorageProfile adds storage profiles to a VDC.
 func (c *Client) AddStorageProfile(ctx context.Context, params types.ParamsAddStorageProfile) error {
-	vdc, err := c.GetVDC(ctx, types.ParamsGetVDC{ID: params.VdcID, Name: params.VdcName})
+	vdc, err := c.GetVDC(ctx, types.ParamsGetVDC{ID: params.VDCID, Name: params.VDCName})
 	if err != nil {
 		return fmt.Errorf("%s: get vdc: %w", opAddStorageProfile, err)
 	}
 
-	apiR := itypes.ApiRequestUpdateVDC{
-		VDC: itypes.ApiRequestUpdateVDCVDC{Name: vdc.Name},
+	apiR := itypes.APIRequestUpdateVDC{
+		VDC: itypes.APIRequestUpdateVDCVDC{Name: vdc.Name},
 	}
 	for _, sp := range params.StorageProfiles {
-		apiR.VDC.StorageProfiles = append(apiR.VDC.StorageProfiles, itypes.ApiRequestVDCStorageProfile{
+		apiR.VDC.StorageProfiles = append(apiR.VDC.StorageProfiles, itypes.APIRequestVDCStorageProfile{
 			Class:   sp.Class,
 			Limit:   sp.Limit,
 			Default: sp.Default,
 		})
 	}
 
-	ep := endpoints.UpdateVdc()
+	ep := endpoints.UpdateVDC()
 	if _, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], vdc.Name), cav.SetBody(apiR)); err != nil {
 		return fmt.Errorf("%s: add: %w", opAddStorageProfile, err)
 	}
@@ -111,7 +111,7 @@ func (c *Client) AddStorageProfile(ctx context.Context, params types.ParamsAddSt
 
 // DeleteStorageProfile removes storage profiles from a VDC.
 func (c *Client) DeleteStorageProfile(ctx context.Context, params types.ParamsDeleteStorageProfile) error {
-	listSP, err := c.ListStorageProfile(ctx, types.ParamsListStorageProfile{VdcName: params.VdcName, VdcID: params.VdcID})
+	listSP, err := c.ListStorageProfile(ctx, types.ParamsListStorageProfile{VDCName: params.VDCName, VDCID: params.VDCID})
 	if err != nil {
 		return fmt.Errorf("%s: list: %w", opDeleteStorageProfile, err)
 	}
@@ -124,8 +124,8 @@ func (c *Client) DeleteStorageProfile(ctx context.Context, params types.ParamsDe
 		return fmt.Errorf("%s: %w", opDeleteStorageProfile, errors.New("cannot delete storage profile, at least one storage profile must exist for a VDC"))
 	}
 
-	apiR := itypes.ApiRequestUpdateVDC{VDC: itypes.ApiRequestUpdateVDCVDC{Name: vdc.Name}}
-	apiR.VDC.StorageProfiles = make([]itypes.ApiRequestVDCStorageProfile, 0, len(params.StorageProfiles))
+	apiR := itypes.APIRequestUpdateVDC{VDC: itypes.APIRequestUpdateVDCVDC{Name: vdc.Name}}
+	apiR.VDC.StorageProfiles = make([]itypes.APIRequestVDCStorageProfile, 0, len(params.StorageProfiles))
 	for _, pSP := range params.StorageProfiles {
 		found := false
 		for _, sp := range vdc.StorageProfiles {
@@ -139,14 +139,14 @@ func (c *Client) DeleteStorageProfile(ctx context.Context, params types.ParamsDe
 			if sp.Used > 0 {
 				return fmt.Errorf("%s: %w", opDeleteStorageProfile, errors.Newf("cannot delete a non-empty storage profile %s from VDC %s", sp.Class, vdc.Name))
 			}
-			apiR.VDC.StorageProfiles = append(apiR.VDC.StorageProfiles, itypes.ApiRequestVDCStorageProfile{Class: pSP.Class, Limit: 0, Default: false})
+			apiR.VDC.StorageProfiles = append(apiR.VDC.StorageProfiles, itypes.APIRequestVDCStorageProfile{Class: pSP.Class, Limit: 0, Default: false})
 		}
 		if !found {
 			return fmt.Errorf("%s: %w", opDeleteStorageProfile, errors.Newf("storage profile class %s not found in VDC %s", pSP.Class, vdc.Name))
 		}
 	}
 
-	ep := endpoints.UpdateVdc()
+	ep := endpoints.UpdateVDC()
 	if _, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], vdc.Name), cav.SetBody(apiR)); err != nil {
 		return fmt.Errorf("%s: delete: %w", opDeleteStorageProfile, err)
 	}
@@ -156,7 +156,7 @@ func (c *Client) DeleteStorageProfile(ctx context.Context, params types.ParamsDe
 
 // UpdateStorageProfile updates storage profile limits and default flags for a VDC.
 func (c *Client) UpdateStorageProfile(ctx context.Context, params types.ParamsUpdateStorageProfile) (*types.ModelListStorageProfilesVDC, error) {
-	listSP, err := c.ListStorageProfile(ctx, types.ParamsListStorageProfile{VdcName: params.VdcName, VdcID: params.VdcID})
+	listSP, err := c.ListStorageProfile(ctx, types.ParamsListStorageProfile{VDCName: params.VDCName, VDCID: params.VDCID})
 	if err != nil {
 		return nil, fmt.Errorf("%s: list: %w", opUpdateStorageProfile, err)
 	}
@@ -165,8 +165,8 @@ func (c *Client) UpdateStorageProfile(ctx context.Context, params types.ParamsUp
 		return nil, fmt.Errorf("%s: resolve vdc: %w", opUpdateStorageProfile, err)
 	}
 
-	apiR := itypes.ApiRequestUpdateVDC{VDC: itypes.ApiRequestUpdateVDCVDC{Name: vdc.Name}}
-	apiR.VDC.StorageProfiles = make([]itypes.ApiRequestVDCStorageProfile, 0, len(params.StorageProfiles))
+	apiR := itypes.APIRequestUpdateVDC{VDC: itypes.APIRequestUpdateVDCVDC{Name: vdc.Name}}
+	apiR.VDC.StorageProfiles = make([]itypes.APIRequestVDCStorageProfile, 0, len(params.StorageProfiles))
 
 	currentStorageProfiles := make(map[string]types.ModelListStorageProfile, len(vdc.StorageProfiles))
 	for _, sp := range vdc.StorageProfiles {
@@ -191,7 +191,7 @@ func (c *Client) UpdateStorageProfile(ctx context.Context, params types.ParamsUp
 			}
 		}
 
-		apiR.VDC.StorageProfiles = append(apiR.VDC.StorageProfiles, itypes.ApiRequestVDCStorageProfile{
+		apiR.VDC.StorageProfiles = append(apiR.VDC.StorageProfiles, itypes.APIRequestVDCStorageProfile{
 			Class: sp.Class,
 			Limit: func() int {
 				if sp.Limit > 0 {
@@ -207,12 +207,12 @@ func (c *Client) UpdateStorageProfile(ctx context.Context, params types.ParamsUp
 		return nil, fmt.Errorf("%s: multiple storage profiles have default=true, only one is allowed", opUpdateStorageProfile)
 	}
 
-	ep := endpoints.UpdateVdc()
+	ep := endpoints.UpdateVDC()
 	if _, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], vdc.Name), cav.SetBody(apiR)); err != nil {
 		return nil, fmt.Errorf("%s: update: %w", opUpdateStorageProfile, err)
 	}
 
-	updated, err := c.ListStorageProfile(ctx, types.ParamsListStorageProfile{VdcID: vdc.ID, VdcName: vdc.Name})
+	updated, err := c.ListStorageProfile(ctx, types.ParamsListStorageProfile{VDCID: vdc.ID, VDCName: vdc.Name})
 	if err != nil {
 		return nil, fmt.Errorf("%s: list updated: %w", opUpdateStorageProfile, err)
 	}

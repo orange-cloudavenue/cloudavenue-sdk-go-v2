@@ -28,7 +28,7 @@ const (
 	opDeleteEdgeGatewayAppPortProfile = "EdgeGateway.AppPortProfile.Delete"
 )
 
-func resolveEdgeGatewayAppPortProfileContext(ctx context.Context, c cav.Client, edgeGatewayID, edgeGatewayName string) (*itypes.ApiObjectReference, string, error) {
+func resolveEdgeGatewayAppPortProfileContext(ctx context.Context, c cav.Client, edgeGatewayID, edgeGatewayName string) (*itypes.APIObjectReference, string, error) {
 	ep := endpoints.GetEdgeGateway()
 	identifier := edgeGatewayID
 	if identifier == "" {
@@ -40,31 +40,31 @@ func resolveEdgeGatewayAppPortProfileContext(ctx context.Context, c cav.Client, 
 		return nil, "", err
 	}
 
-	edgeGateway := resp.Result().(*itypes.ApiResponseEdgegateway)
+	edgeGateway := resp.Result().(*itypes.APIResponseEdgegateway)
 	if edgeGateway.OwnerRef == nil {
 		return nil, "", fmt.Errorf("edge gateway owner is missing")
 	}
 
 	cd := cav.GetExtraDataFromContext(resp.Request.Context())
-	return &itypes.ApiObjectReference{ID: edgeGateway.OwnerRef.ID, Name: edgeGateway.OwnerRef.Name}, cd.OrganizationID, nil
+	return &itypes.APIObjectReference{ID: edgeGateway.OwnerRef.ID, Name: edgeGateway.OwnerRef.Name}, cd.OrganizationID, nil
 }
 
-func createEdgeGatewayAppPortProfileBody(ctx context.Context, c cav.Client, params types.ParamsCreateEdgeGatewayAppPortProfile) (itypes.ApiRequestAppPortProfile, error) {
+func createEdgeGatewayAppPortProfileBody(ctx context.Context, c cav.Client, params types.ParamsCreateEdgeGatewayAppPortProfile) (itypes.APIRequestAppPortProfile, error) {
 	if err := inetworkobjects.ValidateAppPortProfileApplicationPorts(params.ApplicationPorts); err != nil {
-		return itypes.ApiRequestAppPortProfile{}, err
+		return itypes.APIRequestAppPortProfile{}, err
 	}
 
 	ownerRef, orgID, err := resolveEdgeGatewayAppPortProfileContext(ctx, c, params.EdgeGatewayID, params.EdgeGatewayName)
 	if err != nil {
-		return itypes.ApiRequestAppPortProfile{}, err
+		return itypes.APIRequestAppPortProfile{}, err
 	}
 
-	return itypes.ApiRequestAppPortProfile{
+	return itypes.APIRequestAppPortProfile{
 		Name:             params.Name,
 		Description:      params.Description,
-		ApplicationPorts: inetworkobjects.ToApiAppPortProfilePorts(params.ApplicationPorts),
-		OrgRef:           &itypes.ApiObjectReference{ID: orgID},
-		ContextEntityId:  ownerRef.ID,
+		ApplicationPorts: inetworkobjects.ToAPIAppPortProfilePorts(params.ApplicationPorts),
+		OrgRef:           &itypes.APIObjectReference{ID: orgID},
+		ContextEntityID:  ownerRef.ID,
 		Scope:            types.AppPortProfileScopeTenant,
 	}, nil
 }
@@ -86,7 +86,7 @@ func (c *Client) ListAppPortProfile(ctx context.Context, params types.ParamsList
 		return nil, fmt.Errorf("%s: list: %w", opListEdgeGatewayAppPortProfile, err)
 	}
 
-	return resp.Result().(*itypes.ApiResponseListAppPortProfile).ToModel(), nil
+	return resp.Result().(*itypes.APIResponseListAppPortProfile).ToModel(), nil
 }
 
 // GetAppPortProfile returns an application port profile by ID or name for an edge gateway.
@@ -127,7 +127,7 @@ func (c *Client) CreateAppPortProfile(ctx context.Context, params types.ParamsCr
 		return nil, fmt.Errorf("%s: %w", opCreateEdgeGatewayAppPortProfile, err)
 	}
 
-	profile, ok := resp.Result().(*itypes.ApiResponseAppPortProfile)
+	profile, ok := resp.Result().(*itypes.APIResponseAppPortProfile)
 	if !ok || profile == nil {
 		return nil, fmt.Errorf("%s: unexpected create response type %T", opCreateEdgeGatewayAppPortProfile, resp.Result())
 	}
@@ -170,16 +170,16 @@ func (c *Client) UpdateAppPortProfile(ctx context.Context, params types.ParamsUp
 
 	applicationPorts := current.ApplicationPorts
 	if len(params.ApplicationPorts) != 0 {
-		applicationPorts = inetworkobjects.ToApiAppPortProfilePorts(params.ApplicationPorts)
+		applicationPorts = inetworkobjects.ToAPIAppPortProfilePorts(params.ApplicationPorts)
 	}
 
-	body := itypes.ApiRequestAppPortProfile{
+	body := itypes.APIRequestAppPortProfile{
 		ID:               current.ID,
 		Name:             current.Name,
 		Description:      description,
 		ApplicationPorts: applicationPorts,
 		OrgRef:           current.OrgRef,
-		ContextEntityId:  current.ContextEntityId,
+		ContextEntityID:  current.ContextEntityID,
 		Scope:            current.Scope,
 	}
 

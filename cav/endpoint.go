@@ -23,7 +23,7 @@ type (
 		ID string
 
 		// Name is stable registry name.
-		Name string `validate:"required,disallow_space,case=PascalCase"` // e.g., "Firewall", "LoadBalancer"
+		Name string `validate:"required,disallow_space"` // e.g., "Firewall", "LoadBalancer"
 
 		// Description is human-readable operation summary.
 		Description string `validate:"required"`

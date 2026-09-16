@@ -21,116 +21,116 @@ import (
 )
 
 const (
-	opGetVdcNetworkRouted    = "VdcNetworkRouted.Get"
-	opCreateVdcNetworkRouted = "VdcNetworkRouted.Create"
-	opUpdateVdcNetworkRouted = "VdcNetworkRouted.Update"
-	opDeleteVdcNetworkRouted = "VdcNetworkRouted.Delete"
+	opGetVDCNetworkRouted    = "VdcNetworkRouted.Get"
+	opCreateVDCNetworkRouted = "VdcNetworkRouted.Create"
+	opUpdateVDCNetworkRouted = "VdcNetworkRouted.Update"
+	opDeleteVDCNetworkRouted = "VdcNetworkRouted.Delete"
 )
 
-// GetVdcNetworkRouted gets NSX-T routed Org VDC network by ID or name within VDC group.
-func (c *Client) GetVdcNetworkRouted(ctx context.Context, params types.ParamsGetVdcNetworkRouted) (*types.ModelGetVdcNetwork, error) {
-	resp, err := getVdcNetworkModel(ctx, c.c, params.ID, params.Name, params.VdcGroupID, params.VdcGroupName, types.VdcNetworkTypeRouted)
+// GetVDCNetworkRouted gets NSX-T routed Org VDC network by ID or name within VDC group.
+func (c *Client) GetVDCNetworkRouted(ctx context.Context, params types.ParamsGetVDCNetworkRouted) (*types.ModelGetVDCNetwork, error) {
+	resp, err := getVDCNetworkModel(ctx, c.c, params.ID, params.Name, params.VDCGroupID, params.VDCGroupName, types.VDCNetworkTypeRouted)
 	if err != nil {
-		return nil, fmt.Errorf("%s: get: %w", opGetVdcNetworkRouted, err)
+		return nil, fmt.Errorf("%s: get: %w", opGetVDCNetworkRouted, err)
 	}
 
 	return resp, nil
 }
 
-// CreateVdcNetworkRouted creates NSX-T routed Org VDC network within VDC group.
-func (c *Client) CreateVdcNetworkRouted(ctx context.Context, params types.ParamsCreateVdcNetworkRouted) (*types.ModelGetVdcNetwork, error) {
-	vdcGroupID, vdcGroupName, err := resolveVdcGroupRef(ctx, c.c, params.VdcGroupID, params.VdcGroupName)
+// CreateVDCNetworkRouted creates NSX-T routed Org VDC network within VDC group.
+func (c *Client) CreateVDCNetworkRouted(ctx context.Context, params types.ParamsCreateVDCNetworkRouted) (*types.ModelGetVDCNetwork, error) {
+	vdcGroupID, vdcGroupName, err := resolveVDCGroupRef(ctx, c.c, params.VDCGroupID, params.VDCGroupName)
 	if err != nil {
-		return nil, fmt.Errorf("%s: transform: %w", opCreateVdcNetworkRouted, err)
+		return nil, fmt.Errorf("%s: transform: %w", opCreateVDCNetworkRouted, err)
 	}
 
-	body := itypes.ApiRequestVdcNetwork{
+	body := itypes.APIRequestVDCNetwork{
 		Name:        params.Name,
 		Description: params.Description,
-		NetworkType: types.VdcNetworkTypeRouted,
-		OwnerRef:    &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
-		Subnets: itypes.ApiVdcNetworkSubnets{
-			Values: []itypes.ApiVdcNetworkSubnetValue{{
+		NetworkType: types.VDCNetworkTypeRouted,
+		OwnerRef:    &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		Subnets: itypes.APIVDCNetworkSubnets{
+			Values: []itypes.APIVDCNetworkSubnetValue{{
 				Gateway:      params.Subnet.Gateway,
 				PrefixLength: params.Subnet.PrefixLength,
 				DNSServer1:   params.Subnet.DNSServer1,
 				DNSServer2:   params.Subnet.DNSServer2,
 				DNSSuffix:    params.Subnet.DNSSuffix,
-				IPRanges: itypes.ApiVdcNetworkIPRanges{
-					Values: createVdcNetworkIPRanges(params.Subnet.IPRanges),
+				IPRanges: itypes.APIVDCNetworkIPRanges{
+					Values: createVDCNetworkIPRanges(params.Subnet.IPRanges),
 				},
 			}},
 		},
-		GuestVlanTaggingAllowed: params.GuestVlanTaggingAllowed,
+		GuestVLANTaggingAllowed: params.GuestVLANTaggingAllowed,
 		Shared:                  new(true),
-		Connection: &itypes.ApiVdcNetworkConnection{
-			RouterRef:           itypes.ApiObjectReference{ID: params.EdgeGatewayID, Name: params.EdgeGatewayName},
+		Connection: &itypes.APIVDCNetworkConnection{
+			RouterRef:           itypes.APIObjectReference{ID: params.EdgeGatewayID, Name: params.EdgeGatewayName},
 			ConnectionTypeValue: "INTERNAL",
 		},
 	}
 
-	ep := endpoints.CreateVdcNetwork()
+	ep := endpoints.CreateVDCNetwork()
 	resp, err := c.c.Do(ctx, ep, cav.SetBody(body))
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", opCreateVdcNetworkRouted, err)
+		return nil, fmt.Errorf("%s: %w", opCreateVDCNetworkRouted, err)
 	}
 
-	network, ok := resp.Result().(*itypes.ApiResponseVdcNetwork)
+	network, ok := resp.Result().(*itypes.APIResponseVDCNetwork)
 	if !ok || network == nil {
-		return nil, fmt.Errorf("%s: unexpected create response type %T", opCreateVdcNetworkRouted, resp.Result())
+		return nil, fmt.Errorf("%s: unexpected create response type %T", opCreateVDCNetworkRouted, resp.Result())
 	}
 
 	model := network.ToModel()
 	return &model, nil
 }
 
-// UpdateVdcNetworkRouted updates NSX-T routed Org VDC network within VDC group.
-func (c *Client) UpdateVdcNetworkRouted(ctx context.Context, params types.ParamsUpdateVdcNetworkRouted) (*types.ModelGetVdcNetwork, error) {
-	current, err := getVdcNetworkWithRetry(ctx, c.c, params.ID, "")
+// UpdateVDCNetworkRouted updates NSX-T routed Org VDC network within VDC group.
+func (c *Client) UpdateVDCNetworkRouted(ctx context.Context, params types.ParamsUpdateVDCNetworkRouted) (*types.ModelGetVDCNetwork, error) {
+	current, err := getVDCNetworkWithRetry(ctx, c.c, params.ID, "")
 	if err != nil {
-		return nil, fmt.Errorf("%s: resolve target: %w", opUpdateVdcNetworkRouted, err)
+		return nil, fmt.Errorf("%s: resolve target: %w", opUpdateVDCNetworkRouted, err)
 	}
 
-	if current.NetworkType != types.VdcNetworkTypeRouted {
-		return nil, fmt.Errorf("%s: %w", opUpdateVdcNetworkRouted, errors.Newf("org vdc network %q is not a routed network", params.ID))
+	if current.NetworkType != types.VDCNetworkTypeRouted {
+		return nil, fmt.Errorf("%s: %w", opUpdateVDCNetworkRouted, errors.Newf("org vdc network %q is not a routed network", params.ID))
 	}
 
-	body := mergeVdcNetworkRoutedUpdate(current, params)
+	body := mergeVDCNetworkRoutedUpdate(current, params)
 
-	ep := endpoints.UpdateVdcNetwork()
+	ep := endpoints.UpdateVDCNetwork()
 	if _, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], current.ID), cav.SetBody(body)); err != nil {
-		return nil, fmt.Errorf("%s: %w", opUpdateVdcNetworkRouted, err)
+		return nil, fmt.Errorf("%s: %w", opUpdateVDCNetworkRouted, err)
 	}
 
 	model := body.ToModel()
 	return &model, nil
 }
 
-// DeleteVdcNetworkRouted deletes NSX-T routed Org VDC network from VDC group.
-func (c *Client) DeleteVdcNetworkRouted(ctx context.Context, params types.ParamsDeleteVdcNetworkRouted) error {
-	current, err := deleteVdcNetworkTarget(ctx, c.c, params.ID, params.Name, params.VdcGroupID, params.VdcGroupName)
+// DeleteVDCNetworkRouted deletes NSX-T routed Org VDC network from VDC group.
+func (c *Client) DeleteVDCNetworkRouted(ctx context.Context, params types.ParamsDeleteVDCNetworkRouted) error {
+	current, err := deleteVDCNetworkTarget(ctx, c.c, params.ID, params.Name, params.VDCGroupID, params.VDCGroupName)
 	if err != nil {
-		return fmt.Errorf("%s: resolve target: %w", opDeleteVdcNetworkRouted, err)
+		return fmt.Errorf("%s: resolve target: %w", opDeleteVDCNetworkRouted, err)
 	}
 
-	if current.NetworkType != types.VdcNetworkTypeRouted {
+	if current.NetworkType != types.VDCNetworkTypeRouted {
 		idOrName := params.ID
 		if idOrName == "" {
 			idOrName = params.Name
 		}
-		return fmt.Errorf("%s: %w", opDeleteVdcNetworkRouted, errors.Newf("org vdc network %q is not a routed network", idOrName))
+		return fmt.Errorf("%s: %w", opDeleteVDCNetworkRouted, errors.Newf("org vdc network %q is not a routed network", idOrName))
 	}
 
-	ep := endpoints.DeleteVdcNetwork()
+	ep := endpoints.DeleteVDCNetwork()
 	if _, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], current.ID)); err != nil {
-		return fmt.Errorf("%s: %w", opDeleteVdcNetworkRouted, err)
+		return fmt.Errorf("%s: %w", opDeleteVDCNetworkRouted, err)
 	}
 
 	return nil
 }
 
-// mergeVdcNetworkRoutedUpdate applies optional update params onto current network state.
-func mergeVdcNetworkRoutedUpdate(current *itypes.ApiResponseVdcNetwork, params types.ParamsUpdateVdcNetworkRouted) itypes.ApiRequestVdcNetwork {
+// mergeVDCNetworkRoutedUpdate applies optional update params onto current network state.
+func mergeVDCNetworkRoutedUpdate(current *itypes.APIResponseVDCNetwork, params types.ParamsUpdateVDCNetworkRouted) itypes.APIRequestVDCNetwork {
 	description := current.Description
 	if params.Description != "" {
 		description = params.Description
@@ -138,39 +138,39 @@ func mergeVdcNetworkRoutedUpdate(current *itypes.ApiResponseVdcNetwork, params t
 
 	subnets := current.Subnets
 	if params.Subnet != nil {
-		subnets = itypes.ApiVdcNetworkSubnets{
-			Values: []itypes.ApiVdcNetworkSubnetValue{{
+		subnets = itypes.APIVDCNetworkSubnets{
+			Values: []itypes.APIVDCNetworkSubnetValue{{
 				Gateway:      params.Subnet.Gateway,
 				PrefixLength: params.Subnet.PrefixLength,
 				DNSServer1:   params.Subnet.DNSServer1,
 				DNSServer2:   params.Subnet.DNSServer2,
 				DNSSuffix:    params.Subnet.DNSSuffix,
-				IPRanges:     itypes.ApiVdcNetworkIPRanges{Values: createVdcNetworkIPRanges(params.Subnet.IPRanges)},
+				IPRanges:     itypes.APIVDCNetworkIPRanges{Values: createVDCNetworkIPRanges(params.Subnet.IPRanges)},
 			}},
 		}
 	}
 
-	guestVlanTaggingAllowed := current.GuestVlanTaggingAllowed
-	if params.GuestVlanTaggingAllowed != nil {
-		guestVlanTaggingAllowed = params.GuestVlanTaggingAllowed
+	guestVLANTaggingAllowed := current.GuestVLANTaggingAllowed
+	if params.GuestVLANTaggingAllowed != nil {
+		guestVLANTaggingAllowed = params.GuestVLANTaggingAllowed
 	}
 
 	connection := current.Connection
 	if params.EdgeGatewayID != "" {
-		connection = &itypes.ApiVdcNetworkConnection{
-			RouterRef:           itypes.ApiObjectReference{ID: params.EdgeGatewayID, Name: params.EdgeGatewayName},
+		connection = &itypes.APIVDCNetworkConnection{
+			RouterRef:           itypes.APIObjectReference{ID: params.EdgeGatewayID, Name: params.EdgeGatewayName},
 			ConnectionTypeValue: "INTERNAL",
 		}
 	}
 
-	return itypes.ApiRequestVdcNetwork{
+	return itypes.APIRequestVDCNetwork{
 		ID:                      current.ID,
 		Name:                    current.Name,
 		Description:             description,
 		NetworkType:             current.NetworkType,
 		OwnerRef:                current.OwnerRef,
 		Subnets:                 subnets,
-		GuestVlanTaggingAllowed: guestVlanTaggingAllowed,
+		GuestVLANTaggingAllowed: guestVLANTaggingAllowed,
 		Shared:                  current.Shared,
 		Connection:              connection,
 	}

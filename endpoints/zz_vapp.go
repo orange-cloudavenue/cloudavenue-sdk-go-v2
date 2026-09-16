@@ -13,51 +13,45 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
 
-// ListVapp - List VApps
+// ListVApp - List VApps
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-VApp.html
-func ListVapp() *cav.Endpoint {
-	return cav.MustGetEndpoint("ListVapp")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-VApp.html 
+func ListVApp() *cav.Endpoint {
+	return cav.MustGetEndpoint("ListVApp")
 }
-
-// GetVapp - Get VApp
+// GetVApp - Get VApp
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-VApp.html
-func GetVapp() *cav.Endpoint {
-	return cav.MustGetEndpoint("GetVapp")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-VApp.html 
+func GetVApp() *cav.Endpoint {
+	return cav.MustGetEndpoint("GetVApp")
 }
-
-// CreateVapp - Create a new VApp
+// CreateVApp - Create a new VApp
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-VApp.html
-func CreateVapp() *cav.Endpoint {
-	return cav.MustGetEndpoint("CreateVapp")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-VApp.html 
+func CreateVApp() *cav.Endpoint {
+	return cav.MustGetEndpoint("CreateVApp")
 }
-
-// UpdateVapp - Update an existing VApp
+// UpdateVApp - Update an existing VApp
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-VApp.html
-func UpdateVapp() *cav.Endpoint {
-	return cav.MustGetEndpoint("UpdateVapp")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-VApp.html 
+func UpdateVApp() *cav.Endpoint {
+	return cav.MustGetEndpoint("UpdateVApp")
 }
-
-// DeleteVapp - Delete an existing VApp
+// DeleteVApp - Delete an existing VApp
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/DELETE-VApp.html
-func DeleteVapp() *cav.Endpoint {
-	return cav.MustGetEndpoint("DeleteVapp")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/DELETE-VApp.html 
+func DeleteVApp() *cav.Endpoint {
+	return cav.MustGetEndpoint("DeleteVApp")
 }
-
 // RemoveAllNetworks - Remove all networks from a VApp
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-VApp-RemoveAllNetworks.html
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-VApp-RemoveAllNetworks.html 
 func RemoveAllNetworks() *cav.Endpoint {
 	return cav.MustGetEndpoint("RemoveAllNetworks")
 }
-
-// UndeployVapp - Undeploy a VApp
+// UndeployVApp - Undeploy a VApp
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-VApp-Undeploy.html
-func UndeployVapp() *cav.Endpoint {
-	return cav.MustGetEndpoint("UndeployVapp")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-VApp-Undeploy.html 
+func UndeployVApp() *cav.Endpoint {
+	return cav.MustGetEndpoint("UndeployVApp")
 }

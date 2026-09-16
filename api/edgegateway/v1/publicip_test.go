@@ -41,10 +41,10 @@ func TestListEdgegatewayPublicIP(t *testing.T) {
 			params: types.ParamsEdgeGateway{
 				ID: validEdgeGWID,
 			},
-			mockResponse: &itypes.ApiResponseNetworkServices{
+			mockResponse: &itypes.APIResponseNetworkServices{
 				{
 					Type: "tier-0-vrf",
-					Children: []itypes.ApiResponseNetworkServicesChildren{
+					Children: []itypes.APIResponseNetworkServicesChildren{
 						{
 							Type: "edge-gateway",
 							Name: validEdgeGWName,
@@ -54,7 +54,7 @@ func TestListEdgegatewayPublicIP(t *testing.T) {
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
-							Children: []itypes.ApiResponseNetworkServicesSubChildren{
+							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
 									Name:      "internet",
@@ -150,10 +150,10 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 				ID: validEdgeGWID,
 				IP: validIP,
 			},
-			mockResponse: &itypes.ApiResponseNetworkServices{
+			mockResponse: &itypes.APIResponseNetworkServices{
 				{
 					Type: "tier-0-vrf",
-					Children: []itypes.ApiResponseNetworkServicesChildren{
+					Children: []itypes.APIResponseNetworkServicesChildren{
 						{
 							Type: "edge-gateway",
 							Name: validEdgeGWName,
@@ -163,7 +163,7 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
-							Children: []itypes.ApiResponseNetworkServicesSubChildren{
+							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
 									Name:      "internet",
@@ -193,8 +193,8 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 				IP:   validIP,
 				Name: validEdgeGWName,
 			},
-			mockListResponse: &itypes.ApiResponseQueryEdgeGateway{
-				Record: []itypes.ApiResponseQueryEdgeGatewayRecord{
+			mockListResponse: &itypes.APIResponseQueryEdgeGateway{
+				Record: []itypes.APIResponseQueryEdgeGatewayRecord{
 					{
 						ID:   validEdgeGWID,
 						HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
@@ -203,10 +203,10 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 				},
 			},
 			mockListResponseStatus: http.StatusOK,
-			mockResponse: &itypes.ApiResponseNetworkServices{
+			mockResponse: &itypes.APIResponseNetworkServices{
 				{
 					Type: "tier-0-vrf",
-					Children: []itypes.ApiResponseNetworkServicesChildren{
+					Children: []itypes.APIResponseNetworkServicesChildren{
 						{
 							Type: "edge-gateway",
 							Name: validEdgeGWName,
@@ -216,7 +216,7 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
-							Children: []itypes.ApiResponseNetworkServicesSubChildren{
+							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
 									Name:      "internet",
@@ -272,7 +272,7 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 				ID: validEdgeGWID,
 				IP: validIP,
 			},
-			mockResponse:       &itypes.ApiResponseNetworkServices{},
+			mockResponse:       &itypes.APIResponseNetworkServices{},
 			mockResponseStatus: http.StatusOK,
 			expectedErr:        true,
 		},
@@ -295,8 +295,8 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 				listStatusCode := tt.mockListResponseStatus
 				ms.CleanResponse(epQuery)
 				ms.SetResponse(epQuery, tt.mockListResponse, &listStatusCode)
-				ms.CleanResponse(endpoints.ListVdc())
-				ms.SetResponse(endpoints.ListVdc(), tt.mockListResponse, &listStatusCode)
+				ms.CleanResponse(endpoints.ListVDC())
+				ms.SetResponse(endpoints.ListVDC(), tt.mockListResponse, &listStatusCode)
 			}
 
 			resp, err := client.GetPublicIP(t.Context(), tt.params)
@@ -311,7 +311,7 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 			ms.CleanResponse(endpoints.GetEdgeGatewayServices())
 			ms.CleanResponse(endpoints.ListT0())
 			ms.CleanResponse(endpoints.QueryEdgeGateway())
-			ms.CleanResponse(endpoints.ListVdc())
+			ms.CleanResponse(endpoints.ListVDC())
 		})
 	}
 }
@@ -359,10 +359,10 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 				},
 			},
 			mockJobResponseStatus: 200,
-			mockGetNetworkServicesResponse: &itypes.ApiResponseNetworkServices{
+			mockGetNetworkServicesResponse: &itypes.APIResponseNetworkServices{
 				{
 					Type: "tier-0-vrf",
-					Children: []itypes.ApiResponseNetworkServicesChildren{
+					Children: []itypes.APIResponseNetworkServicesChildren{
 						{
 							Type: "edge-gateway",
 							Name: validEdgeGWName,
@@ -372,7 +372,7 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
-							Children: []itypes.ApiResponseNetworkServicesSubChildren{
+							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
 									Name:      "internet",
@@ -401,8 +401,8 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 			params: types.ParamsEdgeGateway{
 				Name: validEdgeGWName,
 			},
-			mockListResponse: &itypes.ApiResponseQueryEdgeGateway{
-				Record: []itypes.ApiResponseQueryEdgeGatewayRecord{
+			mockListResponse: &itypes.APIResponseQueryEdgeGateway{
+				Record: []itypes.APIResponseQueryEdgeGatewayRecord{
 					{
 						ID:   validEdgeGWID,
 						HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
@@ -426,10 +426,10 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 				},
 			},
 			mockJobResponseStatus: 200,
-			mockGetNetworkServicesResponse: &itypes.ApiResponseNetworkServices{
+			mockGetNetworkServicesResponse: &itypes.APIResponseNetworkServices{
 				{
 					Type: "tier-0-vrf",
-					Children: []itypes.ApiResponseNetworkServicesChildren{
+					Children: []itypes.APIResponseNetworkServicesChildren{
 						{
 							Type: "edge-gateway",
 							Name: validEdgeGWName,
@@ -439,7 +439,7 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
-							Children: []itypes.ApiResponseNetworkServicesSubChildren{
+							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
 									Name:      "internet",
@@ -501,18 +501,18 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			client, ms := newClient(t)
-			epCreatePublicIp := endpoints.CreatePublicIp()
+			epCreatePublicIP := endpoints.CreatePublicIP()
 			if tt.mockResponseStatus != 0 {
 				statusCode := tt.mockResponseStatus
-				ms.SetResponse(epCreatePublicIp, tt.mockResponse, &statusCode)
+				ms.SetResponse(epCreatePublicIP, tt.mockResponse, &statusCode)
 			}
 
 			epQuery := endpoints.QueryEdgeGateway()
 			if tt.mockListResponse != nil || tt.mockListResponseStatus != 0 {
 				listStatusCode := tt.mockListResponseStatus
 				ms.SetResponse(epQuery, tt.mockListResponse, &listStatusCode)
-				ms.CleanResponse(endpoints.ListVdc())
-				ms.SetResponse(endpoints.ListVdc(), tt.mockListResponse, &listStatusCode)
+				ms.CleanResponse(endpoints.ListVDC())
+				ms.SetResponse(endpoints.ListVDC(), tt.mockListResponse, &listStatusCode)
 			}
 
 			epGetJob := endpoints.GetJobCerberus()

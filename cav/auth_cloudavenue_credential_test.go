@@ -13,11 +13,12 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"resty.dev/v3"
+
 	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/http-client"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/xlog"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
-	"github.com/stretchr/testify/assert"
-	"resty.dev/v3"
 )
 
 func Test_newCloudavenueCredential(t *testing.T) {

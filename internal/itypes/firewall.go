@@ -12,44 +12,44 @@ package itypes
 import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 
 type (
-	// ApiDfwPolicies represents the Distributed Firewall policies of a VDC Group.
-	ApiDfwPolicies struct {
+	// APIDFWPolicies represents the Distributed Firewall policies of a VDC Group.
+	APIDFWPolicies struct {
 		Enabled       bool                 `json:"enabled"`
-		DefaultPolicy *ApiDfwDefaultPolicy `json:"defaultPolicy,omitempty"`
+		DefaultPolicy *APIDfwDefaultPolicy `json:"defaultPolicy,omitempty"`
 	}
 
-	// ApiDfwDefaultPolicy represents the default Distributed Firewall policy of a VDC Group.
-	ApiDfwDefaultPolicy struct {
+	// APIDfwDefaultPolicy represents the default Distributed Firewall policy of a VDC Group.
+	APIDfwDefaultPolicy struct {
 		Description string         `json:"description,omitempty"`
 		Enabled     *bool          `json:"enabled,omitempty"`
 		ID          string         `json:"id,omitempty"`
 		Name        string         `json:"name"`
-		Version     *ApiDfwVersion `json:"version,omitempty"`
+		Version     *APIDfwVersion `json:"version,omitempty"`
 	}
 
-	// ApiDfwVersion is the optimistic-concurrency version marker used by the DFW default policy.
-	ApiDfwVersion struct {
+	// APIDfwVersion is the optimistic-concurrency version marker used by the DFW default policy.
+	APIDfwVersion struct {
 		Version int `json:"version"`
 	}
 
-	// ApiDistributedFirewallRules is the bulk container of Distributed Firewall rules.
-	ApiDistributedFirewallRules struct {
-		Values []ApiDistributedFirewallRule `json:"values"`
+	// APIDistributedFirewallRules is the bulk container of Distributed Firewall rules.
+	APIDistributedFirewallRules struct {
+		Values []APIDistributedFirewallRule `json:"values"`
 	}
 
-	// ApiDistributedFirewallRule represents a single Distributed Firewall rule.
-	ApiDistributedFirewallRule struct {
+	// APIDistributedFirewallRule represents a single Distributed Firewall rule.
+	APIDistributedFirewallRule struct {
 		ID                        string               `json:"id,omitempty"`
 		Name                      string               `json:"name"`
 		Description               string               `json:"description,omitempty"`
 		Comments                  string               `json:"comments,omitempty"`
-		ApplicationPortProfiles   []ApiObjectReference `json:"applicationPortProfiles,omitempty"`
-		SourceFirewallGroups      []ApiObjectReference `json:"sourceFirewallGroups,omitempty"`
-		DestinationFirewallGroups []ApiObjectReference `json:"destinationFirewallGroups,omitempty"`
-		NetworkContextProfiles    []ApiObjectReference `json:"networkContextProfiles,omitempty"`
+		ApplicationPortProfiles   []APIObjectReference `json:"applicationPortProfiles,omitempty"`
+		SourceFirewallGroups      []APIObjectReference `json:"sourceFirewallGroups,omitempty"`
+		DestinationFirewallGroups []APIObjectReference `json:"destinationFirewallGroups,omitempty"`
+		NetworkContextProfiles    []APIObjectReference `json:"networkContextProfiles,omitempty"`
 		Direction                 string               `json:"direction"`
 		Enabled                   bool                 `json:"enabled"`
-		IpProtocol                string               `json:"ipProtocol"`
+		IPProtocol                string               `json:"ipProtocol"`
 		Logging                   bool                 `json:"logging"`
 		ActionValue               string               `json:"actionValue,omitempty"`
 		SourceGroupsExcluded      *bool                `json:"sourceGroupsExcluded,omitempty"`
@@ -58,14 +58,14 @@ type (
 )
 
 // ToModel converts the wire DFW rule into its public model representation.
-func (r *ApiDistributedFirewallRule) ToModel() types.ModelFirewallRule {
+func (r *APIDistributedFirewallRule) ToModel() types.ModelFirewallRule {
 	m := types.ModelFirewallRule{
 		ID:                        r.ID,
 		Name:                      r.Name,
 		Description:               r.Description,
 		Direction:                 r.Direction,
 		Enabled:                   r.Enabled,
-		IPProtocol:                r.IpProtocol,
+		IPProtocol:                r.IPProtocol,
 		Action:                    r.ActionValue,
 		Logging:                   r.Logging,
 		SourceGroupsExcluded:      r.SourceGroupsExcluded,
@@ -89,7 +89,7 @@ func (r *ApiDistributedFirewallRule) ToModel() types.ModelFirewallRule {
 }
 
 // ToModel converts the wire DFW rules container into its public model representation.
-func (r *ApiDistributedFirewallRules) ToModel() []types.ModelFirewallRule {
+func (r *APIDistributedFirewallRules) ToModel() []types.ModelFirewallRule {
 	rules := make([]types.ModelFirewallRule, 0, len(r.Values))
 	for _, v := range r.Values {
 		rules = append(rules, v.ToModel())

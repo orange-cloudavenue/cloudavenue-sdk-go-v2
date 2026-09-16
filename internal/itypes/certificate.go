@@ -12,20 +12,20 @@ package itypes
 import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 
 type (
-	ApiEntityReferences struct {
-		Values []ApiEntityReference `json:"values" fakesize:"2"`
+	APIEntityReferences struct {
+		Values []APIEntityReference `json:"values" fakesize:"2"`
 	}
 
-	ApiEntityReference struct {
+	APIEntityReference struct {
 		Name string `json:"name,omitempty" fake:"mock-entity-{word}"`
 		ID   string `json:"id,omitempty" fake:"{urn}"`
 	}
 
-	ApiResponseListCertificate struct {
-		Values []ApiResponseCertificate `json:"values" fakesize:"2"`
+	APIResponseListCertificate struct {
+		Values []APIResponseCertificate `json:"values" fakesize:"2"`
 	}
 
-	ApiResponseCertificate struct {
+	APIResponseCertificate struct {
 		ID                   string `json:"id,omitempty" fake:"{urn:certificateLibraryItem}"`
 		Alias                string `json:"alias,omitempty" fake:"mock-certificate-{word}"`
 		PrivateKey           string `json:"privateKey,omitempty" fake:"-----BEGIN PRIVATE KEY-----mock-----END PRIVATE KEY-----"`
@@ -35,7 +35,7 @@ type (
 		ConsumerCount        int    `json:"consumerCount,omitempty" fake:"{number:0,5}"`
 	}
 
-	ApiRequestCertificate struct {
+	APIRequestCertificate struct {
 		ID                   string `json:"id,omitempty" fake:"{urn:certificateLibraryItem}"`
 		Alias                string `json:"alias,omitempty" fake:"mock-certificate-{word}"`
 		PrivateKey           string `json:"privateKey,omitempty" fake:"-----BEGIN PRIVATE KEY-----mock-----END PRIVATE KEY-----"`
@@ -46,7 +46,7 @@ type (
 	}
 )
 
-func (r *ApiResponseListCertificate) ToModel() *types.ModelListCertificate {
+func (r *APIResponseListCertificate) ToModel() *types.ModelListCertificate {
 	model := &types.ModelListCertificate{Certificates: make([]types.ModelGetCertificate, 0, len(r.Values))}
 	for _, certificate := range r.Values {
 		model.Certificates = append(model.Certificates, certificate.ToModel())
@@ -54,7 +54,7 @@ func (r *ApiResponseListCertificate) ToModel() *types.ModelListCertificate {
 	return model
 }
 
-func (r *ApiEntityReferences) ToModel() *types.ModelListEntityReference {
+func (r *APIEntityReferences) ToModel() *types.ModelListEntityReference {
 	model := &types.ModelListEntityReference{References: make([]types.ModelEntityReference, 0, len(r.Values))}
 	for _, ref := range r.Values {
 		model.References = append(model.References, ref.ToModel())
@@ -62,11 +62,11 @@ func (r *ApiEntityReferences) ToModel() *types.ModelListEntityReference {
 	return model
 }
 
-func (r *ApiEntityReference) ToModel() types.ModelEntityReference {
+func (r *APIEntityReference) ToModel() types.ModelEntityReference {
 	return types.ModelEntityReference{ID: r.ID, Name: r.Name}
 }
 
-func (r *ApiResponseCertificate) ToModel() types.ModelGetCertificate {
+func (r *APIResponseCertificate) ToModel() types.ModelGetCertificate {
 	return types.ModelGetCertificate{
 		ID:            r.ID,
 		Name:          r.Alias,
@@ -76,7 +76,7 @@ func (r *ApiResponseCertificate) ToModel() types.ModelGetCertificate {
 	}
 }
 
-func (r *ApiRequestCertificate) ToModel() types.ModelGetCertificate {
+func (r *APIRequestCertificate) ToModel() types.ModelGetCertificate {
 	return types.ModelGetCertificate{
 		ID:            r.ID,
 		Name:          r.Alias,
