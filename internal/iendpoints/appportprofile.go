@@ -42,6 +42,11 @@ func init() {
 				Description: descPageSize,
 				Value:       pageSize100,
 			},
+			{
+				Name:        queryParamPage,
+				Description: descPage,
+				Value:       "1",
+			},
 		},
 		ResponseType: itypes.APIResponseListAppPortProfile{},
 	}.Register()

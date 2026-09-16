@@ -28,7 +28,7 @@ import (
 func init() {
 	// ListVDCNetwork
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/get/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/get/",
 		Name:             "ListVDCNetwork",
 		Description:      "List Org VDC Networks (routed and isolated)",
 		Method:           cav.MethodGET,
@@ -44,13 +44,18 @@ func init() {
 				Description: "The number of items per page. VCD enforces a maximum of 32 for this resource.",
 				Value:       pageSize32,
 			},
+			{
+				Name:        queryParamPage,
+				Description: descPage,
+				Value:       "1",
+			},
 		},
 		ResponseType: itypes.APIResponseListVDCNetwork{},
 	}.Register()
 
 	// GetVDCNetwork
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/get/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/get/",
 		Name:             "GetVDCNetwork",
 		Description:      "Get an Org VDC Network (routed or isolated)",
 		Method:           cav.MethodGET,
@@ -71,7 +76,7 @@ func init() {
 
 	// CreateVDCNetwork
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/post/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/post/",
 		Name:             "CreateVDCNetwork",
 		Description:      "Create an Org VDC Network (routed or isolated)",
 		Method:           cav.MethodPOST,
@@ -83,7 +88,7 @@ func init() {
 
 	// UpdateVDCNetwork
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/put/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/put/",
 		Name:             "UpdateVDCNetwork",
 		Description:      "Update an Org VDC Network (routed or isolated)",
 		Method:           cav.MethodPUT,
@@ -105,7 +110,7 @@ func init() {
 
 	// DeleteVDCNetwork
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/delete/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/delete/",
 		Name:             "DeleteVDCNetwork",
 		Description:      "Delete an Org VDC Network (routed or isolated)",
 		Method:           cav.MethodDELETE,

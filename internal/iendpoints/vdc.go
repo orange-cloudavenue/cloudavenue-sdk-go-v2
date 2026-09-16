@@ -61,6 +61,11 @@ func init() {
 				Value:       pageSize100,
 			},
 			{
+				Name:        queryParamPage,
+				Description: descPage,
+				Value:       "1",
+			},
+			{
 				Name:        queryParamFormat,
 				Description: descFormatResponse,
 				Value:       formatRecords,
