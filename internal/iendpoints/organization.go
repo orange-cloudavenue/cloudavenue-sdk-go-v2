@@ -19,7 +19,7 @@ import (
 func init() {
 	// Get Organization from Vmware Cloud Director
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/orgs/get/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgs/get/",
 		Name:             "GetOrganizationDetails",
 		Description:      "Get organizations details from VMware Cloud Director",
 		Method:           cav.MethodGET,

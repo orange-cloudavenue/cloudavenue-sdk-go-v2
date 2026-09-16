@@ -30,10 +30,10 @@ func init() {
 		Description:      "Get EdgeGateway",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/edgeGateways/{edgeId}",
+		PathTemplate:     "/cloudapi/1.0.0/edgeGateways/{gatewayId}",
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamEdgeID,
+				Name:        "gatewayId",
 				Description: descEdgeGatewayID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {

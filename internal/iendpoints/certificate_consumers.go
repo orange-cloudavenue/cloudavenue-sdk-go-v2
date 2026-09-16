@@ -20,7 +20,7 @@ import (
 
 func init() {
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/ssl/certificateLibrary/certLibraryItemId/consumers/get/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/certificateLibrary/certLibraryItemId/consumers/get/",
 		Name:             "ListCertificateConsumers",
 		Description:      "List consumers of a certificate library item",
 		Method:           cav.MethodGET,
@@ -39,7 +39,7 @@ func init() {
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/ssl/certificateLibrary/certLibraryItemId/consumers/post/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/certificateLibrary/certLibraryItemId/consumers/post/",
 		Name:             "AddCertificateConsumer",
 		Description:      "Add consumer reference to a certificate library item",
 		Method:           cav.MethodPOST,
@@ -58,7 +58,7 @@ func init() {
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/v39.1/cloudapi/1.0.0/ssl/certificateLibrary/certLibraryItemId/consumers/put/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/certificateLibrary/certLibraryItemId/consumers/put/",
 		Name:             "SetCertificateConsumers",
 		Description:      "Replace consumer references for a certificate library item",
 		Method:           cav.MethodPUT,

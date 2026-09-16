@@ -23,6 +23,7 @@ import (
 const (
 	queryParamFilter   = "filter"
 	queryParamFormat   = "format"
+	queryParamPage     = "page"
 	queryParamPageSize = "pageSize"
 	queryParamSortAsc  = "sortAsc"
 	queryParamType     = "type"
@@ -49,6 +50,7 @@ const (
 	typeVApp                 = "vApp"
 
 	descPageSize                 = "The number of items per page."
+	descPage                     = "Page to fetch, zero offset."
 	descFormatResponse           = "The format of the response."
 	descTypeOfObjectQuery        = "The type of object to query"
 	descEdgeGatewayID            = "The ID of the edge gateway."
