@@ -19,6 +19,7 @@ import (
 func init() {
 	const pathAdminOrgs = "/api/admin/orgs"
 	const pathAdminOrg = "/api/admin/org/{orgId}"
+	const pathAdminCatalog = "/api/admin/catalog/{catalogId}"
 	const pathAdminCatalogID = "catalogId"
 	const descCatalogID = "Catalog ID"
 
@@ -98,7 +99,7 @@ func init() {
 		Description:      "Get a catalog by ID (admin scope)",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/api/admin/catalog/{catalogId}",
+		PathTemplate:     pathAdminCatalog,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathAdminCatalogID,
@@ -135,7 +136,7 @@ func init() {
 		Description:      "Update a catalog (admin scope)",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/api/admin/catalog/{catalogId}",
+		PathTemplate:     pathAdminCatalog,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathAdminCatalogID,
@@ -162,5 +163,42 @@ func init() {
 				Required:    true,
 			},
 		},
+	}.Register()
+
+	// GetAdminCatalogACL
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-AdminCatalogControlAccess.html",
+		Name:             "GetAdminCatalogACL",
+		Description:      "Get catalog ACL (admin scope)",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     "/api/admin/catalog/{catalogId}/controlAccess",
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathAdminCatalogID,
+				Description: descCatalogID,
+				Required:    true,
+			},
+		},
+		ResponseType: itypes.ControlAccessParams{},
+	}.Register()
+
+	// SetAdminCatalogACL
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-AdminCatalogControlAccess.html",
+		Name:             "SetAdminCatalogACL",
+		Description:      "Set catalog ACL (admin scope)",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     "/api/admin/catalog/{catalogId}/action/controlAccess",
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathAdminCatalogID,
+				Description: descCatalogID,
+				Required:    true,
+			},
+		},
+		BodyRequestType: itypes.ControlAccessParams{},
+		ResponseType:    itypes.ControlAccessParams{},
 	}.Register()
 }

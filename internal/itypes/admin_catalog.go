@@ -32,10 +32,10 @@ type AdminCatalog struct {
 
 // AdminCatalogRequest represents the request body for creating or updating a VMware vCD AdminCatalog.
 type AdminCatalogRequest struct {
-	XMLName          xml.Name    `xml:"Catalog"`
-	Name             string      `xml:"name,attr"`
-	Description      string      `xml:"Description,omitempty"`
-	StorageProfiles  []Reference `xml:"StorageProfiles>StorageProfile,omitempty"`
+	XMLName         xml.Name    `xml:"Catalog"`
+	Name            string      `xml:"name,attr"`
+	Description     string      `xml:"Description,omitempty"`
+	StorageProfiles []Reference `xml:"StorageProfiles>StorageProfile,omitempty"`
 }
 
 // AdminCatalogs represents the wrapper for a list of catalogs in VMware vCD AdminCatalog API.
