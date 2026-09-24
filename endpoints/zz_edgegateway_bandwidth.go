@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (c) 2025 Orange
+ * SPDX-FileCopyrightText: Copyright (c) 2026 Orange
  * SPDX-License-Identifier: Mozilla Public License 2.0
  *
  * This software is distributed under the MPL-2.0 license.
@@ -15,7 +15,8 @@ import (
 
 // UpdateEdgeGatewayBandwidth - Update EdgeGateway Bandwidth
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/put_api_customers_v2_0_edges__edge_id_ 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/put_api_customers_v2_0_edges__edge_id_
 func UpdateEdgeGatewayBandwidth() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateEdgeGatewayBandwidth")
 }
+

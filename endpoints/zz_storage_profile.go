@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (c) 2025 Orange
+ * SPDX-FileCopyrightText: Copyright (c) 2026 Orange
  * SPDX-License-Identifier: Mozilla Public License 2.0
  *
  * This software is distributed under the MPL-2.0 license.
@@ -15,7 +15,8 @@ import (
 
 // ListStorageProfile - List VDC Storage Profiles
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/queries/orgVdcStorageProfile.html 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/queries/orgVdcStorageProfile.html
 func ListStorageProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListStorageProfile")
 }
+
