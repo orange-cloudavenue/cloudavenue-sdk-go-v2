@@ -19,4 +19,3 @@ import (
 func ListStorageProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListStorageProfile")
 }
-

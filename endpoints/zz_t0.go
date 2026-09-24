@@ -19,4 +19,3 @@ import (
 func ListT0() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListT0")
 }
-

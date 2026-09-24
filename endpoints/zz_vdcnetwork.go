@@ -19,28 +19,31 @@ import (
 func ListVDCNetwork() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListVDCNetwork")
 }
+
 // GetVDCNetwork - Get an Org VDC Network (routed or isolated)
 //
 // DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/get/
 func GetVDCNetwork() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetVDCNetwork")
 }
+
 // CreateVDCNetwork - Create an Org VDC Network (routed or isolated)
 //
 // DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/post/
 func CreateVDCNetwork() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreateVDCNetwork")
 }
+
 // UpdateVDCNetwork - Update an Org VDC Network (routed or isolated)
 //
 // DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/put/
 func UpdateVDCNetwork() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateVDCNetwork")
 }
+
 // DeleteVDCNetwork - Delete an Org VDC Network (routed or isolated)
 //
 // DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/delete/
 func DeleteVDCNetwork() *cav.Endpoint {
 	return cav.MustGetEndpoint("DeleteVDCNetwork")
 }
-

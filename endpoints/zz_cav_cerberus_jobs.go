@@ -19,4 +19,3 @@ import (
 func GetJobCerberus() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetJobCerberus")
 }
-
