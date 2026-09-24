@@ -25,12 +25,12 @@ type AdminVDC struct {
 	Description           string      `xml:"Description,omitempty"`
 	IsEnabled             bool        `xml:"IsEnabled,omitempty"`
 	IsFullProtected       bool        `xml:"IsFullProtected,omitempty"`
-	VdcStorageProfiles    []Reference `xml:"StorageProfiles>StorageProfile"`
+	VDCStorageProfiles    []Reference `xml:"StorageProfiles>StorageProfile"`
 	ComputePolicies       []Reference `xml:"ComputePolicies>ComputePolicy"`
 	Networks              []Reference `xml:"Networks>Network"`
 	EdgeGatewayReferences []Reference `xml:"EdgeGateways>EdgeGateway"`
-	VmCount               int         `xml:"VmCount"`
-	VmRunningCount        int         `xml:"VmRunningCount"`
+	VMCount               int         `xml:"VmCount"`
+	VMRunningCount        int         `xml:"VmRunningCount"`
 	VappCount             int         `xml:"VappCount"`
 	VappTemplateCount     int         `xml:"VappTemplateCount"`
 	Allocation            struct {
@@ -57,8 +57,8 @@ func (r *AdminVDC) ToModel() *types.ModelAdminVDC {
 		Description:       r.Description,
 		IsEnabled:         r.IsEnabled,
 		IsFullProtected:   r.IsFullProtected,
-		VmCount:           r.VmCount,
-		VmRunningCount:    r.VmRunningCount,
+		VMCount:           r.VMCount,
+		VMRunningCount:    r.VMRunningCount,
 		VappCount:         r.VappCount,
 		VappTemplateCount: r.VappTemplateCount,
 	}
