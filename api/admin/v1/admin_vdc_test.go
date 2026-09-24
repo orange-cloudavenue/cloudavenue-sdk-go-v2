@@ -120,8 +120,8 @@ func TestGetAdminVDCByID(t *testing.T) {
 			Description:       "A VDC for testing",
 			IsEnabled:         true,
 			IsFullProtected:   false,
-			VmCount:           10,
-			VmRunningCount:    5,
+			VMCount:           10,
+			VMRunningCount:    5,
 			VappCount:         3,
 			VappTemplateCount: 2,
 		}
@@ -140,8 +140,8 @@ func TestGetAdminVDCByID(t *testing.T) {
 	assert.Equal(t, "A VDC for testing", result.Description)
 	assert.True(t, result.IsEnabled)
 	assert.False(t, result.IsFullProtected)
-	assert.Equal(t, 10, result.VmCount)
-	assert.Equal(t, 5, result.VmRunningCount)
+	assert.Equal(t, 10, result.VMCount)
+	assert.Equal(t, 5, result.VMRunningCount)
 	assert.Equal(t, 3, result.VappCount)
 	assert.Equal(t, 2, result.VappTemplateCount)
 }

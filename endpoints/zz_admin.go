@@ -19,24 +19,22 @@ import (
 func ListAdminOrgs() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListAdminOrgs")
 }
-
 // GetAdminOrg - Get an organization by ID (admin scope)
 //
 // DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-AdminOrg.html
 func GetAdminOrg() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetAdminOrg")
 }
-
 // ListAdminVDCs - List VDCs (admin scope)
 //
 // DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-AdminVdcs.html
 func ListAdminVDCs() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListAdminVDCs")
 }
-
 // GetAdminVDC - Get a VDC by ID (admin scope)
 //
 // DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-AdminVdc.html
 func GetAdminVDC() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetAdminVDC")
 }
+
