@@ -30,7 +30,7 @@ type AdminOrg struct {
 	Networks        []Reference  `xml:"Networks>Network"`
 	Catalogs        []Reference  `xml:"Catalogs>Catalog"`
 	StorageProfiles []Reference  `xml:"StorageProfiles>StorageProfile"`
-	VdcGroups       []Reference  `xml:"VdcGroups>VdcGroup"`
+	VDCGroups       []Reference  `xml:"VdcGroups>VdcGroup"`
 	Rights          []Reference  `xml:"Rights>Right"`
 	Users           []Reference  `xml:"Users>User"`
 	Groups          []Reference  `xml:"Groups>Group"`
