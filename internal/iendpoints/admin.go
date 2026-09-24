@@ -48,4 +48,33 @@ func init() {
 		},
 		ResponseType: itypes.AdminOrg{},
 	}.Register()
+
+	// ListAdminVDCs
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-AdminVdcs.html",
+		Name:             "ListAdminVDCs",
+		Description:      "List VDCs (admin scope)",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     "/api/admin/vdcs",
+		ResponseType:     itypes.AdminVDCs{},
+	}.Register()
+
+	// GetAdminVDC
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-AdminVdc.html",
+		Name:             "GetAdminVDC",
+		Description:      "Get a VDC by ID (admin scope)",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     "/api/admin/vdc/{vdcId}",
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamVDCIDAdmin,
+				Description: descVDCIDAdmin,
+				Required:    true,
+			},
+		},
+		ResponseType: itypes.AdminVDC{},
+	}.Register()
 }
