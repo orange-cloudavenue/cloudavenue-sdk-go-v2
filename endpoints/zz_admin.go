@@ -37,4 +37,34 @@ func ListAdminVDCs() *cav.Endpoint {
 func GetAdminVDC() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetAdminVDC")
 }
+// ListAdminCatalogs - List catalogs (admin scope)
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-AdminCatalogs.html
+func ListAdminCatalogs() *cav.Endpoint {
+	return cav.MustGetEndpoint("ListAdminCatalogs")
+}
+// GetAdminCatalog - Get a catalog by ID (admin scope)
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-AdminCatalog.html
+func GetAdminCatalog() *cav.Endpoint {
+	return cav.MustGetEndpoint("GetAdminCatalog")
+}
+// CreateAdminCatalog - Create a catalog (admin scope)
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-CreateCatalog.html
+func CreateAdminCatalog() *cav.Endpoint {
+	return cav.MustGetEndpoint("CreateAdminCatalog")
+}
+// UpdateAdminCatalog - Update a catalog (admin scope)
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-AdminCatalog.html
+func UpdateAdminCatalog() *cav.Endpoint {
+	return cav.MustGetEndpoint("UpdateAdminCatalog")
+}
+// DeleteAdminCatalog - Delete a catalog (admin scope)
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/DELETE-AdminCatalog.html
+func DeleteAdminCatalog() *cav.Endpoint {
+	return cav.MustGetEndpoint("DeleteAdminCatalog")
+}
 
