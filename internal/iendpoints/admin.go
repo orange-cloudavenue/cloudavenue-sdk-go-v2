@@ -19,6 +19,8 @@ import (
 func init() {
 	const pathAdminOrgs = "/api/admin/orgs"
 	const pathAdminOrg = "/api/admin/org/{orgId}"
+	const pathAdminCatalogID = "catalogId"
+	const descCatalogID = "Catalog ID"
 
 	// ListAdminOrgs
 	cav.Endpoint{
@@ -76,5 +78,89 @@ func init() {
 			},
 		},
 		ResponseType: itypes.AdminVDC{},
+	}.Register()
+
+	// ListAdminCatalogs
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-AdminCatalogs.html",
+		Name:             "ListAdminCatalogs",
+		Description:      "List catalogs (admin scope)",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     "/api/admin/catalogs",
+		ResponseType:     itypes.AdminCatalogs{},
+	}.Register()
+
+	// GetAdminCatalog
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-AdminCatalog.html",
+		Name:             "GetAdminCatalog",
+		Description:      "Get a catalog by ID (admin scope)",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     "/api/admin/catalog/{catalogId}",
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathAdminCatalogID,
+				Description: descCatalogID,
+				Required:    true,
+			},
+		},
+		ResponseType: itypes.AdminCatalog{},
+	}.Register()
+
+	// CreateAdminCatalog
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-CreateCatalog.html",
+		Name:             "CreateAdminCatalog",
+		Description:      "Create a catalog (admin scope)",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     "/api/admin/org/{orgId}/catalog",
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamOrgIDAdmin,
+				Description: descOrgIDAdmin,
+				Required:    true,
+			},
+		},
+		BodyRequestType: itypes.AdminCatalogRequest{},
+		ResponseType:    itypes.AdminCatalog{},
+	}.Register()
+
+	// UpdateAdminCatalog
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-AdminCatalog.html",
+		Name:             "UpdateAdminCatalog",
+		Description:      "Update a catalog (admin scope)",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     "/api/admin/catalog/{catalogId}",
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathAdminCatalogID,
+				Description: descCatalogID,
+				Required:    true,
+			},
+		},
+		BodyRequestType: itypes.AdminCatalogRequest{},
+		ResponseType:    itypes.AdminCatalog{},
+	}.Register()
+
+	// DeleteAdminCatalog
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/DELETE-AdminCatalog.html",
+		Name:             "DeleteAdminCatalog",
+		Description:      "Delete a catalog (admin scope)",
+		Method:           cav.MethodDELETE,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     "/api/admin/catalog/{catalogId}",
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathAdminCatalogID,
+				Description: descCatalogID,
+				Required:    true,
+			},
+		},
 	}.Register()
 }

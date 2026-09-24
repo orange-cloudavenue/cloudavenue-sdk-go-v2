@@ -14,8 +14,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"resty.dev/v3"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
@@ -177,10 +175,4 @@ func (c *Client) DisableOrg(ctx context.Context, params types.ParamsGetAdminOrg)
 	}
 
 	return org.ToModel(), nil
-}
-
-// setXMLHeaders sets Accept and Content-Type to application/xml.
-func setXMLHeaders(req *resty.Request) {
-	req.SetHeader("Accept", "application/xml")
-	req.SetHeader("Content-Type", "application/xml")
 }
