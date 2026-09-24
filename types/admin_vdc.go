@@ -40,10 +40,10 @@ type ModelAdminVDC struct {
 	IsFullProtected bool `documentation:"Indicates if the VDC is full protected"`
 
 	// Number of VMs in the VDC
-	VmCount int `documentation:"Number of VMs in the VDC"`
+	VMCount int `documentation:"Number of VMs in the VDC"`
 
 	// Number of running VMs in the VDC
-	VmRunningCount int `documentation:"Number of running VMs in the VDC"`
+	VMRunningCount int `documentation:"Number of running VMs in the VDC"`
 
 	// Number of deployed vApps in the VDC
 	VappCount int `documentation:"Number of deployed vApps in the VDC"`
