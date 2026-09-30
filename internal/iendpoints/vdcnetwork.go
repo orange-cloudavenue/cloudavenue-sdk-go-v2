@@ -127,4 +127,67 @@ func init() {
 			},
 		},
 	}.Register()
+
+	// GetNetworkDhcpConfig
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp/get/",
+		Name:             "GetNetworkDhcpConfig",
+		Description:      "Get the DHCP configuration of an Org VDC Network",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathOrgVDCNetworkDHCPGet,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamVDCNetworkID,
+				Description: descVDCNetworkID,
+				Required:    true,
+				ValidatorFunc: func(value string) error {
+					return validators.New().Var(value, urnNetwork)
+				},
+			},
+		},
+		ResponseType: itypes.DhcpConfig{},
+	}.Register()
+
+	// UpdateNetworkDhcpConfig
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp/put/",
+		Name:             "UpdateNetworkDhcpConfig",
+		Description:      "Update the DHCP configuration of an Org VDC Network",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathOrgVDCNetworkDHCAPut,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamVDCNetworkID,
+				Description: descVDCNetworkID,
+				Required:    true,
+				ValidatorFunc: func(value string) error {
+					return validators.New().Var(value, urnNetwork)
+				},
+			},
+		},
+		BodyRequestType: itypes.APIRequestDhcpConfig{},
+		ResponseType:    itypes.DhcpConfig{},
+	}.Register()
+
+	// DeleteNetworkDhcpConfig
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp/delete/",
+		Name:             "DeleteNetworkDhcpConfig",
+		Description:      "Delete the DHCP configuration of an Org VDC Network",
+		Method:           cav.MethodDELETE,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathOrgVDCNetworkDHCPDelete,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamVDCNetworkID,
+				Description: descVDCNetworkID,
+				Required:    true,
+				ValidatorFunc: func(value string) error {
+					return validators.New().Var(value, urnNetwork)
+				},
+			},
+		},
+	}.Register()
 }

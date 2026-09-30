@@ -237,4 +237,53 @@ type (
 		StartAddress string `documentation:"First IP address of the range"`
 		EndAddress   string `documentation:"Last IP address of the range"`
 	}
+
+	// * DHCP
+	ParamsGetNetworkDhcpConfig struct {
+		// VDCNetworkID is the unique identifier of the Org VDC Network.
+		VDCNetworkID string
+	}
+
+	ParamsUpdateNetworkDhcpConfig struct {
+		// VDCNetworkID is the unique identifier of the Org VDC Network.
+		VDCNetworkID string
+
+		// Config is the DHCP configuration to apply.
+		Config ModelDhcpConfig
+	}
+
+	ParamsDeleteNetworkDhcpConfig struct {
+		// VDCNetworkID is the unique identifier of the Org VDC Network.
+		VDCNetworkID string
+	}
+
+	ModelDhcpConfig struct {
+		ID                       string `documentation:"ID of the DHCP configuration"`
+		VDCNetworkID             string `documentation:"ID of the Org VDC Network"`
+		DHCPServerIPAddress      string `documentation:"IP address of the DHCP server"`
+		DHCPServerPort           int    `documentation:"Port of the DHCP server"`
+		DHCPRelayServerIPAddress string `documentation:"IP address of the DHCP relay server"`
+		DHCPEnabled              bool   `documentation:"Whether DHCP is enabled"`
+		DHCPLeaseTime            int    `documentation:"Lease time in seconds"`
+		DHCPIPAddress            string `documentation:"DHCP IP range"`
+		DHCPPoolIPAddress        string `documentation:"DHCP pool IP address"`
+		DHCPSubnetMask           string `documentation:"DHCP subnet mask"`
+		DHCPDefaultGateway       string `documentation:"DHCP default gateway"`
+		DHCPDNS1IPAddress        string `documentation:"Primary DHCP DNS server IP address"`
+		DHCPDNS2IPAddress        string `documentation:"Secondary DHCP DNS server IP address"`
+		DHCPSearchDomain         string `documentation:"DHCP search domain"`
+
+		DHCPServerCredentials *ModelDhcpServerCredentials `documentation:"DHCP server credentials"`
+		DHCPOptions           []ModelDhcpOption           `documentation:"List of DHCP options"`
+	}
+
+	ModelDhcpServerCredentials struct {
+		Username string `documentation:"Username of the DHCP server"`
+		Password string `documentation:"Password of the DHCP server"`
+	}
+
+	ModelDhcpOption struct {
+		Code  string `documentation:"DHCP option code"`
+		Value string `documentation:"DHCP option value"`
+	}
 )
