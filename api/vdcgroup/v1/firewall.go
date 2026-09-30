@@ -26,6 +26,10 @@ const (
 	opDeleteFirewall = "Firewall.Delete"
 )
 
+// defaultPolicyName is the fallback name applied to a distributed firewall
+// default policy when the API returns no name.
+const defaultPolicyName = "Default"
+
 // toAPIConfiguredFirewallRules converts public firewall rules to wire format.
 //
 // Comments intentionally mirror Description for v1 compatibility, and ActionValue is always used.
@@ -90,7 +94,7 @@ func dfwEnableOrDisable(ctx context.Context, cc *Client, vdcGroupID string, enab
 		defaultPolicy.Version = policies.DefaultPolicy.Version
 	}
 	if defaultPolicy.Name == "" {
-		defaultPolicy.Name = "Default"
+		defaultPolicy.Name = defaultPolicyName
 	}
 
 	epUpdate := endpoints.UpdateDFWDefaultPolicy()

@@ -22,6 +22,10 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
+// cavServicesNetworkType is the network type of the Cloudavenue services
+// network attached to an edge gateway.
+const cavServicesNetworkType = "cav-services"
+
 // GetServices returns network service state for an edge gateway.
 func (c *Client) GetServices(ctx context.Context, params types.ParamsEdgeGateway) (*types.ModelEdgeGatewayServices, error) {
 	if params.ID == "" && params.Name == "" {
@@ -83,7 +87,7 @@ func (c *Client) EnableCloudavenueServices(ctx context.Context, params types.Par
 	}
 
 	requestBody := &itypes.APIRequestNetworkServicesCavSvc{
-		NetworkType:   "cav-services",
+		NetworkType:   cavServicesNetworkType,
 		EdgeGatewayID: urn.ExtractUUID(params.ID),
 		Properties: struct {
 			PrefixLength int "json:\"prefixLength,omitempty\" validate:\"omitempty,min=25,max=28\" default:\"27\""

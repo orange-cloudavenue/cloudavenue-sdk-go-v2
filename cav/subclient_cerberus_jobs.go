@@ -21,6 +21,12 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
+// jobTaskID is the name of the path parameter carrying a job/task identifier.
+const jobTaskID = "taskId"
+
+// jobStatusDone is the terminal success status reported by Cerberus.
+const jobStatusDone = "done"
+
 //go:generate endpoint-generator -path subclient_cerberus_jobs.go -filename zz_cav_cerberus_jobs.go -output cav_cerberus_jobs.go
 
 func init() {
@@ -33,7 +39,7 @@ func init() {
 		PathTemplate:     "/api/customers/v1.0/jobs/{taskId}",
 		PathParams: []PathParam{
 			{
-				Name:        "taskId",
+				Name:        jobTaskID,
 				Description: "The identifier of the task to retrieve.",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -146,7 +152,7 @@ func (v *cerberus) JobParser(resp *resty.Response) (job *Job, err error) {
 		}
 
 		job = &Job{
-			ID:          resp.Request.PathParams["taskId"],
+			ID:          resp.Request.PathParams[jobTaskID],
 			Name:        (*apiR)[0].Name,
 			Description: (*apiR)[0].Description,
 			HREF:        resp.Request.URL,
@@ -193,7 +199,7 @@ func (v *cerberus) JobStatusParser(status string) (s JobStatus, err error) {
 		s = JobRunning
 	case "failed":
 		s = JobError
-	case "done":
+	case jobStatusDone:
 		s = JobSuccess
 	default:
 		return "", errors.New("unknown job status: " + status)

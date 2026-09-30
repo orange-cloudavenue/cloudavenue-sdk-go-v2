@@ -29,7 +29,7 @@ func init() {
 		PathTemplate:     "/api/task/{taskId}",
 		PathParams: []PathParam{
 			{
-				Name:        "taskId",
+				Name:        jobTaskID,
 				Description: "The identifier of the task to retrieve.",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -178,7 +178,7 @@ func (v *vmware) JobStatusParser(status string) (s JobStatus, err error) {
 		s = JobRunning
 	case "success":
 		s = JobSuccess
-	case "error":
+	case string(JobError):
 		s = JobError
 	case "aborted":
 		s = JobAborted

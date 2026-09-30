@@ -28,6 +28,10 @@ const (
 	opDeleteEdgeGatewayFirewall = "EdgeGateway.Firewall.Delete"
 )
 
+// defaultPolicyName is the fallback name applied to a distributed firewall
+// default policy when the API returns no name.
+const defaultPolicyName = "Default"
+
 func resolveEdgeGatewayVDCGroupOwnerRef(ctx context.Context, c *Client, edgeGatewayID, edgeGatewayName string) (*itypes.APIObjectReference, error) {
 	ownerRef, err := resolveEdgeGatewayOwnerRef(ctx, c.c, edgeGatewayID, edgeGatewayName)
 	if err != nil {
@@ -93,7 +97,7 @@ func edgeGatewayDFWEnableOrDisable(ctx context.Context, c *Client, vdcGroupID st
 		defaultPolicy.Version = policies.DefaultPolicy.Version
 	}
 	if defaultPolicy.Name == "" {
-		defaultPolicy.Name = "Default"
+		defaultPolicy.Name = defaultPolicyName
 	}
 
 	epUpdate := endpoints.UpdateDFWDefaultPolicy()

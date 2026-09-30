@@ -21,12 +21,13 @@ import (
 )
 
 const (
-	queryParamFilter   = "filter"
-	queryParamFormat   = "format"
-	queryParamPage     = "page"
-	queryParamPageSize = "pageSize"
-	queryParamSortAsc  = "sortAsc"
-	queryParamType     = "type"
+	queryParamFilter     = "filter"
+	queryParamFormat     = "format"
+	queryParamPage       = "page"
+	queryParamPageSize   = "pageSize"
+	queryParamMaxResults = "maxResults"
+	queryParamSortAsc    = "sortAsc"
+	queryParamType       = "type"
 
 	pathParamEdgeID                  = "edgeId"
 	pathParamNetworkContextProfileID = "networkContextProfileId"
@@ -51,6 +52,7 @@ const (
 
 	descPageSize                 = "The number of items per page."
 	descPage                     = "Page to fetch, zero offset."
+	descMaxResults               = "The maximum number of results to return."
 	descFormatResponse           = "The format of the response."
 	descTypeOfObjectQuery        = "The type of object to query"
 	descEdgeGatewayID            = "The ID of the edge gateway."
@@ -73,10 +75,12 @@ const (
 	urnNetwork                  = "urn=network"
 	urnVDC                      = "urn=vdc"
 	urnVDCGroup                 = "urn=vdcGroup"
+	urnVDCNetwork               = "urn=vdcNetwork"
 	urnVDCStorageProfile        = "urn=vdcstorageProfile"
 	urnVApp                     = "urn=vapp"
 	urnOrg                      = "urn=org"
 	urnEdgeGatewayID            = "urn=edgegateway"
+	urnCatalog                  = "urn=catalog"
 	ruleRequiredURNEdgeGateway  = "required," + urnEdgeGateway
 	ruleResourceNameEdgeGateway = "resource_name=edgegateway"
 
@@ -91,11 +95,22 @@ const (
 	pathNetworkContextProfiles      = "/cloudapi/1.0.0/networkContextProfiles/{networkContextProfileId}"
 	pathTrustedCertificates         = "/cloudapi/1.0.0/ssl/trustedCertificates/{trustedCertificate}"
 	pathOrgVDCNetworks              = "/cloudapi/1.0.0/orgVdcNetworks/{vdcNetworkId}"
+	pathCatalogAccessControl        = "/cloudapi/1.0.0/catalogs/{catalogUrn}/accessControls"
+	pathParamCatalogURN             = "catalogUrn"
+	descCatalogURN                  = "URN of the catalog"
+	pathOrgVDCNetworkDHCPGet        = "/cloudapi/1.0.0/orgVdcNetworks/{vdcNetworkId}/dhcp/get/"
+	pathOrgVDCNetworkDHCAPut        = "/cloudapi/1.0.0/orgVdcNetworks/{vdcNetworkId}/dhcp/put/"
+	pathOrgVDCNetworkDHCPDelete     = "/cloudapi/1.0.0/orgVdcNetworks/{vdcNetworkId}/dhcp/delete/"
 	pathParamVDCNetworkID           = "vdcNetworkId"
+	descVDCNetworkID                = "ID of the Org VDC Network"
 	pathParamOrgID                  = "orgId"
 	descOrgID                       = "Organization ID"
 	pathParamUserID                 = "userId"
 	descUserID                      = "User ID or name"
+	pathParamTokenID                = "id"
+	descTokenID                     = "Token ID"
+	pathParamGlobalRoleID           = "id"
+	descGlobalRoleID                = "Global Role ID"
 	queryParamVDC                   = "vdc"
 
 	pathParamOrgIDAdmin         = "orgId"

@@ -57,7 +57,7 @@ func TestListEdgegatewayPublicIP(t *testing.T) {
 							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
-									Name:      "internet",
+									Name:      networkTypeInternet,
 									ServiceID: "test-publicip-id",
 									Properties: struct {
 										ClassOfService     string   `json:"classOfService,omitempty"`
@@ -166,7 +166,7 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
-									Name:      "internet",
+									Name:      networkTypeInternet,
 									ServiceID: "test-publicip-id",
 									Properties: struct {
 										ClassOfService     string   `json:"classOfService,omitempty"`
@@ -219,7 +219,7 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
-									Name:      "internet",
+									Name:      networkTypeInternet,
 									ServiceID: "test-publicip-id",
 									Properties: struct {
 										ClassOfService     string   `json:"classOfService,omitempty"`
@@ -375,7 +375,7 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
-									Name:      "internet",
+									Name:      networkTypeInternet,
 									ServiceID: "test-publicip-id",
 									Properties: struct {
 										ClassOfService     string   `json:"classOfService,omitempty"`
@@ -442,7 +442,7 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
-									Name:      "internet",
+									Name:      networkTypeInternet,
 									ServiceID: "test-publicip-id",
 									Properties: struct {
 										ClassOfService     string   `json:"classOfService,omitempty"`

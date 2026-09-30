@@ -65,13 +65,13 @@ func TestCreateFirewall(t *testing.T) {
 	ms.CleanResponse(endpoints.GetDFWPolicies())
 	ms.SetResponse(endpoints.GetDFWPolicies(), &itypes.APIDFWPolicies{
 		Enabled:       true,
-		DefaultPolicy: &itypes.APIDfwDefaultPolicy{ID: "default-policy", Name: "Default", Enabled: &enabledFalse},
+		DefaultPolicy: &itypes.APIDfwDefaultPolicy{ID: "default-policy", Name: defaultPolicyName, Enabled: &enabledFalse},
 	}, nil)
 
 	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
 	ms.SetResponse(endpoints.UpdateDFWDefaultPolicy(), &itypes.APIDfwDefaultPolicy{
 		ID:      "default-policy",
-		Name:    "Default",
+		Name:    defaultPolicyName,
 		Enabled: &enabledTrue,
 	}, nil)
 
@@ -140,7 +140,7 @@ func TestGetFirewall(t *testing.T) {
 	ms.CleanResponse(endpoints.GetDFWPolicies())
 	ms.SetResponse(endpoints.GetDFWPolicies(), &itypes.APIDFWPolicies{
 		Enabled:       true,
-		DefaultPolicy: &itypes.APIDfwDefaultPolicy{ID: "default-policy", Name: "Default", Enabled: &enabledTrue},
+		DefaultPolicy: &itypes.APIDfwDefaultPolicy{ID: "default-policy", Name: defaultPolicyName, Enabled: &enabledTrue},
 	}, nil)
 
 	ms.CleanResponse(endpoints.GetDFWRules())
@@ -194,13 +194,13 @@ func TestUpdateFirewall(t *testing.T) {
 	ms.CleanResponse(endpoints.GetDFWPolicies())
 	ms.SetResponse(endpoints.GetDFWPolicies(), &itypes.APIDFWPolicies{
 		Enabled:       true,
-		DefaultPolicy: &itypes.APIDfwDefaultPolicy{ID: "default-policy", Name: "Default", Enabled: &enabledTrue},
+		DefaultPolicy: &itypes.APIDfwDefaultPolicy{ID: "default-policy", Name: defaultPolicyName, Enabled: &enabledTrue},
 	}, nil)
 
 	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
 	ms.SetResponse(endpoints.UpdateDFWDefaultPolicy(), &itypes.APIDfwDefaultPolicy{
 		ID:      "default-policy",
-		Name:    "Default",
+		Name:    defaultPolicyName,
 		Enabled: &enabledFalse,
 	}, nil)
 
@@ -267,12 +267,12 @@ func TestDeleteFirewall(t *testing.T) {
 	ms.CleanResponse(endpoints.GetDFWPolicies())
 	ms.SetResponse(endpoints.GetDFWPolicies(), &itypes.APIDFWPolicies{
 		Enabled:       true,
-		DefaultPolicy: &itypes.APIDfwDefaultPolicy{ID: "default-policy", Name: "Default", Enabled: &enabledTrue},
+		DefaultPolicy: &itypes.APIDfwDefaultPolicy{ID: "default-policy", Name: defaultPolicyName, Enabled: &enabledTrue},
 	}, nil)
 	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
 	ms.SetResponse(endpoints.UpdateDFWDefaultPolicy(), &itypes.APIDfwDefaultPolicy{
 		ID:      "default-policy",
-		Name:    "Default",
+		Name:    defaultPolicyName,
 		Enabled: &enabledFalse,
 	}, nil)
 	ms.CleanResponse(endpoints.UpdateDFWPolicies())
