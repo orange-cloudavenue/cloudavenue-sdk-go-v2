@@ -19,3 +19,4 @@ import (
 func UpdateEdgeGatewayBandwidth() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateEdgeGatewayBandwidth")
 }
+
