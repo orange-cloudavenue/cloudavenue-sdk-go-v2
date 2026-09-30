@@ -97,6 +97,35 @@ type (
 		// Name is the name of the VApp to delete.
 		Name string
 	}
+
+	// ModelVAppLeaseSettings contains org/VDC-level lease settings.
+	ModelVAppLeaseSettings struct {
+		DeploymentLeaseInSeconds int `documentation:"Deployment lease in seconds"`
+		StorageLeaseInSeconds    int `documentation:"Storage lease in seconds"`
+	}
+
+	// ParamsGetVAppLeaseSettings defines the parameters for getting org/VDC-level lease settings.
+	ParamsGetVAppLeaseSettings struct {
+		// OrgID is the unique identifier of the organization.
+		// Example: urn:vcloud:org:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+		OrgID string
+
+		// OrgName is the name of the organization.
+		OrgName string
+	}
+
+	// ParamsUpdateVAppLeaseSettings defines the parameters for updating org/VDC-level lease settings.
+	ParamsUpdateVAppLeaseSettings struct {
+		// OrgID is the unique identifier of the organization.
+		// Example: urn:vcloud:org:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+		OrgID string
+
+		// OrgName is the name of the organization.
+		OrgName string
+
+		// LeaseSettings are the lease settings to apply.
+		LeaseSettings ModelVAppLeaseSettings
+	}
 )
 
 // Validate checks ParamsGetVApp structural constraints.
@@ -129,6 +158,22 @@ func (p ParamsUpdateVApp) Validate() error {
 // Validate checks ParamsDeleteVApp structural constraints.
 func (p ParamsDeleteVApp) Validate() error {
 	if p.ID == "" && p.Name == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	return nil
+}
+
+// Validate checks ParamsGetVAppLeaseSettings structural constraints.
+func (p ParamsGetVAppLeaseSettings) Validate() error {
+	if p.OrgID == "" && p.OrgName == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	return nil
+}
+
+// Validate checks ParamsUpdateVAppLeaseSettings structural constraints.
+func (p ParamsUpdateVAppLeaseSettings) Validate() error {
+	if p.OrgID == "" && p.OrgName == "" {
 		return fmt.Errorf("missing required parameters")
 	}
 	return nil
