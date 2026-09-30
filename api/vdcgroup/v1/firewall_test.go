@@ -41,7 +41,7 @@ func TestCreateFirewall(t *testing.T) {
 		Enabled: true,
 		DefaultPolicy: &itypes.APIDfwDefaultPolicy{
 			ID:      "default-policy",
-			Name:    "Default",
+			Name:    defaultPolicyName,
 			Enabled: &enabledFalse,
 		},
 	}, nil)
@@ -49,7 +49,7 @@ func TestCreateFirewall(t *testing.T) {
 	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
 	ms.SetResponse(endpoints.UpdateDFWDefaultPolicy(), &itypes.APIDfwDefaultPolicy{
 		ID:      "default-policy",
-		Name:    "Default",
+		Name:    defaultPolicyName,
 		Enabled: &enabledTrue,
 	}, nil)
 
@@ -113,7 +113,7 @@ func TestGetFirewall(t *testing.T) {
 		Enabled: true,
 		DefaultPolicy: &itypes.APIDfwDefaultPolicy{
 			ID:      "default-policy",
-			Name:    "Default",
+			Name:    defaultPolicyName,
 			Enabled: &enabledTrue,
 		},
 	}, nil)
@@ -164,7 +164,7 @@ func TestUpdateFirewall(t *testing.T) {
 		Enabled: true,
 		DefaultPolicy: &itypes.APIDfwDefaultPolicy{
 			ID:      "default-policy",
-			Name:    "Default",
+			Name:    defaultPolicyName,
 			Enabled: &enabledTrue,
 		},
 	}, nil)
@@ -172,7 +172,7 @@ func TestUpdateFirewall(t *testing.T) {
 	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
 	ms.SetResponse(endpoints.UpdateDFWDefaultPolicy(), &itypes.APIDfwDefaultPolicy{
 		ID:      "default-policy",
-		Name:    "Default",
+		Name:    defaultPolicyName,
 		Enabled: &enabledFalse,
 	}, nil)
 
@@ -236,14 +236,14 @@ func TestDeleteFirewall(t *testing.T) {
 		Enabled: true,
 		DefaultPolicy: &itypes.APIDfwDefaultPolicy{
 			ID:      "default-policy",
-			Name:    "Default",
+			Name:    defaultPolicyName,
 			Enabled: &enabledTrue,
 		},
 	}, nil)
 	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
 	ms.SetResponse(endpoints.UpdateDFWDefaultPolicy(), &itypes.APIDfwDefaultPolicy{
 		ID:      "default-policy",
-		Name:    "Default",
+		Name:    defaultPolicyName,
 		Enabled: &enabledFalse,
 	}, nil)
 	ms.CleanResponse(endpoints.UpdateDFWPolicies())

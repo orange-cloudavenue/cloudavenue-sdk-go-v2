@@ -98,7 +98,7 @@ func TestUpdateOrganization(t *testing.T) {
 				FullName:            "New Org Name",
 				Description:         func(s string) *string { return &s }("New Org Description"),
 				Email:               "user@email.com",
-				InternetBillingMode: "PAYG",
+				InternetBillingMode: internetBillingModePAYG,
 			},
 		},
 		{
@@ -156,7 +156,7 @@ func TestUpdateOrganization(t *testing.T) {
 				FullName:            "New Org Name",
 				Description:         func(s string) *string { return &s }("New Org Description"),
 				Email:               "user@email.com",
-				InternetBillingMode: "PAYG",
+				InternetBillingMode: internetBillingModePAYG,
 			},
 			mockUpdateOrgStatus: 404,
 			expectErr:           true,
