@@ -142,6 +142,18 @@ type APIRequestLeaseSettings struct {
 	StorageLeaseInSeconds    *int `json:"storageLeaseInSeconds,omitempty"`
 }
 
+// APIResponseOrgLeaseSettings contains org/VDC-level lease settings.
+type APIResponseOrgLeaseSettings struct {
+	DeploymentLeaseInSeconds int `json:"deploymentLeaseInSeconds"`
+	StorageLeaseInSeconds    int `json:"storageLeaseInSeconds"`
+}
+
+// APIRequestOrgLeaseSettings is the request payload for updating org/VDC-level lease settings.
+type APIRequestOrgLeaseSettings struct {
+	DeploymentLeaseInSeconds int `json:"deploymentLeaseInSeconds"`
+	StorageLeaseInSeconds    int `json:"storageLeaseInSeconds"`
+}
+
 // APIRequestUndeployVApp contains the request payload for undeploying a VApp.
 type APIRequestUndeployVApp struct {
 	XMLNS            string `json:"xmlns" fake:"http://www.vmware.com/vcloud/v1.5"`

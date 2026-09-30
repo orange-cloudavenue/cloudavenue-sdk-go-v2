@@ -165,4 +165,43 @@ func init() {
 		BodyRequestType: itypes.APIRequestUndeployVApp{},
 		ResponseType:    cav.Job{},
 	}.Register()
+
+	// GetVAppLeaseSettings
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-VAppLeaseSettings.html",
+		Name:             "GetVAppLeaseSettings",
+		Description:      "Get org/VDC-level lease settings",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     "/api/org/{orgId}/vAppLeaseSettings",
+		PathParams: []cav.PathParam{
+			{
+				Name:          pathParamOrgID,
+				Description:   descOrgID,
+				Required:      true,
+				ValidatorFunc: validateRule(urnOrg),
+			},
+		},
+		ResponseType: itypes.APIResponseOrgLeaseSettings{},
+	}.Register()
+
+	// UpdateVAppLeaseSettings
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-VAppLeaseSettings.html",
+		Name:             "UpdateVAppLeaseSettings",
+		Description:      "Update org/VDC-level lease settings",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     "/api/org/{orgId}/vAppLeaseSettings",
+		PathParams: []cav.PathParam{
+			{
+				Name:          pathParamOrgID,
+				Description:   descOrgID,
+				Required:      true,
+				ValidatorFunc: validateRule(urnOrg),
+			},
+		},
+		BodyRequestType: itypes.APIRequestOrgLeaseSettings{},
+		ResponseType:    itypes.APIResponseOrgLeaseSettings{},
+	}.Register()
 }
