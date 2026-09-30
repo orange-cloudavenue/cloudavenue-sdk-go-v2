@@ -27,6 +27,10 @@ const (
 	opDeleteVDCNetworkRouted = "VdcNetworkRouted.Delete"
 )
 
+// routedConnectionTypeInternal is the connection type of a routed VDC network
+// backed by an edge gateway.
+const routedConnectionTypeInternal = "INTERNAL"
+
 // GetVDCNetworkRouted gets NSX-T routed Org VDC network by ID or name within VDC group.
 func (c *Client) GetVDCNetworkRouted(ctx context.Context, params types.ParamsGetVDCNetworkRouted) (*types.ModelGetVDCNetwork, error) {
 	resp, err := getVDCNetworkModel(ctx, c.c, params.ID, params.Name, params.VDCGroupID, params.VDCGroupName, types.VDCNetworkTypeRouted)
@@ -65,7 +69,7 @@ func (c *Client) CreateVDCNetworkRouted(ctx context.Context, params types.Params
 		Shared:                  new(true),
 		Connection: &itypes.APIVDCNetworkConnection{
 			RouterRef:           itypes.APIObjectReference{ID: params.EdgeGatewayID, Name: params.EdgeGatewayName},
-			ConnectionTypeValue: "INTERNAL",
+			ConnectionTypeValue: routedConnectionTypeInternal,
 		},
 	}
 
@@ -159,7 +163,7 @@ func mergeVDCNetworkRoutedUpdate(current *itypes.APIResponseVDCNetwork, params t
 	if params.EdgeGatewayID != "" {
 		connection = &itypes.APIVDCNetworkConnection{
 			RouterRef:           itypes.APIObjectReference{ID: params.EdgeGatewayID, Name: params.EdgeGatewayName},
-			ConnectionTypeValue: "INTERNAL",
+			ConnectionTypeValue: routedConnectionTypeInternal,
 		}
 	}
 

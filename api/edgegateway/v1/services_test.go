@@ -271,7 +271,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
-									Name:      "cav-services",
+									Name:      cavServicesNetworkType,
 									ServiceID: "test-service-id",
 								},
 							},
@@ -313,7 +313,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
-									Name:      "cav-services",
+									Name:      cavServicesNetworkType,
 									ServiceID: "test-service-id",
 								},
 							},
@@ -362,7 +362,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
-									Name:      "cav-services",
+									Name:      cavServicesNetworkType,
 									ServiceID: "test-service-id",
 								},
 							},
@@ -395,7 +395,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
-									Name:      "cav-services",
+									Name:      cavServicesNetworkType,
 									ServiceID: "test-service-id",
 								},
 							},
@@ -491,7 +491,7 @@ func TestGetCloudavenueServices(t *testing.T) {
 							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
-									Name:      "cav-services",
+									Name:      cavServicesNetworkType,
 									ServiceID: "test-service-id",
 								},
 							},
@@ -533,7 +533,7 @@ func TestGetCloudavenueServices(t *testing.T) {
 							Children: []itypes.APIResponseNetworkServicesSubChildren{
 								{
 									Type:      "service",
-									Name:      "cav-services",
+									Name:      cavServicesNetworkType,
 									ServiceID: "test-service-id",
 								},
 							},
