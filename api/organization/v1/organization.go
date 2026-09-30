@@ -23,8 +23,10 @@ import (
 )
 
 const (
-	opGetOrganization    = "Organization.Get"
-	opUpdateOrganization = "Organization.Update"
+	opGetOrganization         = "Organization.Get"
+	opUpdateOrganization      = "Organization.Update"
+	opGetCatalogAccessControl = "CatalogAccessControl.Get"
+	opSetCatalogAccessControl = "CatalogAccessControl.Set"
 )
 
 const (
@@ -154,4 +156,55 @@ func validateUpdateOrganizationParams(p types.ParamsUpdateOrganization) error {
 	}
 
 	return nil
+}
+
+// GetCatalogAccessControl retrieves the list of access control grants for a catalog.
+func (c *Client) GetCatalogAccessControl(ctx context.Context, params types.ParamsGetCatalogAccessControl) (*types.ModelListCatalogAccessControlGrant, error) {
+	if err := params.Validate(); err != nil {
+		return nil, fmt.Errorf("%s: validate: %w", opGetCatalogAccessControl, err)
+	}
+
+	ep := endpoints.GetCatalogAccessControl()
+	resp, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], params.CatalogURN))
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", opGetCatalogAccessControl, err)
+	}
+
+	grants, ok := resp.Result().(*itypes.APIResponseCatalogAccessControlGrants)
+	if !ok || grants == nil {
+		return nil, fmt.Errorf("%s: unexpected response type %T", opGetCatalogAccessControl, resp.Result())
+	}
+
+	return grants.ToModel(), nil
+}
+
+// SetCatalogAccessControl sets the access control grants for a catalog.
+func (c *Client) SetCatalogAccessControl(ctx context.Context, params types.ParamsSetCatalogAccessControl) (*types.ModelListCatalogAccessControlGrant, error) {
+	if err := params.Validate(); err != nil {
+		return nil, fmt.Errorf("%s: validate: %w", opSetCatalogAccessControl, err)
+	}
+
+	body := itypes.APIRequestCatalogAccessControlGrants{
+		Values: make([]itypes.APIRequestCatalogAccessControlGrant, 0, len(params.Grants)),
+	}
+	for _, grant := range params.Grants {
+		body.Values = append(body.Values, itypes.APIRequestCatalogAccessControlGrant{
+			SubjectName: grant.SubjectName,
+			SubjectType: grant.SubjectType,
+			RoleURN:     grant.RoleURN,
+		})
+	}
+
+	ep := endpoints.SetCatalogAccessControl()
+	resp, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], params.CatalogURN), cav.SetBody(body))
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", opSetCatalogAccessControl, err)
+	}
+
+	grants, ok := resp.Result().(*itypes.APIResponseCatalogAccessControlGrants)
+	if !ok || grants == nil {
+		return nil, fmt.Errorf("%s: unexpected response type %T", opSetCatalogAccessControl, resp.Result())
+	}
+
+	return grants.ToModel(), nil
 }

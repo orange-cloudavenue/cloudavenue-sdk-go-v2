@@ -10,6 +10,8 @@
 package iendpoints
 
 import (
+	"github.com/orange-cloudavenue/common-go/validators"
+
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 )
@@ -49,5 +51,48 @@ func init() {
 		PathTemplate:     "/api/customers/v2.0/configurations",
 		BodyRequestType:  itypes.APIRequestUpdateOrg{},
 		ResponseType:     cav.Job{},
+	}.Register()
+
+	// GetCatalogAccessControl
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/catalogs/catalogUrn/accessControls/get/",
+		Name:             "GetCatalogAccessControl",
+		Description:      "List catalog access control grants",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathCatalogAccessControl,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamCatalogURN,
+				Description: descCatalogURN,
+				Required:    true,
+				ValidatorFunc: func(value string) error {
+					return validators.New().Var(value, urnCatalog)
+				},
+			},
+		},
+		ResponseType: itypes.APIResponseCatalogAccessControlGrants{},
+	}.Register()
+
+	// SetCatalogAccessControl
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/catalogs/catalogUrn/accessControls/put/",
+		Name:             "SetCatalogAccessControl",
+		Description:      "Set catalog access control grants",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathCatalogAccessControl,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamCatalogURN,
+				Description: descCatalogURN,
+				Required:    true,
+				ValidatorFunc: func(value string) error {
+					return validators.New().Var(value, urnCatalog)
+				},
+			},
+		},
+		BodyRequestType: itypes.APIRequestCatalogAccessControlGrants{},
+		ResponseType:    itypes.APIResponseCatalogAccessControlGrants{},
 	}.Register()
 }
