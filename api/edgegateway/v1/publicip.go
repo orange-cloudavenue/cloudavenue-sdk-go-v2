@@ -26,6 +26,9 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
+// networkTypeInternet is the network type used when allocating a public IP.
+const networkTypeInternet = "internet"
+
 // CreatePublicIP allocates a public IP for an edge gateway.
 func (c *Client) CreatePublicIP(ctx context.Context, params types.ParamsEdgeGateway) (*types.ModelEdgeGatewayPublicIP, error) {
 	if params.ID == "" && params.Name == "" {
@@ -48,7 +51,7 @@ func (c *Client) CreatePublicIP(ctx context.Context, params types.ParamsEdgeGate
 	}
 
 	body := itypes.APIRequestEdgegatewayPublicIP{
-		NetworkType:   "internet",
+		NetworkType:   networkTypeInternet,
 		EdgeGatewayID: edgeID,
 		Properties: itypes.APIRequestEdgegatewayPublicIPProperties{
 			Announced: true,

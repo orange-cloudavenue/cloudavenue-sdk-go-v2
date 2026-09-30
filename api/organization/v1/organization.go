@@ -27,6 +27,11 @@ const (
 	opUpdateOrganization = "Organization.Update"
 )
 
+const (
+	internetBillingModePAYG          = "PAYG"
+	internetBillingModeTrafficVolume = "TRAFFIC_VOLUME"
+)
+
 // GetOrganization gets detailed information about organization.
 func (c *Client) GetOrganization(ctx context.Context) (*types.ModelGetOrganization, error) {
 	logger := c.logger.WithGroup("GetOrganization")
@@ -144,7 +149,7 @@ func validateUpdateOrganizationParams(p types.ParamsUpdateOrganization) error {
 		}
 	}
 
-	if p.InternetBillingMode != "" && p.InternetBillingMode != "PAYG" && p.InternetBillingMode != "TRAFFIC_VOLUME" {
+	if p.InternetBillingMode != "" && p.InternetBillingMode != internetBillingModePAYG && p.InternetBillingMode != internetBillingModeTrafficVolume {
 		return fmt.Errorf("internet_billing_mode must be one of PAYG, TRAFFIC_VOLUME")
 	}
 

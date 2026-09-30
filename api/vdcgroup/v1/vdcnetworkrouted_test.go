@@ -50,7 +50,7 @@ func TestCreateVdcNetworkRouted(t *testing.T) {
 		Shared:                  &shared,
 		Connection: &itypes.APIVDCNetworkConnection{
 			RouterRef:           itypes.APIObjectReference{ID: edgeGatewayID, Name: edgeGatewayName},
-			ConnectionTypeValue: "INTERNAL",
+			ConnectionTypeValue: routedConnectionTypeInternal,
 		},
 		Subnets: itypes.APIVDCNetworkSubnets{
 			Values: []itypes.APIVDCNetworkSubnetValue{{
