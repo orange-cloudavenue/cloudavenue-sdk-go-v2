@@ -15,7 +15,7 @@ import (
 
 // CreatePublicIP - Create a new public IP
 //
-// DocumentationURL: 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func CreatePublicIP() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreatePublicIP")
 }

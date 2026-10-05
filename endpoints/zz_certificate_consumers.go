@@ -15,19 +15,19 @@ import (
 
 // ListCertificateConsumers - List consumers of a certificate library item
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func ListCertificateConsumers() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListCertificateConsumers")
 }
 // AddCertificateConsumer - Add consumer reference to a certificate library item
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func AddCertificateConsumer() *cav.Endpoint {
 	return cav.MustGetEndpoint("AddCertificateConsumer")
 }
 // SetCertificateConsumers - Replace consumer references for a certificate library item
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func SetCertificateConsumers() *cav.Endpoint {
 	return cav.MustGetEndpoint("SetCertificateConsumers")
 }
