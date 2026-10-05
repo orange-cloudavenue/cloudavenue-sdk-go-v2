@@ -781,7 +781,7 @@ information:
 
 ## 12. Open Questions
 
-All five questions previously open have been resolved:
+Four of the five questions previously open are resolved; item 3 is explicitly not:
 
 1. **`aws-sdk-go` v1 vs v2 for the OSE/S3 subclient** (§8.4) — **decided:
    `aws-sdk-go-v2`.**
@@ -789,20 +789,31 @@ All five questions previously open have been resolved:
    no infrapi credential-exchange surface exists for NetBackup; it keeps its
    own OAuth2 password-grant flow as a documented, explicit exception to
    §8.1.
-3. **IAM user CRUD REST availability** (§9.5) — **resolved: the surface
-   exists; the "confirmed" negative claim is retracted.** A live GET probe
-   on 2026-09-30 (org `cav01xxxxxxxxxxx6205`, console1; GET/OPTIONS only, no
-   writes) returned **200** for `GET /cloudapi/1.0.0/users`, **200** for a
-   FIQL-filtered `?filter=username==…` query, and **200** for a URN-keyed
+3. **IAM user CRUD REST availability** (§9.5) — **NOT resolved: no backend
+   decision is made for IAM Users.** A live GET probe on 2026-09-30 (org
+   `cav01xxxxxxxxxxx6205`, console1; GET/OPTIONS only, no writes) returned
+   **200** for `GET /cloudapi/1.0.0/users`, **200** for a FIQL-filtered
+   `?filter=username==…` query, and **200** for a URN-keyed
    `GET /cloudapi/1.0.0/users/urn:vcloud:user:…`, against a **404** control
-   on an absent path. IAM Users is therefore a normal `Operation[P,R]`
-   backend assignment of `BackendInfrapi` per §8.1, the legacy XML AdminOrg
-   path is retired, and the migration is the ordinary per-verb kind already
-   described in §7 — no bespoke non-generated path is needed. Full evidence,
-   the documented verb surface, the behaviour-affecting deltas (XML → JSON,
-   list-scan → FIQL filter, `{userId}` becoming a real URN), and the
-   provenance note explaining why a `/vApps` **404** makes spec presence
-   insufficient proof are in §9.5.
+   on an absent path.
+
+   That establishes a **VMware** JSON user surface. It does **not** establish
+   customer API coverage: `/cloudapi/1.0.0/...` is a VMware path, and §9.5
+   states that evidence from VMware `/cloudapi/...` endpoints does not by
+   itself establish customer API coverage. It therefore cannot support a
+   `BackendInfrapi` assignment, which would additionally require retiring the
+   AdminOrg XML path. The customer API source of truth records no IAM user
+   CRUD surface at all, so the target contract remains unproven.
+
+   Current code is `BackendVMware` on the AdminOrg XML API
+   (`internal/iendpoints/iam.go`), consistent with the above. The earlier
+   "resolved" wording in this section is retracted: it drew a backend
+   conclusion from the evidence class §9.5 explicitly excludes.
+
+   If IAM Users is later migrated, the documented JSON contract is
+   `VcdUser`, and its `deployedVmQuota`/`storedVmQuota` fields are
+   `x-vcloud-removed-in: 37.0` — quotas must be deliberately dropped, not
+   carried over. See §9.5.
 4. **Org Properties backend identity** (`infrapicustomerproxy` vs.
    `UpdateOrganization`) (§9.5) — the endpoint-identity question itself
    still requires confirmation during implementation (determines one leaf
