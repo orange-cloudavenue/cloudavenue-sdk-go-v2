@@ -33,7 +33,10 @@ func (c *Client) TestLDAP(ctx context.Context, params types.ParamsTestLDAP) (*ty
 		return nil, fmt.Errorf("%s: validate: %w", opTestLDAP, err)
 	}
 
-	body := itypes.LDAPConfigToAPIRequest(params)
+	body, err := itypes.LDAPConfigToAPIRequest(params)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", opTestLDAP, err)
+	}
 
 	ep := endpoints.TestLDAP()
 	opts := []cav.EndpointRequestOption{
