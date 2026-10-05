@@ -37,7 +37,7 @@ func init() {
 		Method:           MethodGET,
 		Backend:          BackendInfrapi,
 		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Jobs/getJobById",
-		PathTemplate:     "/api/customers/v1.0/jobs/{taskId}",
+		PathTemplate:     "/infrapicustomerproxy/v1.0/jobs/{taskId}",
 		PathParams: []PathParam{
 			{
 				Name:        jobTaskID,

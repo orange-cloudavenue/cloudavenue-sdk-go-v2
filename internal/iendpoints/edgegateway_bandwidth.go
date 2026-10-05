@@ -27,7 +27,7 @@ func init() {
 		Description:      "Update EdgeGateway Bandwidth",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/api/customers/v2.0/edges/{edgeId}",
+		PathTemplate:     pathCerberusEdgeGatewayByID,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamEdgeID,

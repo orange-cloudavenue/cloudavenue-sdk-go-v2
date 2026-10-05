@@ -130,7 +130,7 @@ func init() {
 		Description:      "Create a new Org VDC",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/api/customers/v2.0/vdcs",
+		PathTemplate:     "/infrapicustomerproxy/v2.0/vdcs",
 		BodyRequestType:  itypes.APIRequestCreateVDC{},
 		ResponseType:     cav.Job{},
 	}.Register()
@@ -142,7 +142,7 @@ func init() {
 		Description:      "Update an existing Org VDC",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/api/customers/v2.0/vdcs/{vdc-name}",
+		PathTemplate:     pathCerberusVDCByName,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamVDCName,
@@ -161,7 +161,7 @@ func init() {
 		Description:      "Delete an existing Org VDC",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/api/customers/v2.0/vdcs/{vdc-name}",
+		PathTemplate:     pathCerberusVDCByName,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamVDCName,
