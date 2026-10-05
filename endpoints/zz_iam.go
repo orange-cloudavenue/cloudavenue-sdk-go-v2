@@ -99,7 +99,7 @@ func DeleteToken() *cav.Endpoint {
 }
 // TestLDAP - Test LDAP connection
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-LDAPTest.html
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/ldap/test/post/
 func TestLDAP() *cav.Endpoint {
 	return cav.MustGetEndpoint("TestLDAP")
 }
@@ -111,13 +111,13 @@ func SyncLDAP() *cav.Endpoint {
 }
 // SearchLDAPUsers - Search LDAP users
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-LDAPSearchUser.html
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/ldap/search/user/get/
 func SearchLDAPUsers() *cav.Endpoint {
 	return cav.MustGetEndpoint("SearchLDAPUsers")
 }
 // SearchLDAPGroups - Search LDAP groups
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-LDAPSearchGroup.html
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/ldap/search/group/get/
 func SearchLDAPGroups() *cav.Endpoint {
 	return cav.MustGetEndpoint("SearchLDAPGroups")
 }

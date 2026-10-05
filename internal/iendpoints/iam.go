@@ -341,14 +341,21 @@ func init() {
 
 	// TestLDAP
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-LDAPTest.html",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/ldap/test/post/",
 		Name:             "TestLDAP",
 		Description:      "Test LDAP connection",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathLDAP + "/test",
-		BodyRequestType:  itypes.APIRequestLDAPTest{},
-		ResponseType:     itypes.APIResponseLDAPTestResult{},
+		QueryParams: []cav.QueryParam{
+			{
+				Name:        "username",
+				Description: "Username to use when testing LDAP search",
+				Required:    false,
+			},
+		},
+		BodyRequestType: itypes.APIRequestLDAPTest{},
+		ResponseType:    itypes.APIResponseLDAPTestResult{},
 	}.Register()
 
 	// SyncLDAP
@@ -365,7 +372,7 @@ func init() {
 
 	// SearchLDAPUsers
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-LDAPSearchUser.html",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/ldap/search/user/get/",
 		Name:             "SearchLDAPUsers",
 		Description:      "Search LDAP users",
 		Method:           cav.MethodGET,
@@ -373,32 +380,17 @@ func init() {
 		PathTemplate:     pathLDAP + "/search/user",
 		QueryParams: []cav.QueryParam{
 			{
-				Name:        queryParamFilter,
-				Description: descFilterNameOrID,
-				Required:    false,
-			},
-			{
-				Name:        queryParamMaxResults,
-				Description: descMaxResults,
-				Required:    false,
-			},
-			{
-				Name:        queryParamPageSize,
-				Description: descPageSize,
-				Required:    false,
-			},
-			{
-				Name:        queryParamPage,
-				Description: descPage,
+				Name:        queryParamQ,
+				Description: "String to search for via LDAP",
 				Required:    false,
 			},
 		},
-		ResponseType: itypes.APIResponseLDAPUsers{},
+		ResponseType: []itypes.APIResponseLDAPUser{},
 	}.Register()
 
 	// SearchLDAPGroups
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-LDAPSearchGroup.html",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/ldap/search/group/get/",
 		Name:             "SearchLDAPGroups",
 		Description:      "Search LDAP groups",
 		Method:           cav.MethodGET,
@@ -406,27 +398,12 @@ func init() {
 		PathTemplate:     pathLDAP + "/search/group",
 		QueryParams: []cav.QueryParam{
 			{
-				Name:        queryParamFilter,
-				Description: descFilterNameOrID,
-				Required:    false,
-			},
-			{
-				Name:        queryParamMaxResults,
-				Description: descMaxResults,
-				Required:    false,
-			},
-			{
-				Name:        queryParamPageSize,
-				Description: descPageSize,
-				Required:    false,
-			},
-			{
-				Name:        queryParamPage,
-				Description: descPage,
+				Name:        queryParamQ,
+				Description: "String to search for via LDAP",
 				Required:    false,
 			},
 		},
-		ResponseType: itypes.APIResponseLDAPGroups{},
+		ResponseType: []itypes.APIResponseLDAPGroup{},
 	}.Register()
 
 	// ListGlobalRoles
