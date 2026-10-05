@@ -12,6 +12,7 @@ package edgegateway
 import (
 	"context"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -133,6 +134,14 @@ func (c *Client) ListPublicIP(ctx context.Context, params types.ParamsEdgeGatewa
 		})
 	}
 
+	sort.SliceStable(ips.PublicIPs, func(i, j int) bool {
+		if ips.PublicIPs[i].IP == ips.PublicIPs[j].IP {
+			return ips.PublicIPs[i].ID < ips.PublicIPs[j].ID
+		}
+
+		return ips.PublicIPs[i].IP < ips.PublicIPs[j].IP
+	})
+
 	return ips, nil
 }
 
@@ -143,6 +152,10 @@ func (c *Client) GetPublicIP(ctx context.Context, params types.ParamsGetEdgeGate
 	}
 	if err := validators.New().Var(params.IP, "ip4_addr"); err != nil {
 		return nil, fmt.Errorf("invalid IP address: %w", err)
+	}
+
+	if err := validateEdgeGatewayRef(params.ID, params.Name); err != nil {
+		return nil, err
 	}
 
 	if params.ID == "" {
@@ -157,9 +170,6 @@ func (c *Client) GetPublicIP(ctx context.Context, params types.ParamsGetEdgeGate
 	resp, err := c.c.Do(
 		ctx,
 		ep,
-		cav.WithQueryParam(ep.QueryParams[0], params.ID),
-		cav.WithQueryParam(ep.QueryParams[1], params.Name),
-		cav.WithQueryParam(ep.QueryParams[2], params.IP),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error retrieving network services for edge gateway %s: %w", params.ID, err)
@@ -169,7 +179,10 @@ func (c *Client) GetPublicIP(ctx context.Context, params types.ParamsGetEdgeGate
 		ID:   params.ID,
 		Name: params.Name,
 	})
-	if data == nil || len(data.PublicIP) == 0 {
+	if data == nil || data.ID == "" {
+		return nil, fmt.Errorf("no network services found for edge gateway %s", params.ID)
+	}
+	if len(data.PublicIP) == 0 {
 		return nil, fmt.Errorf("no public IPs found for edge gateway %s", params.ID)
 	}
 
