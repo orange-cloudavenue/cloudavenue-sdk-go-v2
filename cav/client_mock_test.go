@@ -91,7 +91,7 @@ func defaultMockHandler(ep *Endpoint) http.HandlerFunc {
 			return
 		}
 
-		// Cerberus job endpoints return 201 with jobId
+		// Customer job endpoints routed through Cerberus return 201 with jobId.
 		if ep.Name == "GetJobCerberus" {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusCreated)
