@@ -13,62 +13,92 @@ import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 
 // * Request / Response API (JSON)
 
-// APIRequestLDAPConfig represents the LDAP configuration used in test/sync requests.
-type APIRequestLDAPConfig struct {
-	Host                    string `json:"host,omitempty"`
-	Port                    *int   `json:"port,omitempty"`
-	BindUser                string `json:"bindUser,omitempty"`
-	BindPassword            string `json:"bindPassword,omitempty"`
-	BaseDN                  string `json:"baseDn,omitempty"`
-	UserSearchBase          string `json:"userSearchBase,omitempty"`
-	GroupSearchBase         string `json:"groupSearchBase,omitempty"`
-	UserObjectClass         string `json:"userObjectClass,omitempty"`
-	GroupObjectClass        string `json:"groupObjectClass,omitempty"`
-	UserNameAttribute       string `json:"userNameAttribute,omitempty"`
-	GroupNameAttribute      string `json:"groupNameAttribute,omitempty"`
-	GroupMemberAttribute    string `json:"groupMemberAttribute,omitempty"`
-	AuthenticationMechanism string `json:"authenticationMechanism,omitempty"`
-	SSLEnabled              *bool  `json:"sslEnabled,omitempty"`
-	SSLTrustCertificate     string `json:"sslTrustCertificate,omitempty"`
-	ConnectionTimeout       *int   `json:"connectionTimeout,omitempty"`
-	ReadTimeout             *int   `json:"readTimeout,omitempty"`
-	Enabled                 *bool  `json:"enabled,omitempty"`
-}
-
 // APIRequestLDAPTest represents the request body for TestLDAP.
 type APIRequestLDAPTest struct {
-	Config APIRequestLDAPConfig `json:"config,omitempty"`
+	HostName                 string                         `json:"hostName,omitempty"`
+	Port                     *int                           `json:"port,omitempty"`
+	IsSSL                    *bool                          `json:"isSsl,omitempty"`
+	IsSSLAcceptAll           *bool                          `json:"isSslAcceptAll,omitempty"`
+	Realm                    string                         `json:"realm,omitempty"`
+	PagedSearchDisabled      *bool                          `json:"pagedSearchDisabled,omitempty"`
+	PageSize                 *int                           `json:"pageSize,omitempty"`
+	MaxResults               *int                           `json:"maxResults,omitempty"`
+	MaxUserGroups            *int                           `json:"maxUserGroups,omitempty"`
+	SearchBase               string                         `json:"searchBase,omitempty"`
+	UserName                 string                         `json:"userName,omitempty"`
+	Password                 string                         `json:"password,omitempty"`
+	AuthenticationMechanism  string                         `json:"authenticationMechanism,omitempty"`
+	GroupSearchBase          string                         `json:"groupSearchBase,omitempty"`
+	IsGroupSearchBaseEnabled *bool                          `json:"isGroupSearchBaseEnabled,omitempty"`
+	ConnectorType            string                         `json:"connectorType,omitempty"`
+	UserAttributes           *APIRequestLDAPUserAttributes  `json:"userAttributes,omitempty"`
+	GroupAttributes          *APIRequestLDAPGroupAttributes `json:"groupAttributes,omitempty"`
+	UseExternalKerberos      *bool                          `json:"useExternalKerberos,omitempty"`
+	CustomUIButtonLabel      string                         `json:"customUiButtonLabel,omitempty"`
+}
+
+// APIRequestLDAPUserAttributes represents LDAP user attribute mapping for TestLDAP.
+type APIRequestLDAPUserAttributes struct {
+	ObjectClass               string `json:"objectClass,omitempty"`
+	ObjectIdentifier          string `json:"objectIdentifier,omitempty"`
+	UserName                  string `json:"userName,omitempty"`
+	Email                     string `json:"email,omitempty"`
+	FullName                  string `json:"fullName,omitempty"`
+	GivenName                 string `json:"givenName,omitempty"`
+	Surname                   string `json:"surname,omitempty"`
+	Telephone                 string `json:"telephone,omitempty"`
+	GroupMembershipIdentifier string `json:"groupMembershipIdentifier,omitempty"`
+	GroupBackLinkIdentifier   string `json:"groupBackLinkIdentifier,omitempty"`
+}
+
+// APIRequestLDAPGroupAttributes represents LDAP group attribute mapping for TestLDAP.
+type APIRequestLDAPGroupAttributes struct {
+	ObjectClass          string `json:"objectClass,omitempty"`
+	ObjectIdentifier     string `json:"objectIdentifier,omitempty"`
+	GroupName            string `json:"groupName,omitempty"`
+	Membership           string `json:"membership,omitempty"`
+	MembershipIdentifier string `json:"membershipIdentifier,omitempty"`
+	BackLinkIdentifier   string `json:"backLinkIdentifier,omitempty"`
 }
 
 // APIResponseLDAPTestResult represents the response of TestLDAP.
 type APIResponseLDAPTestResult struct {
-	Success bool   `json:"success,omitempty"`
-	Message string `json:"message,omitempty"`
+	ConnectionTest *APIResponseLDAPConnectionTest    `json:"connectionTest,omitempty"`
+	SettingsTest   []APIResponseLDAPSettingsTestItem `json:"settingsTest,omitempty"`
+}
+
+// APIResponseLDAPConnectionTest represents LDAP connection test result.
+type APIResponseLDAPConnectionTest struct {
+	Successful *bool                 `json:"successful,omitempty"`
+	Error      *APIResponseLDAPError `json:"error,omitempty"`
+}
+
+// APIResponseLDAPError represents LDAP test error details.
+type APIResponseLDAPError struct {
+	MinorErrorCode string `json:"minorErrorCode,omitempty"`
+	Message        string `json:"message,omitempty"`
+	StackTrace     string `json:"stackTrace,omitempty"`
+}
+
+// APIResponseLDAPSettingsTestItem represents single LDAP settings test result.
+type APIResponseLDAPSettingsTestItem struct {
+	Attribute      string `json:"attribute,omitempty"`
+	AttributeValue string `json:"attributeValue,omitempty"`
+	Result         string `json:"result,omitempty"`
+	Successful     *bool  `json:"successful,omitempty"`
 }
 
 // APIResponseLDAPUser represents a single LDAP user returned by SearchLDAPUsers.
 type APIResponseLDAPUser struct {
-	Name     string `json:"name,omitempty"`
-	DN       string `json:"dn,omitempty"`
+	Username string `json:"username,omitempty"`
 	Email    string `json:"email,omitempty"`
-	FullName string `json:"fullName,omitempty"`
-}
-
-// APIResponseLDAPUsers represents the wrapper for a list of LDAP users.
-type APIResponseLDAPUsers struct {
-	Users []APIResponseLDAPUser `json:"users,omitempty"`
+	Fullname string `json:"fullname,omitempty"`
 }
 
 // APIResponseLDAPGroup represents a single LDAP group returned by SearchLDAPGroups.
 type APIResponseLDAPGroup struct {
-	Name    string   `json:"name,omitempty"`
-	DN      string   `json:"dn,omitempty"`
-	Members []string `json:"members,omitempty"`
-}
-
-// APIResponseLDAPGroups represents the wrapper for a list of LDAP groups.
-type APIResponseLDAPGroups struct {
-	Groups []APIResponseLDAPGroup `json:"groups,omitempty"`
+	Name string `json:"name,omitempty"`
+	ID   string `json:"id,omitempty"`
 }
 
 // ToModel converts the APIResponseLDAPTestResult to ModelLDAPTestResult.
@@ -78,19 +108,15 @@ func (api *APIResponseLDAPTestResult) ToModel() *types.ModelLDAPTestResult {
 	}
 
 	return &types.ModelLDAPTestResult{
-		Success: api.Success,
-		Message: api.Message,
+		Success: api.ConnectionTest != nil && api.ConnectionTest.Successful != nil && *api.ConnectionTest.Successful,
+		Message: ldapTestMessage(api),
 	}
 }
 
-// ToModel converts each LDAP user to ModelLDAPUser.
-func (api *APIResponseLDAPUsers) ToModel() []*types.ModelLDAPUser {
-	if api == nil {
-		return nil
-	}
-
-	result := make([]*types.ModelLDAPUser, len(api.Users))
-	for i, u := range api.Users {
+// ToModels converts each LDAP user to ModelLDAPUser.
+func LDAPUsersToModel(api []APIResponseLDAPUser) []*types.ModelLDAPUser {
+	result := make([]*types.ModelLDAPUser, len(api))
+	for i, u := range api {
 		result[i] = u.ToModel()
 	}
 
@@ -104,21 +130,16 @@ func (api *APIResponseLDAPUser) ToModel() *types.ModelLDAPUser {
 	}
 
 	return &types.ModelLDAPUser{
-		Name:     api.Name,
-		DN:       api.DN,
+		Name:     api.Username,
 		Email:    api.Email,
-		FullName: api.FullName,
+		FullName: api.Fullname,
 	}
 }
 
-// ToModel converts each LDAP group to ModelLDAPGroup.
-func (api *APIResponseLDAPGroups) ToModel() []*types.ModelLDAPGroup {
-	if api == nil {
-		return nil
-	}
-
-	result := make([]*types.ModelLDAPGroup, len(api.Groups))
-	for i, g := range api.Groups {
+// ToModels converts each LDAP group to ModelLDAPGroup.
+func LDAPGroupsToModel(api []APIResponseLDAPGroup) []*types.ModelLDAPGroup {
+	result := make([]*types.ModelLDAPGroup, len(api))
+	for i, g := range api {
 		result[i] = g.ToModel()
 	}
 
@@ -131,36 +152,53 @@ func (api *APIResponseLDAPGroup) ToModel() *types.ModelLDAPGroup {
 		return nil
 	}
 
-	members := make([]string, len(api.Members))
-	copy(members, api.Members)
-
 	return &types.ModelLDAPGroup{
-		Name:    api.Name,
-		DN:      api.DN,
-		Members: members,
+		Name: api.Name,
+		DN:   api.ID,
 	}
 }
 
 // LDAPConfigToAPIRequest converts public LDAP params to internal API request config.
-func LDAPConfigToAPIRequest(p types.ParamsTestLDAP) APIRequestLDAPConfig {
-	return APIRequestLDAPConfig{
-		Host:                    p.Host,
-		Port:                    p.Port,
-		BindUser:                p.BindUser,
-		BindPassword:            p.BindPassword,
-		BaseDN:                  p.BaseDN,
-		UserSearchBase:          p.UserSearchBase,
-		GroupSearchBase:         p.GroupSearchBase,
-		UserObjectClass:         p.UserObjectClass,
-		GroupObjectClass:        p.GroupObjectClass,
-		UserNameAttribute:       p.UserNameAttribute,
-		GroupNameAttribute:      p.GroupNameAttribute,
-		GroupMemberAttribute:    p.GroupMemberAttribute,
-		AuthenticationMechanism: p.AuthenticationMechanism,
-		SSLEnabled:              p.SSLEnabled,
-		SSLTrustCertificate:     p.SSLTrustCertificate,
-		ConnectionTimeout:       p.ConnectionTimeout,
-		ReadTimeout:             p.ReadTimeout,
-		Enabled:                 p.Enabled,
+func LDAPConfigToAPIRequest(p types.ParamsTestLDAP) APIRequestLDAPTest {
+	var groupSearchBaseEnabled *bool
+	if p.GroupSearchBase != "" {
+		enabled := true
+		groupSearchBaseEnabled = &enabled
 	}
+
+	return APIRequestLDAPTest{
+		HostName:                 p.Host,
+		Port:                     p.Port,
+		IsSSL:                    p.SSLEnabled,
+		SearchBase:               p.BaseDN,
+		UserName:                 p.BindUser,
+		Password:                 p.BindPassword,
+		AuthenticationMechanism:  p.AuthenticationMechanism,
+		GroupSearchBase:          p.GroupSearchBase,
+		IsGroupSearchBaseEnabled: groupSearchBaseEnabled,
+		UserAttributes: &APIRequestLDAPUserAttributes{
+			ObjectClass: p.UserObjectClass,
+			UserName:    p.UserNameAttribute,
+		},
+		GroupAttributes: &APIRequestLDAPGroupAttributes{
+			ObjectClass: p.GroupObjectClass,
+			GroupName:   p.GroupNameAttribute,
+			Membership:  p.GroupMemberAttribute,
+		},
+	}
+}
+
+func ldapTestMessage(api *APIResponseLDAPTestResult) string {
+	if api == nil {
+		return ""
+	}
+	if api.ConnectionTest != nil && api.ConnectionTest.Error != nil && api.ConnectionTest.Error.Message != "" {
+		return api.ConnectionTest.Error.Message
+	}
+	for _, item := range api.SettingsTest {
+		if item.Result != "" {
+			return item.Result
+		}
+	}
+	return ""
 }

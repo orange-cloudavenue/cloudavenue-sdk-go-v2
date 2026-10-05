@@ -21,13 +21,13 @@ import (
 )
 
 const (
-	queryParamFilter     = "filter"
-	queryParamFormat     = "format"
-	queryParamPage       = "page"
-	queryParamPageSize   = "pageSize"
-	queryParamMaxResults = "maxResults"
-	queryParamSortAsc    = "sortAsc"
-	queryParamType       = "type"
+	queryParamFilter   = "filter"
+	queryParamQ        = "q"
+	queryParamFormat   = "format"
+	queryParamPage     = "page"
+	queryParamPageSize = "pageSize"
+	queryParamSortAsc  = "sortAsc"
+	queryParamType     = "type"
 
 	pathParamEdgeID                  = "edgeId"
 	pathParamNetworkContextProfileID = "networkContextProfileId"
@@ -52,7 +52,6 @@ const (
 
 	descPageSize                 = "The number of items per page."
 	descPage                     = "Page to fetch, zero offset."
-	descMaxResults               = "The maximum number of results to return."
 	descFormatResponse           = "The format of the response."
 	descTypeOfObjectQuery        = "The type of object to query"
 	descEdgeGatewayID            = "The ID of the edge gateway."
