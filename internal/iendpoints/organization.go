@@ -37,7 +37,7 @@ func init() {
 		Description:      "Get your organization information",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/api/customers/v2.0/configurations",
+		PathTemplate:     pathCerberusConfigurations,
 		ResponseType:     itypes.APIResponseGetOrg{},
 	}.Register()
 
@@ -48,7 +48,7 @@ func init() {
 		Description:      "Update an existing organization",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/api/customers/v2.0/configurations",
+		PathTemplate:     pathCerberusConfigurations,
 		BodyRequestType:  itypes.APIRequestUpdateOrg{},
 		ResponseType:     cav.Job{},
 	}.Register()
