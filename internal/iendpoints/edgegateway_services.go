@@ -10,9 +10,6 @@
 package iendpoints
 
 import (
-	"github.com/orange-cloudavenue/common-go/extractor"
-	"github.com/orange-cloudavenue/common-go/validators"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 )
@@ -29,35 +26,6 @@ func init() {
 		Backend:          cav.BackendInfrapi,
 		PathTemplate:     "/api/customers/v2.0/network",
 		ResponseType:     itypes.APIResponseNetworkServices{},
-		QueryParams: []cav.QueryParam{
-			// Query parameters are not used in this endpoint, but can be added
-			// for the mock response if needed
-			{
-				Name:        pathParamEdgeID,
-				Description: "The ID of the edge gateway to get network services for",
-				Required:    false,
-				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, urnEdgeGateway)
-				},
-				TransformFunc: extractor.ExtractUUID,
-			},
-			{
-				Name:        "edgeName",
-				Description: "The name of the edge gateway to get network services for",
-				Required:    false,
-				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, ruleResourceNameEdgeGateway)
-				},
-			},
-			{
-				Name:        "publicIP",
-				Description: "The public IP address of the edge gateway",
-				Required:    false,
-				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "ipv4")
-				},
-			},
-		},
 	}.Register()
 
 	cav.Endpoint{
