@@ -19,7 +19,7 @@ import (
 func init() {
 	// * GetEdgeGatewayServices
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/getNetworkHierarchy",
+		DocumentationURL: docURLCerberus,
 		Name:             "GetEdgeGatewayServices",
 		Description:      "Get EdgeGateway Network Services",
 		Method:           cav.MethodGET,
@@ -29,7 +29,7 @@ func init() {
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/addNetworkConnectivity",
+		DocumentationURL: docURLCerberus,
 		Name:             "EnableCloudavenueServices",
 		Description:      "Enable Cloud Avenue Services",
 		Method:           cav.MethodPOST,
@@ -40,7 +40,7 @@ func init() {
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/deleteNetworkService",
+		DocumentationURL: docURLCerberus,
 		Name:             "DisableCloudavenueServices",
 		Description:      "Disable Cloud Avenue Services",
 		Method:           cav.MethodDELETE,

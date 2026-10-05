@@ -27,7 +27,7 @@ import (
 func init() {
 	// ListVDC
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/38.1/doc/types/ReferenceType.html",
+		DocumentationURL: docURLVMware,
 		Name:             "ListVDC",
 		Description:      "List VDCs",
 		Method:           cav.MethodGET,
@@ -81,7 +81,7 @@ func init() {
 
 	// GetVDC
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-Vdc.html",
+		DocumentationURL: docURLVMware,
 		Name:             "GetVDC",
 		Description:      "Get VDC",
 		Method:           cav.MethodGET,
@@ -103,7 +103,7 @@ func init() {
 
 	// GetVDCMetadata
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-VdcMetadata.html",
+		DocumentationURL: docURLVMware,
 		Name:             "GetVDCMetadata",
 		Description:      "Get VDC Metadata",
 		Method:           cav.MethodGET,
@@ -125,7 +125,7 @@ func init() {
 
 	// CreateVDC
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/vDC/createOrgVdc",
+		DocumentationURL: docURLCerberus,
 		Name:             "CreateVDC",
 		Description:      "Create a new Org VDC",
 		Method:           cav.MethodPOST,
@@ -137,7 +137,7 @@ func init() {
 
 	// UpdateVDC
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/vDC/updateOrgVdc",
+		DocumentationURL: docURLCerberus,
 		Name:             "UpdateVDC",
 		Description:      "Update an existing Org VDC",
 		Method:           cav.MethodPUT,
@@ -156,7 +156,7 @@ func init() {
 
 	// DeleteVDC
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/vDC/deleteOrgVdc",
+		DocumentationURL: docURLCerberus,
 		Name:             "DeleteVDC",
 		Description:      "Delete an existing Org VDC",
 		Method:           cav.MethodDELETE,

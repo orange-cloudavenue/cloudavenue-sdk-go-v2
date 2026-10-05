@@ -15,37 +15,37 @@ import (
 
 // ListNetworkContextProfile - List Network Context Profiles
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/get/
+// DocumentationURL: 
 func ListNetworkContextProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListNetworkContextProfile")
 }
 // GetNetworkContextProfile - Get a Network Context Profile
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/networkContextProfileId/get/
+// DocumentationURL: 
 func GetNetworkContextProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetNetworkContextProfile")
 }
 // CreateNetworkContextProfile - Create a Network Context Profile
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/post/
+// DocumentationURL: 
 func CreateNetworkContextProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreateNetworkContextProfile")
 }
 // UpdateNetworkContextProfile - Update a Network Context Profile
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/networkContextProfileId/put/
+// DocumentationURL: 
 func UpdateNetworkContextProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateNetworkContextProfile")
 }
 // DeleteNetworkContextProfile - Delete a Network Context Profile
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/networkContextProfileId/delete/
+// DocumentationURL: 
 func DeleteNetworkContextProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("DeleteNetworkContextProfile")
 }
 // GetNetworkContextProfileAttributes - Get the static reference catalog (App IDs, Domain Names) of attributes usable in Network Context Profiles
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/attributes/get/
+// DocumentationURL: 
 func GetNetworkContextProfileAttributes() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetNetworkContextProfileAttributes")
 }

@@ -26,7 +26,7 @@ import (
 func init() {
 	// * ListStorageProfile
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/queries/orgVdcStorageProfile.html",
+		DocumentationURL: docURLVMware,
 		Name:             "ListStorageProfile",
 		Description:      "List VDC Storage Profiles",
 		Method:           cav.MethodGET,

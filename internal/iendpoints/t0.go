@@ -21,7 +21,7 @@ import (
 func init() {
 	// GET - List all T0
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Tier-0/getTier0Vrfs",
+		DocumentationURL: docURLCerberus,
 		Name:             "ListT0",
 		Description:      "List T0",
 		Method:           cav.MethodGET,
@@ -32,7 +32,7 @@ func init() {
 
 	// GET - T0 details
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Tier-0/getTier0VrfByName",
+		DocumentationURL: docURLCerberus,
 		Name:             "GetT0",
 		Description:      "Get T0",
 		Method:           cav.MethodGET,

@@ -21,7 +21,7 @@ func init() {
 
 	// ListUsers
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-Users.html",
+		DocumentationURL: docURLVMware,
 		Name:             "ListUsers",
 		Description:      "List users in organization",
 		Method:           cav.MethodGET,
@@ -39,7 +39,7 @@ func init() {
 
 	// GetUser
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-User.html",
+		DocumentationURL: docURLVMware,
 		Name:             "GetUser",
 		Description:      "Get user by ID or name",
 		Method:           cav.MethodGET,
@@ -62,7 +62,7 @@ func init() {
 
 	// CreateUser
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-User.html",
+		DocumentationURL: docURLVMware,
 		Name:             "CreateUser",
 		Description:      "Create a new user in organization",
 		Method:           cav.MethodPOST,
@@ -81,7 +81,7 @@ func init() {
 
 	// UpdateUser
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-User.html",
+		DocumentationURL: docURLVMware,
 		Name:             "UpdateUser",
 		Description:      "Update an existing user",
 		Method:           cav.MethodPUT,
@@ -105,7 +105,7 @@ func init() {
 
 	// DeleteUser
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/DELETE-User.html",
+		DocumentationURL: docURLVMware,
 		Name:             "DeleteUser",
 		Description:      "Delete a user",
 		Method:           cav.MethodDELETE,
@@ -135,7 +135,7 @@ func init() {
 
 	// EnableUser
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-UserEnable.html",
+		DocumentationURL: docURLVMware,
 		Name:             "EnableUser",
 		Description:      "Enable a user",
 		Method:           cav.MethodPOST,
@@ -158,7 +158,7 @@ func init() {
 
 	// DisableUser
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-UserDisable.html",
+		DocumentationURL: docURLVMware,
 		Name:             "DisableUser",
 		Description:      "Disable a user",
 		Method:           cav.MethodPOST,
@@ -181,7 +181,7 @@ func init() {
 
 	// UnlockUser
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-UserUnlock.html",
+		DocumentationURL: docURLVMware,
 		Name:             "UnlockUser",
 		Description:      "Unlock a user",
 		Method:           cav.MethodPOST,
@@ -204,7 +204,7 @@ func init() {
 
 	// ChangePassword
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-UserChangePassword.html",
+		DocumentationURL: docURLVMware,
 		Name:             "ChangePassword",
 		Description:      "Change a user's password",
 		Method:           cav.MethodPOST,
@@ -230,7 +230,7 @@ func init() {
 
 	// ListTokens
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-Tokens.html",
+		DocumentationURL: docURLVMware,
 		Name:             "ListTokens",
 		Description:      "List tokens in organization",
 		Method:           cav.MethodGET,
@@ -248,7 +248,7 @@ func init() {
 
 	// GetToken
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-Token.html",
+		DocumentationURL: docURLVMware,
 		Name:             "GetToken",
 		Description:      "Get token by ID",
 		Method:           cav.MethodGET,
@@ -271,7 +271,7 @@ func init() {
 
 	// CreateToken
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-Token.html",
+		DocumentationURL: docURLVMware,
 		Name:             "CreateToken",
 		Description:      "Create a new token in organization",
 		Method:           cav.MethodPOST,
@@ -290,7 +290,7 @@ func init() {
 
 	// UpdateToken
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-Token.html",
+		DocumentationURL: docURLVMware,
 		Name:             "UpdateToken",
 		Description:      "Update an existing token",
 		Method:           cav.MethodPUT,
@@ -314,7 +314,7 @@ func init() {
 
 	// DeleteToken
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/DELETE-Token.html",
+		DocumentationURL: docURLVMware,
 		Name:             "DeleteToken",
 		Description:      "Delete a token",
 		Method:           cav.MethodDELETE,
@@ -341,7 +341,7 @@ func init() {
 
 	// TestLDAP
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/ldap/test/post/",
+		DocumentationURL: docURLVMware,
 		Name:             "TestLDAP",
 		Description:      "Test LDAP connection",
 		Method:           cav.MethodPOST,
@@ -360,7 +360,7 @@ func init() {
 
 	// SyncLDAP
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-LDAPSync.html",
+		DocumentationURL: docURLVMware,
 		Name:             "SyncLDAP",
 		Description:      "Synchronize LDAP directory",
 		Method:           cav.MethodPOST,
@@ -372,7 +372,7 @@ func init() {
 
 	// SearchLDAPUsers
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/ldap/search/user/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "SearchLDAPUsers",
 		Description:      "Search LDAP users",
 		Method:           cav.MethodGET,
@@ -390,7 +390,7 @@ func init() {
 
 	// SearchLDAPGroups
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/ldap/search/group/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "SearchLDAPGroups",
 		Description:      "Search LDAP groups",
 		Method:           cav.MethodGET,
@@ -408,7 +408,7 @@ func init() {
 
 	// ListGlobalRoles
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-GlobalRoles.html",
+		DocumentationURL: docURLVMware,
 		Name:             "ListGlobalRoles",
 		Description:      "List global roles",
 		Method:           cav.MethodGET,
@@ -419,7 +419,7 @@ func init() {
 
 	// GetGlobalRole
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-GlobalRole.html",
+		DocumentationURL: docURLVMware,
 		Name:             "GetGlobalRole",
 		Description:      "Get global role by ID",
 		Method:           cav.MethodGET,
@@ -437,7 +437,7 @@ func init() {
 
 	// CreateGlobalRole
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-GlobalRole.html",
+		DocumentationURL: docURLVMware,
 		Name:             "CreateGlobalRole",
 		Description:      "Create a global role",
 		Method:           cav.MethodPOST,
@@ -449,7 +449,7 @@ func init() {
 
 	// UpdateGlobalRole
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-GlobalRole.html",
+		DocumentationURL: docURLVMware,
 		Name:             "UpdateGlobalRole",
 		Description:      "Update a global role",
 		Method:           cav.MethodPUT,
@@ -468,7 +468,7 @@ func init() {
 
 	// DeleteGlobalRole
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/DELETE-GlobalRole.html",
+		DocumentationURL: docURLVMware,
 		Name:             "DeleteGlobalRole",
 		Description:      "Delete a global role",
 		Method:           cav.MethodDELETE,
@@ -486,7 +486,7 @@ func init() {
 
 	// ListGlobalRoleRights
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-GlobalRoleRights.html",
+		DocumentationURL: docURLVMware,
 		Name:             "ListGlobalRoleRights",
 		Description:      "List rights of a global role",
 		Method:           cav.MethodGET,
@@ -504,7 +504,7 @@ func init() {
 
 	// AddGlobalRoleRights
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-GlobalRoleRights.html",
+		DocumentationURL: docURLVMware,
 		Name:             "AddGlobalRoleRights",
 		Description:      "Add rights to a global role",
 		Method:           cav.MethodPOST,
@@ -523,7 +523,7 @@ func init() {
 
 	// ReplaceGlobalRoleRights
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-GlobalRoleRights.html",
+		DocumentationURL: docURLVMware,
 		Name:             "ReplaceGlobalRoleRights",
 		Description:      "Replace rights of a global role",
 		Method:           cav.MethodPUT,
@@ -542,7 +542,7 @@ func init() {
 
 	// ListGlobalRoleTenants
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-GlobalRoleTenants.html",
+		DocumentationURL: docURLVMware,
 		Name:             "ListGlobalRoleTenants",
 		Description:      "List tenants of a global role",
 		Method:           cav.MethodGET,
@@ -560,7 +560,7 @@ func init() {
 
 	// SetGlobalRoleTenants
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-GlobalRoleTenants.html",
+		DocumentationURL: docURLVMware,
 		Name:             "SetGlobalRoleTenants",
 		Description:      "Set tenants of a global role",
 		Method:           cav.MethodPUT,
@@ -579,7 +579,7 @@ func init() {
 
 	// PublishGlobalRoleTenants
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-GlobalRoleTenantsPublish.html",
+		DocumentationURL: docURLVMware,
 		Name:             "PublishGlobalRoleTenants",
 		Description:      "Publish tenants of a global role",
 		Method:           cav.MethodPOST,
@@ -598,7 +598,7 @@ func init() {
 
 	// UnpublishGlobalRoleTenants
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-GlobalRoleTenantsUnpublish.html",
+		DocumentationURL: docURLVMware,
 		Name:             "UnpublishGlobalRoleTenants",
 		Description:      "Unpublish tenants of a global role",
 		Method:           cav.MethodPOST,
@@ -617,7 +617,7 @@ func init() {
 
 	// PublishAllGlobalRoleTenants
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-GlobalRoleTenantsPublishAll.html",
+		DocumentationURL: docURLVMware,
 		Name:             "PublishAllGlobalRoleTenants",
 		Description:      "Publish all tenants of a global role",
 		Method:           cav.MethodPOST,
@@ -635,7 +635,7 @@ func init() {
 
 	// UnpublishAllGlobalRoleTenants
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-GlobalRoleTenantsUnpublishAll.html",
+		DocumentationURL: docURLVMware,
 		Name:             "UnpublishAllGlobalRoleTenants",
 		Description:      "Unpublish all tenants of a global role",
 		Method:           cav.MethodPOST,

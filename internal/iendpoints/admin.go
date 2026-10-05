@@ -25,7 +25,7 @@ func init() {
 
 	// ListAdminOrgs
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-AdminOrgs.html",
+		DocumentationURL: docURLVMware,
 		Name:             "ListAdminOrgs",
 		Description:      "List organizations (admin scope)",
 		Method:           cav.MethodGET,
@@ -36,7 +36,7 @@ func init() {
 
 	// GetAdminOrg
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-AdminOrg.html",
+		DocumentationURL: docURLVMware,
 		Name:             "GetAdminOrg",
 		Description:      "Get an organization by ID (admin scope)",
 		Method:           cav.MethodGET,
@@ -54,7 +54,7 @@ func init() {
 
 	// ListAdminVDCs
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-AdminVdcs.html",
+		DocumentationURL: docURLVMware,
 		Name:             "ListAdminVDCs",
 		Description:      "List VDCs (admin scope)",
 		Method:           cav.MethodGET,
@@ -65,7 +65,7 @@ func init() {
 
 	// GetAdminVDC
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-AdminVdc.html",
+		DocumentationURL: docURLVMware,
 		Name:             "GetAdminVDC",
 		Description:      "Get a VDC by ID (admin scope)",
 		Method:           cav.MethodGET,
@@ -83,7 +83,7 @@ func init() {
 
 	// ListAdminCatalogs
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-AdminCatalogs.html",
+		DocumentationURL: docURLVMware,
 		Name:             "ListAdminCatalogs",
 		Description:      "List catalogs (admin scope)",
 		Method:           cav.MethodGET,
@@ -94,7 +94,7 @@ func init() {
 
 	// GetAdminCatalog
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-AdminCatalog.html",
+		DocumentationURL: docURLVMware,
 		Name:             "GetAdminCatalog",
 		Description:      "Get a catalog by ID (admin scope)",
 		Method:           cav.MethodGET,
@@ -112,7 +112,7 @@ func init() {
 
 	// CreateAdminCatalog
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-CreateCatalog.html",
+		DocumentationURL: docURLVMware,
 		Name:             "CreateAdminCatalog",
 		Description:      "Create a catalog (admin scope)",
 		Method:           cav.MethodPOST,
@@ -131,7 +131,7 @@ func init() {
 
 	// UpdateAdminCatalog
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-AdminCatalog.html",
+		DocumentationURL: docURLVMware,
 		Name:             "UpdateAdminCatalog",
 		Description:      "Update a catalog (admin scope)",
 		Method:           cav.MethodPUT,
@@ -150,7 +150,7 @@ func init() {
 
 	// DeleteAdminCatalog
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/DELETE-AdminCatalog.html",
+		DocumentationURL: docURLVMware,
 		Name:             "DeleteAdminCatalog",
 		Description:      "Delete a catalog (admin scope)",
 		Method:           cav.MethodDELETE,
@@ -167,7 +167,7 @@ func init() {
 
 	// GetAdminCatalogACL
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-AdminCatalogControlAccess.html",
+		DocumentationURL: docURLVMware,
 		Name:             "GetAdminCatalogACL",
 		Description:      "Get catalog ACL (admin scope)",
 		Method:           cav.MethodGET,
@@ -185,7 +185,7 @@ func init() {
 
 	// SetAdminCatalogACL
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-AdminCatalogControlAccess.html",
+		DocumentationURL: docURLVMware,
 		Name:             "SetAdminCatalogACL",
 		Description:      "Set catalog ACL (admin scope)",
 		Method:           cav.MethodPOST,
