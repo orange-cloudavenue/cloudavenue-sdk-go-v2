@@ -650,20 +650,22 @@ here, recorded for traceability):
   does not, by itself, establish customer API coverage for IAM Users.
 
   No backend migration decision is made in this document for IAM Users.
-- **Org Properties**: gap-fill is blocked pending verification of whether
-  v1's `infrapicustomerproxy` endpoint and v2's `UpdateOrganization` endpoint
-  are literally the same backend operation (determines whether they should
-  be merged into one leaf operation or kept separate). **Resolution
-  principle (per §8.1, generalized beyond auth to all backend selection):**
-  infrapi is authoritative — if Org Properties can be read/written through
-  infrapi, `Backend` is `BackendInfrapi`; for any specific property/field
-  infrapi does not support, that leaf (or that field's leaf, if split at
-  finer granularity) falls back to `BackendVMware`. The infrapicustomerproxy-
-  vs-UpdateOrganization identity question determines *whether one leaf or
-  two* are needed, not *which backend wins* — the backend-selection rule
-  itself is already settled by this principle and requires no further
-  decision once the endpoint-identity question is answered during
-  implementation.
+- **Org Properties**: the endpoint-identity question is **resolved**. v1's
+  `infrapicustomerproxy` path and v2's `UpdateOrganization` are the same
+  operation: both are `PUT /infrapicustomerproxy/v2.0/configurations`, so
+  one leaf, not two. They differed only while v2 carried the retired
+  `/api/customers/v2.0/` prefix. **Resolution principle (per §8.1,
+  generalized beyond auth to all backend selection):** infrapi is
+  authoritative — if Org Properties can be read/written through infrapi,
+  `Backend` is `BackendInfrapi`; for any specific property/field infrapi
+  does not support, that leaf (or that field's leaf, if split at finer
+  granularity) falls back to `BackendVMware`.
+
+  The Cerberus **host** is decided separately: v2 keeps per-console hosts
+  (`consoleEndpoint1` … `consoleEndpoint5`) and does not adopt v1's unified
+  `api1.cloudavenue.orange-business.com`. The spec's `servers:` block names
+  `api1`, but that is the spec author's declaration, not a statement about
+  this SDK's target host.
 - **AppPortProfile/SecurityGroup/IPSet shared logic**: **placement decided:**
   a new internal package `internal/inetworkobjects` (sibling to
   `internal/iendpoints`) holds logic shared across these three resources
@@ -815,11 +817,21 @@ Four of the five questions previously open are resolved; item 3 is explicitly no
    `x-vcloud-removed-in: 37.0` — quotas must be deliberately dropped, not
    carried over. See §9.5.
 4. **Org Properties backend identity** (`infrapicustomerproxy` vs.
-   `UpdateOrganization`) (§9.5) — the endpoint-identity question itself
-   still requires confirmation during implementation (determines one leaf
-   vs. two), but the **backend-selection principle is resolved**: infrapi
-   first, `BackendVMware` fallback per field/leaf where infrapi lacks
-   support, per §8.1 generalized.
+   `UpdateOrganization`) (§9.5) — **resolved: the same operation, so no
+   merge is needed.** The question was whether v1's `infrapicustomerproxy`
+   path and v2's `UpdateOrganization` were literally the same backend
+   operation, which determined one leaf or two. They differed only because
+   v2 still carried the retired `/api/customers/v2.0/` prefix. Both are now
+   `PUT /infrapicustomerproxy/v2.0/configurations` (`pathCerberusConfigurations`,
+   pinned by `internal/iendpoints/cerberus_paths_test.go`), so they are one
+   operation. Backend is `BackendInfrapi` per §8.1.
+
+   The separate **host** divergence is decided and closed: v2 keeps
+   per-console Cerberus hosts (`consoleEndpoint1` … `consoleEndpoint5`),
+   and the unified `api1.cloudavenue.orange-business.com` host that v1
+   adopted is **not** adopted here. The spec's `servers:` block lists
+   `api1`; that is the spec author's server declaration, not a statement
+   about which host this SDK targets. No code change.
 5. **AppPortProfile/SecurityGroup/IPSet shared-logic placement** (§9.5) —
    **decided:** a new internal package `internal/inetworkobjects` holds only
    genuinely shared, non-domain-specific helpers; domain-specific
