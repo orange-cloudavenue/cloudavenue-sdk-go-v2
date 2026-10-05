@@ -15,55 +15,55 @@ import (
 
 // ListVApp - List VApps
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func ListVApp() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListVApp")
 }
 // GetVApp - Get VApp
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func GetVApp() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetVApp")
 }
 // CreateVApp - Create a new VApp
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func CreateVApp() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreateVApp")
 }
 // UpdateVApp - Update an existing VApp
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func UpdateVApp() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateVApp")
 }
 // DeleteVApp - Delete an existing VApp
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func DeleteVApp() *cav.Endpoint {
 	return cav.MustGetEndpoint("DeleteVApp")
 }
 // RemoveAllNetworks - Remove all networks from a VApp
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func RemoveAllNetworks() *cav.Endpoint {
 	return cav.MustGetEndpoint("RemoveAllNetworks")
 }
 // UndeployVApp - Undeploy a VApp
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func UndeployVApp() *cav.Endpoint {
 	return cav.MustGetEndpoint("UndeployVApp")
 }
 // GetVAppLeaseSettings - Get org/VDC-level lease settings
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func GetVAppLeaseSettings() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetVAppLeaseSettings")
 }
 // UpdateVAppLeaseSettings - Update org/VDC-level lease settings
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func UpdateVAppLeaseSettings() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateVAppLeaseSettings")
 }

@@ -15,19 +15,19 @@ import (
 
 // ListDraasOnPremiseIP - List of on premise IP addresses allowed for this organization's draas offer
 //
-// DocumentationURL: 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func ListDraasOnPremiseIP() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListDraasOnPremiseIP")
 }
 // AddDraasOnPremiseIP - Allow a new on premise IP address for this organization's draas offer
 //
-// DocumentationURL: 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func AddDraasOnPremiseIP() *cav.Endpoint {
 	return cav.MustGetEndpoint("AddDraasOnPremiseIP")
 }
 // RemoveDraasOnPremiseIP - Remove an on premise IP address from this organization's draas offer
 //
-// DocumentationURL: 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func RemoveDraasOnPremiseIP() *cav.Endpoint {
 	return cav.MustGetEndpoint("RemoveDraasOnPremiseIP")
 }

@@ -15,37 +15,37 @@ import (
 
 // ListVDC - List VDCs
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func ListVDC() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListVDC")
 }
 // GetVDC - Get VDC
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func GetVDC() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetVDC")
 }
 // GetVDCMetadata - Get VDC Metadata
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func GetVDCMetadata() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetVDCMetadata")
 }
 // CreateVDC - Create a new Org VDC
 //
-// DocumentationURL: 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func CreateVDC() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreateVDC")
 }
 // UpdateVDC - Update an existing Org VDC
 //
-// DocumentationURL: 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func UpdateVDC() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateVDC")
 }
 // DeleteVDC - Delete an existing Org VDC
 //
-// DocumentationURL: 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func DeleteVDC() *cav.Endpoint {
 	return cav.MustGetEndpoint("DeleteVDC")
 }

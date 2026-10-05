@@ -15,31 +15,31 @@ import (
 
 // GetOrganizationDetails - Get organizations details from VMware Cloud Director
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func GetOrganizationDetails() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetOrganizationDetails")
 }
 // GetOrganization - Get your organization information
 //
-// DocumentationURL: 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func GetOrganization() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetOrganization")
 }
 // UpdateOrganization - Update an existing organization
 //
-// DocumentationURL: 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func UpdateOrganization() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateOrganization")
 }
 // GetCatalogAccessControl - List catalog access control grants
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func GetCatalogAccessControl() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetCatalogAccessControl")
 }
 // SetCatalogAccessControl - Set catalog access control grants
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func SetCatalogAccessControl() *cav.Endpoint {
 	return cav.MustGetEndpoint("SetCatalogAccessControl")
 }

@@ -15,31 +15,31 @@ import (
 
 // ListCertificate - List certificate library items
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func ListCertificate() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListCertificate")
 }
 // GetCertificate - Get a certificate library item
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func GetCertificate() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetCertificate")
 }
 // CreateCertificate - Create a certificate library item
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func CreateCertificate() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreateCertificate")
 }
 // UpdateCertificate - Update a certificate library item
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func UpdateCertificate() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateCertificate")
 }
 // DeleteCertificate - Delete a certificate library item
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func DeleteCertificate() *cav.Endpoint {
 	return cav.MustGetEndpoint("DeleteCertificate")
 }
