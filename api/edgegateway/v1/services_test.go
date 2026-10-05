@@ -17,9 +17,11 @@ import (
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+	sdkerrors "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
@@ -34,6 +36,7 @@ func TestGetEdgeGatewayServices(t *testing.T) {
 		mockQueryResponseStatus int
 
 		expectedErr bool
+		assertErr   func(*testing.T, error)
 	}{
 		{
 			name: "Valid Edge Gateway services",
@@ -72,6 +75,19 @@ func TestGetEdgeGatewayServices(t *testing.T) {
 			expectedErr:        true,
 		},
 		{
+			name: "Error 404",
+			params: &types.ParamsEdgeGateway{
+				ID: generator.MustGenerate("{urn:edgegateway}"),
+			},
+			mockResponseStatus: http.StatusNotFound,
+			expectedErr:        true,
+			assertErr: func(t *testing.T, err error) {
+				var apiErr *sdkerrors.APIError
+				assert.ErrorAs(t, err, &apiErr)
+				assert.Equal(t, http.StatusNotFound, apiErr.StatusCode)
+			},
+		},
+		{
 			name: "Simulate empty response",
 			params: &types.ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgegateway}"),
@@ -108,6 +124,9 @@ func TestGetEdgeGatewayServices(t *testing.T) {
 
 			if tt.expectedErr {
 				assert.NotNil(t, err, "Expected error but got nil")
+				if tt.assertErr != nil {
+					tt.assertErr(t, err)
+				}
 				assert.Nil(t, result, "Result should be nil: %v", result)
 			} else {
 				assert.Nil(t, err, "Unexpected error: %v", tt.params)
@@ -436,6 +455,8 @@ func TestDisableCloudavenueServices(t *testing.T) {
 				ms.SetResponse(epGetNetworkServices, tt.mockGetNetworkServicesResponse, &tt.mockGetNetworkServicesResponseStatus)
 				ms.CleanResponse(endpoints.ListT0())
 				ms.SetResponse(endpoints.ListT0(), tt.mockGetNetworkServicesResponse, &tt.mockGetNetworkServicesResponseStatus)
+				ms.CleanResponse(cav.MustGetEndpoint("GetT0"))
+				ms.SetResponse(cav.MustGetEndpoint("GetT0"), tt.mockGetNetworkServicesResponse, &tt.mockGetNetworkServicesResponseStatus)
 			}
 
 			err := eC.DisableCloudavenueServices(t.Context(), tt.params)
@@ -450,6 +471,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 			ms.CleanResponse(endpoints.ListVDC())
 			ms.CleanResponse(endpoints.GetEdgeGatewayServices())
 			ms.CleanResponse(endpoints.ListT0())
+			ms.CleanResponse(cav.MustGetEndpoint("GetT0"))
 		})
 	}
 }
@@ -588,6 +610,8 @@ func TestGetCloudavenueServices(t *testing.T) {
 				ms.SetResponse(epGetNetworkServices, tt.mockGetNetworkServicesResponse, &tt.mockGetNetworkServicesResponseStatus)
 				ms.CleanResponse(endpoints.ListT0())
 				ms.SetResponse(endpoints.ListT0(), tt.mockGetNetworkServicesResponse, &tt.mockGetNetworkServicesResponseStatus)
+				ms.CleanResponse(cav.MustGetEndpoint("GetT0"))
+				ms.SetResponse(cav.MustGetEndpoint("GetT0"), tt.mockGetNetworkServicesResponse, &tt.mockGetNetworkServicesResponseStatus)
 			}
 
 			result, err := eC.GetCloudavenueServices(t.Context(), tt.params)
@@ -603,6 +627,7 @@ func TestGetCloudavenueServices(t *testing.T) {
 			ms.CleanResponse(endpoints.ListVDC())
 			ms.CleanResponse(endpoints.GetEdgeGatewayServices())
 			ms.CleanResponse(endpoints.ListT0())
+			ms.CleanResponse(cav.MustGetEndpoint("GetT0"))
 		})
 	}
 }
