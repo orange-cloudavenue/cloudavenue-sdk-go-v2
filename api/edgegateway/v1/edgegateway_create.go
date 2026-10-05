@@ -181,7 +181,7 @@ func (c *Client) CreateEdgeGateway(ctx context.Context, params types.ParamsCreat
 		return nil, fmt.Errorf("%s: validate: owner name is required", opCreateEdgeGateway)
 	}
 
-	dependencies, err := c.resolveCreateEdgeGatewayDependencies(ctx, params.OwnerName)
+	dependencies, err := c.resolveCreateEdgeGatewayDependencies(ctx, params.OwnerName, params.T0Name)
 	if err != nil {
 		return nil, fmt.Errorf("%s: resolve dependencies: %w", opCreateEdgeGateway, err)
 	}
@@ -247,7 +247,7 @@ type createEdgeGatewayDependencies struct {
 	t0s       *types.ModelT0s
 }
 
-func (c *Client) resolveCreateEdgeGatewayDependencies(ctx context.Context, ownerName string) (*createEdgeGatewayDependencies, error) {
+func (c *Client) resolveCreateEdgeGatewayDependencies(ctx context.Context, ownerName, t0Name string) (*createEdgeGatewayDependencies, error) {
 	dependencies := &createEdgeGatewayDependencies{}
 	errGroup, errCtx := errgroup.WithContext(ctx)
 
@@ -276,6 +276,27 @@ func (c *Client) resolveCreateEdgeGatewayDependencies(ctx context.Context, owner
 		dependencies.t0s, err = c.ListT0(errCtx)
 		if err != nil {
 			return fmt.Errorf("failed to list T0 routers: %w", err)
+		}
+
+		// The Tier-0 list endpoint returns names only, so the selected T0 needs a
+		// detail lookup to carry its bandwidth. resolveEdgeGatewayCreateT0 consumes
+		// exactly one T0, so hydrate only that one.
+		if dependencies.t0s == nil {
+			return nil
+		}
+
+		for i, t0 := range dependencies.t0s.T0s {
+			if len(dependencies.t0s.T0s) > 1 && (t0Name == "" || t0Name != t0.Name) {
+				continue
+			}
+
+			detail, getErr := c.GetT0(errCtx, types.ParamsGetT0{T0Name: t0.Name})
+			if getErr != nil {
+				return fmt.Errorf("failed to get T0 router %s: %w", t0.Name, getErr)
+			}
+			dependencies.t0s.T0s[i] = *detail
+
+			return nil
 		}
 
 		return nil

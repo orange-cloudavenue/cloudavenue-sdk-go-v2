@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	pkgerrors "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
@@ -29,6 +30,7 @@ func Test_GetEdgeGatewayBandwidth(t *testing.T) {
 		name               string
 		params             types.ParamsEdgeGateway
 		mockResponse       any
+		mockDetailResponse any
 		mockResponseStatus int
 		expectedErr        bool
 	}{
@@ -37,20 +39,17 @@ func Test_GetEdgeGatewayBandwidth(t *testing.T) {
 			params: types.ParamsEdgeGateway{
 				ID: "urn:vcloud:gateway:test-edge-gw-id",
 			},
-			mockResponse: func() *itypes.APIResponseT0s {
-				child := itypes.APIResponseT0Children{
-					Type: "edge-gateway",
-					Name: "test-edge-gw",
-				}
+			mockResponse: func() *itypes.APIResponseNetworkServices {
+				child := itypes.APIResponseNetworkServicesChildren{Type: "edge-gateway", Name: "test-edge-gw"}
 				child.Properties.RateLimit = 5
 				child.Properties.EdgeUUID = "urn:vcloud:gateway:test-edge-gw-id"
-				return &itypes.APIResponseT0s{
-					{
-						Type:     "tier-0-vrf",
-						Name:     "test-t0",
-						Children: []itypes.APIResponseT0Children{child},
-					},
-				}
+				return &itypes.APIResponseNetworkServices{{Type: "tier-0-vrf", Name: "prvrf01eocb0001234allsp01", Children: []itypes.APIResponseNetworkServicesChildren{child}}}
+			}(),
+			mockDetailResponse: func() *itypes.APIResponseT0 {
+				child := itypes.APIResponseT0Children{Type: "edge-gateway", Name: "test-edge-gw"}
+				child.Properties.RateLimit = 5
+				child.Properties.EdgeUUID = "urn:vcloud:gateway:test-edge-gw-id"
+				return &itypes.APIResponseT0{Type: "tier-0-vrf", Name: "prvrf01eocb0001234allsp01", Children: []itypes.APIResponseT0Children{child}}
 			}(),
 			mockResponseStatus: 200,
 			expectedErr:        false,
@@ -60,20 +59,17 @@ func Test_GetEdgeGatewayBandwidth(t *testing.T) {
 			params: types.ParamsEdgeGateway{
 				Name: validEdgeGatewayName,
 			},
-			mockResponse: func() *itypes.APIResponseT0s {
-				child := itypes.APIResponseT0Children{
-					Type: "edge-gateway",
-					Name: validEdgeGatewayName,
-				}
+			mockResponse: func() *itypes.APIResponseNetworkServices {
+				child := itypes.APIResponseNetworkServicesChildren{Type: "edge-gateway", Name: validEdgeGatewayName}
 				child.Properties.RateLimit = 5
 				child.Properties.EdgeUUID = "urn:vcloud:gateway:test-edge-gw-id"
-				return &itypes.APIResponseT0s{
-					{
-						Type:     "tier-0-vrf",
-						Name:     "test-t0",
-						Children: []itypes.APIResponseT0Children{child},
-					},
-				}
+				return &itypes.APIResponseNetworkServices{{Type: "tier-0-vrf", Name: "prvrf01eocb0001234allsp01", Children: []itypes.APIResponseNetworkServicesChildren{child}}}
+			}(),
+			mockDetailResponse: func() *itypes.APIResponseT0 {
+				child := itypes.APIResponseT0Children{Type: "edge-gateway", Name: validEdgeGatewayName}
+				child.Properties.RateLimit = 5
+				child.Properties.EdgeUUID = "urn:vcloud:gateway:test-edge-gw-id"
+				return &itypes.APIResponseT0{Type: "tier-0-vrf", Name: "prvrf01eocb0001234allsp01", Children: []itypes.APIResponseT0Children{child}}
 			}(),
 			mockResponseStatus: 200,
 			expectedErr:        false,
@@ -109,15 +105,18 @@ func Test_GetEdgeGatewayBandwidth(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			eC, ms := newClient(t)
 
-			// Set up mock response on both endpoint identities sharing the same path.
-			ep := endpoints.ListT0()
-			epSharedPath := endpoints.GetEdgeGatewayServices()
+			epList := endpoints.ListT0()
+			epServices := endpoints.GetEdgeGatewayServices()
+			epDetail := cav.MustGetEndpoint("GetT0")
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				t.Log("Setting up mock response for:", tt.name)
-				ms.CleanResponse(ep)
-				ms.CleanResponse(epSharedPath)
-				ms.SetResponse(ep, tt.mockResponse, &tt.mockResponseStatus)
-				ms.SetResponse(epSharedPath, tt.mockResponse, &tt.mockResponseStatus)
+				ms.CleanResponse(epList)
+				ms.CleanResponse(epServices)
+				ms.CleanResponse(epDetail)
+				ms.SetResponse(epServices, tt.mockResponse, &tt.mockResponseStatus)
+				if tt.mockDetailResponse != nil {
+					ms.SetResponse(epDetail, tt.mockDetailResponse, &tt.mockResponseStatus)
+				}
 			}
 
 			result, err := eC.GetBandwidth(t.Context(), tt.params)
@@ -138,27 +137,24 @@ func Test_GetEdgeGatewayBandwidth(t *testing.T) {
 
 func TestGetBandwidthReturnsNotFoundWhenT0LookupDoesNotContainRequestedEdgeGateway(t *testing.T) {
 	eC, ms := newClient(t)
-	ep := endpoints.ListT0()
-	epSharedPath := endpoints.GetEdgeGatewayServices()
+	epServices := endpoints.GetEdgeGatewayServices()
 	status := 200
 
-	child := itypes.APIResponseT0Children{
+	child := itypes.APIResponseNetworkServicesChildren{
 		Type: "edge-gateway",
 		Name: "another-edge-gateway",
 	}
 	child.Properties.RateLimit = 5
 	child.Properties.EdgeUUID = "urn:vcloud:gateway:existing-edge-gw-id"
 
-	resp := &itypes.APIResponseT0s{{
+	resp := &itypes.APIResponseNetworkServices{{
 		Type:     "tier-0-vrf",
 		Name:     "test-t0",
-		Children: []itypes.APIResponseT0Children{child},
+		Children: []itypes.APIResponseNetworkServicesChildren{child},
 	}}
 
-	ms.CleanResponse(ep)
-	ms.CleanResponse(epSharedPath)
-	ms.SetResponse(ep, resp, &status)
-	ms.SetResponse(epSharedPath, resp, &status)
+	ms.CleanResponse(epServices)
+	ms.SetResponse(epServices, resp, &status)
 
 	result, err := eC.GetBandwidth(t.Context(), types.ParamsEdgeGateway{
 		ID: "urn:vcloud:gateway:missing-edge-gw-id",
