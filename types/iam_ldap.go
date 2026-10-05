@@ -9,7 +9,15 @@
 
 package types
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+	"strings"
+)
+
+// ErrUnsupportedLDAPTestParams is returned when a ParamsTestLDAP field has no
+// counterpart in the LDAP test request payload.
+var ErrUnsupportedLDAPTestParams = errors.New("unsupported params for endpoint")
 
 // ModelLDAPTestResult represents the result of an LDAP connection test.
 type ModelLDAPTestResult struct {
@@ -65,6 +73,7 @@ type ParamsTestLDAP struct {
 	BaseDN string
 
 	// UserSearchBase is the base DN used to search for users.
+	// Not supported by the LDAP test endpoint: Validate rejects it when set.
 	UserSearchBase string
 
 	// GroupSearchBase is the base DN used to search for groups.
@@ -92,15 +101,19 @@ type ParamsTestLDAP struct {
 	SSLEnabled *bool
 
 	// SSLTrustCertificate is the trusted certificate (PEM) for SSL.
+	// Not supported by the LDAP test endpoint: Validate rejects it when set.
 	SSLTrustCertificate string
 
 	// ConnectionTimeout is the connection timeout in seconds.
+	// Not supported by the LDAP test endpoint: Validate rejects it when set.
 	ConnectionTimeout *int
 
 	// ReadTimeout is the read timeout in seconds.
+	// Not supported by the LDAP test endpoint: Validate rejects it when set.
 	ReadTimeout *int
 
 	// Enabled indicates whether LDAP authentication is enabled.
+	// Not supported by the LDAP test endpoint: Validate rejects it when non-nil.
 	Enabled *bool
 }
 
@@ -109,7 +122,36 @@ func (p ParamsTestLDAP) Validate() error {
 	if p.Host == "" {
 		return fmt.Errorf("host is required")
 	}
+
+	if names := p.unsupportedFields(); len(names) > 0 {
+		return fmt.Errorf("%w: %s", ErrUnsupportedLDAPTestParams, strings.Join(names, ", "))
+	}
+
 	return nil
+}
+
+// unsupportedFields returns the lowerCamelCase names of the fields that are set
+// but absent from the LDAP test request payload.
+func (p ParamsTestLDAP) unsupportedFields() []string {
+	var names []string
+
+	if p.UserSearchBase != "" {
+		names = append(names, "userSearchBase")
+	}
+	if p.SSLTrustCertificate != "" {
+		names = append(names, "sslTrustCertificate")
+	}
+	if p.ConnectionTimeout != nil {
+		names = append(names, "connectionTimeout")
+	}
+	if p.ReadTimeout != nil {
+		names = append(names, "readTimeout")
+	}
+	if p.Enabled != nil {
+		names = append(names, "enabled")
+	}
+
+	return names
 }
 
 // ParamsSyncLDAP defines parameters for triggering an LDAP synchronization.

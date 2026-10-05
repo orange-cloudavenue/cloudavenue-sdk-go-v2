@@ -9,7 +9,11 @@
 
 package itypes
 
-import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
+import (
+	"fmt"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
+)
 
 // * Request / Response API (JSON)
 
@@ -159,7 +163,13 @@ func (api *APIResponseLDAPGroup) ToModel() *types.ModelLDAPGroup {
 }
 
 // LDAPConfigToAPIRequest converts public LDAP params to internal API request config.
-func LDAPConfigToAPIRequest(p types.ParamsTestLDAP) APIRequestLDAPTest {
+// It fails when params carry fields the LDAP test payload cannot express, so no
+// caller can silently drop them.
+func LDAPConfigToAPIRequest(p types.ParamsTestLDAP) (APIRequestLDAPTest, error) {
+	if err := p.Validate(); err != nil {
+		return APIRequestLDAPTest{}, fmt.Errorf("ldap config: %w", err)
+	}
+
 	var groupSearchBaseEnabled *bool
 	if p.GroupSearchBase != "" {
 		enabled := true
@@ -185,7 +195,7 @@ func LDAPConfigToAPIRequest(p types.ParamsTestLDAP) APIRequestLDAPTest {
 			GroupName:   p.GroupNameAttribute,
 			Membership:  p.GroupMemberAttribute,
 		},
-	}
+	}, nil
 }
 
 func ldapTestMessage(api *APIResponseLDAPTestResult) string {

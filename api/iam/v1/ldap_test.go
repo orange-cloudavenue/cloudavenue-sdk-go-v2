@@ -79,6 +79,120 @@ func TestTestLDAP(t *testing.T) {
 		assert.True(t, result.Success)
 		assert.Equal(t, "ok", result.Message)
 	})
+
+	t.Run("nil Enabled accepted", func(t *testing.T) {
+		client, ms := newClient(t)
+
+		ms.CleanResponse(endpoints.TestLDAP())
+		ms.SetResponseFunc(endpoints.TestLDAP(), func(w http.ResponseWriter, _ *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"connectionTest":{"successful":true}}`))
+		})
+
+		result, err := client.TestLDAP(t.Context(), types.ParamsTestLDAP{
+			Host:              "ldap.example.com",
+			Enabled:           nil,
+			BaseDN:            "dc=example,dc=com",
+			UserNameAttribute: "uid",
+		})
+		assert.NoError(t, err)
+		require.NotNil(t, result)
+		assert.True(t, result.Success)
+	})
+
+	t.Run("reject unsupported params", func(t *testing.T) {
+		trueVal := true
+		falseVal := false
+		timeout := 5
+		zero := 0
+
+		tests := []struct {
+			name   string
+			params types.ParamsTestLDAP
+			want   string
+		}{
+			{
+				name: "userSearchBase",
+				params: types.ParamsTestLDAP{
+					Host:           "ldap.example.com",
+					UserSearchBase: "ou=people,dc=example,dc=com",
+				},
+				want: "IAM.TestLDAP: validate: unsupported params for endpoint: userSearchBase",
+			},
+			{
+				name: "sslTrustCertificate",
+				params: types.ParamsTestLDAP{
+					Host:                "ldap.example.com",
+					SSLTrustCertificate: "-----BEGIN CERTIFICATE-----",
+				},
+				want: "IAM.TestLDAP: validate: unsupported params for endpoint: sslTrustCertificate",
+			},
+			{
+				name: "connectionTimeout",
+				params: types.ParamsTestLDAP{
+					Host:              "ldap.example.com",
+					ConnectionTimeout: &timeout,
+				},
+				want: "IAM.TestLDAP: validate: unsupported params for endpoint: connectionTimeout",
+			},
+			{
+				name: "readTimeout",
+				params: types.ParamsTestLDAP{
+					Host:        "ldap.example.com",
+					ReadTimeout: &timeout,
+				},
+				want: "IAM.TestLDAP: validate: unsupported params for endpoint: readTimeout",
+			},
+			{
+				name: "enabled true",
+				params: types.ParamsTestLDAP{
+					Host:    "ldap.example.com",
+					Enabled: &trueVal,
+				},
+				want: "IAM.TestLDAP: validate: unsupported params for endpoint: enabled",
+			},
+			{
+				name: "enabled false",
+				params: types.ParamsTestLDAP{
+					Host:    "ldap.example.com",
+					Enabled: &falseVal,
+				},
+				want: "IAM.TestLDAP: validate: unsupported params for endpoint: enabled",
+			},
+			{
+				name: "all five",
+				params: types.ParamsTestLDAP{
+					Host:                "ldap.example.com",
+					UserSearchBase:      "ou=people,dc=example,dc=com",
+					SSLTrustCertificate: "-----BEGIN CERTIFICATE-----",
+					ConnectionTimeout:   &timeout,
+					ReadTimeout:         &timeout,
+					Enabled:             &trueVal,
+				},
+				want: "IAM.TestLDAP: validate: unsupported params for endpoint: userSearchBase, sslTrustCertificate, connectionTimeout, readTimeout, enabled",
+			},
+			{
+				name: "zero value pointers rejected",
+				params: types.ParamsTestLDAP{
+					Host:              "ldap.example.com",
+					ConnectionTimeout: &zero,
+					ReadTimeout:       &zero,
+				},
+				want: "IAM.TestLDAP: validate: unsupported params for endpoint: connectionTimeout, readTimeout",
+			},
+		}
+
+		for _, tc := range tests {
+			t.Run(tc.name, func(t *testing.T) {
+				client, _ := newClient(t)
+
+				result, err := client.TestLDAP(t.Context(), tc.params)
+				assert.Nil(t, result)
+				assert.EqualError(t, err, tc.want)
+				assert.ErrorIs(t, err, types.ErrUnsupportedLDAPTestParams)
+			})
+		}
+	})
 }
 
 func TestSearchLDAPUsers(t *testing.T) {
