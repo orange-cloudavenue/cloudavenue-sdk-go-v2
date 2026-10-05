@@ -17,6 +17,8 @@ import (
 
 type (
 	// * APIResponse
+	APIResponseT0Names []string
+
 	APIResponseT0s []APIResponseT0
 
 	APIResponseT0 struct {
@@ -39,6 +41,19 @@ type (
 		} `json:"properties"`
 	}
 )
+
+func (t0Names APIResponseT0Names) ToModel() *types.ModelT0s {
+	modelT0s := &types.ModelT0s{}
+	for _, name := range t0Names {
+		modelT0s.T0s = append(modelT0s.T0s, types.ModelT0{Name: name})
+	}
+	modelT0s.Count = len(modelT0s.T0s)
+	return modelT0s
+}
+
+func (t0 APIResponseT0) ToModel() *types.ModelT0s {
+	return APIResponseT0s{t0}.ToModel()
+}
 
 func (t0s APIResponseT0s) ToModel() *types.ModelT0s {
 	var modelT0s types.ModelT0s
