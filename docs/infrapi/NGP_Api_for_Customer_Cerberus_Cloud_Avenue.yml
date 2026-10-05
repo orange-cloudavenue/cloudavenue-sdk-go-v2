@@ -5,8 +5,10 @@ info:
     \ infrastructure.\n\n## Authentication\n\nIn order to authenticate to this API,\
     \ you must first authenticate by clicking on the \"Authorize\" button and fill\
     \ the required parameters:\n- client_id: your username\n- client_secret: your\
-    \ password\n- organization: the organization holding your user\n\n Server:\
-    \ \n- https://api1.cloudavenue.orange-business.com\n\nOnce done,\
+    \ password\n- organization: the organization holding your user\n\n Servers purpose:\
+    \ \n- https://api1.cloudavenue.orange-business.com: this server is intended to\
+    \ be used from internet \n- https://api1.cloudavenue-vdr.itn.intraorange: this\
+    \ server is intended to be used from inside orange internal network\n\nOnce done,\
     \ click on the \"Authorize\" button, close the authentication modal and start\
     \ using the API!"
   version: 2.0.0
@@ -39,7 +41,6 @@ paths:
   /infrapicustomerproxy/v1.0/federate:
     get:
       x-compatibility:
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       security:
       - Cerberus: []
@@ -71,7 +72,6 @@ paths:
       parameters: []
     post:
       x-compatibility:
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       summary: Federate an existing organization
       description: Federate an existing organization
@@ -100,7 +100,6 @@ paths:
       parameters: []
     put:
       x-compatibility:
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       summary: Regenerate SAML certificate
       description: Regenerate SAML certificate of an organization and updates the
@@ -133,7 +132,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       security:
       - Cerberus: []
@@ -167,7 +165,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       security:
       - Cerberus: []
@@ -203,7 +200,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       summary: Returns a job status by ID.
       operationId: getJobById
@@ -245,7 +241,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       summary: Get on premise IP addresses
       description: Get list of on premise IP addresses allowed for this organization's
@@ -284,7 +279,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       summary: Add on premise IP address
       description: Allow a new on premise IP address for this organization's draas
@@ -325,7 +319,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       summary: Remove on premise IP address
       description: Remove an existing on premise IP address from this organization's
@@ -367,7 +360,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       summary: Get current root job id of an organization
       description: Get current root job id of an organization
@@ -405,7 +397,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       operationId: getNetworkHierarchy
       summary: Get network hierarchy
@@ -441,7 +432,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       security:
       - Cerberus: []
@@ -490,7 +480,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       security:
       - Cerberus: []
@@ -539,7 +528,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       security:
       - Cerberus: []
@@ -576,7 +564,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       security:
       - Cerberus: []
@@ -616,7 +603,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       security:
       - Cerberus: []
@@ -653,7 +639,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       summary: Update qos rate limit on edge gateway.
       description: Update qos rate limit on edge gateway.
@@ -700,7 +685,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       summary: Get all Tier-0 Gateway
       description: Get all Tier-0 gateway.
@@ -734,7 +718,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       summary: Get Tier-0 Details
       description: Get Tier-0 details.
@@ -773,7 +756,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       summary: Add network connectivity
       description: Add newtwork connectivity to your organization. Please look at
@@ -870,7 +852,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       security:
       - Cerberus: []
@@ -919,7 +900,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       security:
       - Cerberus: []
@@ -956,7 +936,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       security:
       - Cerberus: []
@@ -995,7 +974,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       security:
       - Cerberus: []
@@ -1035,7 +1013,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       security:
       - Cerberus: []
@@ -1074,7 +1051,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       x-api-for-customer: true
       security:
@@ -1119,7 +1095,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       summary: Get list of BMS and their description
       description: Get list of BMS and their description
@@ -1141,7 +1116,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       summary: update services
       description: currently used to update cav_std_sv
@@ -1199,7 +1173,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       summary: Delete network connectivity by service ID
       description: Delete network connectivity by service ID
@@ -1238,7 +1211,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       summary: Get Trend micro tenant status
       description: Get Trend micro tenant status
@@ -1258,7 +1230,6 @@ paths:
       x-compatibility:
       - NGP
       - CERBERUS_NGP
-      - NGP_API_FOR_CUSTOMER
       - CERBERUS_NGP_API_FOR_CUSTOMER
       summary: Manage Trend Micro Status
       description: Manage Trend Micro Status
@@ -1294,6 +1265,7 @@ paths:
             example: '{"enabled": "true", "mail": "mail.test@example.com"}'
 servers:
 - url: https://api1.cloudavenue.orange-business.com
+- url: https://api1.cloudavenue-vdr.itn.intraorange
 security: []
 components:
   securitySchemes:

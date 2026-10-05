@@ -24,7 +24,8 @@ import (
 // jobTaskID is the name of the path parameter carrying a job/task identifier.
 const jobTaskID = "taskId"
 
-// jobStatusDone is the terminal success status reported by Cerberus.
+// jobStatusDone is terminal success status reported by customer job API
+// responses routed through Cerberus.
 const jobStatusDone = "done"
 
 //go:generate endpoint-generator -path subclient_cerberus_jobs.go -filename zz_cav_cerberus_jobs.go -output cav_cerberus_jobs.go
@@ -56,7 +57,8 @@ func init() {
 // Ensure cerberus implements jobsInterface.
 var _ jobsInterface = &cerberus{}
 
-// cerberusJobCreatedAPIResponse is returned when Cerberus creates job.
+// cerberusJobCreatedAPIResponse is returned when customer API accepts
+// asynchronous work through Cerberus.
 type cerberusJobCreatedAPIResponse struct {
 	ID      string `json:"jobId" fake:"{uuid}"`
 	Message string `json:"message" fake:"{sentence}"`
@@ -65,7 +67,8 @@ type cerberusJobCreatedAPIResponse struct {
 // CerberusJobCreatedAPIResponse aliases cerberusJobCreatedAPIResponse.
 type CerberusJobCreatedAPIResponse = cerberusJobCreatedAPIResponse
 
-// CerberusJobAPIResponse describes Cerberus job lookup response.
+// CerberusJobAPIResponse describes customer job lookup response returned
+// through Cerberus.
 type CerberusJobAPIResponse []struct {
 	Actions     []CerberusJobAPIResponseAction `json:"actions" fakesize:"3"`
 	Description string                         `json:"description" fake:"{sentence}"`
@@ -79,7 +82,7 @@ type CerberusJobAPIResponseAction struct {
 	Details string `json:"details" fake:"{sentence}"`
 }
 
-// JobRefresh refreshes Cerberus job status.
+// JobRefresh refreshes customer job status through Cerberus job endpoint.
 func (v *cerberus) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts []EndpointRequestOption) (job *Job, err error) {
 	job, err = v.JobParser(resp)
 	if err != nil {
@@ -95,7 +98,7 @@ func (v *cerberus) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts
 		reqOpts,
 		SetCustomRestyOption(
 			func(r *resty.Request) {
-				r.SetResultError(&cerberusError{})
+				r.SetResultError(&errors.CustomerAPIErrorBody{})
 				r.SetResult(&CerberusJobAPIResponse{})
 			},
 		),
@@ -120,13 +123,14 @@ func (v *cerberus) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts
 	return v.JobParser(respR)
 }
 
-// JobParser parses Cerberus job data from response.
+// JobParser parses customer job data from response returned through Cerberus.
 func (v *cerberus) JobParser(resp *resty.Response) (job *Job, err error) {
 	if resp == nil {
 		return job, errors.New("no response to parse")
 	}
 
-	// Cerberus returns a different body shape for HTTP 201 job creation responses.
+	// Cerberus-wrapped create responses use different body shape for HTTP 201 job
+	// creation responses.
 	if resp.StatusCode() == http.StatusCreated {
 		jobCreated := &cerberusJobCreatedAPIResponse{}
 		if err := json.Unmarshal(resp.Bytes(), jobCreated); err == nil {
@@ -184,10 +188,11 @@ func (v *cerberus) JobParser(resp *resty.Response) (job *Job, err error) {
 		return nil, err
 	}
 
-	return nil, errors.New("failed to parse cerberus job response: unexpected type or empty response")
+	return nil, errors.New("failed to parse customer job response from Cerberus endpoint: unexpected type or empty response")
 }
 
-// JobStatusParser maps Cerberus status strings to JobStatus.
+// JobStatusParser maps customer job status strings returned through Cerberus to
+// JobStatus.
 func (v *cerberus) JobStatusParser(status string) (s JobStatus, err error) {
 	// CREATED, PENDING, IN_PROGRESS, FAILED, DONE
 	switch strings.ToLower(status) {

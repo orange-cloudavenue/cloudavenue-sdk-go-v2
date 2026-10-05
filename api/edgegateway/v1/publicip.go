@@ -67,18 +67,21 @@ func (c *Client) CreatePublicIP(ctx context.Context, params types.ParamsEdgeGate
 		return nil, fmt.Errorf("Failed to create public IP: %w", err)
 	}
 
-	// Parse jobID from the create response (HTTP 201 with {"jobId":"...","message":"..."})
+	// Parse jobID from customer API create response (HTTP 201 with
+	// {"jobId":"...","message":"..."}) routed through Cerberus.
 	jobID := resp.Result().(*cav.CerberusJobCreatedAPIResponse).ID
 	if jobID == "" {
 		return nil, fmt.Errorf("Failed to create public IP: %w", errors.New("job id not found in create response"))
 	}
 
-	// Poll job completion and extract the created public IP from the job response
+	// Poll customer job completion and extract created public IP from job
+	// response.
 	publicipCreated, err := cav.AwaitJob(ctx, c.c, jobID, cav.JobPollOptions{
 		Timeout:         30 * time.Second,
 		PollingInterval: 1 * time.Second,
 	}, func(resp *resty.Response) (string, error) {
-		// The job status response may be either Cerberus or VMware format depending on which endpoint succeeded
+		// Job status response may be customer-job format routed through Cerberus
+		// or VMware task format, depending on which endpoint succeeded.
 		if r, ok := resp.Result().(*cav.CerberusJobAPIResponse); ok {
 			if len(*r) == 0 {
 				return "", errors.New("no job information returned")

@@ -141,7 +141,7 @@ func TestCerberusJobParser_UnknownJobStatus(t *testing.T) {
 	assert.Nil(t, job)
 }
 
-func TestCerberusJobParser_CerberusErrorResponse(t *testing.T) {
+func TestCerberusJobParser_RoutedAPIErrorResponse(t *testing.T) {
 	v := &cerberus{}
 	resp := &resty.Response{
 		RawResponse: &http.Response{

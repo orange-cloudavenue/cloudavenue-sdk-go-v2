@@ -634,18 +634,22 @@ here, recorded for traceability):
   support a shared abstraction better than the old architecture did. This
   should be **re-examined**, not assumed settled, when the vdc/vdcgroup
   domain is implemented.
-- **IAM (Users)**: **confirmed — no infrapi/Cerberus REST endpoint exists
-  for user CRUD.** Per §8.1's infrapi-first principle, this domain would
-  normally target `BackendInfrapi`, but since no such endpoint exists, IAM
-  Users is a **confirmed, explicit exception**: `Backend` is set to
-  `BackendVMware` (routing through the legacy XML AdminOrg API, as v1 does
-  today) for all IAM Users leaf operations, for as long as no REST surface
-  exists. This does not require a bespoke non-generated client path — the
-  `Operation[P,R]`/`Execute[P,R]` abstraction and generator convention are
-  backend-agnostic already (§2, §7); IAM Users leaves are generated exactly
-  like any other `BackendVMware`-targeted leaf, just with XML-API-shaped
-  `Transform`/`Extract` functions instead of JSON. If/when infrapi adds user
-  CRUD, this is a normal per-verb migration (§7), not a structural change.
+- **IAM (Users)**: prior conclusion in this section relied on VMware
+  `cloudapi` paths, not on the true customer API surface. That basis is not
+  sufficient for assigning IAM Users to `BackendInfrapi`, so that decision is
+  retracted here.
+
+  Current verified implementation remains the VMware Cloud Director AdminOrg
+  XML API used by `api/iam/v1` today. True customer API support for IAM user
+  CRUD through infrapi/Cerberus is **unverified** against this repository's
+  customer API source of truth,
+  `docs/infrapi/NGP_Api_for_Customer_Cerberus_Cloud_Avenue.yml`.
+
+  VMware `cloudapi` remains a separate source of truth at
+  `docs/vmware/cloudapi.json`. Evidence from VMware `/cloudapi/...` endpoints
+  does not, by itself, establish customer API coverage for IAM Users.
+
+  No backend migration decision is made in this document for IAM Users.
 - **Org Properties**: gap-fill is blocked pending verification of whether
   v1's `infrapicustomerproxy` endpoint and v2's `UpdateOrganization` endpoint
   are literally the same backend operation (determines whether they should
@@ -785,10 +789,20 @@ All five questions previously open have been resolved:
    no infrapi credential-exchange surface exists for NetBackup; it keeps its
    own OAuth2 password-grant flow as a documented, explicit exception to
    §8.1.
-3. **IAM user CRUD REST availability** (§9.5) — **confirmed: not available.**
-   No infrapi/Cerberus REST endpoint exists for user CRUD. IAM Users targets
-   `BackendVMware` (legacy XML AdminOrg API) as a normal `Operation[P,R]`
-   backend assignment; no bespoke non-generated path is needed.
+3. **IAM user CRUD REST availability** (§9.5) — **resolved: the surface
+   exists; the "confirmed" negative claim is retracted.** A live GET probe
+   on 2026-09-30 (org `cav01xxxxxxxxxxx6205`, console1; GET/OPTIONS only, no
+   writes) returned **200** for `GET /cloudapi/1.0.0/users`, **200** for a
+   FIQL-filtered `?filter=username==…` query, and **200** for a URN-keyed
+   `GET /cloudapi/1.0.0/users/urn:vcloud:user:…`, against a **404** control
+   on an absent path. IAM Users is therefore a normal `Operation[P,R]`
+   backend assignment of `BackendInfrapi` per §8.1, the legacy XML AdminOrg
+   path is retired, and the migration is the ordinary per-verb kind already
+   described in §7 — no bespoke non-generated path is needed. Full evidence,
+   the documented verb surface, the behaviour-affecting deltas (XML → JSON,
+   list-scan → FIQL filter, `{userId}` becoming a real URN), and the
+   provenance note explaining why a `/vApps` **404** makes spec presence
+   insufficient proof are in §9.5.
 4. **Org Properties backend identity** (`infrapicustomerproxy` vs.
    `UpdateOrganization`) (§9.5) — the endpoint-identity question itself
    still requires confirmation during implementation (determines one leaf
@@ -804,4 +818,7 @@ No open questions remain blocking the start of implementation. Two items
 still require a confirmation step *during* implementation, already scoped
 above: the Org Properties endpoint-identity check (item 4) and the general
 practice of re-verifying infrapi coverage per field before assigning
-`BackendVMware` fallback.
+`BackendVMware` fallback. Item 3 is the concrete instance of that failure
+mode — a claim recorded as "confirmed" that had been derived from reading
+the OpenAPI spec rather than from a live request, and was disproven by a
+single `GET`.

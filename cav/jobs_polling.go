@@ -17,6 +17,8 @@ import (
 	"time"
 
 	"resty.dev/v3"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
 const (
@@ -84,13 +86,13 @@ func buildJobRequestOptions(backend BackendTarget, endpoint *Endpoint, jobID str
 			switch backend {
 			case BackendInfrapi:
 				r.SetResult(&CerberusJobAPIResponse{})
-				r.SetResultError(&cerberusError{})
+				r.SetResultError(&errors.CustomerAPIErrorBody{})
 			case BackendVMware:
 				r.SetResult(&vmwareJobAPIResponse{})
 				r.SetResultError(&vmwareError{})
 			default:
 				r.SetResult(&CerberusJobAPIResponse{})
-				r.SetResultError(&cerberusError{})
+				r.SetResultError(&errors.CustomerAPIErrorBody{})
 			}
 		}),
 	}

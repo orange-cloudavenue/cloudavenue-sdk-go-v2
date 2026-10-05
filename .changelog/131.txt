@@ -19,7 +19,7 @@ fix(api): preserve user updates and vApp jobs. UpdateUser now preserves existing
 ```
 
 ```release-note:fix
-fix(cav): deduplicate job endpoint names. Job polling (cerberus, vmware subclients) now uses named endpoint constants (getJobCerberusEndpointName, getJobVMwareEndpointName) instead of inline string literals ("GetJobCerberus", "GetJobVmware").
+fix(cav): deduplicate job endpoint names. Job polling (Cerberus-routed customer API and VMware subclients) now uses named endpoint constants (getJobCerberusEndpointName, getJobVMwareEndpointName) instead of inline string literals ("GetJobCerberus", "GetJobVmware").
 ```
 
 ```release-note:fix
