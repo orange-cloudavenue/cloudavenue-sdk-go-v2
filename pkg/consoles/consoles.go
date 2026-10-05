@@ -321,7 +321,8 @@ func (c ConsoleName) GetAPIVCDEndpoint() string {
 	return consoles[c].Services.APIVCD.GetEndpoint()
 }
 
-// GetAPICerberusEndpoint returns Cerberus API endpoint.
+// GetAPICerberusEndpoint returns customer API endpoint routed/authenticated
+// through Cerberus.
 func (c ConsoleName) GetAPICerberusEndpoint() string {
 	mu.RLock()
 	defer mu.RUnlock()
