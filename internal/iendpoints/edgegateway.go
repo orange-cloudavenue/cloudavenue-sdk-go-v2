@@ -85,7 +85,7 @@ func init() {
 		Description:      "Create EdgeGateway",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/api/customers/v2.0/{vdc-type}/{vdc-name}/edges",
+		PathTemplate:     "/infrapicustomerproxy/v2.0/{vdc-type}/{vdc-name}/edges",
 		PathParams: []cav.PathParam{
 			{
 				Name:        "vdc-type",
@@ -122,7 +122,7 @@ func init() {
 		Description:      "Delete EdgeGateway",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/api/customers/v2.0/edges/{edgeId}",
+		PathTemplate:     pathCerberusEdgeGatewayByID,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamEdgeID,

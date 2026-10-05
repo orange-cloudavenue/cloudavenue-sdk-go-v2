@@ -90,6 +90,11 @@ const (
 	ruleResourceNameEdgeGateway = "resource_name=edgegateway"
 
 	pathQueryAPI                    = "/api/query"
+	pathCerberusDraasOnPremiseIP    = "/infrapicustomerproxy/v2.0/vcda/ips/{ip}"
+	pathCerberusEdgeGatewayByID     = "/infrapicustomerproxy/v2.0/edges/{edgeId}"
+	pathCerberusCloudavenueServices = "/infrapicustomerproxy/v2.0/services"
+	pathCerberusConfigurations      = "/infrapicustomerproxy/v2.0/configurations"
+	pathCerberusVDCByName           = "/infrapicustomerproxy/v2.0/vdcs/{vdc-name}"
 	pathApplicationPortProfiles     = "/cloudapi/1.0.0/applicationPortProfiles/{appPortProfileId}"
 	pathParamAppPortProfileID       = "appPortProfileId"
 	pathCertificateLibrary          = "/cloudapi/1.0.0/ssl/certificateLibrary/{id}"
