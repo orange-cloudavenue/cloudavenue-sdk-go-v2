@@ -25,7 +25,7 @@ import (
 func init() {
 	// GetEdgeGateway
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/edgeGateways/gatewayId/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "GetEdgeGateway",
 		Description:      "Get EdgeGateway",
 		Method:           cav.MethodGET,
@@ -46,8 +46,7 @@ func init() {
 
 	// QueryEdgeGateway
 	cav.Endpoint{
-		// "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-ExecuteQuery.html"
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/types/QueryResultEdgeGatewayRecordType.html",
+		DocumentationURL: docURLVMware,
 		Name:             "QueryEdgeGateway",
 		Description:      "Query EdgeGateway",
 		Method:           cav.MethodGET,
@@ -81,7 +80,7 @@ func init() {
 
 	// CreateEdgeGateway
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/createVdcEdge",
+		DocumentationURL: docURLCerberus,
 		Name:             "CreateEdgeGateway",
 		Description:      "Create EdgeGateway",
 		Method:           cav.MethodPOST,
@@ -118,7 +117,7 @@ func init() {
 
 	// DeleteEdgeGateway
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/deleteEdge",
+		DocumentationURL: docURLCerberus,
 		Name:             "DeleteEdgeGateway",
 		Description:      "Delete EdgeGateway",
 		Method:           cav.MethodDELETE,
@@ -142,7 +141,7 @@ func init() {
 
 	// ListEdgeGateway
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/edgeGateways/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "ListEdgeGateway",
 		Description:      "List EdgeGateways",
 		Method:           cav.MethodGET,

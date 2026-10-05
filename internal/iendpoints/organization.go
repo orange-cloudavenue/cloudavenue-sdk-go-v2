@@ -21,7 +21,7 @@ import (
 func init() {
 	// Get Organization from Vmware Cloud Director
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgs/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "GetOrganizationDetails",
 		Description:      "Get organizations details from VMware Cloud Director",
 		Method:           cav.MethodGET,
@@ -32,7 +32,7 @@ func init() {
 
 	// GetOrganization from infraAPI
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Organizations/get_api_customers_v2_0_configurations",
+		DocumentationURL: docURLCerberus,
 		Name:             "GetOrganization",
 		Description:      "Get your organization information",
 		Method:           cav.MethodGET,
@@ -43,7 +43,7 @@ func init() {
 
 	// UpdateOrganization
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Organizations/put_api_customers_v2_0_configurations",
+		DocumentationURL: docURLCerberus,
 		Name:             "UpdateOrganization",
 		Description:      "Update an existing organization",
 		Method:           cav.MethodPUT,
@@ -55,7 +55,7 @@ func init() {
 
 	// GetCatalogAccessControl
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/catalogs/catalogUrn/accessControls/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "GetCatalogAccessControl",
 		Description:      "List catalog access control grants",
 		Method:           cav.MethodGET,
@@ -76,7 +76,7 @@ func init() {
 
 	// SetCatalogAccessControl
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/catalogs/catalogUrn/accessControls/put/",
+		DocumentationURL: docURLVMware,
 		Name:             "SetCatalogAccessControl",
 		Description:      "Set catalog access control grants",
 		Method:           cav.MethodPUT,

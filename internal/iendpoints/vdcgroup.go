@@ -26,7 +26,7 @@ import (
 func init() {
 	// ListVDCGroup
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "ListVDCGroup",
 		Description:      "List VDC Groups",
 		Method:           cav.MethodGET,
@@ -70,7 +70,7 @@ func init() {
 
 	// CreateVDCGroup
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/post/",
+		DocumentationURL: docURLVMware,
 		Name:             "CreateVDCGroup",
 		Description:      "Create a VDC Group",
 		Method:           cav.MethodPOST,
@@ -82,7 +82,7 @@ func init() {
 
 	// UpdateVDCGroup
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/put/",
+		DocumentationURL: docURLVMware,
 		Name:             "UpdateVDCGroup",
 		Description:      "Update a VDC Group",
 		Method:           cav.MethodPUT,
@@ -104,7 +104,7 @@ func init() {
 
 	// DeleteVDCGroup
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/delete/",
+		DocumentationURL: docURLVMware,
 		Name:             "DeleteVDCGroup",
 		Description:      "Delete a VDC Group",
 		Method:           cav.MethodDELETE,

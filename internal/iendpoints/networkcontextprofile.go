@@ -26,7 +26,7 @@ import (
 func init() {
 	// ListNetworkContextProfile
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "ListNetworkContextProfile",
 		Description:      "List Network Context Profiles",
 		Method:           cav.MethodGET,
@@ -53,7 +53,7 @@ func init() {
 
 	// GetNetworkContextProfile
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/networkContextProfileId/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "GetNetworkContextProfile",
 		Description:      "Get a Network Context Profile",
 		Method:           cav.MethodGET,
@@ -71,7 +71,7 @@ func init() {
 
 	// CreateNetworkContextProfile
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/post/",
+		DocumentationURL: docURLVMware,
 		Name:             "CreateNetworkContextProfile",
 		Description:      "Create a Network Context Profile",
 		Method:           cav.MethodPOST,
@@ -83,7 +83,7 @@ func init() {
 
 	// UpdateNetworkContextProfile
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/networkContextProfileId/put/",
+		DocumentationURL: docURLVMware,
 		Name:             "UpdateNetworkContextProfile",
 		Description:      "Update a Network Context Profile",
 		Method:           cav.MethodPUT,
@@ -102,7 +102,7 @@ func init() {
 
 	// DeleteNetworkContextProfile
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/networkContextProfileId/delete/",
+		DocumentationURL: docURLVMware,
 		Name:             "DeleteNetworkContextProfile",
 		Description:      "Delete a Network Context Profile",
 		Method:           cav.MethodDELETE,
@@ -119,7 +119,7 @@ func init() {
 
 	// GetNetworkContextProfileAttributes
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/attributes/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "GetNetworkContextProfileAttributes",
 		Description:      "Get the static reference catalog (App IDs, Domain Names) of attributes usable in Network Context Profiles",
 		Method:           cav.MethodGET,

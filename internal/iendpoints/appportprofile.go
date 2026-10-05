@@ -26,7 +26,7 @@ import (
 func init() {
 	// ListAppPortProfile
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/applicationPortProfiles/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "ListAppPortProfile",
 		Description:      "List Application Port Profiles",
 		Method:           cav.MethodGET,
@@ -53,7 +53,7 @@ func init() {
 
 	// GetAppPortProfile
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/applicationPortProfiles/applicationPortProfileId/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "GetAppPortProfile",
 		Description:      "Get an Application Port Profile",
 		Method:           cav.MethodGET,
@@ -74,7 +74,7 @@ func init() {
 
 	// CreateAppPortProfile
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/applicationPortProfiles/post/",
+		DocumentationURL: docURLVMware,
 		Name:             "CreateAppPortProfile",
 		Description:      "Create an Application Port Profile",
 		Method:           cav.MethodPOST,
@@ -86,7 +86,7 @@ func init() {
 
 	// UpdateAppPortProfile
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/applicationPortProfiles/applicationPortProfileId/put/",
+		DocumentationURL: docURLVMware,
 		Name:             "UpdateAppPortProfile",
 		Description:      "Update an Application Port Profile",
 		Method:           cav.MethodPUT,
@@ -108,7 +108,7 @@ func init() {
 
 	// DeleteAppPortProfile
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/applicationPortProfiles/applicationPortProfileId/delete/",
+		DocumentationURL: docURLVMware,
 		Name:             "DeleteAppPortProfile",
 		Description:      "Delete an Application Port Profile",
 		Method:           cav.MethodDELETE,
