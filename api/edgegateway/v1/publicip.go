@@ -13,7 +13,6 @@ import (
 	"context"
 	"fmt"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/orange-cloudavenue/common-go/extractor"
@@ -200,6 +199,11 @@ func (c *Client) GetPublicIP(ctx context.Context, params types.ParamsGetEdgeGate
 }
 
 // DeletePublicIP releases a public IP from an edge gateway.
+//
+// The delete endpoint is keyed by the CloudAvenue service identifier, which
+// cannot be derived from the IP address. It is resolved from the org-wide
+// network hierarchy, and the request is refused when it cannot be resolved:
+// the identifier is never synthesized.
 func (c *Client) DeletePublicIP(ctx context.Context, params types.ParamsDeleteEdgeGatewayPublicIP) error {
 	if params.IP == "" {
 		return fmt.Errorf("ip is required")
@@ -208,14 +212,48 @@ func (c *Client) DeletePublicIP(ctx context.Context, params types.ParamsDeleteEd
 		return fmt.Errorf("invalid IP address: %w", err)
 	}
 
-	ep := endpoints.DisableCloudavenueServices()
-	ipID := fmt.Sprintf("ip-%s", strings.ReplaceAll(params.IP, ".", "-"))
+	serviceID, err := c.retrievePublicIPServiceID(ctx, params.IP)
+	if err != nil {
+		return err
+	}
 
-	_, err := c.c.Do(
+	ep := endpoints.DisableCloudavenueServices()
+
+	if _, err := c.c.Do(
 		ctx,
 		ep,
-		cav.WithPathParam(ep.PathParams[0], ipID),
-	)
+		cav.WithPathParam(ep.PathParams[0], serviceID),
+	); err != nil {
+		return fmt.Errorf("error deleting public IP %s: %w", params.IP, err)
+	}
 
-	return err
+	return nil
+}
+
+// retrievePublicIPServiceID resolves the real service identifier of an
+// allocated public IP from the org-wide network hierarchy. The hierarchy is
+// gateway-agnostic, so the lookup spans every edge gateway of the organization.
+func (c *Client) retrievePublicIPServiceID(ctx context.Context, ip string) (string, error) {
+	ep := endpoints.GetEdgeGatewayServices()
+
+	resp, err := c.c.Do(ctx, ep)
+	if err != nil {
+		return "", fmt.Errorf("error retrieving network services to resolve public IP %s: %w", ip, err)
+	}
+
+	services, ok := resp.Result().(*itypes.APIResponseNetworkServices)
+	if !ok || services == nil {
+		return "", fmt.Errorf("unexpected response type while resolving public IP %s", ip)
+	}
+
+	serviceID, found := services.PublicIPServiceID(ip)
+	if !found {
+		return "", fmt.Errorf("public IP %s not found in network services", ip)
+	}
+
+	if serviceID == "" {
+		return "", fmt.Errorf("serviceID is empty, cannot delete public IP %s", ip)
+	}
+
+	return serviceID, nil
 }
