@@ -36,7 +36,7 @@ func init() {
 		Description:      "Get Cerberus Job",
 		Method:           MethodGET,
 		Backend:          BackendInfrapi,
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Jobs/getJobById",
+		DocumentationURL: DocURLCerberus,
 		PathTemplate:     "/infrapicustomerproxy/v1.0/jobs/{taskId}",
 		PathParams: []PathParam{
 			{
