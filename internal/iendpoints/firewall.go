@@ -29,7 +29,7 @@ import (
 func init() {
 	// GetDFWPolicies
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "GetDFWPolicies",
 		Description:      "Get the Distributed Firewall policies (enabled state and default policy) of a VDC Group",
 		Method:           cav.MethodGET,
@@ -50,7 +50,7 @@ func init() {
 
 	// UpdateDFWPolicies
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/put/",
+		DocumentationURL: docURLVMware,
 		Name:             "UpdateDFWPolicies",
 		Description:      "Update the Distributed Firewall policies (enabled state) of a VDC Group",
 		Method:           cav.MethodPUT,
@@ -72,7 +72,7 @@ func init() {
 
 	// UpdateDFWDefaultPolicy
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/default/put/",
+		DocumentationURL: docURLVMware,
 		Name:             "UpdateDFWDefaultPolicy",
 		Description:      "Update the default Distributed Firewall policy of a VDC Group",
 		Method:           cav.MethodPUT,
@@ -94,7 +94,7 @@ func init() {
 
 	// GetDFWRules
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/default/rules/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "GetDFWRules",
 		Description:      "Get the Distributed Firewall rules of a VDC Group",
 		Method:           cav.MethodGET,
@@ -115,7 +115,7 @@ func init() {
 
 	// UpdateDFWRules
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/default/rules/put/",
+		DocumentationURL: docURLVMware,
 		Name:             "UpdateDFWRules",
 		Description:      "Replace (bulk) the Distributed Firewall rules of a VDC Group",
 		Method:           cav.MethodPUT,

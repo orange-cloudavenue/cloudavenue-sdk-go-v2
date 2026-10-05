@@ -15,31 +15,31 @@ import (
 
 // ListAppPortProfile - List Application Port Profiles
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/applicationPortProfiles/get/
+// DocumentationURL: 
 func ListAppPortProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListAppPortProfile")
 }
 // GetAppPortProfile - Get an Application Port Profile
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/applicationPortProfiles/applicationPortProfileId/get/
+// DocumentationURL: 
 func GetAppPortProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetAppPortProfile")
 }
 // CreateAppPortProfile - Create an Application Port Profile
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/applicationPortProfiles/post/
+// DocumentationURL: 
 func CreateAppPortProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreateAppPortProfile")
 }
 // UpdateAppPortProfile - Update an Application Port Profile
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/applicationPortProfiles/applicationPortProfileId/put/
+// DocumentationURL: 
 func UpdateAppPortProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateAppPortProfile")
 }
 // DeleteAppPortProfile - Delete an Application Port Profile
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/applicationPortProfiles/applicationPortProfileId/delete/
+// DocumentationURL: 
 func DeleteAppPortProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("DeleteAppPortProfile")
 }

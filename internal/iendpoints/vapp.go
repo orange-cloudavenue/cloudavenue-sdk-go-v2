@@ -23,7 +23,7 @@ func init() {
 
 	// ListVApp
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-VApp.html",
+		DocumentationURL: docURLVMware,
 		Name:             "ListVApp",
 		Description:      "List VApps",
 		Method:           cav.MethodGET,
@@ -45,7 +45,7 @@ func init() {
 
 	// GetVApp
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-VApp.html",
+		DocumentationURL: docURLVMware,
 		Name:             "GetVApp",
 		Description:      "Get VApp",
 		Method:           cav.MethodGET,
@@ -65,7 +65,7 @@ func init() {
 
 	// CreateVApp
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-VApp.html",
+		DocumentationURL: docURLVMware,
 		Name:             "CreateVApp",
 		Description:      "Create a new VApp",
 		Method:           cav.MethodPOST,
@@ -86,7 +86,7 @@ func init() {
 
 	// UpdateVApp
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-VApp.html",
+		DocumentationURL: docURLVMware,
 		Name:             "UpdateVApp",
 		Description:      "Update an existing VApp",
 		Method:           cav.MethodPUT,
@@ -107,7 +107,7 @@ func init() {
 
 	// DeleteVApp
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/DELETE-VApp.html",
+		DocumentationURL: docURLVMware,
 		Name:             "DeleteVApp",
 		Description:      "Delete an existing VApp",
 		Method:           cav.MethodDELETE,
@@ -127,7 +127,7 @@ func init() {
 
 	// RemoveAllNetworks
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-VApp-RemoveAllNetworks.html",
+		DocumentationURL: docURLVMware,
 		Name:             "RemoveAllNetworks",
 		Description:      "Remove all networks from a VApp",
 		Method:           cav.MethodPOST,
@@ -147,7 +147,7 @@ func init() {
 
 	// UndeployVApp
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-VApp-Undeploy.html",
+		DocumentationURL: docURLVMware,
 		Name:             "UndeployVApp",
 		Description:      "Undeploy a VApp",
 		Method:           cav.MethodPOST,
@@ -168,7 +168,7 @@ func init() {
 
 	// GetVAppLeaseSettings
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-VAppLeaseSettings.html",
+		DocumentationURL: docURLVMware,
 		Name:             "GetVAppLeaseSettings",
 		Description:      "Get org/VDC-level lease settings",
 		Method:           cav.MethodGET,
@@ -187,7 +187,7 @@ func init() {
 
 	// UpdateVAppLeaseSettings
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-VAppLeaseSettings.html",
+		DocumentationURL: docURLVMware,
 		Name:             "UpdateVAppLeaseSettings",
 		Description:      "Update org/VDC-level lease settings",
 		Method:           cav.MethodPUT,

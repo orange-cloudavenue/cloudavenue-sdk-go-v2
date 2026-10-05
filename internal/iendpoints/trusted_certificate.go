@@ -18,7 +18,7 @@ import (
 
 func init() {
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/trustedCertificates/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "ListTrustedCertificate",
 		Description:      "List trusted certificates",
 		Method:           cav.MethodGET,
@@ -29,7 +29,7 @@ func init() {
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/trustedCertificates/trustedCertificate/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "GetTrustedCertificate",
 		Description:      "Get a trusted certificate",
 		Method:           cav.MethodGET,
@@ -44,7 +44,7 @@ func init() {
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/trustedCertificates/post/",
+		DocumentationURL: docURLVMware,
 		Name:             "CreateTrustedCertificate",
 		Description:      "Create a trusted certificate",
 		Method:           cav.MethodPOST,
@@ -55,7 +55,7 @@ func init() {
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/trustedCertificates/trustedCertificate/put/",
+		DocumentationURL: docURLVMware,
 		Name:             "UpdateTrustedCertificate",
 		Description:      "Update a trusted certificate",
 		Method:           cav.MethodPUT,
@@ -71,7 +71,7 @@ func init() {
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/trustedCertificates/trustedCertificate/delete/",
+		DocumentationURL: docURLVMware,
 		Name:             "DeleteTrustedCertificate",
 		Description:      "Delete a trusted certificate",
 		Method:           cav.MethodDELETE,

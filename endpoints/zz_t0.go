@@ -15,13 +15,13 @@ import (
 
 // ListT0 - List T0
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Tier-0/getTier0Vrfs
+// DocumentationURL: 
 func ListT0() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListT0")
 }
 // GetT0 - Get T0
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Tier-0/getTier0VrfByName
+// DocumentationURL: 
 func GetT0() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetT0")
 }
