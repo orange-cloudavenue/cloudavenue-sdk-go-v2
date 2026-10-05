@@ -15,37 +15,37 @@ import (
 
 // ListNetworkContextProfile - List Network Context Profiles
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func ListNetworkContextProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListNetworkContextProfile")
 }
 // GetNetworkContextProfile - Get a Network Context Profile
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func GetNetworkContextProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetNetworkContextProfile")
 }
 // CreateNetworkContextProfile - Create a Network Context Profile
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func CreateNetworkContextProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreateNetworkContextProfile")
 }
 // UpdateNetworkContextProfile - Update a Network Context Profile
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func UpdateNetworkContextProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateNetworkContextProfile")
 }
 // DeleteNetworkContextProfile - Delete a Network Context Profile
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func DeleteNetworkContextProfile() *cav.Endpoint {
 	return cav.MustGetEndpoint("DeleteNetworkContextProfile")
 }
 // GetNetworkContextProfileAttributes - Get the static reference catalog (App IDs, Domain Names) of attributes usable in Network Context Profiles
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func GetNetworkContextProfileAttributes() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetNetworkContextProfileAttributes")
 }
