@@ -236,7 +236,7 @@ func init() {
 		Description:      "Test LDAP connection",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathLDAP + "/test/post/",
+		PathTemplate:     pathLDAP + "/test",
 		BodyRequestType:  itypes.APIRequestLDAPTest{},
 		ResponseType:     itypes.APIResponseLDAPTestResult{},
 	}.Register()
@@ -248,7 +248,7 @@ func init() {
 		Description:      "Synchronize LDAP directory",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathLDAP + "/sync/post/",
+		PathTemplate:     pathLDAP + "/sync",
 		BodyRequestType:  nil, // No request body for this endpoint.
 		ResponseType:     struct{}{},
 	}.Register()
@@ -260,7 +260,7 @@ func init() {
 		Description:      "Search LDAP users",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathLDAP + "/search/user/get/",
+		PathTemplate:     pathLDAP + "/search/user",
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        queryParamFilter,
@@ -293,7 +293,7 @@ func init() {
 		Description:      "Search LDAP groups",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathLDAP + "/search/group/get/",
+		PathTemplate:     pathLDAP + "/search/group",
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        queryParamFilter,
