@@ -33,18 +33,19 @@ func (c *Client) TestLDAP(ctx context.Context, params types.ParamsTestLDAP) (*ty
 		return nil, fmt.Errorf("%s: validate: %w", opTestLDAP, err)
 	}
 
-	body := itypes.APIRequestLDAPTest{
-		Config: itypes.LDAPConfigToAPIRequest(params),
-	}
+	body := itypes.LDAPConfigToAPIRequest(params)
 
 	ep := endpoints.TestLDAP()
-	resp, err := c.c.Do(
-		ctx,
-		ep,
+	opts := []cav.EndpointRequestOption{
 		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.SetBody(body),
 		cav.OverrideSetResult(new(itypes.APIResponseLDAPTestResult)),
-	)
+	}
+	if params.BindUser != "" {
+		opts = append(opts, cav.WithQueryParam(ep.QueryParams[0], params.BindUser))
+	}
+
+	resp, err := c.c.Do(ctx, ep, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", opTestLDAP, err)
 	}
@@ -87,20 +88,14 @@ func (c *Client) SearchLDAPUsers(ctx context.Context, params types.ParamsSearchL
 	ep := endpoints.SearchLDAPUsers()
 	opts := []cav.EndpointRequestOption{
 		cav.SetCustomRestyOption(setJSONHeaders),
-		cav.OverrideSetResult(new(itypes.APIResponseLDAPUsers)),
+		cav.OverrideSetResult(new([]itypes.APIResponseLDAPUser)),
 	}
 
 	if params.Filter != "" {
 		opts = append(opts, cav.WithQueryParam(ep.QueryParams[0], params.Filter))
 	}
-	if params.MaxResults != "" {
-		opts = append(opts, cav.WithQueryParam(ep.QueryParams[1], params.MaxResults))
-	}
-	if params.PageSize != "" {
-		opts = append(opts, cav.WithQueryParam(ep.QueryParams[2], params.PageSize))
-	}
-	if params.Page != "" {
-		opts = append(opts, cav.WithQueryParam(ep.QueryParams[3], params.Page))
+	if params.MaxResults != "" || params.PageSize != "" || params.Page != "" {
+		return nil, fmt.Errorf("%s: validate: unsupported params for endpoint: maxResults, pageSize, page", opSearchLDAPUsers)
 	}
 
 	resp, err := c.c.Do(ctx, ep, opts...)
@@ -108,12 +103,12 @@ func (c *Client) SearchLDAPUsers(ctx context.Context, params types.ParamsSearchL
 		return nil, fmt.Errorf("%s: %w", opSearchLDAPUsers, err)
 	}
 
-	users, ok := resp.Result().(*itypes.APIResponseLDAPUsers)
+	users, ok := resp.Result().(*[]itypes.APIResponseLDAPUser)
 	if !ok {
 		return nil, fmt.Errorf("%s: unexpected response type %T", opSearchLDAPUsers, resp.Result())
 	}
 
-	return users.ToModel(), nil
+	return itypes.LDAPUsersToModel(*users), nil
 }
 
 // SearchLDAPGroups searches the LDAP directory for groups.
@@ -126,20 +121,14 @@ func (c *Client) SearchLDAPGroups(ctx context.Context, params types.ParamsSearch
 	ep := endpoints.SearchLDAPGroups()
 	opts := []cav.EndpointRequestOption{
 		cav.SetCustomRestyOption(setJSONHeaders),
-		cav.OverrideSetResult(new(itypes.APIResponseLDAPGroups)),
+		cav.OverrideSetResult(new([]itypes.APIResponseLDAPGroup)),
 	}
 
 	if params.Filter != "" {
 		opts = append(opts, cav.WithQueryParam(ep.QueryParams[0], params.Filter))
 	}
-	if params.MaxResults != "" {
-		opts = append(opts, cav.WithQueryParam(ep.QueryParams[1], params.MaxResults))
-	}
-	if params.PageSize != "" {
-		opts = append(opts, cav.WithQueryParam(ep.QueryParams[2], params.PageSize))
-	}
-	if params.Page != "" {
-		opts = append(opts, cav.WithQueryParam(ep.QueryParams[3], params.Page))
+	if params.MaxResults != "" || params.PageSize != "" || params.Page != "" {
+		return nil, fmt.Errorf("%s: validate: unsupported params for endpoint: maxResults, pageSize, page", opSearchLDAPGroups)
 	}
 
 	resp, err := c.c.Do(ctx, ep, opts...)
@@ -147,10 +136,10 @@ func (c *Client) SearchLDAPGroups(ctx context.Context, params types.ParamsSearch
 		return nil, fmt.Errorf("%s: %w", opSearchLDAPGroups, err)
 	}
 
-	groups, ok := resp.Result().(*itypes.APIResponseLDAPGroups)
+	groups, ok := resp.Result().(*[]itypes.APIResponseLDAPGroup)
 	if !ok {
 		return nil, fmt.Errorf("%s: unexpected response type %T", opSearchLDAPGroups, resp.Result())
 	}
 
-	return groups.ToModel(), nil
+	return itypes.LDAPGroupsToModel(*groups), nil
 }
