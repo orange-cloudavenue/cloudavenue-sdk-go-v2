@@ -15,31 +15,31 @@ import (
 
 // GetDFWPolicies - Get the Distributed Firewall policies (enabled state and default policy) of a VDC Group
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func GetDFWPolicies() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetDFWPolicies")
 }
 // UpdateDFWPolicies - Update the Distributed Firewall policies (enabled state) of a VDC Group
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func UpdateDFWPolicies() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateDFWPolicies")
 }
 // UpdateDFWDefaultPolicy - Update the default Distributed Firewall policy of a VDC Group
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func UpdateDFWDefaultPolicy() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateDFWDefaultPolicy")
 }
 // GetDFWRules - Get the Distributed Firewall rules of a VDC Group
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func GetDFWRules() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetDFWRules")
 }
 // UpdateDFWRules - Replace (bulk) the Distributed Firewall rules of a VDC Group
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func UpdateDFWRules() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateDFWRules")
 }

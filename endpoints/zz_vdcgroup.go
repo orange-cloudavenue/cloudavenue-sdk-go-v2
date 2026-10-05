@@ -15,25 +15,25 @@ import (
 
 // ListVDCGroup - List VDC Groups
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func ListVDCGroup() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListVDCGroup")
 }
 // CreateVDCGroup - Create a VDC Group
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func CreateVDCGroup() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreateVDCGroup")
 }
 // UpdateVDCGroup - Update a VDC Group
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func UpdateVDCGroup() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateVDCGroup")
 }
 // DeleteVDCGroup - Delete a VDC Group
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func DeleteVDCGroup() *cav.Endpoint {
 	return cav.MustGetEndpoint("DeleteVDCGroup")
 }

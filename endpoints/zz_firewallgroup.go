@@ -15,31 +15,31 @@ import (
 
 // ListFirewallGroup - List Firewall Groups (Security Groups, IP Sets, Dynamic Security Groups)
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func ListFirewallGroup() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListFirewallGroup")
 }
 // GetFirewallGroup - Get a Firewall Group (Security Group, IP Set, or Dynamic Security Group)
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func GetFirewallGroup() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetFirewallGroup")
 }
 // CreateFirewallGroup - Create a Firewall Group (Security Group, IP Set, or Dynamic Security Group)
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func CreateFirewallGroup() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreateFirewallGroup")
 }
 // UpdateFirewallGroup - Update a Firewall Group (Security Group, IP Set, or Dynamic Security Group)
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func UpdateFirewallGroup() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateFirewallGroup")
 }
 // DeleteFirewallGroup - Delete a Firewall Group (Security Group, IP Set, or Dynamic Security Group)
 //
-// DocumentationURL: 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
 func DeleteFirewallGroup() *cav.Endpoint {
 	return cav.MustGetEndpoint("DeleteFirewallGroup")
 }

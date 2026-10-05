@@ -15,19 +15,19 @@ import (
 
 // GetEdgeGatewayServices - Get EdgeGateway Network Services
 //
-// DocumentationURL: 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func GetEdgeGatewayServices() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetEdgeGatewayServices")
 }
 // EnableCloudavenueServices - Enable Cloud Avenue Services
 //
-// DocumentationURL: 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func EnableCloudavenueServices() *cav.Endpoint {
 	return cav.MustGetEndpoint("EnableCloudavenueServices")
 }
 // DisableCloudavenueServices - Disable Cloud Avenue Services
 //
-// DocumentationURL: 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func DisableCloudavenueServices() *cav.Endpoint {
 	return cav.MustGetEndpoint("DisableCloudavenueServices")
 }
