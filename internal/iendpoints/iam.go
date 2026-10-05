@@ -359,7 +359,7 @@ func init() {
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathLDAP + "/sync/post/",
-		BodyRequestType:  itypes.APIRequestLDAPSync{},
+		BodyRequestType:  nil, // No request body for this endpoint.
 		ResponseType:     struct{}{},
 	}.Register()
 

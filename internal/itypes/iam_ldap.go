@@ -40,11 +40,6 @@ type APIRequestLDAPTest struct {
 	Config APIRequestLDAPConfig `json:"config,omitempty"`
 }
 
-// APIRequestLDAPSync represents the request body for SyncLDAP.
-type APIRequestLDAPSync struct {
-	Config APIRequestLDAPConfig `json:"config,omitempty"`
-}
-
 // APIResponseLDAPTestResult represents the response of TestLDAP.
 type APIResponseLDAPTestResult struct {
 	Success bool   `json:"success,omitempty"`

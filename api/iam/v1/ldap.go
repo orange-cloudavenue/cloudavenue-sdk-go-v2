@@ -64,16 +64,11 @@ func (c *Client) SyncLDAP(ctx context.Context, params types.ParamsSyncLDAP) erro
 		return fmt.Errorf("%s: validate: %w", opSyncLDAP, err)
 	}
 
-	body := itypes.APIRequestLDAPSync{
-		Config: itypes.LDAPConfigToAPIRequest(types.ParamsTestLDAP{}),
-	}
-
 	ep := endpoints.SyncLDAP()
 	_, err := c.c.Do(
 		ctx,
 		ep,
 		cav.SetCustomRestyOption(setJSONHeaders),
-		cav.SetBody(body),
 	)
 	if err != nil {
 		return fmt.Errorf("%s: %w", opSyncLDAP, err)
