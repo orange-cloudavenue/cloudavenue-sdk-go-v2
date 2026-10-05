@@ -20,7 +20,7 @@ import (
 
 func init() {
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/certificateLibrary/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "ListCertificate",
 		Description:      "List certificate library items",
 		Method:           cav.MethodGET,
@@ -31,7 +31,7 @@ func init() {
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/certificateLibrary/id/get/",
+		DocumentationURL: docURLVMware,
 		Name:             "GetCertificate",
 		Description:      "Get a certificate library item",
 		Method:           cav.MethodGET,
@@ -49,7 +49,7 @@ func init() {
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/certificateLibrary/post/",
+		DocumentationURL: docURLVMware,
 		Name:             "CreateCertificate",
 		Description:      "Create a certificate library item",
 		Method:           cav.MethodPOST,
@@ -60,7 +60,7 @@ func init() {
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/certificateLibrary/id/put/",
+		DocumentationURL: docURLVMware,
 		Name:             "UpdateCertificate",
 		Description:      "Update a certificate library item",
 		Method:           cav.MethodPUT,
@@ -79,7 +79,7 @@ func init() {
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/certificateLibrary/id/delete/",
+		DocumentationURL: docURLVMware,
 		Name:             "DeleteCertificate",
 		Description:      "Delete a certificate library item",
 		Method:           cav.MethodDELETE,

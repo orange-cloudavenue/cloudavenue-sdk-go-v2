@@ -15,37 +15,37 @@ import (
 
 // ListVDC - List VDCs
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/38.1/doc/types/ReferenceType.html
+// DocumentationURL: 
 func ListVDC() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListVDC")
 }
 // GetVDC - Get VDC
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-Vdc.html
+// DocumentationURL: 
 func GetVDC() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetVDC")
 }
 // GetVDCMetadata - Get VDC Metadata
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-VdcMetadata.html
+// DocumentationURL: 
 func GetVDCMetadata() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetVDCMetadata")
 }
 // CreateVDC - Create a new Org VDC
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/vDC/createOrgVdc
+// DocumentationURL: 
 func CreateVDC() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreateVDC")
 }
 // UpdateVDC - Update an existing Org VDC
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/vDC/updateOrgVdc
+// DocumentationURL: 
 func UpdateVDC() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateVDC")
 }
 // DeleteVDC - Delete an existing Org VDC
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/vDC/deleteOrgVdc
+// DocumentationURL: 
 func DeleteVDC() *cav.Endpoint {
 	return cav.MustGetEndpoint("DeleteVDC")
 }
