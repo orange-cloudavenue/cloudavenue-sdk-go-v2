@@ -25,17 +25,20 @@ func encryptSessions(key []byte, plaintext string) (string, error) {
 	}
 
 	plaintextBytes := []byte(plaintext)
-	ciphertext := make([]byte, aes.BlockSize+len(plaintextBytes))
-
-	iv := ciphertext[:aes.BlockSize]
+	iv := make([]byte, aes.BlockSize)
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
 		return "", err
 	}
 
-	stream := cipher.NewCTR(block, iv)
-	stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintextBytes)
+	ciphertext := make([]byte, len(plaintextBytes))
 
-	return base64.URLEncoding.EncodeToString(ciphertext), nil
+	stream := cipher.NewCTR(block, iv)
+	stream.XORKeyStream(ciphertext, plaintextBytes)
+
+	encoded := make([]byte, len(iv)+len(ciphertext))
+	copy(encoded, iv)
+	copy(encoded[len(iv):], ciphertext)
+	return base64.URLEncoding.EncodeToString(encoded), nil
 }
 
 func decryptSessions(key []byte, ciphertext string) (string, error) {
