@@ -1,0 +1,11 @@
+```release-note:feature
+feat: expand public API surface and backend coverage. Adds admin Org, VDC, catalog, and catalog ACL scopes; IAM global roles, tokens, and LDAP operations; organization catalog ACL; vApp lease settings; and VDC group DHCP support, with matching public types, internal types, endpoint definitions, generated wrappers, and tests.
+```
+
+```release-note:fix
+fix: align backend endpoint behavior and typed payload handling. Corrects Cerberus and VMware path usage, hardens typed payload handling, preserves partial user updates, improves job/operation flow, and fixes edge gateway public IP, bandwidth, network hierarchy, and Tier-0 handling.
+```
+
+```release-note:chore
+chore: refresh generated endpoints and supporting docs/specs. Regenerates endpoint wrappers, updates architecture/spec documentation, and aligns documentation URL references with current backend conventions.
+```
