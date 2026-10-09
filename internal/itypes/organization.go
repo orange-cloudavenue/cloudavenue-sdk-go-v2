@@ -50,6 +50,7 @@ type (
 		Description         string `json:"description" validate:"omitempty"`
 		CustomerMail        string `json:"customerMail" validate:"omitempty,email"`
 		InternetBillingMode string `json:"internetBillingMode" validate:"omitempty,oneof=PAYG TRAFFIC_VOLUME"`
+		IsEnabled           bool   `json:"isEnabled"`
 	}
 )
 
@@ -59,6 +60,7 @@ func (r *APIResponseGetOrg) ToModel() *types.ModelGetOrganization {
 		Name:                r.Name,
 		FullName:            r.FullName,
 		Description:         r.Description,
+		Enabled:             r.IsEnabled,
 		Email:               r.CustomerMail,
 		InternetBillingMode: r.InternetBillingMode,
 	}
