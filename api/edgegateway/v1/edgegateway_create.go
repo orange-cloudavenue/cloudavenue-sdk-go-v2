@@ -123,7 +123,7 @@ var (
 	}
 	listVDCByOwnerNameOp = cav.Operation[listVDCByOwnerNameParams, *itypes.APIResponseListVDC]{
 		Name:     opListVDCByOwnerName,
-		Backend:  cav.BackendVMware,
+		Backend:  cav.BackendInfrapi,
 		Endpoint: endpoints.ListVDC(),
 		Validate: func(p listVDCByOwnerNameParams) error {
 			if p.OwnerName == "" {
@@ -133,10 +133,7 @@ var (
 			return nil
 		},
 		RequestOptions: func(p listVDCByOwnerNameParams) ([]cav.EndpointRequestOption, error) {
-			ep := endpoints.ListVDC()
-			return []cav.EndpointRequestOption{
-				cav.WithQueryParam(ep.QueryParams[0], "name=="+p.OwnerName),
-			}, nil
+			return nil, nil
 		},
 		Extract: func(resp *cav.Response, _ listVDCByOwnerNameParams) (*itypes.APIResponseListVDC, error) {
 			list, ok := resp.Result().(*itypes.APIResponseListVDC)

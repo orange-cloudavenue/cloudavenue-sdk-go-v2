@@ -9,7 +9,11 @@
 
 package itypes
 
-import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
+import (
+	"encoding/json"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
+)
 
 // * Request / Response API
 
@@ -25,6 +29,11 @@ type (
 		ID          string `json:"id" fake:"{urn:edgegateway}"`             // The ID of the edge gateway.
 		Name        string `json:"name" fake:"{resource_name:edgegateway}"` // The name of the edge gateway.
 		Description string `json:"description" fake:"{sentence}"`
+		EdgeID      string `json:"edgeId,omitempty"`
+		EdgeName    string `json:"edgeName,omitempty"`
+		OwnerType   string `json:"ownerType,omitempty"`
+		OwnerName   string `json:"ownerName,omitempty"`
+		Tier0VRFID  string `json:"tier0VrfId,omitempty"`
 
 		EdgeGatewayUplinks []struct {
 			Connected bool `json:"connected" fake:"true"` // Indicates if the uplink is connected.
@@ -79,6 +88,85 @@ type (
 	}
 )
 
+// UnmarshalJSON accepts Cerberus's array response and the former CloudAPI
+// values envelope.
+func (r *APIResponseEdgegateways) UnmarshalJSON(data []byte) error {
+	var values []APIResponseEdgegateway
+	if err := json.Unmarshal(data, &values); err == nil {
+		r.Values = values
+		return nil
+	}
+	var envelope struct {
+		Values []APIResponseEdgegateway            `json:"values"`
+		Record []APIResponseQueryEdgeGatewayRecord `json:"record"`
+	}
+	if err := json.Unmarshal(data, &envelope); err != nil {
+		return err
+	}
+	r.Values = envelope.Values
+	if len(r.Values) == 0 && len(envelope.Record) > 0 {
+		r.Values = make([]APIResponseEdgegateway, 0, len(envelope.Record))
+		for _, record := range envelope.Record {
+			r.Values = append(r.Values, APIResponseEdgegateway{
+				ID:     record.ID,
+				Name:   record.Name,
+				OrgVDC: &APIObjectReference{ID: record.VDCID, Name: record.VDCName},
+			})
+		}
+	}
+	return nil
+}
+
+// UnmarshalJSON accepts both the former query response (record) and the
+// CloudAPI edge gateway collection (values). QueryEdgeGateway remains a
+// compatibility alias, so older fixtures and integrations continue to decode.
+func (r *APIResponseQueryEdgeGateway) UnmarshalJSON(data []byte) error {
+	var values []APIResponseEdgegateway
+	if err := json.Unmarshal(data, &values); err == nil {
+		r.Record = make([]APIResponseQueryEdgeGatewayRecord, 0, len(values))
+		for _, value := range values {
+			r.Record = append(r.Record, queryEdgeGatewayRecord(value))
+		}
+		return nil
+	}
+
+	var response struct {
+		Record []APIResponseQueryEdgeGatewayRecord `json:"record"`
+		Values []APIResponseEdgegateway            `json:"values"`
+	}
+	if err := json.Unmarshal(data, &response); err != nil {
+		return err
+	}
+	r.Record = response.Record
+	for _, value := range response.Values {
+		r.Record = append(r.Record, queryEdgeGatewayRecord(value))
+	}
+	return nil
+}
+
+func queryEdgeGatewayRecord(value APIResponseEdgegateway) APIResponseQueryEdgeGatewayRecord {
+	id, name := value.ID, value.Name
+	if id == "" {
+		id = value.EdgeID
+	}
+	if name == "" {
+		name = value.EdgeName
+	}
+	record := APIResponseQueryEdgeGatewayRecord{ID: id, Name: name}
+	if value.OwnerRef != nil {
+		record.VDCID = value.OwnerRef.ID
+		record.VDCName = value.OwnerRef.Name
+	}
+	if record.VDCName == "" {
+		record.VDCName = value.OwnerName
+	}
+	if value.OrgVDC != nil {
+		record.VDCID = value.OrgVDC.ID
+		record.VDCName = value.OrgVDC.Name
+	}
+	return record
+}
+
 // ToModel converts the APIResponseEdgegateways to ModelEdgeGateways.
 func (api *APIResponseEdgegateways) ToModel() *types.ModelEdgeGateways {
 	if api == nil {
@@ -102,27 +190,43 @@ func (api *APIResponseEdgegateway) ToModel() *types.ModelEdgeGateway {
 		return nil
 	}
 
+	id, name := api.ID, api.Name
+	if id == "" {
+		id = api.EdgeID
+	}
+	if name == "" {
+		name = api.EdgeName
+	}
+	ownerRef := api.OwnerRef
+	if ownerRef == nil && (api.OwnerName != "" || api.OwnerType != "") {
+		ownerRef = &APIObjectReference{Name: api.OwnerName}
+	}
+	uplinkT0 := func() *types.ModelObjectReference {
+		if len(api.EdgeGatewayUplinks) > 0 {
+			return &types.ModelObjectReference{
+				ID:   api.EdgeGatewayUplinks[0].UplinkID,
+				Name: api.EdgeGatewayUplinks[0].UplinkName,
+			}
+		}
+		if api.Tier0VRFID != "" {
+			return &types.ModelObjectReference{ID: api.Tier0VRFID}
+		}
+		return nil
+	}()
+
 	return &types.ModelEdgeGateway{
-		ID:          api.ID,
-		Name:        api.Name,
+		ID:          id,
+		Name:        name,
 		Description: api.Description,
 		OwnerRef: func() *types.ModelObjectReference {
-			if api.OwnerRef != nil {
+			if ownerRef != nil {
 				return &types.ModelObjectReference{
-					ID:   api.OwnerRef.ID,
-					Name: api.OwnerRef.Name,
+					ID:   ownerRef.ID,
+					Name: ownerRef.Name,
 				}
 			}
 			return nil
 		}(),
-		UplinkT0: func() *types.ModelObjectReference {
-			if len(api.EdgeGatewayUplinks) > 0 {
-				return &types.ModelObjectReference{
-					ID:   api.EdgeGatewayUplinks[0].UplinkID,
-					Name: api.EdgeGatewayUplinks[0].UplinkName,
-				}
-			}
-			return nil
-		}(),
+		UplinkT0: uplinkT0,
 	}
 }

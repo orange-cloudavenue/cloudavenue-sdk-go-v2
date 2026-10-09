@@ -11,24 +11,18 @@ package edgegateway
 
 import (
 	"context"
-
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+	"fmt"
 )
 
 func (c *Client) retrieveEdgeGatewayIDByName(ctx context.Context, name string) (string, error) {
-	epQuery := endpoints.QueryEdgeGateway()
-
-	respQuery, err := c.c.Do(
-		ctx,
-		epQuery,
-		cav.WithQueryParam(epQuery.QueryParams[1], "name=="+name),
-	)
+	resp, err := c.ListEdgeGateway(ctx)
 	if err != nil {
 		return "", err
 	}
-
-	// Record is already checked in the middleware.
-	return respQuery.Result().(*itypes.APIResponseQueryEdgeGateway).Record[0].ID, nil
+	for _, gateway := range resp.EdgeGateways {
+		if gateway.Name == name {
+			return gateway.ID, nil
+		}
+	}
+	return "", fmt.Errorf("edge gateway %q not found", name)
 }

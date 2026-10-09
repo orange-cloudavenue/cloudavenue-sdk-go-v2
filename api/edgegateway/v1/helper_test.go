@@ -17,6 +17,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 )
 
 func newClient(t *testing.T) (*Client, *mock.Server) {
@@ -39,4 +40,13 @@ func newClient(t *testing.T) (*Client, *mock.Server) {
 	eC, err := New(mC)
 	assert.Nil(t, err, "Error creating edgegateway client")
 	return eC, ms
+}
+
+// setEdgeGatewayListResponse configures both the current Infrapi list endpoint
+// and its compatibility alias. They share a route in the mock server.
+func setEdgeGatewayListResponse(ms *mock.Server, data any, status *int) {
+	ms.CleanResponse(endpoints.ListEdgeGateway())
+	ms.SetResponse(endpoints.ListEdgeGateway(), data, status)
+	ms.CleanResponse(endpoints.QueryEdgeGateway())
+	ms.SetResponse(endpoints.QueryEdgeGateway(), data, status)
 }
