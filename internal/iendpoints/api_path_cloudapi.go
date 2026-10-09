@@ -78,13 +78,13 @@ const (
 	pathTokenDeleteByID = "/cloudapi/1.0.0/tokens/id/delete/"
 	// pathLDAP manages LDAP operations.
 	// pathLDAPTest tests LDAP configuration.
-	pathLDAPTest = "/cloudapi/1.0.0/ldap/test"
+	pathLDAPTest = "/cloudapi/1.0.0/ldap/{orgId}/test"
 	// pathLDAPSync triggers LDAP synchronization.
-	pathLDAPSync = "/cloudapi/1.0.0/ldap/sync"
+	pathLDAPSync = "/cloudapi/1.0.0/ldap/{orgId}/sync"
 	// pathLDAPSearchUsers searches LDAP users.
-	pathLDAPSearchUsers = "/cloudapi/1.0.0/ldap/search/user"
+	pathLDAPSearchUsers = "/cloudapi/1.0.0/ldap/{orgId}/search/user"
 	// pathLDAPSearchGroups searches LDAP groups.
-	pathLDAPSearchGroups = "/cloudapi/1.0.0/ldap/search/group"
+	pathLDAPSearchGroups = "/cloudapi/1.0.0/ldap/{orgId}/search/group"
 	// pathGlobalRoles manages global roles.
 	pathGlobalRoles = "/cloudapi/1.0.0/globalRoles"
 	// pathGlobalRoleByID addresses one global role by ID.

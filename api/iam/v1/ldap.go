@@ -27,7 +27,7 @@ const (
 )
 
 // TestLDAP tests an LDAP connection using the provided configuration.
-// This is a system-level (non org-scoped) admin operation.
+// This is scoped to the organization carried by the client context.
 func (c *Client) TestLDAP(ctx context.Context, params types.ParamsTestLDAP) (*types.ModelLDAPTestResult, error) {
 	if err := params.Validate(); err != nil {
 		return nil, fmt.Errorf("%s: validate: %w", opTestLDAP, err)
@@ -40,6 +40,7 @@ func (c *Client) TestLDAP(ctx context.Context, params types.ParamsTestLDAP) (*ty
 
 	ep := endpoints.TestLDAP()
 	opts := []cav.EndpointRequestOption{
+		withOrgID(ep.PathParams[0]),
 		cav.SetBody(body),
 		cav.OverrideSetResult(new(itypes.APIResponseLDAPTestResult)),
 	}
@@ -58,7 +59,7 @@ func (c *Client) TestLDAP(ctx context.Context, params types.ParamsTestLDAP) (*ty
 }
 
 // SyncLDAP triggers an LDAP directory synchronization.
-// This is a system-level (non org-scoped) admin operation.
+// This is scoped to the organization carried by the client context.
 func (c *Client) SyncLDAP(ctx context.Context, params types.ParamsSyncLDAP) error {
 	if err := params.Validate(); err != nil {
 		return fmt.Errorf("%s: validate: %w", opSyncLDAP, err)
@@ -68,6 +69,7 @@ func (c *Client) SyncLDAP(ctx context.Context, params types.ParamsSyncLDAP) erro
 	_, err := c.c.Do(
 		ctx,
 		ep,
+		withOrgID(ep.PathParams[0]),
 	)
 	if err != nil {
 		return fmt.Errorf("%s: %w", opSyncLDAP, err)
@@ -77,7 +79,7 @@ func (c *Client) SyncLDAP(ctx context.Context, params types.ParamsSyncLDAP) erro
 }
 
 // SearchLDAPUsers searches the LDAP directory for users.
-// This is a system-level (non org-scoped) admin operation.
+// This is scoped to the organization carried by the client context.
 func (c *Client) SearchLDAPUsers(ctx context.Context, params types.ParamsSearchLDAP) ([]*types.ModelLDAPUser, error) {
 	if err := params.Validate(); err != nil {
 		return nil, fmt.Errorf("%s: validate: %w", opSearchLDAPUsers, err)
@@ -85,6 +87,7 @@ func (c *Client) SearchLDAPUsers(ctx context.Context, params types.ParamsSearchL
 
 	ep := endpoints.SearchLDAPUsers()
 	opts := []cav.EndpointRequestOption{
+		withOrgID(ep.PathParams[0]),
 		cav.OverrideSetResult(new([]itypes.APIResponseLDAPUser)),
 	}
 
@@ -105,7 +108,7 @@ func (c *Client) SearchLDAPUsers(ctx context.Context, params types.ParamsSearchL
 }
 
 // SearchLDAPGroups searches the LDAP directory for groups.
-// This is a system-level (non org-scoped) admin operation.
+// This is scoped to the organization carried by the client context.
 func (c *Client) SearchLDAPGroups(ctx context.Context, params types.ParamsSearchLDAP) ([]*types.ModelLDAPGroup, error) {
 	if err := params.Validate(); err != nil {
 		return nil, fmt.Errorf("%s: validate: %w", opSearchLDAPGroups, err)
@@ -113,6 +116,7 @@ func (c *Client) SearchLDAPGroups(ctx context.Context, params types.ParamsSearch
 
 	ep := endpoints.SearchLDAPGroups()
 	opts := []cav.EndpointRequestOption{
+		withOrgID(ep.PathParams[0]),
 		cav.OverrideSetResult(new([]itypes.APIResponseLDAPGroup)),
 	}
 
