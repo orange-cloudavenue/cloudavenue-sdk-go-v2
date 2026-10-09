@@ -28,6 +28,9 @@ const (
 )
 
 func TestGetAdminCatalogACLByID(t *testing.T) {
+	assert.Equal(t, "/api/catalog/{catalogId}/controlAccess", endpoints.GetAdminCatalogACL().PathTemplate)
+	assert.Equal(t, "/api/catalog/{catalogId}/action/controlAccess", endpoints.SetAdminCatalogACL().PathTemplate)
+
 	tests := []struct {
 		name         string
 		idOrName     string

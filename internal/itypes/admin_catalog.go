@@ -17,30 +17,35 @@ import (
 
 // AdminCatalog represents a VMware vCD AdminCatalog XML element.
 type AdminCatalog struct {
-	XMLName      xml.Name    `xml:"Catalog"`
-	Name         string      `xml:"name,attr"`
-	ID           string      `xml:"id,attr"`
-	Href         string      `xml:"href,attr"`
-	Description  string      `xml:"Description,omitempty"`
-	IsEnabled    bool        `xml:"IsEnabled,omitempty"`
-	Owner        Reference   `xml:"Owner"`
-	Org          Reference   `xml:"Org"`
-	CatalogItems []Reference `xml:"CatalogItems>CatalogItem"`
-	IsPublished  bool        `xml:"IsPublished"`
-	IsTrusted    bool        `xml:"IsTrusted"`
+	// XMLName accepts both Catalog and AdminCatalog roots returned by vCD.
+	XMLName                xml.Name
+	Xmlns                  string      `xml:"xmlns,attr,omitempty"`
+	Name                   string      `xml:"name,attr"`
+	ID                     string      `xml:"id,attr"`
+	Href                   string      `xml:"href,attr"`
+	Type                   string      `xml:"type,attr,omitempty"`
+	Description            string      `xml:"Description,omitempty"`
+	IsEnabled              bool        `xml:"IsEnabled,omitempty"`
+	Owner                  Reference   `xml:"Owner"`
+	Org                    Reference   `xml:"Org"`
+	CatalogItems           []Reference `xml:"CatalogItems>CatalogItem"`
+	CatalogStorageProfiles []Reference `xml:"CatalogStorageProfiles>VdcStorageProfile"`
+	IsPublished            bool        `xml:"IsPublished"`
+	IsTrusted              bool        `xml:"IsTrusted"`
 }
 
 // AdminCatalogRequest represents the request body for creating or updating a VMware vCD AdminCatalog.
 type AdminCatalogRequest struct {
 	XMLName         xml.Name    `xml:"Catalog"`
+	Xmlns           string      `xml:"xmlns,attr,omitempty"`
 	Name            string      `xml:"name,attr"`
 	Description     string      `xml:"Description,omitempty"`
-	StorageProfiles []Reference `xml:"StorageProfiles>StorageProfile,omitempty"`
+	StorageProfiles []Reference `xml:"CatalogStorageProfiles>VdcStorageProfile,omitempty"`
 }
 
 // AdminCatalogs represents the wrapper for a list of catalogs in VMware vCD AdminCatalog API.
 type AdminCatalogs struct {
-	XMLName  xml.Name       `xml:"Catalogs"`
+	XMLName  xml.Name
 	Catalogs []AdminCatalog `xml:"Catalog"`
 }
 
