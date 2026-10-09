@@ -135,7 +135,7 @@ func init() {
 		Description:      "Get the DHCP configuration of an Org VDC Network",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathOrgVDCNetworkDHCPGet,
+		PathTemplate:     pathOrgVDCNetworkDHCP,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamVDCNetworkID,
@@ -156,7 +156,7 @@ func init() {
 		Description:      "Update the DHCP configuration of an Org VDC Network",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathOrgVDCNetworkDHCAPut,
+		PathTemplate:     pathOrgVDCNetworkDHCP,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamVDCNetworkID,
@@ -168,7 +168,7 @@ func init() {
 			},
 		},
 		BodyRequestType: itypes.APIRequestDhcpConfig{},
-		ResponseType:    itypes.DhcpConfig{},
+		ResponseType:    cav.Job{},
 	}.Register()
 
 	// DeleteNetworkDhcpConfig
@@ -178,7 +178,7 @@ func init() {
 		Description:      "Delete the DHCP configuration of an Org VDC Network",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathOrgVDCNetworkDHCPDelete,
+		PathTemplate:     pathOrgVDCNetworkDHCP,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamVDCNetworkID,
@@ -189,5 +189,6 @@ func init() {
 				},
 			},
 		},
+		ResponseType: cav.Job{},
 	}.Register()
 }

@@ -10,148 +10,116 @@
 package vdcgroup
 
 import (
+	"net/http"
 	"testing"
 
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
+const dhcpTaskIdentifier = "87ab1934-0146-4fb0-80bc-815fea03214d"
+
+func configureDhcpTask(t *testing.T, ms interface {
+	SetResponseFunc(*cav.Endpoint, http.HandlerFunc)
+	CleanResponse(*cav.Endpoint)
+},
+) {
+	t.Helper()
+	jobEndpoint := cav.MustGetEndpoint("GetJobVmware")
+	ms.SetResponseFunc(jobEndpoint, func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"id":"` + dhcpTaskIdentifier + `","status":"success"}`))
+	})
+	t.Cleanup(func() { ms.CleanResponse(jobEndpoint) })
+}
+
 func TestGetNetworkDhcpConfig(t *testing.T) {
 	networkID := generator.MustGenerate("{urn:network}")
 	client, ms := newClient(t)
-
-	ms.CleanResponse(endpoints.GetNetworkDhcpConfig())
 	ms.SetResponse(endpoints.GetNetworkDhcpConfig(), &itypes.DhcpConfig{
-		ID:                       "dhcp-1",
-		VDCNetworkID:             networkID,
-		DHCPServerIPAddress:      "10.0.0.10",
-		DHCPServerPort:           5460,
-		DHCPRelayServerIPAddress: "10.0.0.1",
-		DHCPEnabled:              true,
-		DHCPLeaseTime:            3600,
-		DHCPIPAddress:            "10.0.0.0/24",
-		DHCPPoolIPAddress:        "10.0.0.100",
-		DHCPSubnetMask:           "255.255.255.0",
-		DHCPDefaultGateway:       "10.0.0.1",
-		DHCPDNS1IPAddress:        "8.8.8.8",
-		DHCPDNS2IPAddress:        "8.8.4.4",
-		DHCPSearchDomain:         "corp.local",
-		DHCPServerCredentials: &itypes.DHCPServerCredentials{
-			Username: "dhcpuser",
-			Password: "dhcppass",
-		},
-		DHCPOptions: []itypes.DHCPOption{
-			{Code: "6", Value: "8.8.8.8"},
-		},
+		Enabled:    true,
+		LeaseTime:  86400,
+		Mode:       "NETWORK",
+		IPAddress:  "10.0.0.2",
+		DNSServers: []string{"8.8.8.8", "1.1.1.1"},
+		DhcpPools:  []itypes.DhcpPool{{IPRange: itypes.IPRange{StartAddress: "10.0.0.100", EndAddress: "10.0.0.200"}}},
 	}, nil)
+	t.Cleanup(func() { ms.CleanResponse(endpoints.GetNetworkDhcpConfig()) })
 
 	resp, err := client.GetNetworkDhcpConfig(t.Context(), types.ParamsGetNetworkDhcpConfig{VDCNetworkID: networkID})
 
-	assert.NoError(t, err)
-	assert.NotNil(t, resp)
-	assert.Equal(t, "dhcp-1", resp.ID)
-	assert.Equal(t, networkID, resp.VDCNetworkID)
-	assert.Equal(t, "10.0.0.10", resp.DHCPServerIPAddress)
-	assert.Equal(t, 5460, resp.DHCPServerPort)
-	assert.Equal(t, "10.0.0.1", resp.DHCPRelayServerIPAddress)
-	assert.True(t, resp.DHCPEnabled)
-	assert.Equal(t, 3600, resp.DHCPLeaseTime)
-	assert.Equal(t, "10.0.0.0/24", resp.DHCPIPAddress)
-	assert.Equal(t, "10.0.0.100", resp.DHCPPoolIPAddress)
-	assert.Equal(t, "255.255.255.0", resp.DHCPSubnetMask)
-	assert.Equal(t, "10.0.0.1", resp.DHCPDefaultGateway)
-	assert.Equal(t, "8.8.8.8", resp.DHCPDNS1IPAddress)
-	assert.Equal(t, "8.8.4.4", resp.DHCPDNS2IPAddress)
-	assert.Equal(t, "corp.local", resp.DHCPSearchDomain)
-	assert.NotNil(t, resp.DHCPServerCredentials)
-	assert.Equal(t, "dhcpuser", resp.DHCPServerCredentials.Username)
-	assert.Equal(t, "dhcppass", resp.DHCPServerCredentials.Password)
-	assert.Len(t, resp.DHCPOptions, 1)
-	assert.Equal(t, "6", resp.DHCPOptions[0].Code)
-	assert.Equal(t, "8.8.8.8", resp.DHCPOptions[0].Value)
-
-	ms.CleanResponse(endpoints.GetNetworkDhcpConfig())
+	require.NoError(t, err)
+	assert.True(t, resp.Enabled)
+	assert.Equal(t, int64(86400), resp.LeaseTime)
+	assert.Equal(t, "NETWORK", resp.Mode)
+	assert.Equal(t, "10.0.0.2", resp.ListenerIPAddress)
+	assert.Equal(t, []string{"8.8.8.8", "1.1.1.1"}, resp.DNSServers)
+	require.Len(t, resp.Pools, 1)
+	assert.Equal(t, "10.0.0.100", resp.Pools[0].StartAddress)
+	assert.Equal(t, "10.0.0.200", resp.Pools[0].EndAddress)
 }
 
-func TestGetNetworkDhcpConfig_ValidateError(t *testing.T) {
-	client, ms := newClient(t)
-	defer ms.CleanResponse(endpoints.GetNetworkDhcpConfig())
-
-	_, err := client.GetNetworkDhcpConfig(t.Context(), types.ParamsGetNetworkDhcpConfig{})
-	assert.Error(t, err)
-}
-
-func TestGetNetworkDhcpConfig_Error(t *testing.T) {
+func TestUpdateNetworkDhcpConfigWaitsForTask(t *testing.T) {
 	networkID := generator.MustGenerate("{urn:network}")
 	client, ms := newClient(t)
-
-	ms.CleanResponse(endpoints.GetNetworkDhcpConfig())
-	status := 500
-	ms.SetResponse(endpoints.GetNetworkDhcpConfig(), nil, &status)
-
-	_, err := client.GetNetworkDhcpConfig(t.Context(), types.ParamsGetNetworkDhcpConfig{VDCNetworkID: networkID})
-	assert.Error(t, err)
-
-	ms.CleanResponse(endpoints.GetNetworkDhcpConfig())
-}
-
-func TestUpdateNetworkDhcpConfig(t *testing.T) {
-	networkID := generator.MustGenerate("{urn:network}")
-	client, ms := newClient(t)
-
-	ms.CleanResponse(endpoints.UpdateNetworkDhcpConfig())
-	ms.SetResponse(endpoints.UpdateNetworkDhcpConfig(), &itypes.DhcpConfig{
-		ID:           "dhcp-1",
-		VDCNetworkID: networkID,
-		DHCPEnabled:  true,
-	}, nil)
+	configureDhcpTask(t, ms)
+	ms.SetResponseFunc(endpoints.UpdateNetworkDhcpConfig(), func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Location", "/api/task/"+dhcpTaskIdentifier)
+		w.WriteHeader(http.StatusAccepted)
+	})
+	ms.SetResponse(endpoints.GetNetworkDhcpConfig(), &itypes.DhcpConfig{Enabled: true, Mode: "NETWORK"}, nil)
+	t.Cleanup(func() {
+		ms.CleanResponse(endpoints.UpdateNetworkDhcpConfig())
+		ms.CleanResponse(endpoints.GetNetworkDhcpConfig())
+	})
 
 	resp, err := client.UpdateNetworkDhcpConfig(t.Context(), types.ParamsUpdateNetworkDhcpConfig{
 		VDCNetworkID: networkID,
 		Config: types.ModelDhcpConfig{
-			ID:                  "dhcp-1",
-			VDCNetworkID:        networkID,
-			DHCPServerIPAddress: "10.0.0.10",
-			DHCPServerPort:      5460,
-			DHCPEnabled:         true,
+			Enabled:           true,
+			Mode:              "NETWORK",
+			LeaseTime:         86400,
+			ListenerIPAddress: "10.0.0.2",
+			Pools:             []types.ModelDhcpPool{{StartAddress: "10.0.0.100", EndAddress: "10.0.0.200"}},
 		},
 	})
 
-	assert.NoError(t, err)
-	assert.NotNil(t, resp)
-	assert.Equal(t, "dhcp-1", resp.ID)
-	assert.Equal(t, networkID, resp.VDCNetworkID)
-	assert.True(t, resp.DHCPEnabled)
-
-	ms.CleanResponse(endpoints.UpdateNetworkDhcpConfig())
+	require.NoError(t, err)
+	assert.True(t, resp.Enabled)
+	assert.Equal(t, "NETWORK", resp.Mode)
 }
 
-func TestUpdateNetworkDhcpConfig_ValidateError(t *testing.T) {
-	client, ms := newClient(t)
-	defer ms.CleanResponse(endpoints.UpdateNetworkDhcpConfig())
-
-	_, err := client.UpdateNetworkDhcpConfig(t.Context(), types.ParamsUpdateNetworkDhcpConfig{})
-	assert.Error(t, err)
-}
-
-func TestDeleteNetworkDhcpConfig(t *testing.T) {
+func TestDeleteNetworkDhcpConfigWaitsForTask(t *testing.T) {
 	networkID := generator.MustGenerate("{urn:network}")
 	client, ms := newClient(t)
+	configureDhcpTask(t, ms)
+	ms.SetResponseFunc(endpoints.DeleteNetworkDhcpConfig(), func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Location", "/api/task/"+dhcpTaskIdentifier)
+		w.WriteHeader(http.StatusAccepted)
+	})
+	t.Cleanup(func() { ms.CleanResponse(endpoints.DeleteNetworkDhcpConfig()) })
 
-	err := client.DeleteNetworkDhcpConfig(t.Context(), types.ParamsDeleteNetworkDhcpConfig{VDCNetworkID: networkID})
-	assert.NoError(t, err)
-
-	ms.CleanResponse(endpoints.DeleteNetworkDhcpConfig())
+	assert.NoError(t, client.DeleteNetworkDhcpConfig(t.Context(), types.ParamsDeleteNetworkDhcpConfig{VDCNetworkID: networkID}))
 }
 
-func TestDeleteNetworkDhcpConfig_ValidateError(t *testing.T) {
+func TestNetworkDhcpConfigValidation(t *testing.T) {
 	client, ms := newClient(t)
-	defer ms.CleanResponse(endpoints.DeleteNetworkDhcpConfig())
+	t.Cleanup(func() {
+		ms.CleanResponse(endpoints.GetNetworkDhcpConfig())
+		ms.CleanResponse(endpoints.UpdateNetworkDhcpConfig())
+		ms.CleanResponse(endpoints.DeleteNetworkDhcpConfig())
+	})
 
-	err := client.DeleteNetworkDhcpConfig(t.Context(), types.ParamsDeleteNetworkDhcpConfig{})
+	_, err := client.GetNetworkDhcpConfig(t.Context(), types.ParamsGetNetworkDhcpConfig{})
+	assert.Error(t, err)
+	_, err = client.UpdateNetworkDhcpConfig(t.Context(), types.ParamsUpdateNetworkDhcpConfig{})
+	assert.Error(t, err)
+	err = client.DeleteNetworkDhcpConfig(t.Context(), types.ParamsDeleteNetworkDhcpConfig{})
 	assert.Error(t, err)
 }

@@ -52,12 +52,8 @@ const (
 	pathOrgVDCNetworks = "/cloudapi/1.0.0/orgVdcNetworks/{vdcNetworkId}"
 	// pathCatalogAccessControl manages catalog access controls by catalog URN.
 	pathCatalogAccessControl = "/cloudapi/1.0.0/catalogs/{catalogUrn}/accessControls"
-	// pathOrgVDCNetworkDHCPGet retrieves DHCP configuration for one Org VDC network.
-	pathOrgVDCNetworkDHCPGet = "/cloudapi/1.0.0/orgVdcNetworks/{vdcNetworkId}/dhcp/get/"
-	// pathOrgVDCNetworkDHCAPut updates DHCP configuration for one Org VDC network.
-	pathOrgVDCNetworkDHCAPut = "/cloudapi/1.0.0/orgVdcNetworks/{vdcNetworkId}/dhcp/put/"
-	// pathOrgVDCNetworkDHCPDelete deletes DHCP configuration for one Org VDC network.
-	pathOrgVDCNetworkDHCPDelete = "/cloudapi/1.0.0/orgVdcNetworks/{vdcNetworkId}/dhcp/delete/"
+	// pathOrgVDCNetworkDHCP addresses DHCP configuration for one Org VDC network.
+	pathOrgVDCNetworkDHCP = "/cloudapi/1.0.0/orgVdcNetworks/{vdcNetworkId}/dhcp"
 	// pathVDCGroups lists and creates VDC groups.
 	pathVDCGroups = "/cloudapi/1.0.0/vdcGroups"
 	// pathVDCGroupByID addresses one VDC group by ID.
