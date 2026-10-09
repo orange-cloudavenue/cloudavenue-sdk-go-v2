@@ -117,6 +117,14 @@ func TestGetEdgeGatewayServices(t *testing.T) {
 				ms.CleanResponse(epQuery)
 				// Set the mock query response
 				ms.SetResponse(epQuery, tt.mockQueryResponse, &tt.mockQueryResponseStatus)
+				ms.CleanResponse(endpoints.ListEdgeGateway())
+				ms.SetResponse(endpoints.ListEdgeGateway(), tt.mockQueryResponse, &tt.mockQueryResponseStatus)
+			}
+			if tt.params.Name != "" && tt.mockQueryResponseStatus == 0 && !tt.expectedErr {
+				status := http.StatusOK
+				setEdgeGatewayListResponse(ms, &itypes.APIResponseEdgegateways{Values: []itypes.APIResponseEdgegateway{{
+					ID: generator.MustGenerate("{urn:edgegateway}"), Name: tt.params.Name,
+				}}}, &status)
 			}
 
 			// Call the GetNetworkServices method
@@ -221,6 +229,14 @@ func TestEnableCloudavenueServices(t *testing.T) {
 				t.Log("Setting up mock query response for:", tt.name)
 				ms.CleanResponse(epQuery)
 				ms.SetResponse(epQuery, tt.mockQueryResponse, &tt.mockQueryResponseStatus)
+				ms.CleanResponse(endpoints.ListEdgeGateway())
+				ms.SetResponse(endpoints.ListEdgeGateway(), tt.mockQueryResponse, &tt.mockQueryResponseStatus)
+			}
+			if tt.params.Name != "" && tt.mockQueryResponseStatus == 0 && !tt.expectedErr {
+				status := http.StatusOK
+				setEdgeGatewayListResponse(ms, &itypes.APIResponseEdgegateways{Values: []itypes.APIResponseEdgegateway{{
+					ID: generator.MustGenerate("{urn:edgegateway}"), Name: tt.params.Name,
+				}}}, &status)
 			}
 
 			err := eC.EnableCloudavenueServices(t.Context(), tt.params)
@@ -443,6 +459,8 @@ func TestDisableCloudavenueServices(t *testing.T) {
 				epQuery := endpoints.QueryEdgeGateway()
 				ms.CleanResponse(epQuery)
 				ms.SetResponse(epQuery, tt.mockQueryResponse, &tt.mockQueryResponseStatus)
+				ms.CleanResponse(endpoints.ListEdgeGateway())
+				ms.SetResponse(endpoints.ListEdgeGateway(), tt.mockQueryResponse, &tt.mockQueryResponseStatus)
 				ms.CleanResponse(endpoints.ListVDC())
 				ms.SetResponse(endpoints.ListVDC(), tt.mockQueryResponse, &tt.mockQueryResponseStatus)
 			}

@@ -11,7 +11,6 @@ package edgegateway
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"testing"
 
@@ -95,13 +94,20 @@ func TestGetEdgeGateway(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			eC, ms := newClient(t)
+			if query, ok := tt.mockQueryResponse.(*itypes.APIResponseQueryEdgeGateway); ok {
+				for i := range query.Record {
+					if query.Record[i].Name == "" {
+						query.Record[i].Name = tt.params.Name
+					}
+				}
+			}
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				ms.SetResponse(endpoints.GetEdgeGateway(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			if tt.mockQueryResponse != nil || tt.mockQueryResponseStatus != 0 {
-				ms.SetResponse(endpoints.QueryEdgeGateway(), tt.mockQueryResponse, &tt.mockQueryResponseStatus)
+				setEdgeGatewayListResponse(ms, tt.mockQueryResponse, &tt.mockQueryResponseStatus)
 				ms.SetResponse(endpoints.ListVDC(), tt.mockQueryResponse, &tt.mockQueryResponseStatus)
 			}
 
@@ -164,8 +170,13 @@ func TestRetrieveEdgeGatewayIDByName(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			eC, ms := newClient(t)
+			for i := range tt.queryResp.Record {
+				if tt.queryResp.Record[i].Name == "" {
+					tt.queryResp.Record[i].Name = tt.edgeName
+				}
+			}
 
-			ms.SetResponse(endpoints.QueryEdgeGateway(), tt.queryResp, &tt.queryStatus)
+			setEdgeGatewayListResponse(ms, tt.queryResp, &tt.queryStatus)
 			ms.SetResponse(endpoints.ListVDC(), tt.queryResp, &tt.queryStatus)
 
 			id, err := eC.retrieveEdgeGatewayIDByName(t.Context(), tt.edgeName)
@@ -264,8 +275,13 @@ func TestDeleteEdgeGateway(t *testing.T) {
 			}
 
 			if tt.mockQueryResponseStatus != 0 {
-				ms.SetResponse(endpoints.QueryEdgeGateway(), nil, &tt.mockQueryResponseStatus)
+				setEdgeGatewayListResponse(ms, nil, &tt.mockQueryResponseStatus)
 				ms.SetResponse(endpoints.ListVDC(), nil, &tt.mockQueryResponseStatus)
+			} else if tt.params.Name != "" && !tt.expectedErr {
+				status := http.StatusOK
+				setEdgeGatewayListResponse(ms, &itypes.APIResponseEdgegateways{Values: []itypes.APIResponseEdgegateway{{
+					ID: generator.MustGenerate("{urn:edgegateway}"), Name: tt.params.Name,
+				}}}, &status)
 			}
 
 			err := eC.DeleteEdgeGateway(t.Context(), *tt.params)
@@ -757,6 +773,18 @@ func TestCreateEdgeGateway(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			eC, ms := newClient(t)
+			// Create flow resolves the completed job's gateway name through the
+			// current Infrapi list response. Older fixtures omitted record names.
+			if query, ok := tt.mockQueryResponse.(*itypes.APIResponseQueryEdgeGateway); ok && tt.mockJobResponse != nil {
+				if jobs, ok := tt.mockJobResponse.(*cav.CerberusJobAPIResponse); ok && len(*jobs) > 0 && len((*jobs)[0].Actions) > 0 {
+					createdName := (*jobs)[0].Actions[0].Details
+					for i := range query.Record {
+						if query.Record[i].Name == "" {
+							query.Record[i].Name = createdName
+						}
+					}
+				}
+			}
 
 			if tt.mockListVDCResponseStatus != 0 {
 				ms.CleanResponse(endpoints.ListVDC())
@@ -792,42 +820,12 @@ func TestCreateEdgeGateway(t *testing.T) {
 				ms.SetResponse(endpoints.GetEdgeGateway(), tt.mockGetEdgeGatewayResponse, &tt.mockGetEdgeGatewayResponseStatus)
 			}
 
-			if tt.mockListVDCResponse != nil || tt.mockListVDCResponseStatus != 0 || tt.mockQueryResponse != nil || tt.mockQueryResponseStatus != 0 {
-				handler := func(w http.ResponseWriter, r *http.Request) {
-					statusCode := http.StatusOK
-					data := tt.mockQueryResponse
-
-					if r.URL.Query().Get("type") == "edgeGateway" {
-						if tt.mockQueryResponseStatus != 0 {
-							statusCode = tt.mockQueryResponseStatus
-						}
-						data = tt.mockQueryResponse
-					} else if r.URL.Query().Get("type") == "orgVdc" {
-						if tt.mockListVDCResponseStatus != 0 {
-							statusCode = tt.mockListVDCResponseStatus
-						}
-						data = tt.mockListVDCResponse
-					}
-
-					if statusCode >= http.StatusMultipleChoices {
-						http.Error(w, http.StatusText(statusCode), statusCode)
-						return
-					}
-
-					w.Header().Set("Content-Type", "application/json")
-					w.Header().Set("X-Cloud-Avenue-Mock", "true")
-					if data == nil {
-						data = map[string]any{}
-					}
-					if err := json.NewEncoder(w).Encode(data); err != nil {
-						http.Error(w, err.Error(), http.StatusInternalServerError)
-					}
-				}
-
-				ms.CleanResponse(endpoints.QueryEdgeGateway())
-				ms.SetResponseFunc(endpoints.QueryEdgeGateway(), handler)
+			if tt.mockQueryResponse != nil || tt.mockQueryResponseStatus != 0 {
+				setEdgeGatewayListResponse(ms, tt.mockQueryResponse, &tt.mockQueryResponseStatus)
+			}
+			if tt.mockListVDCResponse != nil || tt.mockListVDCResponseStatus != 0 {
 				ms.CleanResponse(endpoints.ListVDC())
-				ms.SetResponseFunc(endpoints.ListVDC(), handler)
+				ms.SetResponse(endpoints.ListVDC(), tt.mockListVDCResponse, &tt.mockListVDCResponseStatus)
 			}
 
 			if tt.mockUpdateEdgeGatewayBandwidthResponseStatus != 0 {
@@ -876,7 +874,7 @@ func TestListEdgeGateay(t *testing.T) {
 			eC, ms := newClient(t)
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
-				ms.SetResponse(endpoints.ListEdgeGateway(), tt.mockResponse, &tt.mockResponseStatus)
+				setEdgeGatewayListResponse(ms, tt.mockResponse, &tt.mockResponseStatus)
 			}
 
 			result, err := eC.ListEdgeGateway(t.Context())
@@ -942,6 +940,12 @@ func TestUpdateEdgeGateway(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			eC, ms := newClient(t)
+			if tt.params.Name != "" && tt.mockQueryResponseStatus == 0 && !tt.expectedErr {
+				status := http.StatusOK
+				setEdgeGatewayListResponse(ms, &itypes.APIResponseEdgegateways{Values: []itypes.APIResponseEdgegateway{{
+					ID: generator.MustGenerate("{urn:edgegateway}"), Name: tt.params.Name,
+				}}}, &status)
+			}
 
 			if tt.mockResponseStatus != 0 {
 				ms.CleanResponse(endpoints.UpdateEdgeGatewayBandwidth())
@@ -949,8 +953,7 @@ func TestUpdateEdgeGateway(t *testing.T) {
 			}
 
 			if tt.mockQueryResponseStatus != 0 {
-				ms.CleanResponse(endpoints.QueryEdgeGateway())
-				ms.SetResponse(endpoints.QueryEdgeGateway(), nil, &tt.mockQueryResponseStatus)
+				setEdgeGatewayListResponse(ms, nil, &tt.mockQueryResponseStatus)
 				ms.CleanResponse(endpoints.ListVDC())
 				ms.SetResponse(endpoints.ListVDC(), nil, &tt.mockQueryResponseStatus)
 			}
