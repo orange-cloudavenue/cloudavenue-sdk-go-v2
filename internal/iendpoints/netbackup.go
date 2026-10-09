@@ -17,8 +17,6 @@ import (
 //go:generate endpoint-generator -path netbackup.go -output netbackup
 
 func init() {
-	const pathNetBackupBase = "/NetBackupSelfService/Api"
-
 	// GetNetbackupToken
 	cav.Endpoint{
 		DocumentationURL: "https://backup.cloudavenue.orange-business.com/NetBackupSelfService/Api/auth/token",
@@ -26,7 +24,7 @@ func init() {
 		Description:      "Get NetBackup OAuth2 token using password grant",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendNetBackup,
-		PathTemplate:     pathNetBackupBase + "/auth/token",
+		PathTemplate:     pathNetBackupAuthToken,
 		BodyRequestType:  netbackupTokenRequest{},
 		ResponseType:     netbackupTokenResponse{},
 	}.Register()
@@ -38,7 +36,7 @@ func init() {
 		Description:      "Refresh NetBackup OAuth2 token using refresh token grant",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendNetBackup,
-		PathTemplate:     pathNetBackupBase + "/auth/token",
+		PathTemplate:     pathNetBackupAuthToken,
 		BodyRequestType:  netbackupRefreshTokenRequest{},
 		ResponseType:     netbackupTokenResponse{},
 	}.Register()
@@ -50,7 +48,7 @@ func init() {
 		Description:      "List NetBackup inventory",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendNetBackup,
-		PathTemplate:     pathNetBackupBase + "/inventory",
+		PathTemplate:     pathNetBackupInventory,
 		ResponseType:     itypes.APIResponseListNetbackupInventory{},
 	}.Register()
 
@@ -61,7 +59,7 @@ func init() {
 		Description:      "List NetBackup machines",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendNetBackup,
-		PathTemplate:     pathNetBackupBase + "/machines",
+		PathTemplate:     pathNetBackupMachines,
 		ResponseType:     itypes.APIResponseListNetbackupMachines{},
 	}.Register()
 
@@ -72,7 +70,7 @@ func init() {
 		Description:      "Get NetBackup protection level by ID",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendNetBackup,
-		PathTemplate:     pathNetBackupBase + "/protection-levels/{id}",
+		PathTemplate:     pathNetBackupProtectionLevelByID,
 		PathParams: []cav.PathParam{
 			{
 				Name:        "id",
@@ -90,7 +88,7 @@ func init() {
 		Description:      "List NetBackup protection levels",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendNetBackup,
-		PathTemplate:     pathNetBackupBase + "/protection-levels",
+		PathTemplate:     pathNetBackupProtectionLevels,
 		ResponseType:     itypes.APIResponseListNetbackupProtectionLevels{},
 	}.Register()
 
@@ -101,7 +99,7 @@ func init() {
 		Description:      "Protect a NetBackup machine",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendNetBackup,
-		PathTemplate:     pathNetBackupBase + "/machines/{id}/protect",
+		PathTemplate:     pathNetBackupMachineProtect,
 		PathParams: []cav.PathParam{
 			{
 				Name:        "id",

@@ -26,12 +26,12 @@ import (
 func init() {
 	// ListVDCGroup
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/get/",
 		Name:             "ListVDCGroup",
 		Description:      "List VDC Groups",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/vdcGroups",
+		PathTemplate:     pathVDCGroups,
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        queryParamFilter,
@@ -70,27 +70,27 @@ func init() {
 
 	// CreateVDCGroup
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/post/",
 		Name:             "CreateVDCGroup",
 		Description:      "Create a VDC Group",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/vdcGroups",
+		PathTemplate:     pathVDCGroups,
 		BodyRequestType:  itypes.APIRequestCreateVDCGroup{},
 		ResponseType:     cav.Job{},
 	}.Register()
 
 	// UpdateVDCGroup
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/put/",
 		Name:             "UpdateVDCGroup",
 		Description:      "Update a VDC Group",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}",
+		PathTemplate:     pathVDCGroupByID,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVDCGroupID,
+				Name:        pathParamVdcGroupID,
 				Description: "ID of the Vdc Group to update",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -104,15 +104,15 @@ func init() {
 
 	// DeleteVDCGroup
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/delete/",
 		Name:             "DeleteVDCGroup",
 		Description:      "Delete a VDC Group",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}",
+		PathTemplate:     pathVDCGroupByID,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVDCGroupID,
+				Name:        pathParamVdcGroupID,
 				Description: "ID of the Vdc Group to delete",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
