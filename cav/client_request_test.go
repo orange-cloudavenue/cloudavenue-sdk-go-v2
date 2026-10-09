@@ -45,6 +45,32 @@ func Test_NewRequest(t *testing.T) {
 	}
 }
 
+func TestNewRequestAppliesEndpointHeaders(t *testing.T) {
+	client, err := NewClient(mockOrg, WithCloudAvenueCredential("mockuser", "mockpassword"))
+	if err != nil {
+		t.Fatalf("Error creating client with mock: %v", err)
+	}
+	defer func() {
+		if err := client.Close(); err != nil {
+			t.Fatalf("Error closing client with mock: %v", err)
+		}
+	}()
+
+	req, err := client.NewRequest(t.Context(), &Endpoint{
+		Backend: BackendVMware,
+		Headers: map[string]string{"Accept": "application/xml", "X-Endpoint": "endpoint"},
+	})
+	if err != nil {
+		t.Fatalf("Error creating request with endpoint headers: %v", err)
+	}
+	if got := req.Header.Get("Accept"); got != "application/xml" {
+		t.Fatalf("Accept header = %q, want %q", got, "application/xml")
+	}
+	if got := req.Header.Get("X-Endpoint"); got != "endpoint" {
+		t.Fatalf("X-Endpoint header = %q, want %q", got, "endpoint")
+	}
+}
+
 func TestNewRawRequest(t *testing.T) {
 	c, err := NewClient(mockOrg, WithCloudAvenueCredential("mockuser", "mockpassword"))
 	if err != nil {

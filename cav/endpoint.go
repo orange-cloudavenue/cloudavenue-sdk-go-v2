@@ -59,6 +59,11 @@ type (
 		// QueryParams describes supported query parameters.
 		QueryParams []QueryParam `validate:"dive"`
 
+		// Headers contains headers applied to every request for this endpoint.
+		// Request-specific options are applied after endpoint headers and may
+		// override them.
+		Headers map[string]string
+
 		// DocumentationURL points to upstream endpoint documentation.
 		DocumentationURL string `validate:"required,url"` // e.g., "https://docs.xx.com/api/v1/xx"
 
