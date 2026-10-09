@@ -11,6 +11,122 @@ package types
 
 import "fmt"
 
+// ModelToken represents a CloudAvenue IAM token.
+type ModelToken struct {
+	// ID of the token in URN format
+	ID string `documentation:"URN of the token in the format urn:vcloud:token:<UUID>"`
+
+	// Name of the token
+	Name string `documentation:"Name of the token"`
+
+	// Description of the token
+	Description string `documentation:"Description of the token"`
+
+	// Indicates if the token is enabled
+	Enabled bool `documentation:"Indicates if the token is enabled"`
+
+	// Name of the token's role
+	RoleName string `documentation:"Name of the token's role"`
+
+	// Href of the token's role
+	RoleHref string `documentation:"Href of the token's role"`
+
+	// Type of token (PROXY or EXTENSION).
+	Type string `documentation:"Type of token"`
+
+	// ExtensionID is the extension URN associated with an extension token.
+	ExtensionID string `documentation:"Extension ID associated with the token"`
+
+	// Token is the secret value returned when a token is created.
+	Token string `documentation:"Token value"`
+
+	// ExpirationTimeUTC is the token expiration timestamp in UTC.
+	ExpirationTimeUTC string `documentation:"Token expiration timestamp in UTC"`
+
+	// OwnerID is the token owner's entity ID.
+	OwnerID string `documentation:"Token owner ID"`
+
+	// OwnerName is the token owner's entity name.
+	OwnerName string `documentation:"Token owner name"`
+
+	// OrgID is the token organization entity ID.
+	OrgID string `documentation:"Token organization ID"`
+
+	// OrgName is the token organization entity name.
+	OrgName string `documentation:"Token organization name"`
+
+	// RequireRotation indicates whether refresh-token rotation is required.
+	RequireRotation *bool `documentation:"Whether refresh-token rotation is required"`
+}
+
+// ParamsGetToken defines parameters for getting a token.
+type ParamsGetToken struct {
+	ID string
+}
+
+// Validate checks ParamsGetToken structural constraints.
+func (p ParamsGetToken) Validate() error {
+	if p.ID == "" {
+		return fmt.Errorf("id is required")
+	}
+	return nil
+}
+
+// ParamsCreateToken defines parameters for creating a token.
+type ParamsCreateToken struct {
+	Name        string
+	RoleID      string
+	RoleName    string
+	Description string
+	IsEnabled   bool
+	Type        string
+	ExtensionID string
+}
+
+// Validate checks ParamsCreateToken structural constraints.
+func (p ParamsCreateToken) Validate() error {
+	if p.Name == "" {
+		return fmt.Errorf("name is required")
+	}
+	if p.RoleName == "" {
+		return fmt.Errorf("role_name is required")
+	}
+	return nil
+}
+
+// ParamsUpdateToken defines parameters for updating a token.
+type ParamsUpdateToken struct {
+	ID          string
+	Name        string
+	RoleID      string
+	RoleName    string
+	Description string
+	IsEnabled   bool
+	Type        string
+	ExtensionID string
+}
+
+// Validate checks ParamsUpdateToken structural constraints.
+func (p ParamsUpdateToken) Validate() error {
+	if p.ID == "" {
+		return fmt.Errorf("id is required")
+	}
+	return nil
+}
+
+// ParamsDeleteToken defines parameters for deleting a token.
+type ParamsDeleteToken struct {
+	ID string
+}
+
+// Validate checks ParamsDeleteToken structural constraints.
+func (p ParamsDeleteToken) Validate() error {
+	if p.ID == "" {
+		return fmt.Errorf("id is required")
+	}
+	return nil
+}
+
 // ParamsEntityReference represents an entity reference (ID + Name) used in global role params.
 type ParamsEntityReference struct {
 	ID   string
@@ -67,6 +183,12 @@ type ModelGlobalRole struct {
 	// Description of the global role
 	Description string `documentation:"Description of the global role"`
 
+	// BundleKey is the read-only rights bundle key.
+	BundleKey string `documentation:"Rights bundle key of the global role"`
+
+	// ReadOnly indicates whether this global role is read-only.
+	ReadOnly bool `documentation:"Whether the global role is read-only"`
+
 	// Rights of the global role
 	Rights []*ModelRight `documentation:"Rights of the global role"`
 
@@ -78,6 +200,9 @@ type ModelGlobalRole struct {
 
 	// IsInternalRole indicates if the global role is an internal role
 	IsInternalRole bool `documentation:"Indicates if the global role is an internal role"`
+
+	// PublishAll indicates whether the role is published to all tenants.
+	PublishAll bool `documentation:"Whether the global role is published to all tenants"`
 }
 
 // ParamsGetGlobalRole defines parameters for getting a global role.
