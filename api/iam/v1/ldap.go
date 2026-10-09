@@ -43,9 +43,6 @@ func (c *Client) TestLDAP(ctx context.Context, params types.ParamsTestLDAP) (*ty
 		cav.SetBody(body),
 		cav.OverrideSetResult(new(itypes.APIResponseLDAPTestResult)),
 	}
-	if params.BindUser != "" {
-		opts = append(opts, cav.WithQueryParam(ep.QueryParams[0], params.BindUser))
-	}
 
 	resp, err := c.c.Do(ctx, ep, opts...)
 	if err != nil {
@@ -94,10 +91,6 @@ func (c *Client) SearchLDAPUsers(ctx context.Context, params types.ParamsSearchL
 	if params.Filter != "" {
 		opts = append(opts, cav.WithQueryParam(ep.QueryParams[0], params.Filter))
 	}
-	if params.MaxResults != "" || params.PageSize != "" || params.Page != "" {
-		return nil, fmt.Errorf("%s: validate: unsupported params for endpoint: maxResults, pageSize, page", opSearchLDAPUsers)
-	}
-
 	resp, err := c.c.Do(ctx, ep, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", opSearchLDAPUsers, err)
@@ -126,10 +119,6 @@ func (c *Client) SearchLDAPGroups(ctx context.Context, params types.ParamsSearch
 	if params.Filter != "" {
 		opts = append(opts, cav.WithQueryParam(ep.QueryParams[0], params.Filter))
 	}
-	if params.MaxResults != "" || params.PageSize != "" || params.Page != "" {
-		return nil, fmt.Errorf("%s: validate: unsupported params for endpoint: maxResults, pageSize, page", opSearchLDAPGroups)
-	}
-
 	resp, err := c.c.Do(ctx, ep, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", opSearchLDAPGroups, err)
