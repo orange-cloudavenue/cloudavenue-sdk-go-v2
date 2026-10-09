@@ -15,6 +15,7 @@ type ParamsUpdateOrganization struct {
 	Description         *string
 	Email               string
 	InternetBillingMode string
+	Enabled             *bool
 }
 
 type ModelGetOrganization struct {
