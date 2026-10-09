@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (c) 2025 Orange
+ * SPDX-FileCopyrightText: Copyright (c) 2026 Orange
  * SPDX-License-Identifier: Mozilla Public License 2.0
  *
  * This software is distributed under the MPL-2.0 license.
@@ -15,31 +15,56 @@ import (
 
 // ListVDCNetwork - List Org VDC Networks (routed and isolated)
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/get/ 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/get/
 func ListVDCNetwork() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListVDCNetwork")
 }
+
 // GetVDCNetwork - Get an Org VDC Network (routed or isolated)
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/get/ 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/get/
 func GetVDCNetwork() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetVDCNetwork")
 }
+
 // CreateVDCNetwork - Create an Org VDC Network (routed or isolated)
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/post/ 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/post/
 func CreateVDCNetwork() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreateVDCNetwork")
 }
+
 // UpdateVDCNetwork - Update an Org VDC Network (routed or isolated)
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/put/ 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/put/
 func UpdateVDCNetwork() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateVDCNetwork")
 }
+
 // DeleteVDCNetwork - Delete an Org VDC Network (routed or isolated)
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/delete/ 
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/delete/
 func DeleteVDCNetwork() *cav.Endpoint {
 	return cav.MustGetEndpoint("DeleteVDCNetwork")
+}
+
+// GetNetworkDhcpConfig - Get the DHCP configuration of an Org VDC Network
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp
+func GetNetworkDhcpConfig() *cav.Endpoint {
+	return cav.MustGetEndpoint("GetNetworkDhcpConfig")
+}
+
+// UpdateNetworkDhcpConfig - Update the DHCP configuration of an Org VDC Network
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp
+func UpdateNetworkDhcpConfig() *cav.Endpoint {
+	return cav.MustGetEndpoint("UpdateNetworkDhcpConfig")
+}
+
+// DeleteNetworkDhcpConfig - Delete the DHCP configuration of an Org VDC Network
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp
+func DeleteNetworkDhcpConfig() *cav.Endpoint {
+	return cav.MustGetEndpoint("DeleteNetworkDhcpConfig")
 }

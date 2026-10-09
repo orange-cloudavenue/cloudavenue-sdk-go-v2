@@ -21,23 +21,23 @@ import (
 func init() {
 	// * ListDraasOnPremiseIP
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/VCDA/getVcdaIPs",
+		DocumentationURL: docURLCerberus,
 		Name:             "ListDraasOnPremiseIP",
 		Description:      "List of on premise IP addresses allowed for this organization's draas offer",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/api/customers/v2.0/vcda/ips",
+		PathTemplate:     pathCerberusDraasOnPremiseIPs,
 		ResponseType:     itypes.APIResponseListDraasOnPremise{},
 	}.Register()
 
 	// * AddDraasOnPremiseIP
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/VCDA/postVcdaIPs",
+		DocumentationURL: docURLCerberus,
 		Name:             "AddDraasOnPremiseIP",
 		Description:      "Allow a new on premise IP address for this organization's draas offer",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/api/customers/v2.0/vcda/ips/{ip}",
+		PathTemplate:     pathCerberusDraasOnPremiseIP,
 		PathParams: []cav.PathParam{
 			{
 				Name:        "ip",
@@ -52,12 +52,12 @@ func init() {
 
 	// * RemoveDraasOnPremiseIP
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/VCDA/deleteVcdaIPs",
+		DocumentationURL: docURLCerberus,
 		Name:             "RemoveDraasOnPremiseIP",
 		Description:      "Remove an on premise IP address from this organization's draas offer",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/api/customers/v2.0/vcda/ips/{ip}",
+		PathTemplate:     pathCerberusDraasOnPremiseIP,
 		PathParams: []cav.PathParam{
 			{
 				Name:        "ip",

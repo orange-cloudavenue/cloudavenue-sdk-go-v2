@@ -94,7 +94,7 @@ func TestUpdateVdcNetworkRouted(t *testing.T) {
 		OwnerRef:    &itypes.APIObjectReference{ID: vdcGroupID, Name: "vdcg1"},
 		Connection: &itypes.APIVDCNetworkConnection{
 			RouterRef:           itypes.APIObjectReference{ID: "old-edge-gw", Name: "old-gw"},
-			ConnectionTypeValue: "INTERNAL",
+			ConnectionTypeValue: routedConnectionTypeInternal,
 		},
 		GuestVLANTaggingAllowed: &guestVLAN,
 		Shared:                  &shared,

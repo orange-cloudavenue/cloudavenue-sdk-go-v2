@@ -17,100 +17,156 @@ import (
 //go:generate endpoint-generator -path iam.go -output iam
 
 func init() {
-	const pathAdminOrg = "/api/admin/org/{orgId}"
-
+	// IAM user operations use VMware CloudAPI. They are distinct from both the
+	// Infrapi customer API and the legacy AdminOrg XML API.
 	// ListUsers
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-Users.html",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/get/",
 		Name:             "ListUsers",
 		Description:      "List users in organization",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/users",
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
+		PathTemplate:     pathCloudAPIUsers,
+		QueryParams: []cav.QueryParam{
+			{Name: "page", Description: "Page to fetch", Required: true, Value: "1"},
+			{Name: "pageSize", Description: "Results per page to fetch", Required: true, Value: "128"},
 		},
-		ResponseType: itypes.Users{},
+		ResponseType: itypes.APIResponseListUsers{},
 	}.Register()
 
 	// GetUser
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-User.html",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/userUrn/get/",
 		Name:             "GetUser",
 		Description:      "Get user by ID or name",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/user/{userId}",
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
-			{
-				Name:        pathParamUserID,
-				Description: descUserID,
-				Required:    true,
-			},
-		},
-		ResponseType: itypes.User{},
+		PathTemplate:     pathCloudAPIUser,
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: descUserURN, Required: true}},
+		ResponseType:     itypes.APIUser{},
 	}.Register()
 
 	// CreateUser
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-User.html",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/post/",
 		Name:             "CreateUser",
 		Description:      "Create a new user in organization",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/users",
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
-		},
-		BodyRequestType: itypes.UserRequest{},
-		ResponseType:    itypes.User{},
+		PathTemplate:     pathCloudAPIUsers,
+		PathParams:       []cav.PathParam{},
+		BodyRequestType:  itypes.APIUser{},
+		ResponseType:     itypes.APIUser{},
 	}.Register()
 
 	// UpdateUser
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-User.html",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/userUrn/put/",
 		Name:             "UpdateUser",
 		Description:      "Update an existing user",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/user/{userId}",
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
-			{
-				Name:        pathParamUserID,
-				Description: descUserID,
-				Required:    true,
-			},
-		},
-		BodyRequestType: itypes.UserRequest{},
-		ResponseType:    itypes.User{},
+		PathTemplate:     pathCloudAPIUser,
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: descUserURN, Required: true}},
+		BodyRequestType:  itypes.APIUser{},
+		ResponseType:     itypes.APIUser{},
+	}.Register()
+
+	// TakeOwnership transfers entities owned by a user to the caller.
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/userUrn/takeOwnership/post/",
+		Name:             "TakeOwnership",
+		Description:      "Take ownership of a user",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathCloudAPIUserTakeOwnership,
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: descUserURN, Required: true}},
+		ResponseType:     struct{}{},
 	}.Register()
 
 	// DeleteUser
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/DELETE-User.html",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/userUrn/delete/",
 		Name:             "DeleteUser",
 		Description:      "Delete a user",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/user/{userId}",
+		PathTemplate:     pathCloudAPIUser,
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: descUserURN, Required: true}},
+		ResponseType:     struct{}{},
+	}.Register()
+
+	// EnableUser
+	cav.Endpoint{
+		DocumentationURL: docURLVMware,
+		Name:             "EnableUser",
+		Description:      "Enable a user",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathCloudAPIUser,
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: descUserURN, Required: true}},
+		BodyRequestType:  itypes.APIUser{},
+		ResponseType:     itypes.APIUser{},
+	}.Register()
+
+	// DisableUser
+	cav.Endpoint{
+		DocumentationURL: docURLVMware,
+		Name:             "DisableUser",
+		Description:      "Disable a user",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathCloudAPIUser,
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: descUserURN, Required: true}},
+		BodyRequestType:  itypes.APIUser{},
+		ResponseType:     itypes.APIUser{},
+	}.Register()
+
+	// UnlockUser
+	cav.Endpoint{
+		DocumentationURL: docURLVMware,
+		Name:             "UnlockUser",
+		Description:      "Unlock a user",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathCloudAPIUser,
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: descUserURN, Required: true}},
+		BodyRequestType:  itypes.APIUser{},
+		ResponseType:     itypes.APIUser{},
+	}.Register()
+
+	// ChangePassword
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/userUrn/changePassword/post/",
+		Name:             "ChangePassword",
+		Description:      "Change a user's password",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathCloudAPIUserChangePassword,
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: descUserURN, Required: true}},
+		BodyRequestType:  itypes.APIRequestPasswordChange{},
+		ResponseType:     struct{}{},
+	}.Register()
+
+	// ListTokens
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/tokens/get/",
+		Name:             "ListTokens",
+		Description:      "List tokens in organization",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathTokenGet,
+		ResponseType:     itypes.APIResponseListTokens{},
+	}.Register()
+
+	// GetToken
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/sessions/id/token/get/",
+		Name:             "GetToken",
+		Description:      "Get token by ID",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathTokenGetByID,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamOrgID,
@@ -118,111 +174,393 @@ func init() {
 				Required:    true,
 			},
 			{
-				Name:        pathParamUserID,
-				Description: descUserID,
+				Name:        pathParamID,
+				Description: descTokenID,
 				Required:    true,
 			},
 		},
-		QueryParams: []cav.QueryParam{
+		ResponseType: itypes.APIResponseToken{},
+	}.Register()
+
+	// CreateToken
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/tokens/post/",
+		Name:             "CreateToken",
+		Description:      "Create a new token in organization",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathTokenCreate,
+		PathParams: []cav.PathParam{
 			{
-				Name:        "takeOwnership",
-				Description: "Take ownership of user's resources",
-				Required:    false,
+				Name:        pathParamOrgID,
+				Description: descOrgID,
+				Required:    true,
+			},
+		},
+		BodyRequestType: itypes.APIRequestToken{},
+		ResponseType:    itypes.APIResponseToken{},
+	}.Register()
+
+	// UpdateToken
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/tokens/id/put/",
+		Name:             "UpdateToken",
+		Description:      "Update an existing token",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathTokenUpdateByID,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamOrgID,
+				Description: descOrgID,
+				Required:    true,
+			},
+			{
+				Name:        pathParamID,
+				Description: descTokenID,
+				Required:    true,
+			},
+		},
+		BodyRequestType: itypes.APIRequestToken{},
+		ResponseType:    itypes.APIResponseToken{},
+	}.Register()
+
+	// DeleteToken
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/tokens/id/delete/",
+		Name:             "DeleteToken",
+		Description:      "Delete a token",
+		Method:           cav.MethodDELETE,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathTokenDeleteByID,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamOrgID,
+				Description: descOrgID,
+				Required:    true,
+			},
+			{
+				Name:        pathParamID,
+				Description: descTokenID,
+				Required:    true,
 			},
 		},
 		ResponseType: struct{}{},
 	}.Register()
 
-	// EnableUser
+	// TestLDAP
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-UserEnable.html",
-		Name:             "EnableUser",
-		Description:      "Enable a user",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ldap/test/post/",
+		Name:             "TestLDAP",
+		Description:      "Test LDAP connection",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/user/{userId}/action/enable",
-		PathParams: []cav.PathParam{
+		PathTemplate:     pathLDAPTest,
+		PathParams:       []cav.PathParam{{Name: pathParamOrgID, Description: descOrgID, Required: true}},
+		QueryParams: []cav.QueryParam{
 			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
-			{
-				Name:        pathParamUserID,
-				Description: descUserID,
-				Required:    true,
+				Name:        "username",
+				Description: "Username to use when testing LDAP search",
+				Required:    false,
 			},
 		},
-		ResponseType: itypes.User{},
+		BodyRequestType: itypes.APIRequestLDAPTest{},
+		ResponseType:    itypes.APIResponseLDAPTestResult{},
 	}.Register()
 
-	// DisableUser
+	// SyncLDAP
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-UserDisable.html",
-		Name:             "DisableUser",
-		Description:      "Disable a user",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ldap/sync/post/",
+		Name:             "SyncLDAP",
+		Description:      "Synchronize LDAP directory",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/user/{userId}/action/disable",
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
-			{
-				Name:        pathParamUserID,
-				Description: descUserID,
-				Required:    true,
-			},
-		},
-		ResponseType: itypes.User{},
+		PathTemplate:     pathLDAPSync,
+		PathParams:       []cav.PathParam{{Name: pathParamOrgID, Description: descOrgID, Required: true}},
+		BodyRequestType:  nil, // No request body for this endpoint.
+		ResponseType:     struct{}{},
 	}.Register()
 
-	// UnlockUser
+	// SearchLDAPUsers
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-UserUnlock.html",
-		Name:             "UnlockUser",
-		Description:      "Unlock a user",
-		Method:           cav.MethodPOST,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ldap/search/user/get/",
+		Name:             "SearchLDAPUsers",
+		Description:      "Search LDAP users",
+		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/user/{userId}/action/unlock",
-		PathParams: []cav.PathParam{
+		PathTemplate:     pathLDAPSearchUsers,
+		PathParams:       []cav.PathParam{{Name: pathParamOrgID, Description: descOrgID, Required: true}},
+		QueryParams: []cav.QueryParam{
 			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
-			{
-				Name:        pathParamUserID,
-				Description: descUserID,
-				Required:    true,
+				Name:        queryParamQ,
+				Description: "String to search for via LDAP",
+				Required:    false,
 			},
 		},
-		ResponseType: itypes.User{},
+		ResponseType: []itypes.APIResponseLDAPUser{},
 	}.Register()
 
-	// ChangePassword
+	// SearchLDAPGroups
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-UserChangePassword.html",
-		Name:             "ChangePassword",
-		Description:      "Change a user's password",
-		Method:           cav.MethodPOST,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ldap/search/group/get/",
+		Name:             "SearchLDAPGroups",
+		Description:      "Search LDAP groups",
+		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/user/{userId}/action/changePassword",
+		PathTemplate:     pathLDAPSearchGroups,
+		PathParams:       []cav.PathParam{{Name: pathParamOrgID, Description: descOrgID, Required: true}},
+		QueryParams: []cav.QueryParam{
+			{
+				Name:        queryParamQ,
+				Description: "String to search for via LDAP",
+				Required:    false,
+			},
+		},
+		ResponseType: []itypes.APIResponseLDAPGroup{},
+	}.Register()
+
+	// ListGlobalRoles
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/get/",
+		Name:             "ListGlobalRoles",
+		Description:      "List global roles",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathGlobalRoles,
+		ResponseType:     itypes.APIResponseListGlobalRoles{},
+	}.Register()
+
+	// GetGlobalRole
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/get/",
+		Name:             "GetGlobalRole",
+		Description:      "Get global role by ID",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathGlobalRoleByID,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
-			{
-				Name:        pathParamUserID,
-				Description: descUserID,
+				Name:        pathParamID,
+				Description: descGlobalRoleID,
 				Required:    true,
 			},
 		},
-		BodyRequestType: itypes.NewPassword{},
+		ResponseType: itypes.APIResponseGlobalRole{},
+	}.Register()
+
+	// CreateGlobalRole
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/post/",
+		Name:             "CreateGlobalRole",
+		Description:      "Create a global role",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathGlobalRoles,
+		BodyRequestType:  itypes.APIRequestGlobalRole{},
+		ResponseType:     itypes.APIResponseGlobalRole{},
+	}.Register()
+
+	// UpdateGlobalRole
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/put/",
+		Name:             "UpdateGlobalRole",
+		Description:      "Update a global role",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathGlobalRoleByID,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: descGlobalRoleID,
+				Required:    true,
+			},
+		},
+		BodyRequestType: itypes.APIRequestGlobalRole{},
+		ResponseType:    itypes.APIResponseGlobalRole{},
+	}.Register()
+
+	// DeleteGlobalRole
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/delete/",
+		Name:             "DeleteGlobalRole",
+		Description:      "Delete a global role",
+		Method:           cav.MethodDELETE,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathGlobalRoleByID,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: descGlobalRoleID,
+				Required:    true,
+			},
+		},
+		ResponseType: struct{}{},
+	}.Register()
+
+	// ListGlobalRoleRights
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/rights/get/",
+		Name:             "ListGlobalRoleRights",
+		Description:      "List rights of a global role",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathGlobalRoleRights,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: descGlobalRoleID,
+				Required:    true,
+			},
+		},
+		ResponseType: itypes.APIResponseGlobalRoleRights{},
+	}.Register()
+
+	// AddGlobalRoleRights
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/rights/post/",
+		Name:             "AddGlobalRoleRights",
+		Description:      "Add rights to a global role",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathGlobalRoleRights,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: descGlobalRoleID,
+				Required:    true,
+			},
+		},
+		BodyRequestType: itypes.APIRequestGlobalRoleRights{},
+		ResponseType:    itypes.APIResponseGlobalRoleRights{},
+	}.Register()
+
+	// ReplaceGlobalRoleRights
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/rights/put/",
+		Name:             "ReplaceGlobalRoleRights",
+		Description:      "Replace rights of a global role",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathGlobalRoleRights,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: descGlobalRoleID,
+				Required:    true,
+			},
+		},
+		BodyRequestType: itypes.APIRequestGlobalRoleRights{},
+		ResponseType:    itypes.APIResponseGlobalRoleRights{},
+	}.Register()
+
+	// ListGlobalRoleTenants
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/tenants/get/",
+		Name:             "ListGlobalRoleTenants",
+		Description:      "List tenants of a global role",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathGlobalRoleTenants,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: descGlobalRoleID,
+				Required:    true,
+			},
+		},
+		ResponseType: itypes.APIResponseGlobalRoleTenants{},
+	}.Register()
+
+	// SetGlobalRoleTenants
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/tenants/put/",
+		Name:             "SetGlobalRoleTenants",
+		Description:      "Set tenants of a global role",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathGlobalRoleTenants,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: descGlobalRoleID,
+				Required:    true,
+			},
+		},
+		BodyRequestType: itypes.APIRequestGlobalRoleTenants{},
+		ResponseType:    itypes.APIResponseGlobalRoleTenants{},
+	}.Register()
+
+	// PublishGlobalRoleTenants
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/tenants/publish/post/",
+		Name:             "PublishGlobalRoleTenants",
+		Description:      "Publish tenants of a global role",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathGlobalRoleTenantsPublish,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: descGlobalRoleID,
+				Required:    true,
+			},
+		},
+		BodyRequestType: itypes.APIRequestGlobalRoleTenants{},
 		ResponseType:    struct{}{},
+	}.Register()
+
+	// UnpublishGlobalRoleTenants
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/tenants/unpublish/post/",
+		Name:             "UnpublishGlobalRoleTenants",
+		Description:      "Unpublish tenants of a global role",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathGlobalRoleTenantsUnpublish,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: descGlobalRoleID,
+				Required:    true,
+			},
+		},
+		BodyRequestType: itypes.APIRequestGlobalRoleTenants{},
+		ResponseType:    struct{}{},
+	}.Register()
+
+	// PublishAllGlobalRoleTenants
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/tenants/publishAll/post/",
+		Name:             "PublishAllGlobalRoleTenants",
+		Description:      "Publish all tenants of a global role",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathGlobalRoleTenantsPublishAll,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: descGlobalRoleID,
+				Required:    true,
+			},
+		},
+		ResponseType: struct{}{},
+	}.Register()
+
+	// UnpublishAllGlobalRoleTenants
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/tenants/unpublishAll/post/",
+		Name:             "UnpublishAllGlobalRoleTenants",
+		Description:      "Unpublish all tenants of a global role",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathGlobalRoleTenantsUnpublishAll,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: descGlobalRoleID,
+				Required:    true,
+			},
+		},
+		ResponseType: struct{}{},
 	}.Register()
 }

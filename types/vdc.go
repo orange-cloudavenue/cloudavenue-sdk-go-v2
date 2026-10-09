@@ -44,8 +44,11 @@ type (
 	}
 
 	ModelGetVDCStorageProfile struct {
-		ID   string `documentation:"ID of the storage profile"`
-		Name string `documentation:"Class name of the storage profile"`
+		ID      string `documentation:"ID of the storage profile"`
+		Name    string `documentation:"Class name of the storage profile"`
+		Class   string `documentation:"Storage profile class"`
+		Limit   int    `documentation:"Storage profile limit in GiB"`
+		Default bool   `documentation:"Whether storage profile is default"`
 	}
 
 	ModelGetVDCComputeCapacity struct {

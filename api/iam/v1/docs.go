@@ -7,6 +7,7 @@
  * or see the "LICENSE" file for more details.
  */
 
-// Package iam provides CloudAvenue IAM API clients for managing users
-// in VMware Cloud Director organizations via the AdminOrg XML API.
+// Package iam manages organization users through VMware Cloud Director's
+// CloudAPI. IAM user operations are CloudAPI-backed, not Infrapi- or
+// AdminOrg-XML-backed.
 package iam

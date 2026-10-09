@@ -23,7 +23,7 @@ func init() {
 		Description:      "List trusted certificates",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/ssl/trustedCertificates",
+		PathTemplate:     pathTrustedCertificatesBase,
 		QueryParams:      []cav.QueryParam{{Name: queryParamFilter, Description: "Filter to apply to the list of trusted certificates."}, {Name: queryParamPageSize, Description: descPageSize, Value: pageSize100}, {Name: queryParamPage, Description: descPage, Value: "1"}},
 		ResponseType:     itypes.APIResponseListTrustedCertificate{},
 	}.Register()
@@ -49,7 +49,7 @@ func init() {
 		Description:      "Create a trusted certificate",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/ssl/trustedCertificates",
+		PathTemplate:     pathTrustedCertificatesBase,
 		BodyRequestType:  itypes.APIRequestTrustedCertificate{},
 		ResponseType:     itypes.APIResponseTrustedCertificate{},
 	}.Register()

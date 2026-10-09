@@ -19,11 +19,9 @@ import (
 //go:generate endpoint-generator -path vapp.go -output vapp
 
 func init() {
-	const pathVAppByID = "/api/vapp/{vapp-id}"
-
 	// ListVApp
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-VApp.html",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-ExecuteQuery.html",
 		Name:             "ListVApp",
 		Description:      "List VApps",
 		Method:           cav.MethodGET,
@@ -45,7 +43,7 @@ func init() {
 
 	// GetVApp
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-VApp.html",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-VApp.html",
 		Name:             "GetVApp",
 		Description:      "Get VApp",
 		Method:           cav.MethodGET,
@@ -65,12 +63,12 @@ func init() {
 
 	// CreateVApp
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-VApp.html",
+		DocumentationURL: docURLVMware,
 		Name:             "CreateVApp",
 		Description:      "Create a new VApp",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/api/vdc/{vdc-id}/action/createVApp",
+		PathTemplate:     pathVAppCreate,
 		PathParams: []cav.PathParam{
 			{
 				Name:          pathParamVDCID,
@@ -86,7 +84,7 @@ func init() {
 
 	// UpdateVApp
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-VApp.html",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-Vm.html",
 		Name:             "UpdateVApp",
 		Description:      "Update an existing VApp",
 		Method:           cav.MethodPUT,
@@ -107,7 +105,7 @@ func init() {
 
 	// DeleteVApp
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/DELETE-VApp.html",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/DELETE-VApp.html",
 		Name:             "DeleteVApp",
 		Description:      "Delete an existing VApp",
 		Method:           cav.MethodDELETE,
@@ -127,12 +125,12 @@ func init() {
 
 	// RemoveAllNetworks
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-VApp-RemoveAllNetworks.html",
+		DocumentationURL: docURLVMware,
 		Name:             "RemoveAllNetworks",
 		Description:      "Remove all networks from a VApp",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathVAppByID + "/action/removeAllNetworks",
+		PathTemplate:     pathVAppRemoveAllNetworks,
 		PathParams: []cav.PathParam{
 			{
 				Name:          pathParamVAppID,
@@ -147,12 +145,12 @@ func init() {
 
 	// UndeployVApp
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-VApp-Undeploy.html",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-UndeployVApp.html",
 		Name:             "UndeployVApp",
 		Description:      "Undeploy a VApp",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathVAppByID + "/action/undeploy",
+		PathTemplate:     pathVAppUndeploy,
 		PathParams: []cav.PathParam{
 			{
 				Name:          pathParamVAppID,
@@ -164,5 +162,44 @@ func init() {
 		},
 		BodyRequestType: itypes.APIRequestUndeployVApp{},
 		ResponseType:    cav.Job{},
+	}.Register()
+
+	// GetVAppLeaseSettings
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-VAppLeaseSettings.html",
+		Name:             "GetVAppLeaseSettings",
+		Description:      "Get org/VDC-level lease settings",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathVAppLeaseSettings,
+		PathParams: []cav.PathParam{
+			{
+				Name:          pathParamOrgID,
+				Description:   descOrgID,
+				Required:      true,
+				ValidatorFunc: validateRule(urnOrg),
+			},
+		},
+		ResponseType: itypes.APIResponseOrgLeaseSettings{},
+	}.Register()
+
+	// UpdateVAppLeaseSettings
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-VAppLeaseSettings.html",
+		Name:             "UpdateVAppLeaseSettings",
+		Description:      "Update org/VDC-level lease settings",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathVAppLeaseSettings,
+		PathParams: []cav.PathParam{
+			{
+				Name:          pathParamOrgID,
+				Description:   descOrgID,
+				Required:      true,
+				ValidatorFunc: validateRule(urnOrg),
+			},
+		},
+		BodyRequestType: itypes.APIRequestOrgLeaseSettings{},
+		ResponseType:    itypes.APIResponseOrgLeaseSettings{},
 	}.Register()
 }

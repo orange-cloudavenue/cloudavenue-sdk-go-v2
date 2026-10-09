@@ -18,12 +18,12 @@ import (
 
 func init() {
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/addNetworkConnectivity",
+		DocumentationURL: docURLCerberus,
 		Name:             "CreatePublicIP",
 		Description:      "Create a new public IP",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/api/customers/v2.0/services",
+		PathTemplate:     pathCerberusCloudavenueServices,
 		ResponseType:     cav.CerberusJobCreatedAPIResponse{},
 		BodyRequestType:  itypes.APIRequestEdgegatewayPublicIP{},
 	}.Register()

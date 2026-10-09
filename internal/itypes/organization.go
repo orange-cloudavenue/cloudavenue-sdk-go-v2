@@ -14,7 +14,7 @@ import (
 )
 
 type (
-	// APIResponseGetOrg is infrapi organization response.
+	// APIResponseGetOrg is customer API organization response.
 	APIResponseGetOrg struct {
 		Name                string `json:"name" fake:"{resource_name:organization}"`
 		FullName            string `json:"fullName" fake:"{company}"`
@@ -50,15 +50,17 @@ type (
 		Description         string `json:"description" validate:"omitempty"`
 		CustomerMail        string `json:"customerMail" validate:"omitempty,email"`
 		InternetBillingMode string `json:"internetBillingMode" validate:"omitempty,oneof=PAYG TRAFFIC_VOLUME"`
+		IsEnabled           bool   `json:"isEnabled"`
 	}
 )
 
-// ToModel converts infrapi organization response.
+// ToModel converts customer API organization response.
 func (r *APIResponseGetOrg) ToModel() *types.ModelGetOrganization {
 	return &types.ModelGetOrganization{
 		Name:                r.Name,
 		FullName:            r.FullName,
 		Description:         r.Description,
+		Enabled:             r.IsEnabled,
 		Email:               r.CustomerMail,
 		InternetBillingMode: r.InternetBillingMode,
 	}

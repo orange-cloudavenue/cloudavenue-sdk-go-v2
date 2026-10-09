@@ -9,6 +9,22 @@
 
 package cav
 
+// Canonical documentation roots. Per-operation deep links drift and operation
+// pages are unstable, so every endpoint of a backend shares one root. VMware is
+// pinned to the API version the client sends.
+//
+// internal/iendpoints keeps its own copy of these literals: the endpoint
+// generator renders a cross-package reference as "pkg.Name" rather than as the
+// value, so aliasing them would blank every generated comment there. Keep both
+// sets as literals and in sync.
+const (
+	// DocURLVMware is the VMware Cloud Director OpenAPI root.
+	DocURLVMware = "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/"
+
+	// DocURLCerberus is the CloudAvenue customer API root.
+	DocURLCerberus = "https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API"
+)
+
 type (
 	// API identifies API family.
 	API string
@@ -42,6 +58,11 @@ type (
 
 		// QueryParams describes supported query parameters.
 		QueryParams []QueryParam `validate:"dive"`
+
+		// Headers contains headers applied to every request for this endpoint.
+		// Request-specific options are applied after endpoint headers and may
+		// override them.
+		Headers map[string]string
 
 		// DocumentationURL points to upstream endpoint documentation.
 		DocumentationURL string `validate:"required,url"` // e.g., "https://docs.xx.com/api/v1/xx"

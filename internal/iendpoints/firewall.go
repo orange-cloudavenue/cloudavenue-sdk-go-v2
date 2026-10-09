@@ -34,7 +34,7 @@ func init() {
 		Description:      "Get the Distributed Firewall policies (enabled state and default policy) of a VDC Group",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}/dfwPolicies",
+		PathTemplate:     pathDFWPolicies,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamVDCGroupID,
@@ -55,7 +55,7 @@ func init() {
 		Description:      "Update the Distributed Firewall policies (enabled state) of a VDC Group",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}/dfwPolicies",
+		PathTemplate:     pathDFWPolicies,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamVDCGroupID,
@@ -72,12 +72,12 @@ func init() {
 
 	// UpdateDFWDefaultPolicy
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/default/put/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/policyId/put/",
 		Name:             "UpdateDFWDefaultPolicy",
 		Description:      "Update the default Distributed Firewall policy of a VDC Group",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}/dfwPolicies/default",
+		PathTemplate:     pathDFWPolicyDefault,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamVDCGroupID,
@@ -94,12 +94,12 @@ func init() {
 
 	// GetDFWRules
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/default/rules/get/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/policyId/rules/get/",
 		Name:             "GetDFWRules",
 		Description:      "Get the Distributed Firewall rules of a VDC Group",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}/dfwPolicies/default/rules",
+		PathTemplate:     pathDFWPolicyDefaultRules,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamVDCGroupID,
@@ -115,12 +115,12 @@ func init() {
 
 	// UpdateDFWRules
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/default/rules/put/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/policyId/rules/put/",
 		Name:             "UpdateDFWRules",
 		Description:      "Replace (bulk) the Distributed Firewall rules of a VDC Group",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}/dfwPolicies/default/rules",
+		PathTemplate:     pathDFWPolicyDefaultRules,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamVDCGroupID,

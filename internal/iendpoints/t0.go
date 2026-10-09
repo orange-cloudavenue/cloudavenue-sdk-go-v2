@@ -21,41 +21,33 @@ import (
 func init() {
 	// GET - List all T0
 	cav.Endpoint{
-		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/getNetworkHierarchy",
+		DocumentationURL: docURLCerberus,
 		Name:             "ListT0",
 		Description:      "List T0",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/api/customers/v2.0/network",
-		ResponseType:     itypes.APIResponseT0s{},
+		PathTemplate:     pathCerberusT0s,
+		ResponseType:     itypes.APIResponseT0Names{},
+	}.Register()
 
-		QueryParams: []cav.QueryParam{
-			// Query parameters are not used in this endpoint, but can be added
-			// for the mock response if needed
+	// GET - T0 details
+	cav.Endpoint{
+		DocumentationURL: docURLCerberus,
+		Name:             "GetT0",
+		Description:      "Get T0",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendInfrapi,
+		PathTemplate:     pathCerberusT0ByName,
+		PathParams: []cav.PathParam{
 			{
-				Name:        "t0Name",
+				Name:        "tier0Name",
 				Description: "The name of the T0",
-				Required:    false,
+				Required:    true,
 				ValidatorFunc: func(value string) error {
 					return validators.New().Var(value, "resource_name=t0")
 				},
 			},
-			{
-				Name:        "edgeGatewayName",
-				Description: "The name of the Edge Gateway",
-				Required:    false,
-				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, ruleResourceNameEdgeGateway)
-				},
-			},
-			{
-				Name:        "edgeGatewayID",
-				Description: "The ID of the Edge Gateway",
-				Required:    false,
-				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, urnEdgeGateway)
-				},
-			},
 		},
+		ResponseType: itypes.APIResponseT0{},
 	}.Register()
 }

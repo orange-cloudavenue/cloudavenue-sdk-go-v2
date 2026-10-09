@@ -153,7 +153,7 @@ func TestConsole_GetAPIVCDEndpoint(t *testing.T) {
 	}{
 		{Console1, "https://console1.cloudavenue.orange-business.com"},
 		{Console5, "https://console5.cloudavenue-cha.itn.intraorange"},
-		{Console9, "https://console9.cloudavenue.orange-business.com"},
+		{Console9, consoleEndpoint9},
 	}
 	for _, tt := range tests {
 		got := tt.console.GetAPIVCDEndpoint()
@@ -172,7 +172,8 @@ func TestConsole_GetAPICerberusEndpoint(t *testing.T) {
 		{Console2, "https://console2.cloudavenue.orange-business.com"},
 		{Console4, "https://console4.cloudavenue.orange-business.com"},
 		{Console5, "https://console5.cloudavenue-cha.itn.intraorange"},
-		// Console7, Console8, Console9 do not have Cerberus API enabled, so expect an empty string
+		// Console7, Console8, Console9 do not expose customer API through
+		// Cerberus, so expect empty string.
 		{Console7, ""},
 		{Console8, ""},
 		{Console9, ""},

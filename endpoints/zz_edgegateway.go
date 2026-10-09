@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (c) 2025 Orange
+ * SPDX-FileCopyrightText: Copyright (c) 2026 Orange
  * SPDX-License-Identifier: Mozilla Public License 2.0
  *
  * This software is distributed under the MPL-2.0 license.
@@ -15,31 +15,35 @@ import (
 
 // GetEdgeGateway - Get EdgeGateway
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/edgeGateways/gatewayId/get/ 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func GetEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetEdgeGateway")
 }
-// QueryEdgeGateway - Query EdgeGateway
+
+// QueryEdgeGateway - List EdgeGateways (compatibility alias)
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/types/QueryResultEdgeGatewayRecordType.html 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func QueryEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("QueryEdgeGateway")
 }
+
 // CreateEdgeGateway - Create EdgeGateway
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/createVdcEdge 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func CreateEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreateEdgeGateway")
 }
+
 // DeleteEdgeGateway - Delete EdgeGateway
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/deleteEdge 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func DeleteEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("DeleteEdgeGateway")
 }
+
 // ListEdgeGateway - List EdgeGateways
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/latest/cloudapi/1.0.0/edgeGateways/get/ 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func ListEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListEdgeGateway")
 }

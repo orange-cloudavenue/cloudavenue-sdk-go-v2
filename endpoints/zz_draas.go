@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (c) 2025 Orange
+ * SPDX-FileCopyrightText: Copyright (c) 2026 Orange
  * SPDX-License-Identifier: Mozilla Public License 2.0
  *
  * This software is distributed under the MPL-2.0 license.
@@ -15,19 +15,21 @@ import (
 
 // ListDraasOnPremiseIP - List of on premise IP addresses allowed for this organization's draas offer
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/VCDA/getVcdaIPs 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func ListDraasOnPremiseIP() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListDraasOnPremiseIP")
 }
+
 // AddDraasOnPremiseIP - Allow a new on premise IP address for this organization's draas offer
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/VCDA/postVcdaIPs 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func AddDraasOnPremiseIP() *cav.Endpoint {
 	return cav.MustGetEndpoint("AddDraasOnPremiseIP")
 }
+
 // RemoveDraasOnPremiseIP - Remove an on premise IP address from this organization's draas offer
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/VCDA/deleteVcdaIPs 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func RemoveDraasOnPremiseIP() *cav.Endpoint {
 	return cav.MustGetEndpoint("RemoveDraasOnPremiseIP")
 }

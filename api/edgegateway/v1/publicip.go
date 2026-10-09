@@ -12,7 +12,7 @@ package edgegateway
 import (
 	"context"
 	"fmt"
-	"strings"
+	"sort"
 	"time"
 
 	"github.com/orange-cloudavenue/common-go/extractor"
@@ -25,6 +25,9 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
+
+// networkTypeInternet is the network type used when allocating a public IP.
+const networkTypeInternet = "internet"
 
 // CreatePublicIP allocates a public IP for an edge gateway.
 func (c *Client) CreatePublicIP(ctx context.Context, params types.ParamsEdgeGateway) (*types.ModelEdgeGatewayPublicIP, error) {
@@ -48,7 +51,7 @@ func (c *Client) CreatePublicIP(ctx context.Context, params types.ParamsEdgeGate
 	}
 
 	body := itypes.APIRequestEdgegatewayPublicIP{
-		NetworkType:   "internet",
+		NetworkType:   networkTypeInternet,
 		EdgeGatewayID: edgeID,
 		Properties: itypes.APIRequestEdgegatewayPublicIPProperties{
 			Announced: true,
@@ -64,18 +67,21 @@ func (c *Client) CreatePublicIP(ctx context.Context, params types.ParamsEdgeGate
 		return nil, fmt.Errorf("Failed to create public IP: %w", err)
 	}
 
-	// Parse jobID from the create response (HTTP 201 with {"jobId":"...","message":"..."})
+	// Parse jobID from customer API create response (HTTP 201 with
+	// {"jobId":"...","message":"..."}) routed through Cerberus.
 	jobID := resp.Result().(*cav.CerberusJobCreatedAPIResponse).ID
 	if jobID == "" {
 		return nil, fmt.Errorf("Failed to create public IP: %w", errors.New("job id not found in create response"))
 	}
 
-	// Poll job completion and extract the created public IP from the job response
+	// Poll customer job completion and extract created public IP from job
+	// response.
 	publicipCreated, err := cav.AwaitJob(ctx, c.c, jobID, cav.JobPollOptions{
 		Timeout:         30 * time.Second,
 		PollingInterval: 1 * time.Second,
 	}, func(resp *resty.Response) (string, error) {
-		// The job status response may be either Cerberus or VMware format depending on which endpoint succeeded
+		// Job status response may be customer-job format routed through Cerberus
+		// or VMware task format, depending on which endpoint succeeded.
 		if r, ok := resp.Result().(*cav.CerberusJobAPIResponse); ok {
 			if len(*r) == 0 {
 				return "", errors.New("no job information returned")
@@ -127,6 +133,14 @@ func (c *Client) ListPublicIP(ctx context.Context, params types.ParamsEdgeGatewa
 		})
 	}
 
+	sort.SliceStable(ips.PublicIPs, func(i, j int) bool {
+		if ips.PublicIPs[i].IP == ips.PublicIPs[j].IP {
+			return ips.PublicIPs[i].ID < ips.PublicIPs[j].ID
+		}
+
+		return ips.PublicIPs[i].IP < ips.PublicIPs[j].IP
+	})
+
 	return ips, nil
 }
 
@@ -137,6 +151,10 @@ func (c *Client) GetPublicIP(ctx context.Context, params types.ParamsGetEdgeGate
 	}
 	if err := validators.New().Var(params.IP, "ip4_addr"); err != nil {
 		return nil, fmt.Errorf("invalid IP address: %w", err)
+	}
+
+	if err := validateEdgeGatewayRef(params.ID, params.Name); err != nil {
+		return nil, err
 	}
 
 	if params.ID == "" {
@@ -151,9 +169,6 @@ func (c *Client) GetPublicIP(ctx context.Context, params types.ParamsGetEdgeGate
 	resp, err := c.c.Do(
 		ctx,
 		ep,
-		cav.WithQueryParam(ep.QueryParams[0], params.ID),
-		cav.WithQueryParam(ep.QueryParams[1], params.Name),
-		cav.WithQueryParam(ep.QueryParams[2], params.IP),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error retrieving network services for edge gateway %s: %w", params.ID, err)
@@ -163,7 +178,10 @@ func (c *Client) GetPublicIP(ctx context.Context, params types.ParamsGetEdgeGate
 		ID:   params.ID,
 		Name: params.Name,
 	})
-	if data == nil || len(data.PublicIP) == 0 {
+	if data == nil || data.ID == "" {
+		return nil, fmt.Errorf("no network services found for edge gateway %s", params.ID)
+	}
+	if len(data.PublicIP) == 0 {
 		return nil, fmt.Errorf("no public IPs found for edge gateway %s", params.ID)
 	}
 
@@ -181,6 +199,11 @@ func (c *Client) GetPublicIP(ctx context.Context, params types.ParamsGetEdgeGate
 }
 
 // DeletePublicIP releases a public IP from an edge gateway.
+//
+// The delete endpoint is keyed by the CloudAvenue service identifier, which
+// cannot be derived from the IP address. It is resolved from the org-wide
+// network hierarchy, and the request is refused when it cannot be resolved:
+// the identifier is never synthesized.
 func (c *Client) DeletePublicIP(ctx context.Context, params types.ParamsDeleteEdgeGatewayPublicIP) error {
 	if params.IP == "" {
 		return fmt.Errorf("ip is required")
@@ -189,14 +212,48 @@ func (c *Client) DeletePublicIP(ctx context.Context, params types.ParamsDeleteEd
 		return fmt.Errorf("invalid IP address: %w", err)
 	}
 
-	ep := endpoints.DisableCloudavenueServices()
-	ipID := fmt.Sprintf("ip-%s", strings.ReplaceAll(params.IP, ".", "-"))
+	serviceID, err := c.retrievePublicIPServiceID(ctx, params.IP)
+	if err != nil {
+		return err
+	}
 
-	_, err := c.c.Do(
+	ep := endpoints.DisableCloudavenueServices()
+
+	if _, err := c.c.Do(
 		ctx,
 		ep,
-		cav.WithPathParam(ep.PathParams[0], ipID),
-	)
+		cav.WithPathParam(ep.PathParams[0], serviceID),
+	); err != nil {
+		return fmt.Errorf("error deleting public IP %s: %w", params.IP, err)
+	}
 
-	return err
+	return nil
+}
+
+// retrievePublicIPServiceID resolves the real service identifier of an
+// allocated public IP from the org-wide network hierarchy. The hierarchy is
+// gateway-agnostic, so the lookup spans every edge gateway of the organization.
+func (c *Client) retrievePublicIPServiceID(ctx context.Context, ip string) (string, error) {
+	ep := endpoints.GetEdgeGatewayServices()
+
+	resp, err := c.c.Do(ctx, ep)
+	if err != nil {
+		return "", fmt.Errorf("error retrieving network services to resolve public IP %s: %w", ip, err)
+	}
+
+	services, ok := resp.Result().(*itypes.APIResponseNetworkServices)
+	if !ok || services == nil {
+		return "", fmt.Errorf("unexpected response type while resolving public IP %s", ip)
+	}
+
+	serviceID, found := services.PublicIPServiceID(ip)
+	if !found {
+		return "", fmt.Errorf("public IP %s not found in network services", ip)
+	}
+
+	if serviceID == "" {
+		return "", fmt.Errorf("serviceID is empty, cannot delete public IP %s", ip)
+	}
+
+	return serviceID, nil
 }

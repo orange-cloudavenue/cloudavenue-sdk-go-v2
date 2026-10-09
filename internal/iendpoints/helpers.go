@@ -21,33 +21,39 @@ import (
 )
 
 const (
+	// Canonical documentation roots. Per-operation links drift and are not
+	// stable. VMware is pinned to 39.1 to match the API version the client sends.
+	// OSE and NetBackup have no public documentation and keep their own URLs.
+	//
+	// These duplicate cav.DocURLVMware and cav.DocURLCerberus on purpose: the
+	// endpoint generator renders a cross-package reference as "pkg.Name", not as
+	// the value, so aliasing them would blank every generated comment here.
+	headerAccept      = "Accept"
+	headerContentType = "Content-Type"
+	headerXML         = "application/xml"
+	descUserURN       = "User URN"
+	docURLVMware      = "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/"
+	docURLCerberus    = "https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API"
+
 	queryParamFilter   = "filter"
+	queryParamQ        = "q"
 	queryParamFormat   = "format"
 	queryParamPage     = "page"
 	queryParamPageSize = "pageSize"
 	queryParamSortAsc  = "sortAsc"
 	queryParamType     = "type"
 
-	pathParamEdgeID                  = "edgeId"
-	pathParamNetworkContextProfileID = "networkContextProfileId"
-	pathParamServiceID               = "serviceId"
-	pathParamTrustedCertificate      = "trustedCertificate"
-	pathParamVDCGroupID              = "vdcGroupId"
-	pathParamVDCID                   = "vdc-id"
-	pathParamVDCName                 = "vdc-name"
-	pathParamVAppID                  = "vapp-id"
-
 	pageSize32  = "32"
 	pageSize30  = "30"
 	pageSize100 = "100"
 	pageSize128 = "128"
 
-	formatRecords            = "records"
-	sortAscName              = "name"
-	typeEdgeGateway          = "edgeGateway"
-	typeOrgVDC               = "orgVdc"
-	typeOrgVDCStorageProfile = "orgVdcStorageProfile"
-	typeVApp                 = "vApp"
+	formatRecords           = "records"
+	sortAscName             = "name"
+	typeEdgeGateway         = "edgeGateway"
+	typeOrgVDC              = "orgVdc"
+	typeOrgVDCStoragePolicy = "orgVdcStoragePolicy"
+	typeVApp                = "vApp"
 
 	descPageSize                 = "The number of items per page."
 	descPage                     = "Page to fetch, zero offset."
@@ -73,28 +79,25 @@ const (
 	urnNetwork                  = "urn=network"
 	urnVDC                      = "urn=vdc"
 	urnVDCGroup                 = "urn=vdcGroup"
-	urnVDCStorageProfile        = "urn=vdcstorageProfile"
+	urnVDCNetwork               = "urn=vdcNetwork"
+	urnVDCStoragePolicy         = "urn=vdcstorageProfile"
 	urnVApp                     = "urn=vapp"
+	urnOrg                      = "urn=org"
+	urnEdgeGatewayID            = "urn=edgegateway"
+	urnCatalog                  = "urn=catalog"
 	ruleRequiredURNEdgeGateway  = "required," + urnEdgeGateway
 	ruleResourceNameEdgeGateway = "resource_name=edgegateway"
 
-	pathQueryAPI                    = "/api/query"
-	pathApplicationPortProfiles     = "/cloudapi/1.0.0/applicationPortProfiles/{appPortProfileId}"
-	pathParamAppPortProfileID       = "appPortProfileId"
-	pathCertificateLibrary          = "/cloudapi/1.0.0/ssl/certificateLibrary/{id}"
-	pathParamCertLibraryItemID      = "certLibraryItemId"
-	pathCertificateLibraryConsumers = "/cloudapi/1.0.0/ssl/certificateLibrary/{certLibraryItemId}/consumers"
-	pathFirewallGroups              = "/cloudapi/1.0.0/firewallGroups/{firewallGroupId}"
-	pathParamFirewallGroupID        = "firewallGroupId"
-	pathNetworkContextProfiles      = "/cloudapi/1.0.0/networkContextProfiles/{networkContextProfileId}"
-	pathTrustedCertificates         = "/cloudapi/1.0.0/ssl/trustedCertificates/{trustedCertificate}"
-	pathOrgVDCNetworks              = "/cloudapi/1.0.0/orgVdcNetworks/{vdcNetworkId}"
-	pathParamVDCNetworkID           = "vdcNetworkId"
-	pathParamOrgID                  = "orgId"
-	descOrgID                       = "Organization ID"
-	pathParamUserID                 = "userId"
-	descUserID                      = "User ID or name"
-	queryParamVDC                   = "vdc"
+	descCatalogURN   = "URN of the catalog"
+	descVDCNetworkID = "ID of the Org VDC Network"
+	descOrgID        = "Organization ID"
+	descUserID       = "User ID or name"
+	descTokenID      = "Token ID"
+	descGlobalRoleID = "Global Role ID"
+	queryParamVDC    = "vdc"
+
+	descOrgIDAdmin         = "Organization ID"
+	descEdgeGatewayIDAdmin = "Edge Gateway ID"
 )
 
 var filterKeysNameOrID = []string{sortAscName, "id"}

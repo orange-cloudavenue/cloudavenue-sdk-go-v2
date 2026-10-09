@@ -21,6 +21,7 @@ const (
 	consoleEndpoint2 = "https://console2.cloudavenue.orange-business.com"
 	consoleEndpoint4 = "https://console4.cloudavenue.orange-business.com"
 	consoleEndpoint5 = "https://console5.cloudavenue-cha.itn.intraorange"
+	consoleEndpoint9 = "https://console9.cloudavenue.orange-business.com"
 )
 
 type (
@@ -220,11 +221,11 @@ var consoles = map[ConsoleName]Console{
 		Services: Services{
 			IHM: Service{
 				Enabled:  true,
-				Endpoint: "https://console9.cloudavenue.orange-business.com",
+				Endpoint: consoleEndpoint9,
 			},
 			APIVCD: Service{
 				Enabled:  true,
-				Endpoint: "https://console9.cloudavenue.orange-business.com",
+				Endpoint: consoleEndpoint9,
 			},
 			Netbackup: Service{
 				Enabled:  false,
@@ -320,7 +321,8 @@ func (c ConsoleName) GetAPIVCDEndpoint() string {
 	return consoles[c].Services.APIVCD.GetEndpoint()
 }
 
-// GetAPICerberusEndpoint returns Cerberus API endpoint.
+// GetAPICerberusEndpoint returns customer API endpoint routed/authenticated
+// through Cerberus.
 func (c ConsoleName) GetAPICerberusEndpoint() string {
 	mu.RLock()
 	defer mu.RUnlock()

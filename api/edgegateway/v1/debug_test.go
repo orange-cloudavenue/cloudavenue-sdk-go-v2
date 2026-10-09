@@ -45,16 +45,13 @@ func TestDebugListT0(t *testing.T) {
 
 	// Check what endpoints are registered
 	for _, e := range cav.GetEndpointsUncategorized() {
-		if e.Name == "ListT0" || e.Name == "GetEdgeGatewayServices" {
+		if e.Name == "ListT0" || e.Name == "GetT0" || e.Name == "GetEdgeGatewayServices" {
 			t.Logf("Registered endpoint: Name=%q PathTemplate=%q BodyResponseType=%T\n", e.Name, e.PathTemplate, e.ResponseType)
 		}
 	}
 
-	mockResponse := &itypes.APIResponseT0s{
-		{
-			Type: "tier-0-vrf",
-			Name: "test-t0",
-		},
+	mockResponse := &itypes.APIResponseT0Names{
+		"test-t0",
 	}
 	statusCode := 404
 	ms.SetResponse(ep, mockResponse, &statusCode)

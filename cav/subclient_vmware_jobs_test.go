@@ -28,7 +28,7 @@ func TestVmwareJobStatusParser(t *testing.T) {
 		{"queued", JobQueued, false},
 		{"preRunning", JobRunning, false},
 		{"running", JobRunning, false},
-		{"error", JobError, false},
+		{string(JobError), JobError, false},
 		{"success", JobSuccess, false},
 		{"aborted", JobAborted, false},
 		{"unknown", JobStatus(""), true},
@@ -87,7 +87,7 @@ func TestVmwareJobParser_NormalResponse(t *testing.T) {
 			StatusCode: http.StatusOK,
 		},
 		Request: &resty.Request{
-			PathParams: map[string]string{"taskId": data.ID},
+			PathParams: map[string]string{jobTaskID: data.ID},
 			URL:        "http://example.com/job",
 			Result:     data,
 		},
@@ -109,10 +109,10 @@ func TestVmwareJobParser_FailedStatus(t *testing.T) {
 			StatusCode: http.StatusOK,
 		},
 		Request: &resty.Request{
-			PathParams: map[string]string{"taskId": "id-123"},
+			PathParams: map[string]string{jobTaskID: "id-123"},
 			URL:        "http://example.com/job",
 			Result: &vmwareJobAPIResponse{
-				Status: "error",
+				Status: string(JobError),
 				Error: &vmwareError{
 					StatusCode:    http.StatusInternalServerError,
 					StatusMessage: "Internal Server Error",
@@ -134,7 +134,7 @@ func TestVmwareJobParser_EmptyResponse(t *testing.T) {
 			StatusCode: http.StatusOK,
 		},
 		Request: &resty.Request{
-			PathParams: map[string]string{"taskId": "id-123"},
+			PathParams: map[string]string{jobTaskID: "id-123"},
 			URL:        "http://example.com/job",
 			Result:     &vmwareJobAPIResponse{},
 		},
@@ -158,7 +158,7 @@ func TestVmwareJobParser_UnknownJobStatus(t *testing.T) {
 			StatusCode: http.StatusOK,
 		},
 		Request: &resty.Request{
-			PathParams: map[string]string{"taskId": "id-123"},
+			PathParams: map[string]string{jobTaskID: "id-123"},
 			URL:        "http://example.com/job",
 			Result: &vmwareJobAPIResponse{
 				Status: "unknown_status",
@@ -177,7 +177,7 @@ func TestVmwareJobParser_VmwareErrorResponse(t *testing.T) {
 			StatusCode: http.StatusInternalServerError,
 		},
 		Request: &resty.Request{
-			PathParams: map[string]string{"taskId": "id-123"},
+			PathParams: map[string]string{jobTaskID: "id-123"},
 			URL:        "http://example.com/job",
 		},
 	}
@@ -193,7 +193,7 @@ func TestVmwareJobParser_InvalidResponseType(t *testing.T) {
 			StatusCode: http.StatusOK,
 		},
 		Request: &resty.Request{
-			PathParams: map[string]string{"taskId": "id-123"},
+			PathParams: map[string]string{jobTaskID: "id-123"},
 			URL:        "http://example.com/job",
 			Result:     "invalid response type",
 		},

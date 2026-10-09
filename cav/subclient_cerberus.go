@@ -11,9 +11,9 @@ package cav
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"resty.dev/v3"
 
@@ -25,12 +25,6 @@ var _ subClientInterface = &cerberus{}
 
 type cerberus struct {
 	subclient
-}
-
-type cerberusError struct {
-	Code    string `json:"code" fake:"{regex:err-[0-9]{4}}"`
-	Reason  string `json:"reason" fake:"{regex:mock-[0-9]{4}}"`
-	Message string `json:"message" fake:"{sentence:3,10}"`
 }
 
 const cerberusVCDVersion = vmwareVCDVersion
@@ -47,7 +41,7 @@ func (v *cerberus) newHTTPClient(ctx context.Context) (*resty.Client, error) {
 	hC := httpclient.NewHTTPClient().
 		SetBaseURL(v.console.GetAPICerberusEndpoint()).
 		SetHeader("Accept", "application/json;version="+cerberusVCDVersion).
-		SetResultError(cerberusError{})
+		SetResultError(errors.CustomerAPIErrorBody{})
 
 	if !v.credential.IsInitialized() {
 		if err := v.credential.Refresh(ctx); err != nil {
@@ -62,20 +56,39 @@ func (v *cerberus) newHTTPClient(ctx context.Context) (*resty.Client, error) {
 }
 
 func (v *cerberus) parseAPIError(operation string, resp *resty.Response) *errors.APIError {
-	if resp == nil || resp.StatusCode() < http.StatusBadRequest {
+	if resp == nil {
 		return nil
 	}
 
-	if err, ok := resp.ResultError().(*cerberusError); ok {
-		return &errors.APIError{
-			Operation:  operation,
-			StatusCode: resp.StatusCode(),
-			Message:    fmt.Sprintf("%s: %s", err.Reason, err.Message),
-			Duration:   resp.Duration(),
-			Endpoint:   resp.Request.URL,
-			Method:     resp.Request.Method,
-			Err:        classifyStatusCode(resp.StatusCode()),
+	if resp.StatusCode() < http.StatusBadRequest {
+		// Only read response body when the content type can contain a WAF page.
+		// Successful JSON/XML responses must not incur body string conversion.
+		if !strings.Contains(strings.ToLower(resp.Header().Get("Content-Type")), "text/html") {
+			return nil
 		}
+
+		return errors.CustomerAPIWAFError(
+			operation,
+			resp.StatusCode(),
+			resp.Header().Get("Content-Type"),
+			resp.String(),
+			resp.Duration(),
+			resp.Request.URL,
+			resp.Request.Method,
+		)
+	}
+
+	if err, ok := resp.ResultError().(*errors.CustomerAPIErrorBody); ok && err != nil {
+		return errors.CustomerAPIStatusError(
+			operation,
+			resp.StatusCode(),
+			err,
+			unknownErrorMessage,
+			resp.Duration(),
+			resp.Request.URL,
+			resp.Request.Method,
+			classifyStatusCode(resp.StatusCode()),
+		)
 	}
 
 	return &errors.APIError{
@@ -89,13 +102,15 @@ func (v *cerberus) parseAPIError(operation string, resp *resty.Response) *errors
 	}
 }
 
-// regexCerberusJobAlreadyExists matches Cerberus idempotency conflicts.
+// regexCerberusJobAlreadyExists matches customer job idempotency conflicts
+// returned through Cerberus.
 var regexCerberusJobAlreadyExists = regexp.MustCompile(`Job already exists`)
 
-// idempotentRetryCondition retries Cerberus idempotent conflicts.
+// idempotentRetryCondition retries idempotent customer job conflicts returned
+// through Cerberus.
 func (v *cerberus) idempotentRetryCondition() resty.RetryConditionFunc {
 	return func(resp *resty.Response, err error) bool {
-		if err, ok := resp.ResultError().(*cerberusError); ok {
+		if err, ok := resp.ResultError().(*errors.CustomerAPIErrorBody); ok {
 			return regexCerberusJobAlreadyExists.MatchString(err.Reason) || regexCerberusJobAlreadyExists.MatchString(err.Message)
 		}
 

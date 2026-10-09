@@ -6,6 +6,10 @@ feat: add API domain packages and public types. Introduces typed API domain pack
 feat: add internal endpoint, type, and network object infrastructure. Adds internal endpoint definitions under internal/iendpoints/ for VMware vCD API operations. Introduces internal typed payload structures for network objects, IAM XML, and storage profiles. Adds typed endpoint constants, validators, and response types.
 ```
 
+```release-note:feature
+feat: expand public API surface and backend coverage. Adds admin Org, VDC, catalog, and catalog ACL scopes; IAM global roles, tokens, and LDAP operations; organization catalog ACL; vApp lease settings; and VDC group DHCP support, with matching public types, internal types, endpoint definitions, generated wrappers, and tests.
+```
+
 ```release-note:breaking-change
 refactor(api): align all types and parameters to PascalCase. Renames across types/: VdcID→VDCID, VdcGroupName→VDCGroupName, VdcGroupID→VDCGroupID, VdcNetwork→VDCNetwork, Vapp→VAPP, VdcGroup→VDCGroup, Vdc→VDC, ModelVdcNetwork→ModelVDCNetwork, RunningVMCount→RunningVmCount, StorageLimitMB→StorageLimitMb, StorageUsedMB→StorageUsedMb, ContextEntityId→ContextEntityID, ApplicationPort→ApplicationPort, and similar across all resource types (EdgeGateway, Firewall, IPSet, SecurityGroup, NetworkContextProfile, AppPortProfile, DynamicSecurityGroup, Organization). Also renames endpoint operation constants, API method names, path/query param names, and generated endpoint types throughout api/, types/, internal/itypes/, internal/iendpoints/, endpoints/, and api/*/v1/.
 ```
@@ -19,7 +23,7 @@ fix(api): preserve user updates and vApp jobs. UpdateUser now preserves existing
 ```
 
 ```release-note:fix
-fix(cav): deduplicate job endpoint names. Job polling (cerberus, vmware subclients) now uses named endpoint constants (getJobCerberusEndpointName, getJobVMwareEndpointName) instead of inline string literals ("GetJobCerberus", "GetJobVmware").
+fix(cav): deduplicate job endpoint names. Job polling (Cerberus-routed customer API and VMware subclients) now uses named endpoint constants (getJobCerberusEndpointName, getJobVMwareEndpointName) instead of inline string literals ("GetJobCerberus", "GetJobVmware").
 ```
 
 ```release-note:fix
@@ -34,6 +38,14 @@ fix(vapp): align naming after restack. VApp test method names and endpoint refer
 fix(appportprofile): debug mode changed from bool to atomic.Bool for concurrency safety. App port profile and generated endpoint documentation URLs corrected (v39.1→39.1).
 ```
 
+```release-note:fix
+fix: align backend endpoint behavior and typed payload handling. Corrects Cerberus and VMware path usage, hardens typed payload handling, preserves partial user updates, improves job/operation flow, and fixes edge gateway public IP, bandwidth, network hierarchy, and Tier-0 handling.
+```
+
+```release-note:fix
+fix(cav): improve session cache ciphertext construction. Separates IV generation, ciphertext encryption, and final encoding assembly to satisfy security and lint checks while preserving the encoded payload format.
+```
+
 ```release-note:chore
 chore: remove dead ruleguard/. Removes ruleguard directory (docs.go, rules_api.go, rules_commands.go) and suppresses tagliatelle false positives on JSON tags in netbackup.go and vdcnetwork.go that follow upstream API naming (snake_case/PascalCase) rather than Go style.
 ```
@@ -44,4 +56,8 @@ feat: replace reflection-based command registry with typed delegation. Replaces 
 
 ```release-note:chore
 chore: remove dead code and legacy tooling. Removes legacy command-line tooling: cmd/devref/old/, cmd/devtool/, cmd/generator/, and old devref binary code. Removes mock_header.txt and legacy command params. 41 files deleted, 6136 lines removed.
+```
+
+```release-note:chore
+chore: refresh generated endpoints and supporting docs/specs. Regenerates endpoint wrappers, updates architecture/spec documentation, and aligns documentation URL references with current backend conventions.
 ```

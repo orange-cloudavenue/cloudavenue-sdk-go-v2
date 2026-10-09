@@ -31,7 +31,7 @@ func init() {
 		Description:      "List Network Context Profiles",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/networkContextProfiles",
+		PathTemplate:     pathNetworkContextProfilesBase,
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        queryParamFilter,
@@ -53,7 +53,7 @@ func init() {
 
 	// GetNetworkContextProfile
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/networkContextProfileId/get/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/profileId/get/",
 		Name:             "GetNetworkContextProfile",
 		Description:      "Get a Network Context Profile",
 		Method:           cav.MethodGET,
@@ -76,14 +76,14 @@ func init() {
 		Description:      "Create a Network Context Profile",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/networkContextProfiles",
+		PathTemplate:     pathNetworkContextProfilesBase,
 		BodyRequestType:  itypes.APIRequestNetworkContextProfile{},
 		ResponseType:     cav.Job{},
 	}.Register()
 
 	// UpdateNetworkContextProfile
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/networkContextProfileId/put/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/profileId/put/",
 		Name:             "UpdateNetworkContextProfile",
 		Description:      "Update a Network Context Profile",
 		Method:           cav.MethodPUT,
@@ -102,7 +102,7 @@ func init() {
 
 	// DeleteNetworkContextProfile
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/networkContextProfileId/delete/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/profileId/delete/",
 		Name:             "DeleteNetworkContextProfile",
 		Description:      "Delete a Network Context Profile",
 		Method:           cav.MethodDELETE,
@@ -124,7 +124,7 @@ func init() {
 		Description:      "Get the static reference catalog (App IDs, Domain Names) of attributes usable in Network Context Profiles",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/networkContextProfiles/attributes",
+		PathTemplate:     pathNetworkContextProfileAttributes,
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        queryParamFilter,

@@ -31,7 +31,7 @@ func init() {
 		Description:      "List Application Port Profiles",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/applicationPortProfiles",
+		PathTemplate:     pathApplicationPortProfilesBase,
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        queryParamFilter,
@@ -79,7 +79,7 @@ func init() {
 		Description:      "Create an Application Port Profile",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/applicationPortProfiles",
+		PathTemplate:     pathApplicationPortProfilesBase,
 		BodyRequestType:  itypes.APIRequestAppPortProfile{},
 		ResponseType:     itypes.APIResponseAppPortProfile{},
 	}.Register()

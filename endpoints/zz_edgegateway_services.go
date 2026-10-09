@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (c) 2025 Orange
+ * SPDX-FileCopyrightText: Copyright (c) 2026 Orange
  * SPDX-License-Identifier: Mozilla Public License 2.0
  *
  * This software is distributed under the MPL-2.0 license.
@@ -15,19 +15,21 @@ import (
 
 // GetEdgeGatewayServices - Get EdgeGateway Network Services
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/getNetworkHierarchy 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func GetEdgeGatewayServices() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetEdgeGatewayServices")
 }
+
 // EnableCloudavenueServices - Enable Cloud Avenue Services
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/addNetworkConnectivity 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func EnableCloudavenueServices() *cav.Endpoint {
 	return cav.MustGetEndpoint("EnableCloudavenueServices")
 }
+
 // DisableCloudavenueServices - Disable Cloud Avenue Services
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/deleteNetworkService 
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func DisableCloudavenueServices() *cav.Endpoint {
 	return cav.MustGetEndpoint("DisableCloudavenueServices")
 }
