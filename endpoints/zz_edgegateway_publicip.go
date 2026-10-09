@@ -19,4 +19,3 @@ import (
 func CreatePublicIP() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreatePublicIP")
 }
-
