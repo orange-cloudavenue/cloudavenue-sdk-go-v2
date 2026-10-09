@@ -197,6 +197,10 @@ func (c *client) NewRequestWithBackend(ctx context.Context, backend BackendTarge
 		AddRetryConditions(retryConditions...).
 		SetRetryAllowNonIdempotent(retryIdempotent)
 
+	for name, value := range endpoint.Headers {
+		hR.SetHeader(name, value)
+	}
+
 	for _, q := range endpoint.QueryParams {
 		if q.Value != "" {
 			hR.SetQueryParam(q.Name, q.Value)
