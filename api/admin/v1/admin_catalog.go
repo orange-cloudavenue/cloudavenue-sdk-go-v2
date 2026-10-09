@@ -33,7 +33,6 @@ func (c *Client) ListAdminCatalogs(ctx context.Context) ([]*types.ModelAdminCata
 	resp, err := c.c.Do(
 		ctx,
 		ep,
-		cav.SetCustomRestyOption(setXMLHeaders),
 		cav.OverrideSetResult(new(itypes.AdminCatalogs)),
 	)
 	if err != nil {
@@ -94,7 +93,6 @@ func (c *Client) GetAdminCatalog(ctx context.Context, params types.ParamsGetAdmi
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], idOrName),
-		cav.SetCustomRestyOption(setXMLHeaders),
 		cav.OverrideSetResult(new(itypes.AdminCatalog)),
 	)
 	if err != nil {
@@ -133,7 +131,6 @@ func (c *Client) CreateAdminCatalog(ctx context.Context, p types.ParamsCreateAdm
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], p.OrgID),
-		cav.SetCustomRestyOption(setXMLHeaders),
 		cav.SetBody(req),
 		cav.OverrideSetResult(new(itypes.AdminCatalog)),
 	)
@@ -173,7 +170,6 @@ func (c *Client) UpdateAdminCatalog(ctx context.Context, p types.ParamsUpdateAdm
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], p.ID),
-		cav.SetCustomRestyOption(setXMLHeaders),
 		cav.SetBody(req),
 		cav.OverrideSetResult(new(itypes.AdminCatalog)),
 	)
@@ -205,7 +201,6 @@ func (c *Client) DeleteAdminCatalog(ctx context.Context, id string) error {
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], id),
-		cav.SetCustomRestyOption(setXMLHeaders),
 	)
 	if err != nil {
 		return fmt.Errorf("%s: %w", opDeleteAdminCatalog, err)
@@ -260,7 +255,6 @@ func (c *Client) GetAdminCatalogACL(ctx context.Context, params types.ParamsGetA
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], idOrName),
-		cav.SetCustomRestyOption(setXMLHeaders),
 		cav.OverrideSetResult(new(itypes.ControlAccessParams)),
 	)
 	if err != nil {
@@ -308,7 +302,6 @@ func (c *Client) SetAdminCatalogACL(ctx context.Context, params types.ParamsSetA
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], params.ID),
-		cav.SetCustomRestyOption(setXMLHeaders),
 		cav.SetBody(req),
 		cav.OverrideSetResult(new(itypes.ControlAccessParams)),
 	)
