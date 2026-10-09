@@ -173,7 +173,9 @@ func modelTokenToAPIRequest(params any) (itypes.APIRequestToken, error) {
 				ID:   p.RoleID,
 				Name: p.RoleName,
 			},
-			Enabled: p.IsEnabled,
+			Enabled:     p.IsEnabled,
+			Type:        p.Type,
+			ExtensionID: p.ExtensionID,
 		}, nil
 	case types.ParamsUpdateToken:
 		return itypes.APIRequestToken{
@@ -184,7 +186,9 @@ func modelTokenToAPIRequest(params any) (itypes.APIRequestToken, error) {
 				ID:   p.RoleID,
 				Name: p.RoleName,
 			},
-			Enabled: p.IsEnabled,
+			Enabled:     p.IsEnabled,
+			Type:        p.Type,
+			ExtensionID: p.ExtensionID,
 		}, nil
 	default:
 		return itypes.APIRequestToken{}, fmt.Errorf("unsupported params type %T", params)
