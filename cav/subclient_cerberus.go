@@ -13,6 +13,7 @@ import (
 	"context"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"resty.dev/v3"
 
@@ -60,6 +61,12 @@ func (v *cerberus) parseAPIError(operation string, resp *resty.Response) *errors
 	}
 
 	if resp.StatusCode() < http.StatusBadRequest {
+		// Only read response body when the content type can contain a WAF page.
+		// Successful JSON/XML responses must not incur body string conversion.
+		if !strings.Contains(strings.ToLower(resp.Header().Get("Content-Type")), "text/html") {
+			return nil
+		}
+
 		return errors.CustomerAPIWAFError(
 			operation,
 			resp.StatusCode(),
