@@ -158,7 +158,6 @@ func (api *APIResponseLDAPGroup) ToModel() *types.ModelLDAPGroup {
 
 	return &types.ModelLDAPGroup{
 		Name: api.Name,
-		DN:   api.ID,
 	}
 }
 

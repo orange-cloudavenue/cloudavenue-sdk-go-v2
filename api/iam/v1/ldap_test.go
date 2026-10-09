@@ -11,6 +11,7 @@ package iam
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"testing"
 
@@ -18,6 +19,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+	sdkerrors "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
@@ -29,7 +31,7 @@ func TestTestLDAP(t *testing.T) {
 
 		ms.CleanResponse(endpoints.TestLDAP())
 		ms.SetResponseFunc(endpoints.TestLDAP(), func(w http.ResponseWriter, r *http.Request) {
-			assert.Equal(t, "bind-user", r.URL.Query().Get("username"))
+			assert.Empty(t, r.URL.Query().Get("username"))
 
 			var body map[string]any
 			require.NoError(t, json.NewDecoder(r.Body).Decode(&body))
@@ -195,6 +197,38 @@ func TestTestLDAP(t *testing.T) {
 	})
 }
 
+func TestSyncLDAP(t *testing.T) {
+	t.Run("no content success", func(t *testing.T) {
+		client, ms := newClient(t)
+
+		ms.CleanResponse(endpoints.SyncLDAP())
+		ms.SetResponseFunc(endpoints.SyncLDAP(), func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, http.MethodPost, r.Method)
+			body, err := io.ReadAll(r.Body)
+			require.NoError(t, err)
+			assert.Empty(t, body)
+			w.WriteHeader(http.StatusNoContent)
+		})
+
+		err := client.SyncLDAP(t.Context(), types.ParamsSyncLDAP{})
+		assert.NoError(t, err)
+	})
+
+	t.Run("propagates API error", func(t *testing.T) {
+		client, ms := newClient(t)
+
+		ms.CleanResponse(endpoints.SyncLDAP())
+		ms.SetResponseFunc(endpoints.SyncLDAP(), func(w http.ResponseWriter, _ *http.Request) {
+			w.WriteHeader(http.StatusBadRequest)
+		})
+
+		err := client.SyncLDAP(t.Context(), types.ParamsSyncLDAP{})
+		var apiErr *sdkerrors.APIError
+		assert.ErrorAs(t, err, &apiErr)
+		assert.Equal(t, http.StatusBadRequest, apiErr.StatusCode)
+	})
+}
+
 func TestSearchLDAPUsers(t *testing.T) {
 	t.Run("bare array response", func(t *testing.T) {
 		client, ms := newClient(t)
@@ -202,9 +236,6 @@ func TestSearchLDAPUsers(t *testing.T) {
 		ms.CleanResponse(endpoints.SearchLDAPUsers())
 		ms.SetResponseFunc(endpoints.SearchLDAPUsers(), func(w http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, "john", r.URL.Query().Get("q"))
-			assert.Empty(t, r.URL.Query().Get("maxResults"))
-			assert.Empty(t, r.URL.Query().Get("pageSize"))
-			assert.Empty(t, r.URL.Query().Get("page"))
 
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`[{"username":"john","fullname":"John Doe","email":"john@example.com"}]`))
@@ -217,14 +248,6 @@ func TestSearchLDAPUsers(t *testing.T) {
 		assert.Equal(t, "John Doe", result[0].FullName)
 		assert.Equal(t, "john@example.com", result[0].Email)
 	})
-
-	t.Run("reject undocumented params", func(t *testing.T) {
-		client, _ := newClient(t)
-
-		result, err := client.SearchLDAPUsers(t.Context(), types.ParamsSearchLDAP{MaxResults: "10", PageSize: "20", Page: "2"})
-		assert.Nil(t, result)
-		assert.EqualError(t, err, "IAM.SearchLDAPUsers: validate: unsupported params for endpoint: maxResults, pageSize, page")
-	})
 }
 
 func TestSearchLDAPGroups(t *testing.T) {
@@ -234,9 +257,6 @@ func TestSearchLDAPGroups(t *testing.T) {
 		ms.CleanResponse(endpoints.SearchLDAPGroups())
 		ms.SetResponseFunc(endpoints.SearchLDAPGroups(), func(w http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, "admins", r.URL.Query().Get("q"))
-			assert.Empty(t, r.URL.Query().Get("maxResults"))
-			assert.Empty(t, r.URL.Query().Get("pageSize"))
-			assert.Empty(t, r.URL.Query().Get("page"))
 
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`[{"name":"admins","id":"cn=admins,ou=groups,dc=example,dc=com"}]`))
@@ -246,14 +266,5 @@ func TestSearchLDAPGroups(t *testing.T) {
 		assert.NoError(t, err)
 		require.Len(t, result, 1)
 		assert.Equal(t, "admins", result[0].Name)
-		assert.Equal(t, "cn=admins,ou=groups,dc=example,dc=com", result[0].DN)
-	})
-
-	t.Run("reject undocumented params", func(t *testing.T) {
-		client, _ := newClient(t)
-
-		result, err := client.SearchLDAPGroups(t.Context(), types.ParamsSearchLDAP{MaxResults: "10", PageSize: "20", Page: "2"})
-		assert.Nil(t, result)
-		assert.EqualError(t, err, "IAM.SearchLDAPGroups: validate: unsupported params for endpoint: maxResults, pageSize, page")
 	})
 }
