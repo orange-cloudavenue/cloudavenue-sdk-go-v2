@@ -247,6 +247,8 @@ func TestAddStorageProfile(t *testing.T) {
 			if tt.mockResponseVDCStatus != 0 {
 				ms.CleanResponse(endpoints.ListVDC())
 				ms.SetResponse(endpoints.ListVDC(), tt.mockResponseVDC, &tt.mockResponseVDCStatus)
+				ms.CleanResponse(endpoints.GetVDC())
+				ms.SetResponse(endpoints.GetVDC(), tt.mockResponseVDC, &tt.mockResponseVDCStatus)
 			}
 
 			err := client.AddStorageProfile(t.Context(), tt.params)
