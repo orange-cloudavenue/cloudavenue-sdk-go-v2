@@ -26,7 +26,7 @@ func init() {
 		Description:      "List of on premise IP addresses allowed for this organization's draas offer",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/infrapicustomerproxy/v2.0/vcda/ips",
+		PathTemplate:     pathCerberusDraasOnPremiseIPs,
 		ResponseType:     itypes.APIResponseListDraasOnPremise{},
 	}.Register()
 
