@@ -13,6 +13,7 @@ import (
 	"context"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"resty.dev/v3"
 
@@ -51,8 +52,26 @@ func (v *vmware) newHTTPClient(ctx context.Context) (*resty.Client, error) {
 }
 
 func (v *vmware) parseAPIError(operation string, resp *resty.Response) *errors.APIError {
-	if resp == nil || resp.StatusCode() < http.StatusBadRequest {
+	if resp == nil {
 		return nil
+	}
+
+	if resp.StatusCode() < http.StatusBadRequest {
+		// VMware can return the same WAF rejection page as Cerberus on a 2xx
+		// response. Only inspect the body for HTML responses.
+		if !strings.Contains(strings.ToLower(resp.Header().Get("Content-Type")), "text/html") {
+			return nil
+		}
+
+		return errors.CustomerAPIWAFError(
+			operation,
+			resp.StatusCode(),
+			resp.Header().Get("Content-Type"),
+			resp.String(),
+			resp.Duration(),
+			resp.Request.URL,
+			resp.Request.Method,
+		)
 	}
 
 	if err, ok := resp.ResultError().(*vmwareError); ok {

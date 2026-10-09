@@ -149,6 +149,9 @@ func TestCerberusParseAPIError(t *testing.T) {
 			assert.Equal(t, tt.wantCode, apiErr.StatusMessage)
 			assert.Equal(t, tt.wantMessage, apiErr.Message)
 			assert.Equal(t, tt.status, apiErr.StatusCode)
+			assert.Equal(t, resp.Duration(), apiErr.Duration)
+			assert.Equal(t, resp.Request.URL, apiErr.Endpoint)
+			assert.Equal(t, resp.Request.Method, apiErr.Method)
 			assert.NotContains(t, apiErr.Message[:1], ":", "leading colon artifact")
 			require.ErrorIs(t, apiErr, tt.wantSentinel)
 			assert.Equal(t, tt.wantIsNotFound, apiErr.IsNotFound())
@@ -196,6 +199,9 @@ func TestCerberusParseAPIErrorWAFRejection(t *testing.T) {
 	assert.Equal(t, http.StatusOK, apiErr.StatusCode)
 	assert.Equal(t, errors.CustomerAPIWAFRejectedCode(), apiErr.StatusMessage)
 	assert.Contains(t, apiErr.Message, "3850989646093916041")
+	assert.Equal(t, resp.Duration(), apiErr.Duration)
+	assert.Equal(t, resp.Request.URL, apiErr.Endpoint)
+	assert.Equal(t, resp.Request.Method, apiErr.Method)
 }
 
 func TestCerberusContextData(t *testing.T) {
