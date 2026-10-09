@@ -12,6 +12,7 @@ package admin
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/orange-cloudavenue/common-go/validators"
@@ -19,12 +20,16 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
 const (
 	opListAdminCatalogs = "Admin.ListCatalogs"
 	opGetAdminCatalog   = "Admin.GetCatalog"
+	pathAdminUserByID   = "/api/admin/user/%s"
+	urnOrgUserPrefix    = "urn:vcloud:orguser:"
+	urnOrgUserType      = "urn:vcloud:orguser"
 )
 
 // ListAdminCatalogs lists all catalogs in the admin scope.
@@ -286,8 +291,8 @@ func (c *Client) SetAdminCatalogACL(ctx context.Context, params types.ParamsSetA
 		for _, item := range params.SharedWith {
 			settings = append(settings, &itypes.AccessSetting{
 				Subject: &itypes.LocalSubject{
-					HREF: userHREFFromURN(item.UserID),
-					Type: "urn:vcloud:orguser",
+					HREF: userHREFFromURN(c.c.GetConsole(), item.UserID),
+					Type: urnOrgUserType,
 				},
 				AccessLevel: item.AccessLevel,
 			})
@@ -318,11 +323,18 @@ func (c *Client) SetAdminCatalogACL(ctx context.Context, params types.ParamsSetA
 }
 
 // userHREFFromURN extracts the UUID from a user URN (urn:vcloud:orguser:<uuid>)
-// and builds the admin user HREF used by vCD access settings.
-func userHREFFromURN(urn string) string {
-	const prefix = "urn:vcloud:orguser:"
-	if strings.HasPrefix(urn, prefix) {
-		return fmt.Sprintf("https://api.cloudavenue.org/api/admin/user/%s", urn[len(prefix):])
+// and builds the admin user HREF used by vCD access settings from the configured
+// VMware console endpoint.
+func userHREFFromURN(console consoles.ConsoleName, urn string) string {
+	if strings.HasPrefix(urn, urnOrgUserPrefix) {
+		baseURL, err := url.Parse(console.GetAPIVCDEndpoint())
+		if err == nil {
+			baseURL.Path = fmt.Sprintf(pathAdminUserByID, urn[len(urnOrgUserPrefix):])
+			baseURL.RawPath = ""
+			baseURL.RawQuery = ""
+			baseURL.Fragment = ""
+			return baseURL.String()
+		}
 	}
 	return urn
 }
