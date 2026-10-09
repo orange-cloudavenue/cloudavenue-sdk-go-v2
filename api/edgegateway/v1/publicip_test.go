@@ -964,7 +964,8 @@ func TestDeletePublicIPNeverSynthesizesServiceID(t *testing.T) {
 
 	require.Len(t, *recorded, 1, "exactly one DELETE must be issued")
 	assert.Equal(t, http.MethodDelete, (*recorded)[0].Method)
-	assert.Equal(t,
+	assert.Equal(
+		t,
 		"/infrapicustomerproxy/v2.0/services/tn01i01ocb1010314spt102-cav-services",
 		(*recorded)[0].Path,
 		"DELETE must target the real service ID resolved from the network hierarchy",
