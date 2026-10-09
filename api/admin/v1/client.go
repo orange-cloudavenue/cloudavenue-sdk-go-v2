@@ -12,8 +12,6 @@ package admin
 import (
 	"log/slog"
 
-	"resty.dev/v3"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
@@ -38,10 +36,4 @@ func New(c cav.Client) (*Client, error) {
 		c:      c,
 		logger: adminLogger,
 	}, nil
-}
-
-// setXMLHeaders sets Accept and Content-Type to application/xml.
-func setXMLHeaders(req *resty.Request) {
-	req.SetHeader("Accept", "application/xml")
-	req.SetHeader("Content-Type", "application/xml")
 }

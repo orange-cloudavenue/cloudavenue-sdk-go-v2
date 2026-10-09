@@ -14,8 +14,6 @@ import (
 	"fmt"
 	"slices"
 
-	"golang.org/x/sync/errgroup"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
@@ -72,100 +70,46 @@ var (
 // ListVDC lists VDCs visible to current organization.
 func (c *Client) ListVDC(ctx context.Context, params types.ParamsListVDC) (*types.ModelListVDC, error) {
 	ep := endpoints.ListVDC()
-
-	query := ""
-	if params.Name != "" {
-		query = fmt.Sprintf("name==%s", params.Name)
-	}
-	if params.ID != "" {
-		query = fmt.Sprintf("id==%s", params.ID)
-	}
-
-	resp, err := c.c.Do(
-		ctx,
-		ep,
-		cav.WithQueryParam(ep.QueryParams[0], query),
-	)
+	resp, err := c.c.Do(ctx, ep)
 	if err != nil {
 		return nil, fmt.Errorf("%s: list: %w", opListVDC, err)
 	}
 
-	return resp.Result().(*itypes.APIResponseListVDC).ToModel(), nil
+	model := resp.Result().(*itypes.APIResponseListVDC).ToModel()
+	if params.ID == "" && params.Name == "" {
+		return model, nil
+	}
+	filtered := &types.ModelListVDC{VDCS: make([]types.ModelListVDCDetails, 0, len(model.VDCS))}
+	for _, vdc := range model.VDCS {
+		if (params.ID == "" || vdc.ID == params.ID) && (params.Name == "" || vdc.Name == params.Name) {
+			filtered.VDCS = append(filtered.VDCS, vdc)
+		}
+	}
+	return filtered, nil
 }
 
 // GetVDC returns detailed information for a VDC by ID or name.
 func (c *Client) GetVDC(ctx context.Context, params types.ParamsGetVDC) (*types.ModelGetVDC, error) {
-	results, err := c.ListVDC(ctx, types.ParamsListVDC(params))
+	name := params.Name
+	if name == "" {
+		results, err := c.ListVDC(ctx, types.ParamsListVDC{ID: params.ID})
+		if err != nil {
+			return nil, fmt.Errorf("%s: list: %w", opGetVDC, err)
+		}
+		if len(results.VDCS) == 0 {
+			return nil, fmt.Errorf("%s: no VDC found with the provided parameters", opGetVDC)
+		}
+		name = results.VDCS[0].Name
+	}
+	ep := endpoints.GetVDC()
+	resp, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], name))
 	if err != nil {
-		return nil, fmt.Errorf("%s: list: %w", opGetVDC, err)
+		return nil, fmt.Errorf("%s: get details: %w", opGetVDC, err)
 	}
-
-	if len(results.VDCS) == 0 {
-		return nil, fmt.Errorf("%s: no VDC found with the provided parameters", opGetVDC)
+	model := resp.Result().(*itypes.APIResponseGetVDC).ToModel()
+	if model.Name == "" {
+		model.Name = name
 	}
-	vdc := results.VDCS[0]
-
-	var (
-		vdcMetadata *itypes.APIResponseGetVDCMetadatas
-		model       types.ModelGetVDC
-	)
-
-	eg, egCtx := errgroup.WithContext(ctx)
-
-	eg.Go(func() error {
-		epGetVDCMetadata := endpoints.GetVDCMetadata()
-		vdcMetadataResp, err := c.c.Do(
-			egCtx,
-			epGetVDCMetadata,
-			cav.WithPathParam(epGetVDCMetadata.PathParams[0], vdc.ID),
-		)
-		if err != nil {
-			return fmt.Errorf("get metadata: %w", err)
-		}
-
-		vdcMetadata = vdcMetadataResp.Result().(*itypes.APIResponseGetVDCMetadatas)
-		return nil
-	})
-
-	eg.Go(func() error {
-		epGetVDC := endpoints.GetVDC()
-		vdcResp, err := c.c.Do(
-			egCtx,
-			epGetVDC,
-			cav.WithPathParam(epGetVDC.PathParams[0], vdc.ID),
-		)
-		if err != nil {
-			return fmt.Errorf("get details: %w", err)
-		}
-
-		vdcDetails := vdcResp.Result().(*itypes.APIResponseGetVDC)
-		model = vdcDetails.ToModel()
-		model.NumberOfDisks = vdc.NumberOfDisks
-		model.NumberOfStorageProfiles = vdc.NumberOfStorageProfiles
-		model.NumberOfVMS = vdc.NumberOfVMS
-		model.NumberOfRunningVMS = vdc.NumberOfRunningVMS
-		model.NumberOfVAPPS = vdc.NumberOfVAPPS
-
-		return nil
-	})
-
-	if err := eg.Wait(); err != nil {
-		return nil, fmt.Errorf("%s: %w", opGetVDC, err)
-	}
-
-	for _, metadata := range vdcMetadata.Metadatas {
-		switch metadata.Name {
-		case "vdcBillingModel":
-			model.Properties.BillingModel = metadata.Value.Value
-		case "vdcStorageBillingModel":
-			model.Properties.StorageBillingModel = metadata.Value.Value
-		case "vdcDisponibilityClass":
-			model.Properties.DisponibilityClass = metadata.Value.Value
-		case "vdcServiceClass":
-			model.Properties.ServiceClass = metadata.Value.Value
-		}
-	}
-
 	return &model, nil
 }
 
