@@ -99,7 +99,7 @@ func (c *Client) UpdateOrganization(ctx context.Context, p types.ParamsUpdateOrg
 		return nil, fmt.Errorf("%s: validate: %w", opUpdateOrganization, err)
 	}
 
-	if p.FullName == "" && p.Email == "" && p.InternetBillingMode == "" && p.Description == nil {
+	if p.FullName == "" && p.Email == "" && p.InternetBillingMode == "" && p.Description == nil && p.Enabled == nil {
 		return nil, fmt.Errorf("%s: no parameters provided for organization update", opUpdateOrganization)
 	}
 
@@ -116,6 +116,7 @@ func (c *Client) UpdateOrganization(ctx context.Context, p types.ParamsUpdateOrg
 		Description:         data.Description,
 		CustomerMail:        data.Email,
 		InternetBillingMode: data.InternetBillingMode,
+		IsEnabled:           data.Enabled,
 	}
 	if p.FullName != "" {
 		reqBody.FullName = p.FullName
@@ -129,6 +130,9 @@ func (c *Client) UpdateOrganization(ctx context.Context, p types.ParamsUpdateOrg
 	if p.InternetBillingMode != "" {
 		reqBody.InternetBillingMode = p.InternetBillingMode
 	}
+	if p.Enabled != nil {
+		reqBody.IsEnabled = *p.Enabled
+	}
 
 	if _, err = c.c.Do(ctx, endpoints.UpdateOrganization(), cav.SetBody(reqBody)); err != nil {
 		return nil, fmt.Errorf("%s: update: %w", opUpdateOrganization, err)
@@ -137,6 +141,20 @@ func (c *Client) UpdateOrganization(ctx context.Context, p types.ParamsUpdateOrg
 	logger.DebugContext(ctx, "Successfully initiated organization update")
 
 	return c.GetOrganization(ctx)
+}
+
+// EnableOrganization enables this organization through the Infrapi
+// configuration endpoint.
+func (c *Client) EnableOrganization(ctx context.Context) (*types.ModelGetOrganization, error) {
+	enabled := true
+	return c.UpdateOrganization(ctx, types.ParamsUpdateOrganization{Enabled: &enabled})
+}
+
+// DisableOrganization disables this organization through the Infrapi
+// configuration endpoint.
+func (c *Client) DisableOrganization(ctx context.Context) (*types.ModelGetOrganization, error) {
+	enabled := false
+	return c.UpdateOrganization(ctx, types.ParamsUpdateOrganization{Enabled: &enabled})
 }
 
 func validateUpdateOrganizationParams(p types.ParamsUpdateOrganization) error {
