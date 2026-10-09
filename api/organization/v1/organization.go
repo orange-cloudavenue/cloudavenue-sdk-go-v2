@@ -34,7 +34,8 @@ const (
 	internetBillingModeTrafficVolume = "TRAFFIC_VOLUME"
 )
 
-// GetOrganization gets detailed information about organization.
+// GetOrganization combines organization details from VMware CloudAPI with
+// configuration and state from the Infrapi endpoint.
 func (c *Client) GetOrganization(ctx context.Context) (*types.ModelGetOrganization, error) {
 	logger := c.logger.WithGroup("GetOrganization")
 
@@ -90,7 +91,9 @@ func (c *Client) GetOrganization(ctx context.Context) (*types.ModelGetOrganizati
 	}, nil
 }
 
-// UpdateOrganization updates existing organization details.
+// UpdateOrganization updates organization configuration through the Infrapi
+// /infrapicustomerproxy/v2.0/configurations endpoint. Organization state
+// changes belong here rather than in the read-only, XML-backed AdminOrg view.
 func (c *Client) UpdateOrganization(ctx context.Context, p types.ParamsUpdateOrganization) (*types.ModelGetOrganization, error) {
 	if err := validateUpdateOrganizationParams(p); err != nil {
 		return nil, fmt.Errorf("%s: validate: %w", opUpdateOrganization, err)
