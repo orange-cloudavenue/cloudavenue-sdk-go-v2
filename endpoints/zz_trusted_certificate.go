@@ -19,28 +19,31 @@ import (
 func ListTrustedCertificate() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListTrustedCertificate")
 }
+
 // GetTrustedCertificate - Get a trusted certificate
 //
 // DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/trustedCertificates/trustedCertificate/get/
 func GetTrustedCertificate() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetTrustedCertificate")
 }
+
 // CreateTrustedCertificate - Create a trusted certificate
 //
 // DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/trustedCertificates/post/
 func CreateTrustedCertificate() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreateTrustedCertificate")
 }
+
 // UpdateTrustedCertificate - Update a trusted certificate
 //
 // DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/trustedCertificates/trustedCertificate/put/
 func UpdateTrustedCertificate() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateTrustedCertificate")
 }
+
 // DeleteTrustedCertificate - Delete a trusted certificate
 //
 // DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ssl/trustedCertificates/trustedCertificate/delete/
 func DeleteTrustedCertificate() *cav.Endpoint {
 	return cav.MustGetEndpoint("DeleteTrustedCertificate")
 }
-
