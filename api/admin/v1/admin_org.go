@@ -12,7 +12,6 @@ package admin
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
@@ -25,13 +24,14 @@ const (
 	opGetAdminOrg   = "Admin.GetOrg"
 )
 
-// ListAdminOrgs lists all organizations in the admin scope.
+// ListAdminOrgs lists organizations from the read-only, XML-backed AdminOrg
+// view. Organization configuration writes belong to the organization API's
+// Infrapi endpoint.
 func (c *Client) ListAdminOrgs(ctx context.Context) ([]*types.ModelAdminOrg, error) {
 	ep := endpoints.ListAdminOrgs()
 	resp, err := c.c.Do(
 		ctx,
 		ep,
-		cav.SetCustomRestyOption(setXMLHeaders),
 		cav.OverrideSetResult(new(itypes.AdminOrgs)),
 	)
 	if err != nil {
@@ -51,7 +51,8 @@ func (c *Client) ListAdminOrgs(ctx context.Context) ([]*types.ModelAdminOrg, err
 	return result, nil
 }
 
-// GetAdminOrg retrieves an organization by ID or name in the admin scope.
+// GetAdminOrg retrieves an organization by ID or name from the read-only,
+// XML-backed AdminOrg view.
 func (c *Client) GetAdminOrg(ctx context.Context, params types.ParamsGetAdminOrg) (*types.ModelAdminOrg, error) {
 	if err := params.Validate(); err != nil {
 		return nil, fmt.Errorf("%s: validate: %w", opGetAdminOrg, err)
@@ -92,81 +93,10 @@ func (c *Client) GetAdminOrg(ctx context.Context, params types.ParamsGetAdminOrg
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], idOrName),
-		cav.SetCustomRestyOption(setXMLHeaders),
 		cav.OverrideSetResult(new(itypes.AdminOrg)),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", opGetAdminOrg, err)
-	}
-
-	org, ok := resp.Result().(*itypes.AdminOrg)
-	if !ok {
-		return nil, fmt.Errorf("%s: unexpected response type %T", opGetAdminOrg, resp.Result())
-	}
-
-	return org.ToModel(), nil
-}
-
-// EnableOrg enables an organization by ID or name in the admin scope.
-func (c *Client) EnableOrg(ctx context.Context, params types.ParamsGetAdminOrg) (*types.ModelAdminOrg, error) {
-	if err := params.Validate(); err != nil {
-		return nil, fmt.Errorf("%s: validate: %w", opGetAdminOrg, err)
-	}
-
-	idOrName := params.ID
-	if idOrName == "" {
-		idOrName = params.Name
-	}
-
-	ep := endpoints.GetAdminOrg()
-	resp, err := c.c.Do(
-		ctx,
-		ep,
-		cav.WithPathParam(ep.PathParams[0], idOrName),
-		cav.SetCustomRestyOption(setXMLHeaders),
-		cav.OverrideSetResult(new(itypes.AdminOrg)),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", opGetAdminOrg, err)
-	}
-
-	if resp.StatusCode() == http.StatusNoContent {
-		return nil, nil
-	}
-
-	org, ok := resp.Result().(*itypes.AdminOrg)
-	if !ok {
-		return nil, fmt.Errorf("%s: unexpected response type %T", opGetAdminOrg, resp.Result())
-	}
-
-	return org.ToModel(), nil
-}
-
-// DisableOrg disables an organization by ID or name in the admin scope.
-func (c *Client) DisableOrg(ctx context.Context, params types.ParamsGetAdminOrg) (*types.ModelAdminOrg, error) {
-	if err := params.Validate(); err != nil {
-		return nil, fmt.Errorf("%s: validate: %w", opGetAdminOrg, err)
-	}
-
-	idOrName := params.ID
-	if idOrName == "" {
-		idOrName = params.Name
-	}
-
-	ep := endpoints.GetAdminOrg()
-	resp, err := c.c.Do(
-		ctx,
-		ep,
-		cav.WithPathParam(ep.PathParams[0], idOrName),
-		cav.SetCustomRestyOption(setXMLHeaders),
-		cav.OverrideSetResult(new(itypes.AdminOrg)),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", opGetAdminOrg, err)
-	}
-
-	if resp.StatusCode() == http.StatusNoContent {
-		return nil, nil
 	}
 
 	org, ok := resp.Result().(*itypes.AdminOrg)
