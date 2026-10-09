@@ -23,7 +23,7 @@ type DhcpConfig struct {
 
 // DhcpPool is a DHCP address pool in the CloudAPI response.
 type DhcpPool struct {
-	Enabled          bool    `json:"enabled,omitempty"`
+	Enabled          bool    `json:"enabled"`
 	IPRange          IPRange `json:"ipRange"`
 	MaxLeaseTime     int64   `json:"maxLeaseTime,omitempty"`
 	DefaultLeaseTime int64   `json:"defaultLeaseTime,omitempty"`
