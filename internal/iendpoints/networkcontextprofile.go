@@ -19,7 +19,7 @@ import (
 // NetworkContextProfile represents an NSX-T Layer-7 application/context
 // profile that can be referenced by Distributed Firewall rules. Unlike the
 // FirewallGroup family (which uses a single OwnerRef), NetworkContextProfile
-// uses a dedicated pathParamVdcGroupID (or "orgVdcId" for plain VDCs, not used by
+// uses a dedicated pathParamVDCGroupID (or "orgVdcId" for plain VDCs, not used by
 // this VDCGroup-scoped package) named filter key for scoping. Create and
 // Update are asynchronous (VCD returns 202 + task); List/Get/Delete and the
 // read-only "/attributes" static catalog sub-resource are synchronous.

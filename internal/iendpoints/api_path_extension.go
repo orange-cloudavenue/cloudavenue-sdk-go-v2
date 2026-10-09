@@ -14,16 +14,13 @@ const (
 	// pathOSEAssociatedTenants lists OSE tenants associated with current user.
 	pathOSEAssociatedTenants = "/api/v1/core/associated-tenants"
 	// pathOSEUserCredentials gets OSE credentials for one user in one tenant.
-	pathOSEUserCredentials = "/api/v1/core/tenants/{organizationID}/users/{userName}/credentials"
+	pathOSEUserCredentials = "/api/v1/core/tenants/{organizationID}/users/{userName}/credentials" //nolint:gosec // endpoint path, not a credential
 )
 
 // Netbackup endpoints
 const (
-
-	// pathNetBackupBase is the base path for NetBackup self-service API.
-	pathNetBackupBase = "/NetBackupSelfService/Api"
 	// pathNetBackupAuthToken issues or refreshes a NetBackup auth token.
-	pathNetBackupAuthToken = "/NetBackupSelfService/Api/auth/token"
+	pathNetBackupAuthToken = "/NetBackupSelfService/Api/auth/token" //nolint:gosec // endpoint path, not a token
 	// pathNetBackupInventory lists NetBackup inventory.
 	pathNetBackupInventory = "/NetBackupSelfService/Api/inventory"
 	// pathNetBackupMachines lists NetBackup machines.

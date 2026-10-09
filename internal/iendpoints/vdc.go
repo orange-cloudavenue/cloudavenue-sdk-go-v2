@@ -41,7 +41,7 @@ func init() {
 		PathTemplate:     pathCerberusVDCByName,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVdcName,
+				Name:        pathParamVDCName,
 				Description: "The name of the VDC.",
 				Required:    true,
 			},
@@ -59,7 +59,7 @@ func init() {
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathVDCMetadata,
 		PathParams: []cav.PathParam{{
-			Name: pathParamVdcID, Description: descVDCID, Required: true,
+			Name: pathParamVDCID, Description: descVDCID, Required: true,
 			ValidatorFunc: func(value string) error { return validators.New().Var(value, urnVDC) },
 			TransformFunc: extractor.ExtractUUID,
 		}},
@@ -88,7 +88,7 @@ func init() {
 		PathTemplate:     pathCerberusVDCByName,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVdcName,
+				Name:        pathParamVDCName,
 				Description: "The name of the VDC to update.",
 				Required:    true,
 			},
@@ -107,7 +107,7 @@ func init() {
 		PathTemplate:     pathCerberusVDCByName,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVdcName,
+				Name:        pathParamVDCName,
 				Description: "The name of the VDC to delete.",
 				Required:    true,
 			},

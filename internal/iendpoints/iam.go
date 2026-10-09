@@ -42,7 +42,7 @@ func init() {
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathCloudAPIUser,
-		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: "User URN", Required: true}},
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: descUserURN, Required: true}},
 		ResponseType:     itypes.APIUser{},
 	}.Register()
 
@@ -67,7 +67,7 @@ func init() {
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathCloudAPIUser,
-		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: "User URN", Required: true}},
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: descUserURN, Required: true}},
 		BodyRequestType:  itypes.APIUser{},
 		ResponseType:     itypes.APIUser{},
 	}.Register()
@@ -80,7 +80,7 @@ func init() {
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathCloudAPIUserTakeOwnership,
-		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: "User URN", Required: true}},
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: descUserURN, Required: true}},
 		ResponseType:     struct{}{},
 	}.Register()
 
@@ -92,45 +92,45 @@ func init() {
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathCloudAPIUser,
-		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: "User URN", Required: true}},
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: descUserURN, Required: true}},
 		ResponseType:     struct{}{},
 	}.Register()
 
 	// EnableUser
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/",
+		DocumentationURL: docURLVMware,
 		Name:             "EnableUser",
 		Description:      "Enable a user",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathCloudAPIUser,
-		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: "User URN", Required: true}},
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: descUserURN, Required: true}},
 		BodyRequestType:  itypes.APIUser{},
 		ResponseType:     itypes.APIUser{},
 	}.Register()
 
 	// DisableUser
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/",
+		DocumentationURL: docURLVMware,
 		Name:             "DisableUser",
 		Description:      "Disable a user",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathCloudAPIUser,
-		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: "User URN", Required: true}},
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: descUserURN, Required: true}},
 		BodyRequestType:  itypes.APIUser{},
 		ResponseType:     itypes.APIUser{},
 	}.Register()
 
 	// UnlockUser
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/",
+		DocumentationURL: docURLVMware,
 		Name:             "UnlockUser",
 		Description:      "Unlock a user",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathCloudAPIUser,
-		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: "User URN", Required: true}},
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: descUserURN, Required: true}},
 		BodyRequestType:  itypes.APIUser{},
 		ResponseType:     itypes.APIUser{},
 	}.Register()
@@ -143,7 +143,7 @@ func init() {
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathCloudAPIUserChangePassword,
-		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: "User URN", Required: true}},
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: descUserURN, Required: true}},
 		BodyRequestType:  itypes.APIRequestPasswordChange{},
 		ResponseType:     struct{}{},
 	}.Register()

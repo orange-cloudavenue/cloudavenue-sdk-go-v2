@@ -53,5 +53,5 @@ const (
 const (
 	pathParamEdgeID    = "edgeId"
 	pathParamServiceID = "serviceId"
-	pathParamVdcName   = "vdcName"
+	pathParamVDCName   = "vdcName"
 )

@@ -90,7 +90,7 @@ func init() {
 		PathTemplate:     pathVDCGroupByID,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVdcGroupID,
+				Name:        pathParamVDCGroupID,
 				Description: "ID of the Vdc Group to update",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -112,7 +112,7 @@ func init() {
 		PathTemplate:     pathVDCGroupByID,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVdcGroupID,
+				Name:        pathParamVDCGroupID,
 				Description: "ID of the Vdc Group to delete",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
