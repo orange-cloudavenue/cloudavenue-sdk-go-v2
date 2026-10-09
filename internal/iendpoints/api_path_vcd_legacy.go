@@ -29,19 +29,12 @@ const (
 	// These legacy AdminOrg XML user paths are retained for compatibility only;
 	// IAM user operations use VMware CloudAPI.
 	// pathAdminOrgUsers lists and creates users in the legacy admin XML API.
-	pathAdminOrgUsers = "/api/admin/org/{orgId}/users"
 	// pathAdminOrgUserByID addresses one user in the legacy admin XML API.
-	pathAdminOrgUserByID = "/api/admin/org/{orgId}/user/{userId}"
 	// pathAdminTakeOwnershipOrgUserByID takes ownership of one user in the legacy admin XML API.
-	pathAdminTakeOwnershipOrgUserByID = "/api/admin/org/{orgId}/user/{userId}/takeOwnership"
 	// pathAdminOrgUserEnable enables one user in the legacy admin XML API.
-	pathAdminOrgUserEnable = "/api/admin/org/{orgId}/user/{userId}/action/enable"
 	// pathAdminOrgUserDisable disables one user in the legacy admin XML API.
-	pathAdminOrgUserDisable = "/api/admin/org/{orgId}/user/{userId}/action/disable"
 	// pathAdminOrgUserUnlock unlocks one user in the legacy admin XML API.
-	pathAdminOrgUserUnlock = "/api/admin/org/{orgId}/user/{userId}/action/unlock"
 	// pathAdminOrgUserChangePassword changes one user password in the legacy admin XML API.
-	pathAdminOrgUserChangePassword = "/api/admin/org/{orgId}/user/{userId}/action/changePassword"
 	// pathVAppByID addresses one vApp in the legacy XML API.
 	pathVAppByID = "/api/vapp/{vapp-id}"
 	// pathVAppRemoveAllNetworks removes all networks from one vApp.
@@ -57,7 +50,7 @@ const (
 )
 
 const (
-	pathParamVdcID              = "vdc-id"
+	pathParamVDCID              = "vdc-id"
 	pathParamVAppID             = "vapp-id"
 	pathParamOrgID              = "orgId"
 	pathParamUserID             = "userId"

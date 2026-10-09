@@ -19,7 +19,6 @@ import (
 //go:generate endpoint-generator -path vapp.go -output vapp
 
 func init() {
-
 	// ListVApp
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-ExecuteQuery.html",
@@ -64,7 +63,7 @@ func init() {
 
 	// CreateVApp
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/",
+		DocumentationURL: docURLVMware,
 		Name:             "CreateVApp",
 		Description:      "Create a new VApp",
 		Method:           cav.MethodPOST,
@@ -72,7 +71,7 @@ func init() {
 		PathTemplate:     pathVAppCreate,
 		PathParams: []cav.PathParam{
 			{
-				Name:          pathParamVdcID,
+				Name:          pathParamVDCID,
 				Description:   descVDCID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVDC),
@@ -126,7 +125,7 @@ func init() {
 
 	// RemoveAllNetworks
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/",
+		DocumentationURL: docURLVMware,
 		Name:             "RemoveAllNetworks",
 		Description:      "Remove all networks from a VApp",
 		Method:           cav.MethodPOST,
