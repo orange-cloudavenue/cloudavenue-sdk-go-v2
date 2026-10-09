@@ -29,15 +29,15 @@ import (
 func init() {
 	// GetDFWPolicies
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/get/",
 		Name:             "GetDFWPolicies",
 		Description:      "Get the Distributed Firewall policies (enabled state and default policy) of a VDC Group",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}/dfwPolicies",
+		PathTemplate:     pathDFWPolicies,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVDCGroupID,
+				Name:        pathParamVdcGroupID,
 				Description: descVDCGroupID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -50,15 +50,15 @@ func init() {
 
 	// UpdateDFWPolicies
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/put/",
 		Name:             "UpdateDFWPolicies",
 		Description:      "Update the Distributed Firewall policies (enabled state) of a VDC Group",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}/dfwPolicies",
+		PathTemplate:     pathDFWPolicies,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVDCGroupID,
+				Name:        pathParamVdcGroupID,
 				Description: descVDCGroupID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -72,15 +72,15 @@ func init() {
 
 	// UpdateDFWDefaultPolicy
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/policyId/put/",
 		Name:             "UpdateDFWDefaultPolicy",
 		Description:      "Update the default Distributed Firewall policy of a VDC Group",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}/dfwPolicies/default",
+		PathTemplate:     pathDFWPolicyDefault,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVDCGroupID,
+				Name:        pathParamVdcGroupID,
 				Description: descVDCGroupID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -94,15 +94,15 @@ func init() {
 
 	// GetDFWRules
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/policyId/rules/get/",
 		Name:             "GetDFWRules",
 		Description:      "Get the Distributed Firewall rules of a VDC Group",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}/dfwPolicies/default/rules",
+		PathTemplate:     pathDFWPolicyDefaultRules,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVDCGroupID,
+				Name:        pathParamVdcGroupID,
 				Description: descVDCGroupID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -115,15 +115,15 @@ func init() {
 
 	// UpdateDFWRules
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/policyId/rules/put/",
 		Name:             "UpdateDFWRules",
 		Description:      "Replace (bulk) the Distributed Firewall rules of a VDC Group",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}/dfwPolicies/default/rules",
+		PathTemplate:     pathDFWPolicyDefaultRules,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVDCGroupID,
+				Name:        pathParamVdcGroupID,
 				Description: descVDCGroupID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {

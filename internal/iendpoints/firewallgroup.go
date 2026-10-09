@@ -29,12 +29,12 @@ import (
 func init() {
 	// ListFirewallGroup
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/firewallGroups/summaries/get/",
 		Name:             "ListFirewallGroup",
 		Description:      "List Firewall Groups (Security Groups, IP Sets, Dynamic Security Groups)",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/firewallGroups/summaries",
+		PathTemplate:     pathFirewallGroupSummaries,
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        queryParamFilter,
@@ -51,7 +51,7 @@ func init() {
 
 	// GetFirewallGroup
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/firewallGroups/firewallGroupId/get/",
 		Name:             "GetFirewallGroup",
 		Description:      "Get a Firewall Group (Security Group, IP Set, or Dynamic Security Group)",
 		Method:           cav.MethodGET,
@@ -72,19 +72,19 @@ func init() {
 
 	// CreateFirewallGroup
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/firewallGroups/post/",
 		Name:             "CreateFirewallGroup",
 		Description:      "Create a Firewall Group (Security Group, IP Set, or Dynamic Security Group)",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/firewallGroups",
+		PathTemplate:     pathFirewallGroupsBase,
 		BodyRequestType:  itypes.APIRequestFirewallGroup{},
 		ResponseType:     itypes.APIResponseFirewallGroup{},
 	}.Register()
 
 	// UpdateFirewallGroup
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/firewallGroups/firewallGroupId/put/",
 		Name:             "UpdateFirewallGroup",
 		Description:      "Update a Firewall Group (Security Group, IP Set, or Dynamic Security Group)",
 		Method:           cav.MethodPUT,
@@ -106,7 +106,7 @@ func init() {
 
 	// DeleteFirewallGroup
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/firewallGroups/firewallGroupId/delete/",
 		Name:             "DeleteFirewallGroup",
 		Description:      "Delete a Firewall Group (Security Group, IP Set, or Dynamic Security Group)",
 		Method:           cav.MethodDELETE,

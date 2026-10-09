@@ -11,7 +11,6 @@ package iendpoints
 
 import (
 	"fmt"
-	"regexp"
 
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/validators"
@@ -25,20 +24,21 @@ import (
 func init() {
 	// GetEdgeGateway
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: docURLCerberus,
 		Name:             "GetEdgeGateway",
 		Description:      "Get EdgeGateway",
 		Method:           cav.MethodGET,
-		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/edgeGateways/{gatewayId}",
+		Backend:          cav.BackendInfrapi,
+		PathTemplate:     pathCerberusEdgeGatewayByID,
 		PathParams: []cav.PathParam{
 			{
-				Name:        "gatewayId",
+				Name:        pathParamEdgeID,
 				Description: descEdgeGatewayID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
 					return validators.New().Var(value, urnEdgeGateway)
 				},
+				TransformFunc: extractor.ExtractUUID,
 			},
 		},
 		ResponseType: itypes.APIResponseEdgegateway{},
@@ -46,36 +46,16 @@ func init() {
 
 	// QueryEdgeGateway
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: docURLCerberus,
 		Name:             "QueryEdgeGateway",
-		Description:      "Query EdgeGateway",
+		Description:      "List EdgeGateways (compatibility alias)",
 		Method:           cav.MethodGET,
-		Backend:          cav.BackendVMware,
-		PathTemplate:     pathQueryAPI,
-		QueryParams: []cav.QueryParam{
-			{
-				Name:        queryParamType,
-				Description: descTypeOfObjectQuery,
-				Value:       typeEdgeGateway,
-			},
-			{
-				Name:        queryParamFilter,
-				Description: "The filter to apply to the query",
-				Required:    false,
-				ValidatorFunc: func(value string) error {
-					// check if the value is a valid key==value pair
-					x := regexp.MustCompile(`^[a-zA-Z0-9_]+==.*`)
-					if !x.MatchString(value) {
-						return fmt.Errorf("invalid filter format, expected key==value")
-					}
-
-					return nil
-				},
-			},
-		},
-		PathParams:      nil,
-		BodyRequestType: nil,
-		ResponseType:    itypes.APIResponseQueryEdgeGateway{},
+		Backend:          cav.BackendInfrapi,
+		PathTemplate:     pathCerberusEdgeGateways,
+		PathParams:       nil,
+		QueryParams:      nil,
+		BodyRequestType:  nil,
+		ResponseType:     itypes.APIResponseQueryEdgeGateway{},
 	}.Register()
 
 	// CreateEdgeGateway
@@ -85,10 +65,10 @@ func init() {
 		Description:      "Create EdgeGateway",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/infrapicustomerproxy/v2.0/{vdc-type}/{vdc-name}/edges",
+		PathTemplate:     pathCerberusEdgeGatewayCreate,
 		PathParams: []cav.PathParam{
 			{
-				Name:        "vdc-type",
+				Name:        "vdcType",
 				Description: "The type of the VDC where the edge gateway will be created.",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -101,11 +81,11 @@ func init() {
 					case "vdcgroup":
 						return "vdc-groups", nil
 					}
-					return "", fmt.Errorf("invalid vdc-type: %s", value)
+					return "", fmt.Errorf("invalid vdcType: %s", value)
 				},
 			},
 			{
-				Name:        pathParamVDCName,
+				Name:        pathParamVdcName,
 				Description: "The name of the VDC where the edge gateway will be created.",
 				Required:    true,
 			},
@@ -141,20 +121,14 @@ func init() {
 
 	// ListEdgeGateway
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: docURLCerberus,
 		Name:             "ListEdgeGateway",
 		Description:      "List EdgeGateways",
 		Method:           cav.MethodGET,
-		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/edgeGateways",
+		Backend:          cav.BackendInfrapi,
+		PathTemplate:     pathCerberusEdgeGateways,
 		PathParams:       nil,
-		QueryParams: []cav.QueryParam{
-			{
-				Name:        queryParamPageSize,
-				Description: "The number of items to return per page.",
-				Value:       pageSize128,
-			},
-		},
-		ResponseType: itypes.APIResponseEdgegateways{},
+		QueryParams:      nil,
+		ResponseType:     itypes.APIResponseEdgegateways{},
 	}.Register()
 }

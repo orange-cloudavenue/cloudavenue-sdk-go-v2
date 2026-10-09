@@ -17,225 +17,145 @@ import (
 //go:generate endpoint-generator -path iam.go -output iam
 
 func init() {
-	const pathAdminOrg = "/api/admin/org/{orgId}"
-
+	// IAM user operations use VMware CloudAPI. They are distinct from both the
+	// Infrapi customer API and the legacy AdminOrg XML API.
 	// ListUsers
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/get/",
 		Name:             "ListUsers",
 		Description:      "List users in organization",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/users",
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
+		PathTemplate:     pathCloudAPIUsers,
+		QueryParams: []cav.QueryParam{
+			{Name: "page", Description: "Page to fetch", Required: true, Value: "1"},
+			{Name: "pageSize", Description: "Results per page to fetch", Required: true, Value: "128"},
 		},
-		ResponseType: itypes.Users{},
+		ResponseType: itypes.APIResponseListUsers{},
 	}.Register()
 
 	// GetUser
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/userUrn/get/",
 		Name:             "GetUser",
 		Description:      "Get user by ID or name",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/user/{userId}",
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
-			{
-				Name:        pathParamUserID,
-				Description: descUserID,
-				Required:    true,
-			},
-		},
-		ResponseType: itypes.User{},
+		PathTemplate:     pathCloudAPIUser,
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: "User URN", Required: true}},
+		ResponseType:     itypes.APIUser{},
 	}.Register()
 
 	// CreateUser
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/post/",
 		Name:             "CreateUser",
 		Description:      "Create a new user in organization",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/users",
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
-		},
-		BodyRequestType: itypes.UserRequest{},
-		ResponseType:    itypes.User{},
+		PathTemplate:     pathCloudAPIUsers,
+		PathParams:       []cav.PathParam{},
+		BodyRequestType:  itypes.APIUser{},
+		ResponseType:     itypes.APIUser{},
 	}.Register()
 
 	// UpdateUser
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/userUrn/put/",
 		Name:             "UpdateUser",
 		Description:      "Update an existing user",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/user/{userId}",
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
-			{
-				Name:        pathParamUserID,
-				Description: descUserID,
-				Required:    true,
-			},
-		},
-		BodyRequestType: itypes.UserRequest{},
-		ResponseType:    itypes.User{},
+		PathTemplate:     pathCloudAPIUser,
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: "User URN", Required: true}},
+		BodyRequestType:  itypes.APIUser{},
+		ResponseType:     itypes.APIUser{},
+	}.Register()
+
+	// TakeOwnership transfers entities owned by a user to the caller.
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/userUrn/takeOwnership/post/",
+		Name:             "TakeOwnership",
+		Description:      "Take ownership of a user",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathCloudAPIUserTakeOwnership,
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: "User URN", Required: true}},
+		ResponseType:     struct{}{},
 	}.Register()
 
 	// DeleteUser
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/userUrn/delete/",
 		Name:             "DeleteUser",
 		Description:      "Delete a user",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/user/{userId}",
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
-			{
-				Name:        pathParamUserID,
-				Description: descUserID,
-				Required:    true,
-			},
-		},
-		QueryParams: []cav.QueryParam{
-			{
-				Name:        "takeOwnership",
-				Description: "Take ownership of user's resources",
-				Required:    false,
-			},
-		},
-		ResponseType: struct{}{},
+		PathTemplate:     pathCloudAPIUser,
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: "User URN", Required: true}},
+		ResponseType:     struct{}{},
 	}.Register()
 
 	// EnableUser
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/",
 		Name:             "EnableUser",
 		Description:      "Enable a user",
-		Method:           cav.MethodPOST,
+		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/user/{userId}/action/enable",
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
-			{
-				Name:        pathParamUserID,
-				Description: descUserID,
-				Required:    true,
-			},
-		},
-		ResponseType: itypes.User{},
+		PathTemplate:     pathCloudAPIUser,
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: "User URN", Required: true}},
+		BodyRequestType:  itypes.APIUser{},
+		ResponseType:     itypes.APIUser{},
 	}.Register()
 
 	// DisableUser
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/",
 		Name:             "DisableUser",
 		Description:      "Disable a user",
-		Method:           cav.MethodPOST,
+		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/user/{userId}/action/disable",
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
-			{
-				Name:        pathParamUserID,
-				Description: descUserID,
-				Required:    true,
-			},
-		},
-		ResponseType: itypes.User{},
+		PathTemplate:     pathCloudAPIUser,
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: "User URN", Required: true}},
+		BodyRequestType:  itypes.APIUser{},
+		ResponseType:     itypes.APIUser{},
 	}.Register()
 
 	// UnlockUser
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/",
 		Name:             "UnlockUser",
 		Description:      "Unlock a user",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/user/{userId}/action/unlock",
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
-			{
-				Name:        pathParamUserID,
-				Description: descUserID,
-				Required:    true,
-			},
-		},
-		ResponseType: itypes.User{},
+		PathTemplate:     pathCloudAPIUser,
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: "User URN", Required: true}},
+		BodyRequestType:  itypes.APIUser{},
+		ResponseType:     itypes.APIUser{},
 	}.Register()
 
 	// ChangePassword
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/userUrn/changePassword/post/",
 		Name:             "ChangePassword",
 		Description:      "Change a user's password",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathAdminOrg + "/user/{userId}/action/changePassword",
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
-			{
-				Name:        pathParamUserID,
-				Description: descUserID,
-				Required:    true,
-			},
-		},
-		BodyRequestType: itypes.NewPassword{},
-		ResponseType:    struct{}{},
+		PathTemplate:     pathCloudAPIUserChangePassword,
+		PathParams:       []cav.PathParam{{Name: pathParamUserUrn, Description: "User URN", Required: true}},
+		BodyRequestType:  itypes.APIRequestPasswordChange{},
+		ResponseType:     struct{}{},
 	}.Register()
-
-	const pathTokens = "/cloudapi/1.0.0/tokens"
 
 	// ListTokens
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/tokens/get/",
 		Name:             "ListTokens",
 		Description:      "List tokens in organization",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathTokens + "/get/",
+		PathTemplate:     pathTokenGet,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamOrgID,
@@ -248,12 +168,12 @@ func init() {
 
 	// GetToken
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/sessions/id/token/get/",
 		Name:             "GetToken",
 		Description:      "Get token by ID",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathTokens + "/id/get/",
+		PathTemplate:     pathTokenGetByID,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamOrgID,
@@ -261,7 +181,7 @@ func init() {
 				Required:    true,
 			},
 			{
-				Name:        pathParamTokenID,
+				Name:        pathParamID,
 				Description: descTokenID,
 				Required:    true,
 			},
@@ -271,12 +191,12 @@ func init() {
 
 	// CreateToken
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/tokens/post/",
 		Name:             "CreateToken",
 		Description:      "Create a new token in organization",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathTokens + "/post/",
+		PathTemplate:     pathTokenCreate,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamOrgID,
@@ -290,12 +210,12 @@ func init() {
 
 	// UpdateToken
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/tokens/id/put/",
 		Name:             "UpdateToken",
 		Description:      "Update an existing token",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathTokens + "/id/put/",
+		PathTemplate:     pathTokenUpdateByID,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamOrgID,
@@ -303,7 +223,7 @@ func init() {
 				Required:    true,
 			},
 			{
-				Name:        pathParamTokenID,
+				Name:        pathParamID,
 				Description: descTokenID,
 				Required:    true,
 			},
@@ -314,12 +234,12 @@ func init() {
 
 	// DeleteToken
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/tokens/id/delete/",
 		Name:             "DeleteToken",
 		Description:      "Delete a token",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathTokens + "/id/delete/",
+		PathTemplate:     pathTokenDeleteByID,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamOrgID,
@@ -327,7 +247,7 @@ func init() {
 				Required:    true,
 			},
 			{
-				Name:        pathParamTokenID,
+				Name:        pathParamID,
 				Description: descTokenID,
 				Required:    true,
 			},
@@ -335,18 +255,14 @@ func init() {
 		ResponseType: struct{}{},
 	}.Register()
 
-	const pathLDAP = "/cloudapi/1.0.0/ldap"
-
-	const pathGlobalRoles = "/cloudapi/1.0.0/globalRoles"
-
 	// TestLDAP
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ldap/test/post/",
 		Name:             "TestLDAP",
 		Description:      "Test LDAP connection",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathLDAP + "/test",
+		PathTemplate:     pathLDAPTest,
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        "username",
@@ -360,24 +276,24 @@ func init() {
 
 	// SyncLDAP
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ldap/sync/post/",
 		Name:             "SyncLDAP",
 		Description:      "Synchronize LDAP directory",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathLDAP + "/sync",
+		PathTemplate:     pathLDAPSync,
 		BodyRequestType:  nil, // No request body for this endpoint.
 		ResponseType:     struct{}{},
 	}.Register()
 
 	// SearchLDAPUsers
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ldap/search/user/get/",
 		Name:             "SearchLDAPUsers",
 		Description:      "Search LDAP users",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathLDAP + "/search/user",
+		PathTemplate:     pathLDAPSearchUsers,
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        queryParamQ,
@@ -390,12 +306,12 @@ func init() {
 
 	// SearchLDAPGroups
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/ldap/search/group/get/",
 		Name:             "SearchLDAPGroups",
 		Description:      "Search LDAP groups",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathLDAP + "/search/group",
+		PathTemplate:     pathLDAPSearchGroups,
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        queryParamQ,
@@ -408,7 +324,7 @@ func init() {
 
 	// ListGlobalRoles
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/get/",
 		Name:             "ListGlobalRoles",
 		Description:      "List global roles",
 		Method:           cav.MethodGET,
@@ -419,15 +335,15 @@ func init() {
 
 	// GetGlobalRole
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/get/",
 		Name:             "GetGlobalRole",
 		Description:      "Get global role by ID",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathGlobalRoles + "/{id}",
+		PathTemplate:     pathGlobalRoleByID,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamGlobalRoleID,
+				Name:        pathParamID,
 				Description: descGlobalRoleID,
 				Required:    true,
 			},
@@ -437,7 +353,7 @@ func init() {
 
 	// CreateGlobalRole
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/post/",
 		Name:             "CreateGlobalRole",
 		Description:      "Create a global role",
 		Method:           cav.MethodPOST,
@@ -449,15 +365,15 @@ func init() {
 
 	// UpdateGlobalRole
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/put/",
 		Name:             "UpdateGlobalRole",
 		Description:      "Update a global role",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathGlobalRoles + "/{id}",
+		PathTemplate:     pathGlobalRoleByID,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamGlobalRoleID,
+				Name:        pathParamID,
 				Description: descGlobalRoleID,
 				Required:    true,
 			},
@@ -468,15 +384,15 @@ func init() {
 
 	// DeleteGlobalRole
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/delete/",
 		Name:             "DeleteGlobalRole",
 		Description:      "Delete a global role",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathGlobalRoles + "/{id}",
+		PathTemplate:     pathGlobalRoleByID,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamGlobalRoleID,
+				Name:        pathParamID,
 				Description: descGlobalRoleID,
 				Required:    true,
 			},
@@ -486,15 +402,15 @@ func init() {
 
 	// ListGlobalRoleRights
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/rights/get/",
 		Name:             "ListGlobalRoleRights",
 		Description:      "List rights of a global role",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathGlobalRoles + "/{id}/rights",
+		PathTemplate:     pathGlobalRoleRights,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamGlobalRoleID,
+				Name:        pathParamID,
 				Description: descGlobalRoleID,
 				Required:    true,
 			},
@@ -504,15 +420,15 @@ func init() {
 
 	// AddGlobalRoleRights
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/rights/post/",
 		Name:             "AddGlobalRoleRights",
 		Description:      "Add rights to a global role",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathGlobalRoles + "/{id}/rights",
+		PathTemplate:     pathGlobalRoleRights,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamGlobalRoleID,
+				Name:        pathParamID,
 				Description: descGlobalRoleID,
 				Required:    true,
 			},
@@ -523,15 +439,15 @@ func init() {
 
 	// ReplaceGlobalRoleRights
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/rights/put/",
 		Name:             "ReplaceGlobalRoleRights",
 		Description:      "Replace rights of a global role",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathGlobalRoles + "/{id}/rights",
+		PathTemplate:     pathGlobalRoleRights,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamGlobalRoleID,
+				Name:        pathParamID,
 				Description: descGlobalRoleID,
 				Required:    true,
 			},
@@ -542,15 +458,15 @@ func init() {
 
 	// ListGlobalRoleTenants
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/tenants/get/",
 		Name:             "ListGlobalRoleTenants",
 		Description:      "List tenants of a global role",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathGlobalRoles + "/{id}/tenants",
+		PathTemplate:     pathGlobalRoleTenants,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamGlobalRoleID,
+				Name:        pathParamID,
 				Description: descGlobalRoleID,
 				Required:    true,
 			},
@@ -560,15 +476,15 @@ func init() {
 
 	// SetGlobalRoleTenants
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/tenants/put/",
 		Name:             "SetGlobalRoleTenants",
 		Description:      "Set tenants of a global role",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathGlobalRoles + "/{id}/tenants",
+		PathTemplate:     pathGlobalRoleTenants,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamGlobalRoleID,
+				Name:        pathParamID,
 				Description: descGlobalRoleID,
 				Required:    true,
 			},
@@ -579,15 +495,15 @@ func init() {
 
 	// PublishGlobalRoleTenants
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/tenants/publish/post/",
 		Name:             "PublishGlobalRoleTenants",
 		Description:      "Publish tenants of a global role",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathGlobalRoles + "/{id}/tenants/publish",
+		PathTemplate:     pathGlobalRoleTenantsPublish,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamGlobalRoleID,
+				Name:        pathParamID,
 				Description: descGlobalRoleID,
 				Required:    true,
 			},
@@ -598,15 +514,15 @@ func init() {
 
 	// UnpublishGlobalRoleTenants
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/tenants/unpublish/post/",
 		Name:             "UnpublishGlobalRoleTenants",
 		Description:      "Unpublish tenants of a global role",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathGlobalRoles + "/{id}/tenants/unpublish",
+		PathTemplate:     pathGlobalRoleTenantsUnpublish,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamGlobalRoleID,
+				Name:        pathParamID,
 				Description: descGlobalRoleID,
 				Required:    true,
 			},
@@ -617,15 +533,15 @@ func init() {
 
 	// PublishAllGlobalRoleTenants
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/tenants/publishAll/post/",
 		Name:             "PublishAllGlobalRoleTenants",
 		Description:      "Publish all tenants of a global role",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathGlobalRoles + "/{id}/tenants/publishAll",
+		PathTemplate:     pathGlobalRoleTenantsPublishAll,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamGlobalRoleID,
+				Name:        pathParamID,
 				Description: descGlobalRoleID,
 				Required:    true,
 			},
@@ -635,15 +551,15 @@ func init() {
 
 	// UnpublishAllGlobalRoleTenants
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/globalRoles/id/tenants/unpublishAll/post/",
 		Name:             "UnpublishAllGlobalRoleTenants",
 		Description:      "Unpublish all tenants of a global role",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathGlobalRoles + "/{id}/tenants/unpublishAll",
+		PathTemplate:     pathGlobalRoleTenantsUnpublishAll,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamGlobalRoleID,
+				Name:        pathParamID,
 				Description: descGlobalRoleID,
 				Required:    true,
 			},

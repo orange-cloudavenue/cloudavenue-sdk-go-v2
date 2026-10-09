@@ -19,19 +19,19 @@ import (
 // NetworkContextProfile represents an NSX-T Layer-7 application/context
 // profile that can be referenced by Distributed Firewall rules. Unlike the
 // FirewallGroup family (which uses a single OwnerRef), NetworkContextProfile
-// uses a dedicated pathParamVDCGroupID (or "orgVdcId" for plain VDCs, not used by
+// uses a dedicated pathParamVdcGroupID (or "orgVdcId" for plain VDCs, not used by
 // this VDCGroup-scoped package) named filter key for scoping. Create and
 // Update are asynchronous (VCD returns 202 + task); List/Get/Delete and the
 // read-only "/attributes" static catalog sub-resource are synchronous.
 func init() {
 	// ListNetworkContextProfile
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/get/",
 		Name:             "ListNetworkContextProfile",
 		Description:      "List Network Context Profiles",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/networkContextProfiles",
+		PathTemplate:     pathNetworkContextProfilesBase,
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        queryParamFilter,
@@ -53,7 +53,7 @@ func init() {
 
 	// GetNetworkContextProfile
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/profileId/get/",
 		Name:             "GetNetworkContextProfile",
 		Description:      "Get a Network Context Profile",
 		Method:           cav.MethodGET,
@@ -71,19 +71,19 @@ func init() {
 
 	// CreateNetworkContextProfile
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/post/",
 		Name:             "CreateNetworkContextProfile",
 		Description:      "Create a Network Context Profile",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/networkContextProfiles",
+		PathTemplate:     pathNetworkContextProfilesBase,
 		BodyRequestType:  itypes.APIRequestNetworkContextProfile{},
 		ResponseType:     cav.Job{},
 	}.Register()
 
 	// UpdateNetworkContextProfile
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/profileId/put/",
 		Name:             "UpdateNetworkContextProfile",
 		Description:      "Update a Network Context Profile",
 		Method:           cav.MethodPUT,
@@ -102,7 +102,7 @@ func init() {
 
 	// DeleteNetworkContextProfile
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/profileId/delete/",
 		Name:             "DeleteNetworkContextProfile",
 		Description:      "Delete a Network Context Profile",
 		Method:           cav.MethodDELETE,
@@ -119,12 +119,12 @@ func init() {
 
 	// GetNetworkContextProfileAttributes
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/networkContextProfiles/attributes/get/",
 		Name:             "GetNetworkContextProfileAttributes",
 		Description:      "Get the static reference catalog (App IDs, Domain Names) of attributes usable in Network Context Profiles",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/networkContextProfiles/attributes",
+		PathTemplate:     pathNetworkContextProfileAttributes,
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        queryParamFilter,

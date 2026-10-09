@@ -10,11 +10,6 @@
 package iendpoints
 
 import (
-	"errors"
-	"fmt"
-	"slices"
-	"strings"
-
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/validators"
 
@@ -27,99 +22,47 @@ import (
 func init() {
 	// ListVDC
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: docURLCerberus,
 		Name:             "ListVDC",
 		Description:      "List VDCs",
 		Method:           cav.MethodGET,
-		Backend:          cav.BackendVMware,
-		PathTemplate:     pathQueryAPI,
-		QueryParams: []cav.QueryParam{
-			{
-				Name:        queryParamFilter,
-				Description: descFilterNameOrID,
-				ValidatorFunc: func(value string) error {
-					valueSplit := strings.Split(value, "==")
-					if len(valueSplit) != 2 {
-						return errors.New(errFilterFormatSingle)
-					}
-
-					allowedKeys := filterKeysNameOrID
-					if !slices.Contains(allowedKeys, valueSplit[0]) {
-						return fmt.Errorf(errFilterKeyNotAllowed, valueSplit[0])
-					}
-
-					return nil
-				},
-				TransformFunc: func(value string) (string, error) {
-					// Add ( ) around the filter value
-					return fmt.Sprintf("(%s)", value), nil
-				},
-			},
-			{
-				Name:        queryParamPageSize,
-				Description: descPageSize,
-				Value:       pageSize100,
-			},
-			{
-				Name:        queryParamPage,
-				Description: descPage,
-				Value:       "1",
-			},
-			{
-				Name:        queryParamFormat,
-				Description: descFormatResponse,
-				Value:       formatRecords,
-			},
-			{
-				Name:        queryParamType,
-				Description: descTypeOfObjectQuery,
-				Value:       typeOrgVDC,
-			},
-		},
-		ResponseType: itypes.APIResponseListVDC{},
+		Backend:          cav.BackendInfrapi,
+		PathTemplate:     pathCerberusVDCs,
+		ResponseType:     itypes.APIResponseListVDC{},
 	}.Register()
 
 	// GetVDC
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: docURLCerberus,
 		Name:             "GetVDC",
 		Description:      "Get VDC",
 		Method:           cav.MethodGET,
-		Backend:          cav.BackendVMware,
-		PathTemplate:     "/api/vdc/{vdc-id}",
+		Backend:          cav.BackendInfrapi,
+		PathTemplate:     pathCerberusVDCByName,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVDCID,
-				Description: descVDCID,
+				Name:        pathParamVdcName,
+				Description: "The name of the VDC.",
 				Required:    true,
-				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, urnVDC)
-				},
-				TransformFunc: extractor.ExtractUUID,
 			},
 		},
 		ResponseType: itypes.APIResponseGetVDC{},
 	}.Register()
 
-	// GetVDCMetadata
+	// GetVDCMetadata is retained for compatibility with clients that inspect the
+	// VMware metadata endpoint directly. VDC reads no longer depend on it.
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-VdcMetadata.html",
 		Name:             "GetVDCMetadata",
 		Description:      "Get VDC Metadata",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/api/vdc/{vdc-id}/metadata",
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamVDCID,
-				Description: descVDCID,
-				Required:    true,
-				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, urnVDC)
-				},
-				TransformFunc: extractor.ExtractUUID,
-			},
-		},
+		PathTemplate:     pathVDCMetadata,
+		PathParams: []cav.PathParam{{
+			Name: pathParamVdcID, Description: descVDCID, Required: true,
+			ValidatorFunc: func(value string) error { return validators.New().Var(value, urnVDC) },
+			TransformFunc: extractor.ExtractUUID,
+		}},
 		ResponseType: itypes.APIResponseGetVDCMetadatas{},
 	}.Register()
 
@@ -130,7 +73,7 @@ func init() {
 		Description:      "Create a new Org VDC",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/infrapicustomerproxy/v2.0/vdcs",
+		PathTemplate:     pathCerberusVDCs,
 		BodyRequestType:  itypes.APIRequestCreateVDC{},
 		ResponseType:     cav.Job{},
 	}.Register()
@@ -145,7 +88,7 @@ func init() {
 		PathTemplate:     pathCerberusVDCByName,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVDCName,
+				Name:        pathParamVdcName,
 				Description: "The name of the VDC to update.",
 				Required:    true,
 			},
@@ -164,7 +107,7 @@ func init() {
 		PathTemplate:     pathCerberusVDCByName,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVDCName,
+				Name:        pathParamVdcName,
 				Description: "The name of the VDC to delete.",
 				Required:    true,
 			},

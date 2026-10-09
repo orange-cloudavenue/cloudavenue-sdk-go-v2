@@ -19,20 +19,20 @@ import (
 //go:generate endpoint-generator -path organization.go -output org
 
 func init() {
-	// Get Organization from Vmware Cloud Director
+	// Get organization details from VMware CloudAPI.
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgs/get/",
 		Name:             "GetOrganizationDetails",
 		Description:      "Get organizations details from VMware Cloud Director",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/orgs",
+		PathTemplate:     pathCloudAPIOrgs,
 		ResponseType:     itypes.APIResponseGetOrgs{},
 	}.Register()
 
-	// GetOrganization from infraAPI
+	// Get organization configuration from Infrapi.
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API",
 		Name:             "GetOrganization",
 		Description:      "Get your organization information",
 		Method:           cav.MethodGET,
@@ -41,9 +41,9 @@ func init() {
 		ResponseType:     itypes.APIResponseGetOrg{},
 	}.Register()
 
-	// UpdateOrganization
+	// Update organization configuration through Infrapi.
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API",
 		Name:             "UpdateOrganization",
 		Description:      "Update an existing organization",
 		Method:           cav.MethodPUT,
@@ -55,7 +55,7 @@ func init() {
 
 	// GetCatalogAccessControl
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/",
 		Name:             "GetCatalogAccessControl",
 		Description:      "List catalog access control grants",
 		Method:           cav.MethodGET,
@@ -63,7 +63,7 @@ func init() {
 		PathTemplate:     pathCatalogAccessControl,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamCatalogURN,
+				Name:        pathParamCatalogUrn,
 				Description: descCatalogURN,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -76,7 +76,7 @@ func init() {
 
 	// SetCatalogAccessControl
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/",
 		Name:             "SetCatalogAccessControl",
 		Description:      "Set catalog access control grants",
 		Method:           cav.MethodPUT,
@@ -84,7 +84,7 @@ func init() {
 		PathTemplate:     pathCatalogAccessControl,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamCatalogURN,
+				Name:        pathParamCatalogUrn,
 				Description: descCatalogURN,
 				Required:    true,
 				ValidatorFunc: func(value string) error {

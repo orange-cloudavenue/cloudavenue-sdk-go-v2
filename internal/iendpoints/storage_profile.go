@@ -26,16 +26,16 @@ import (
 func init() {
 	// * ListStorageProfile
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcStoragePolicies/get/",
 		Name:             "ListStorageProfile",
 		Description:      "List VDC Storage Profiles",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/api/query/",
+		PathTemplate:     pathOrgVDCStoragePolicies,
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        queryParamFilter,
-				Description: "Filter to apply to the list of VDC Storage Profile. Format: key==value. Supported keys: vdc, vdcName, name, id.",
+				Description: "Filter to apply to the list of VDC Storage Profiles. Format: key==value. Supported keys: vdc, vdcName, name, id.",
 				ValidatorFunc: func(value string) error {
 					// Support multiple filters separated by ';'
 					filters := strings.SplitSeq(value, ";")
@@ -52,7 +52,7 @@ func init() {
 						case "vdcName", sortAscName:
 							// No specific format required
 						case "id":
-							if err := validators.New().Var(valueSplit[1], urnVDCStorageProfile); err != nil {
+							if err := validators.New().Var(valueSplit[1], urnVDCStoragePolicy); err != nil {
 								return err
 							}
 						default:
@@ -93,7 +93,7 @@ func init() {
 							return "", fmt.Errorf(errFilterKeyNotAllowed, valueSplit[0])
 						}
 					}
-					return strings.Join(transformed, ";"), nil
+					return fmt.Sprintf("(%s)", strings.Join(transformed, ";")), nil
 				},
 			},
 			{
@@ -105,21 +105,6 @@ func init() {
 				Name:        queryParamPage,
 				Description: descPage,
 				Value:       "1",
-			},
-			{
-				Name:        queryParamFormat,
-				Description: descFormatResponse,
-				Value:       formatRecords,
-			},
-			{
-				Name:        queryParamType,
-				Description: descTypeOfObjectQuery,
-				Value:       typeOrgVDCStorageProfile,
-			},
-			{
-				Name:        queryParamSortAsc,
-				Description: "Sort the results in ascending order.",
-				Value:       sortAscName,
 			},
 		},
 		ResponseType: itypes.APIResponseListStorageProfiles{},

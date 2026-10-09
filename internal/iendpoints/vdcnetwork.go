@@ -28,12 +28,12 @@ import (
 func init() {
 	// ListVDCNetwork
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/get/",
 		Name:             "ListVDCNetwork",
 		Description:      "List Org VDC Networks (routed and isolated)",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/orgVdcNetworks",
+		PathTemplate:     pathOrgVDCNetworksBase,
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        queryParamFilter,
@@ -55,7 +55,7 @@ func init() {
 
 	// GetVDCNetwork
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/get/",
 		Name:             "GetVDCNetwork",
 		Description:      "Get an Org VDC Network (routed or isolated)",
 		Method:           cav.MethodGET,
@@ -63,7 +63,7 @@ func init() {
 		PathTemplate:     pathOrgVDCNetworks,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVDCNetworkID,
+				Name:        pathParamVdcNetworkID,
 				Description: "ID of the Org VDC Network to get",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -76,19 +76,19 @@ func init() {
 
 	// CreateVDCNetwork
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/post/",
 		Name:             "CreateVDCNetwork",
 		Description:      "Create an Org VDC Network (routed or isolated)",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/orgVdcNetworks",
+		PathTemplate:     pathOrgVDCNetworksBase,
 		BodyRequestType:  itypes.APIRequestVDCNetwork{},
 		ResponseType:     itypes.APIResponseVDCNetwork{},
 	}.Register()
 
 	// UpdateVDCNetwork
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/put/",
 		Name:             "UpdateVDCNetwork",
 		Description:      "Update an Org VDC Network (routed or isolated)",
 		Method:           cav.MethodPUT,
@@ -96,7 +96,7 @@ func init() {
 		PathTemplate:     pathOrgVDCNetworks,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVDCNetworkID,
+				Name:        pathParamVdcNetworkID,
 				Description: "ID of the Org VDC Network to update",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -110,7 +110,7 @@ func init() {
 
 	// DeleteVDCNetwork
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/delete/",
 		Name:             "DeleteVDCNetwork",
 		Description:      "Delete an Org VDC Network (routed or isolated)",
 		Method:           cav.MethodDELETE,
@@ -118,7 +118,7 @@ func init() {
 		PathTemplate:     pathOrgVDCNetworks,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVDCNetworkID,
+				Name:        pathParamVdcNetworkID,
 				Description: "ID of the Org VDC Network to delete",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -130,7 +130,7 @@ func init() {
 
 	// GetNetworkDhcpConfig
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp/get/",
 		Name:             "GetNetworkDhcpConfig",
 		Description:      "Get the DHCP configuration of an Org VDC Network",
 		Method:           cav.MethodGET,
@@ -138,7 +138,7 @@ func init() {
 		PathTemplate:     pathOrgVDCNetworkDHCPGet,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVDCNetworkID,
+				Name:        pathParamVdcNetworkID,
 				Description: descVDCNetworkID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -151,7 +151,7 @@ func init() {
 
 	// UpdateNetworkDhcpConfig
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp/put/",
 		Name:             "UpdateNetworkDhcpConfig",
 		Description:      "Update the DHCP configuration of an Org VDC Network",
 		Method:           cav.MethodPUT,
@@ -159,7 +159,7 @@ func init() {
 		PathTemplate:     pathOrgVDCNetworkDHCAPut,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVDCNetworkID,
+				Name:        pathParamVdcNetworkID,
 				Description: descVDCNetworkID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -173,7 +173,7 @@ func init() {
 
 	// DeleteNetworkDhcpConfig
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp/delete/",
 		Name:             "DeleteNetworkDhcpConfig",
 		Description:      "Delete the DHCP configuration of an Org VDC Network",
 		Method:           cav.MethodDELETE,
@@ -181,7 +181,7 @@ func init() {
 		PathTemplate:     pathOrgVDCNetworkDHCPDelete,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVDCNetworkID,
+				Name:        pathParamVdcNetworkID,
 				Description: descVDCNetworkID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {

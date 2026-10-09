@@ -15,19 +15,19 @@ import (
 
 // ListVDC - List VDCs
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func ListVDC() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListVDC")
 }
 // GetVDC - Get VDC
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func GetVDC() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetVDC")
 }
 // GetVDCMetadata - Get VDC Metadata
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-VdcMetadata.html
 func GetVDCMetadata() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetVDCMetadata")
 }
