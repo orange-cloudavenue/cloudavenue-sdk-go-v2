@@ -72,6 +72,19 @@ func TestListVDC(t *testing.T) {
 				ms.CleanResponse(endpoints.QueryEdgeGateway())
 				ms.SetResponse(endpoints.QueryEdgeGateway(), tt.mockResponse, &tt.mockResponseStatus)
 			}
+			if (tt.params.Name != "" || tt.params.ID != "") && tt.mockResponseStatus == 0 {
+				status := 200
+				name := tt.params.Name
+				if name == "" {
+					name = "my-vdc"
+				}
+				id := tt.params.ID
+				if id == "" {
+					id = generator.MustGenerate("{urn:vdc}")
+				}
+				ms.CleanResponse(endpoints.ListVDC())
+				ms.SetResponse(endpoints.ListVDC(), &itypes.APIResponseListVDC{Records: []itypes.APIResponseListVDCRecord{{ID: id, Name: name}}}, &status)
+			}
 
 			resp, err := client.ListVDC(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -172,10 +185,17 @@ func TestGetVDC(t *testing.T) {
 				ms.CleanResponse(endpoints.QueryEdgeGateway())
 				ms.SetResponse(endpoints.QueryEdgeGateway(), tt.mockListVDCResponse, &tt.mockListVDCResponseStatus)
 			}
+			if tt.params.ID != "" && tt.mockListVDCResponseStatus == 0 {
+				status := 200
+				ms.CleanResponse(endpoints.ListVDC())
+				ms.SetResponse(endpoints.ListVDC(), &itypes.APIResponseListVDC{Records: []itypes.APIResponseListVDCRecord{{ID: tt.params.ID, Name: "my-vdc"}}}, &status)
+			}
 
 			if tt.mockGetMetadataResponseStatus != 0 {
 				ms.CleanResponse(endpoints.GetVDCMetadata())
 				ms.SetResponse(endpoints.GetVDCMetadata(), nil, &tt.mockGetMetadataResponseStatus)
+				ms.CleanResponse(endpoints.GetVDC())
+				ms.SetResponse(endpoints.GetVDC(), nil, &tt.mockGetMetadataResponseStatus)
 			}
 
 			resp, err := client.GetVDC(t.Context(), tt.params)
@@ -400,6 +420,11 @@ func TestUpdateVDC(t *testing.T) {
 				ms.CleanResponse(endpoints.GetVDC())
 				ms.SetResponse(endpoints.GetVDC(), nil, &tt.mockGetVDCResponseStatus)
 			}
+			if tt.params.Vcpu != nil && tt.mockGetVDCResponseStatus == 0 {
+				status := 200
+				ms.CleanResponse(endpoints.GetVDC())
+				ms.SetResponse(endpoints.GetVDC(), &itypes.APIResponseGetVDC{BillingModel: "PAYG", ServiceClass: "STD", Name: tt.params.Name}, &status)
+			}
 
 			data, err := client.UpdateVDC(t.Context(), tt.params)
 			if tt.expectedErr {
@@ -507,6 +532,14 @@ func TestDeleteVDC(t *testing.T) {
 				ms.SetResponse(endpoints.ListVDC(), nil, &tt.mockGetVDCResponseStatus)
 				ms.CleanResponse(endpoints.QueryEdgeGateway())
 				ms.SetResponse(endpoints.QueryEdgeGateway(), nil, &tt.mockGetVDCResponseStatus)
+			} else if tt.params.ID != "" {
+				// Delete now resolves an ID through Infrapi before issuing the
+				// name-based delete request.
+				status := 200
+				ms.CleanResponse(endpoints.ListVDC())
+				ms.SetResponse(endpoints.ListVDC(), &itypes.APIResponseListVDC{
+					Records: []itypes.APIResponseListVDCRecord{{ID: tt.params.ID, Name: "mock-vdc"}},
+				}, &status)
 			}
 
 			err := client.DeleteVDC(t.Context(), tt.params)
