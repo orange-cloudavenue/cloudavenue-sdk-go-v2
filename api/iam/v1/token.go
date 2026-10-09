@@ -13,8 +13,6 @@ import (
 	"context"
 	"fmt"
 
-	"resty.dev/v3"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
@@ -29,12 +27,6 @@ const (
 	opDeleteToken = "IAM.DeleteToken"
 )
 
-// setJSONHeaders sets Accept and Content-Type to application/json.
-func setJSONHeaders(req *resty.Request) {
-	req.SetHeader("Accept", "application/json")
-	req.SetHeader("Content-Type", "application/json")
-}
-
 // ListTokens lists all tokens in the organization.
 func (c *Client) ListTokens(ctx context.Context) ([]*types.ModelToken, error) {
 	ep := endpoints.ListTokens()
@@ -42,7 +34,6 @@ func (c *Client) ListTokens(ctx context.Context) ([]*types.ModelToken, error) {
 		ctx,
 		ep,
 		withOrgID(ep.PathParams[0]),
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.OverrideSetResult(new(itypes.APIResponseListTokens)),
 	)
 	if err != nil {
@@ -74,7 +65,6 @@ func (c *Client) GetToken(ctx context.Context, params types.ParamsGetToken) (*ty
 		ep,
 		withOrgID(ep.PathParams[0]),
 		cav.WithPathParam(ep.PathParams[1], params.ID),
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.OverrideSetResult(new(itypes.APIResponseToken)),
 	)
 	if err != nil {
@@ -105,7 +95,6 @@ func (c *Client) CreateToken(ctx context.Context, params types.ParamsCreateToken
 		ctx,
 		ep,
 		withOrgID(ep.PathParams[0]),
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.SetBody(body),
 		cav.OverrideSetResult(new(itypes.APIResponseToken)),
 	)
@@ -138,7 +127,6 @@ func (c *Client) UpdateToken(ctx context.Context, params types.ParamsUpdateToken
 		ep,
 		withOrgID(ep.PathParams[0]),
 		cav.WithPathParam(ep.PathParams[1], params.ID),
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.SetBody(body),
 		cav.OverrideSetResult(new(itypes.APIResponseToken)),
 	)
@@ -166,7 +154,6 @@ func (c *Client) DeleteToken(ctx context.Context, params types.ParamsDeleteToken
 		ep,
 		withOrgID(ep.PathParams[0]),
 		cav.WithPathParam(ep.PathParams[1], params.ID),
-		cav.SetCustomRestyOption(setJSONHeaders),
 	)
 	if err != nil {
 		return fmt.Errorf("%s: %w", opDeleteToken, err)
