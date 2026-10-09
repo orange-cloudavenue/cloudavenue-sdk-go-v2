@@ -57,14 +57,13 @@ func DeleteAdminCatalog() *cav.Endpoint {
 }
 // GetAdminCatalogACL - Get catalog ACL (admin scope)
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-ControlAccessParams-catalog.html
 func GetAdminCatalogACL() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetAdminCatalogACL")
 }
 // SetAdminCatalogACL - Set catalog ACL (admin scope)
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-ControlAccess-catalog.html
 func SetAdminCatalogACL() *cav.Endpoint {
 	return cav.MustGetEndpoint("SetAdminCatalogACL")
 }
-
