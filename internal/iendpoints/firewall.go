@@ -37,7 +37,7 @@ func init() {
 		PathTemplate:     pathDFWPolicies,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVdcGroupID,
+				Name:        pathParamVDCGroupID,
 				Description: descVDCGroupID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -58,7 +58,7 @@ func init() {
 		PathTemplate:     pathDFWPolicies,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVdcGroupID,
+				Name:        pathParamVDCGroupID,
 				Description: descVDCGroupID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -80,7 +80,7 @@ func init() {
 		PathTemplate:     pathDFWPolicyDefault,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVdcGroupID,
+				Name:        pathParamVDCGroupID,
 				Description: descVDCGroupID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -102,7 +102,7 @@ func init() {
 		PathTemplate:     pathDFWPolicyDefaultRules,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVdcGroupID,
+				Name:        pathParamVDCGroupID,
 				Description: descVDCGroupID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -123,7 +123,7 @@ func init() {
 		PathTemplate:     pathDFWPolicyDefaultRules,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVdcGroupID,
+				Name:        pathParamVDCGroupID,
 				Description: descVDCGroupID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {

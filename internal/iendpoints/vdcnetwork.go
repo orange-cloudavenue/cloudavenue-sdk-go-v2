@@ -63,7 +63,7 @@ func init() {
 		PathTemplate:     pathOrgVDCNetworks,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVdcNetworkID,
+				Name:        pathParamVDCNetworkID,
 				Description: "ID of the Org VDC Network to get",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -96,7 +96,7 @@ func init() {
 		PathTemplate:     pathOrgVDCNetworks,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVdcNetworkID,
+				Name:        pathParamVDCNetworkID,
 				Description: "ID of the Org VDC Network to update",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -118,7 +118,7 @@ func init() {
 		PathTemplate:     pathOrgVDCNetworks,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVdcNetworkID,
+				Name:        pathParamVDCNetworkID,
 				Description: "ID of the Org VDC Network to delete",
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -138,7 +138,7 @@ func init() {
 		PathTemplate:     pathOrgVDCNetworkDHCPGet,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVdcNetworkID,
+				Name:        pathParamVDCNetworkID,
 				Description: descVDCNetworkID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -159,7 +159,7 @@ func init() {
 		PathTemplate:     pathOrgVDCNetworkDHCAPut,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVdcNetworkID,
+				Name:        pathParamVDCNetworkID,
 				Description: descVDCNetworkID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
@@ -181,7 +181,7 @@ func init() {
 		PathTemplate:     pathOrgVDCNetworkDHCPDelete,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamVdcNetworkID,
+				Name:        pathParamVDCNetworkID,
 				Description: descVDCNetworkID,
 				Required:    true,
 				ValidatorFunc: func(value string) error {
