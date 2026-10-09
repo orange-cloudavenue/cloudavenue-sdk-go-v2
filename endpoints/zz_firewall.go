@@ -15,31 +15,31 @@ import (
 
 // GetDFWPolicies - Get the Distributed Firewall policies (enabled state and default policy) of a VDC Group
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/get/
 func GetDFWPolicies() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetDFWPolicies")
 }
 // UpdateDFWPolicies - Update the Distributed Firewall policies (enabled state) of a VDC Group
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/put/
 func UpdateDFWPolicies() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateDFWPolicies")
 }
 // UpdateDFWDefaultPolicy - Update the default Distributed Firewall policy of a VDC Group
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/policyId/put/
 func UpdateDFWDefaultPolicy() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateDFWDefaultPolicy")
 }
 // GetDFWRules - Get the Distributed Firewall rules of a VDC Group
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/policyId/rules/get/
 func GetDFWRules() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetDFWRules")
 }
 // UpdateDFWRules - Replace (bulk) the Distributed Firewall rules of a VDC Group
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/vdcGroups/vdcGroupId/dfwPolicies/policyId/rules/put/
 func UpdateDFWRules() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateDFWRules")
 }

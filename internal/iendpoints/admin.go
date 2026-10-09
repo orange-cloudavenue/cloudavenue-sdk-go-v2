@@ -17,92 +17,56 @@ import (
 //go:generate endpoint-generator -path admin.go -output admin
 
 func init() {
-	const pathAdminOrgs = "/api/admin/orgs"
-	const pathAdminOrg = "/api/admin/org/{orgId}"
-	const pathAdminCatalog = "/api/admin/catalog/{catalogId}"
-	const pathAdminCatalogID = "catalogId"
-	const descCatalogID = "Catalog ID"
-
-	// ListAdminOrgs
+	// ListAdminOrgs is the read-only, XML-backed AdminOrg organization view.
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-OrganizationsFromQuery.html",
 		Name:             "ListAdminOrgs",
 		Description:      "List organizations (admin scope)",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
+		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
 		PathTemplate:     pathAdminOrgs,
 		ResponseType:     itypes.AdminOrgs{},
 	}.Register()
 
-	// GetAdminOrg
+	// GetAdminOrg is the read-only, XML-backed AdminOrg organization view.
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-Organization-AdminView.html",
 		Name:             "GetAdminOrg",
 		Description:      "Get an organization by ID (admin scope)",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
+		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
 		PathTemplate:     pathAdminOrg,
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
-		},
-		ResponseType: itypes.AdminOrg{},
+		PathParams:       []cav.PathParam{{Name: pathParamOrgID, Description: descOrgID, Required: true}},
+		ResponseType:     itypes.AdminOrg{},
 	}.Register()
 
-	// ListAdminVDCs
-	cav.Endpoint{
-		DocumentationURL: docURLVMware,
-		Name:             "ListAdminVDCs",
-		Description:      "List VDCs (admin scope)",
-		Method:           cav.MethodGET,
-		Backend:          cav.BackendVMware,
-		PathTemplate:     "/api/admin/vdcs",
-		ResponseType:     itypes.AdminVDCs{},
-	}.Register()
-
-	// GetAdminVDC
-	cav.Endpoint{
-		DocumentationURL: docURLVMware,
-		Name:             "GetAdminVDC",
-		Description:      "Get a VDC by ID (admin scope)",
-		Method:           cav.MethodGET,
-		Backend:          cav.BackendVMware,
-		PathTemplate:     "/api/admin/vdc/{vdcId}",
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamVDCIDAdmin,
-				Description: descVDCIDAdmin,
-				Required:    true,
-			},
-		},
-		ResponseType: itypes.AdminVDC{},
-	}.Register()
-
+	const descCatalogID = "Catalog ID"
 	// ListAdminCatalogs
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-CatalogsFromQuery.html",
 		Name:             "ListAdminCatalogs",
 		Description:      "List catalogs (admin scope)",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/api/admin/catalogs",
+		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
+		PathTemplate:     pathAdminCatalogs,
 		ResponseType:     itypes.AdminCatalogs{},
 	}.Register()
 
 	// GetAdminCatalog
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-Catalog-AdminView.html",
 		Name:             "GetAdminCatalog",
 		Description:      "Get a catalog by ID (admin scope)",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
+		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
 		PathTemplate:     pathAdminCatalog,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathAdminCatalogID,
+				Name:        pathParamCatalogID,
 				Description: descCatalogID,
 				Required:    true,
 			},
@@ -112,15 +76,16 @@ func init() {
 
 	// CreateAdminCatalog
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-SecuredCreateCatalog.html",
 		Name:             "CreateAdminCatalog",
 		Description:      "Create a catalog (admin scope)",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/api/admin/org/{orgId}/catalog",
+		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
+		PathTemplate:     pathAdminOrgCatalogs,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathParamOrgIDAdmin,
+				Name:        pathParamOrgID,
 				Description: descOrgIDAdmin,
 				Required:    true,
 			},
@@ -131,15 +96,16 @@ func init() {
 
 	// UpdateAdminCatalog
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-Catalog.html",
 		Name:             "UpdateAdminCatalog",
 		Description:      "Update a catalog (admin scope)",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
+		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
 		PathTemplate:     pathAdminCatalog,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathAdminCatalogID,
+				Name:        pathParamCatalogID,
 				Description: descCatalogID,
 				Required:    true,
 			},
@@ -150,15 +116,16 @@ func init() {
 
 	// DeleteAdminCatalog
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/DELETE-Catalog.html",
 		Name:             "DeleteAdminCatalog",
 		Description:      "Delete a catalog (admin scope)",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/api/admin/catalog/{catalogId}",
+		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
+		PathTemplate:     pathAdminCatalog,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathAdminCatalogID,
+				Name:        pathParamCatalogID,
 				Description: descCatalogID,
 				Required:    true,
 			},
@@ -167,15 +134,16 @@ func init() {
 
 	// GetAdminCatalogACL
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/",
 		Name:             "GetAdminCatalogACL",
 		Description:      "Get catalog ACL (admin scope)",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/api/admin/catalog/{catalogId}/controlAccess",
+		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
+		PathTemplate:     pathAdminCatalogControlAccess,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathAdminCatalogID,
+				Name:        pathParamCatalogID,
 				Description: descCatalogID,
 				Required:    true,
 			},
@@ -185,15 +153,16 @@ func init() {
 
 	// SetAdminCatalogACL
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/",
 		Name:             "SetAdminCatalogACL",
 		Description:      "Set catalog ACL (admin scope)",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/api/admin/catalog/{catalogId}/action/controlAccess",
+		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
+		PathTemplate:     pathAdminCatalogControlAccessAction,
 		PathParams: []cav.PathParam{
 			{
-				Name:        pathAdminCatalogID,
+				Name:        pathParamCatalogID,
 				Description: descCatalogID,
 				Required:    true,
 			},

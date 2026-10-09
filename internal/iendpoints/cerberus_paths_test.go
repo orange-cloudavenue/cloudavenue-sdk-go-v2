@@ -35,16 +35,17 @@ const (
 const (
 	expectedPathDraasIPList    = "/infrapicustomerproxy/v2.0/vcda/ips"
 	expectedPathDraasIP        = "/infrapicustomerproxy/v2.0/vcda/ips/{ip}"
-	expectedPathEdgeCreate     = "/infrapicustomerproxy/v2.0/{vdc-type}/{vdc-name}/edges"
+	expectedPathEdgeCreate     = "/infrapicustomerproxy/v2.0/{vdcType}/{vdcName}/edges"
+	expectedPathEdgeList       = "/infrapicustomerproxy/v2.0/edges"
 	expectedPathEdgeByID       = "/infrapicustomerproxy/v2.0/edges/{edgeId}"
 	expectedPathNetwork        = "/infrapicustomerproxy/v2.0/network"
 	expectedPathServices       = "/infrapicustomerproxy/v2.0/services"
 	expectedPathServiceByID    = "/infrapicustomerproxy/v2.0/services/{serviceId}"
 	expectedPathConfigurations = "/infrapicustomerproxy/v2.0/configurations"
 	expectedPathVDCList        = "/infrapicustomerproxy/v2.0/vdcs"
-	expectedPathVDCByName      = "/infrapicustomerproxy/v2.0/vdcs/{vdc-name}"
+	expectedPathVDCByName      = "/infrapicustomerproxy/v2.0/vdcs/{vdcName}"
 	expectedPathT0List         = "/infrapicustomerproxy/v2.0/tier-0-vrfs"
-	expectedPathT0ByName       = "/infrapicustomerproxy/v2.0/tier-0-vrfs/{tier0_name}"
+	expectedPathT0ByName       = "/infrapicustomerproxy/v2.0/tier-0-vrfs/{tier0Name}"
 	expectedPathJobByTaskID    = "/infrapicustomerproxy/v1.0/jobs/{taskId}"
 )
 
@@ -58,6 +59,9 @@ var cerberusEndpoints = []struct {
 	{"AddDraasOnPremiseIP", expectedPathDraasIP},
 	{"RemoveDraasOnPremiseIP", expectedPathDraasIP},
 	{"CreateEdgeGateway", expectedPathEdgeCreate},
+	{"GetEdgeGateway", expectedPathEdgeByID},
+	{"QueryEdgeGateway", expectedPathEdgeList},
+	{"ListEdgeGateway", expectedPathEdgeList},
 	{"DeleteEdgeGateway", expectedPathEdgeByID},
 	{"UpdateEdgeGatewayBandwidth", expectedPathEdgeByID},
 	{"GetEdgeGatewayServices", expectedPathNetwork},
@@ -67,6 +71,8 @@ var cerberusEndpoints = []struct {
 	{"GetOrganization", expectedPathConfigurations},
 	{"UpdateOrganization", expectedPathConfigurations},
 	{"CreateVDC", expectedPathVDCList},
+	{"ListVDC", expectedPathVDCList},
+	{"GetVDC", expectedPathVDCByName},
 	{"UpdateVDC", expectedPathVDCByName},
 	{"DeleteVDC", expectedPathVDCByName},
 	{"GetJobCerberus", expectedPathJobByTaskID},

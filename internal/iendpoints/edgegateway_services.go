@@ -24,7 +24,7 @@ func init() {
 		Description:      "Get EdgeGateway Network Services",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/infrapicustomerproxy/v2.0/network",
+		PathTemplate:     pathCerberusNetwork,
 		ResponseType:     itypes.APIResponseNetworkServices{},
 	}.Register()
 
@@ -45,7 +45,7 @@ func init() {
 		Description:      "Disable Cloud Avenue Services",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/infrapicustomerproxy/v2.0/services/{serviceId}",
+		PathTemplate:     pathCerberusCloudavenueServiceByID,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamServiceID,

@@ -26,7 +26,7 @@ func init() {
 		Description:      "List T0",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/infrapicustomerproxy/v2.0/tier-0-vrfs",
+		PathTemplate:     pathCerberusT0s,
 		ResponseType:     itypes.APIResponseT0Names{},
 	}.Register()
 
@@ -37,10 +37,10 @@ func init() {
 		Description:      "Get T0",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/infrapicustomerproxy/v2.0/tier-0-vrfs/{tier0_name}",
+		PathTemplate:     pathCerberusT0ByName,
 		PathParams: []cav.PathParam{
 			{
-				Name:        "tier0_name",
+				Name:        "tier0Name",
 				Description: "The name of the T0",
 				Required:    true,
 				ValidatorFunc: func(value string) error {

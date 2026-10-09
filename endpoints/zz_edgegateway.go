@@ -15,13 +15,13 @@ import (
 
 // GetEdgeGateway - Get EdgeGateway
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func GetEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetEdgeGateway")
 }
-// QueryEdgeGateway - Query EdgeGateway
+// QueryEdgeGateway - List EdgeGateways (compatibility alias)
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func QueryEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("QueryEdgeGateway")
 }
@@ -39,7 +39,7 @@ func DeleteEdgeGateway() *cav.Endpoint {
 }
 // ListEdgeGateway - List EdgeGateways
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func ListEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListEdgeGateway")
 }
