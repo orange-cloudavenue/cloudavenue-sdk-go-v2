@@ -15,7 +15,8 @@ import (
 	"github.com/orange-cloudavenue/common-go/validators"
 )
 
-// ModelAdminOrg represents the public model for an organization (admin scope).
+// ModelAdminOrg represents the public, read-only model for an organization in
+// the XML-backed AdminOrg view.
 type ModelAdminOrg struct {
 	// ID of the organization
 	// Example: urn:vcloud:org:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
@@ -40,7 +41,8 @@ type ModelAdminOrg struct {
 	IsFullProtected bool `documentation:"Indicates if the organization is full protected"`
 }
 
-// ParamsGetAdminOrg defines the parameters for getting an organization (admin scope).
+// ParamsGetAdminOrg defines parameters for reading an organization from the
+// XML-backed AdminOrg view.
 type ParamsGetAdminOrg struct {
 	// ID of the organization
 	// Example: urn:vcloud:org:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
@@ -50,7 +52,7 @@ type ParamsGetAdminOrg struct {
 	Name string
 }
 
-// Validate validates the parameters for getting an organization (admin scope).
+// Validate validates parameters for reading an AdminOrg view.
 func (p *ParamsGetAdminOrg) Validate() error {
 	if p.ID == "" && p.Name == "" {
 		return fmt.Errorf("id or name is required")
