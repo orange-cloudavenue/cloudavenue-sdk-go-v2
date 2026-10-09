@@ -44,7 +44,6 @@ type ModelLDAPUser struct {
 type ModelLDAPGroup struct {
 	// Name is the LDAP group name.
 	Name string `documentation:"Name of the LDAP group"`
-
 }
 
 // ParamsTestLDAP defines parameters for testing an LDAP connection.

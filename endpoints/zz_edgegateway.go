@@ -19,28 +19,31 @@ import (
 func GetEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetEdgeGateway")
 }
+
 // QueryEdgeGateway - List EdgeGateways (compatibility alias)
 //
 // DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func QueryEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("QueryEdgeGateway")
 }
+
 // CreateEdgeGateway - Create EdgeGateway
 //
 // DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func CreateEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreateEdgeGateway")
 }
+
 // DeleteEdgeGateway - Delete EdgeGateway
 //
 // DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func DeleteEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("DeleteEdgeGateway")
 }
+
 // ListEdgeGateway - List EdgeGateways
 //
 // DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
 func ListEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListEdgeGateway")
 }
-
