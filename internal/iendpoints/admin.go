@@ -134,7 +134,7 @@ func init() {
 
 	// GetAdminCatalogACL
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-ControlAccessParams-catalog.html",
 		Name:             "GetAdminCatalogACL",
 		Description:      "Get catalog ACL (admin scope)",
 		Method:           cav.MethodGET,
@@ -153,7 +153,7 @@ func init() {
 
 	// SetAdminCatalogACL
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-ControlAccess-catalog.html",
 		Name:             "SetAdminCatalogACL",
 		Description:      "Set catalog ACL (admin scope)",
 		Method:           cav.MethodPOST,

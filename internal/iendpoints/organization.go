@@ -55,7 +55,7 @@ func init() {
 
 	// GetCatalogAccessControl
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/catalogs/catalogUrn/accessControls/get/",
 		Name:             "GetCatalogAccessControl",
 		Description:      "List catalog access control grants",
 		Method:           cav.MethodGET,
@@ -76,7 +76,7 @@ func init() {
 
 	// SetCatalogAccessControl
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/catalogs/catalogUrn/accessControls/put/",
 		Name:             "SetCatalogAccessControl",
 		Description:      "Set catalog access control grants",
 		Method:           cav.MethodPUT,
