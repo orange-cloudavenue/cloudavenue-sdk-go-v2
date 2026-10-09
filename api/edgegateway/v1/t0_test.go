@@ -15,10 +15,12 @@ import (
 
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+	pkgerrors "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
@@ -29,7 +31,8 @@ func Test_ListT0(t *testing.T) {
 		mockResponse       any
 		mockResponseStatus int
 
-		expectedErr bool
+		expectedErr   bool
+		errorContains string
 	}{
 		{
 			name:        "List T0",
@@ -84,7 +87,8 @@ func Test_GetT0(t *testing.T) {
 		mockResponse       any
 		mockResponseStatus int
 
-		expectedErr bool
+		expectedErr   bool
+		errorContains string
 	}{
 		{
 			name: "Valid T0",
@@ -126,7 +130,7 @@ func Test_GetT0(t *testing.T) {
 		{
 			name: "Get by EdgeGateway Name",
 			params: types.ParamsGetT0{
-				EdgegatewayName: "test-edgegateway-name",
+				EdgegatewayName: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			mockResponse: &itypes.APIResponseNetworkServices{
 				{
@@ -190,6 +194,24 @@ func Test_GetT0(t *testing.T) {
 			},
 			mockResponseStatus: http.StatusNotFound,
 			expectedErr:        true, // Error HTTP 404 should return an error.
+		},
+		{
+			name:          "Missing edge gateway reference",
+			params:        types.ParamsGetT0{},
+			expectedErr:   true,
+			errorContains: "edge gateway id or name is required",
+		},
+		{
+			name:          "Invalid edge gateway ID",
+			params:        types.ParamsGetT0{EdgegatewayID: "not-an-edge-gateway-urn"},
+			expectedErr:   true,
+			errorContains: "invalid edge gateway ID",
+		},
+		{
+			name:          "Invalid edge gateway name",
+			params:        types.ParamsGetT0{EdgegatewayName: "invalid edge gateway name"},
+			expectedErr:   true,
+			errorContains: "invalid edge gateway name",
 		},
 	}
 
@@ -255,11 +277,14 @@ func Test_GetT0(t *testing.T) {
 			t0, err := eC.GetT0(t.Context(), tt.params)
 
 			if tt.expectedErr {
-				assert.NotNil(t, err, "Expected error but got nil")
+				require.Error(t, err)
 				assert.Nil(t, t0, "Expected nil T0 response")
+				if tt.errorContains != "" {
+					assert.ErrorContains(t, err, tt.errorContains)
+				}
 			} else {
-				assert.Nil(t, err, "Unexpected error while getting T0")
-				assert.NotNil(t, t0, "Expected non-nil T0 response")
+				require.NoError(t, err)
+				require.NotNil(t, t0)
 				if tt.params.T0Name != "" {
 					assert.Equal(t, tt.params.T0Name, t0.Name, "Expected T0 name to match the requested name")
 				}
@@ -269,4 +294,23 @@ func Test_GetT0(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Test_GetT0NotFoundPreservesResponseMetadata(t *testing.T) {
+	eC, ms := newClient(t)
+	ep := endpoints.GetEdgeGatewayServices()
+	ms.CleanResponse(ep)
+	status := http.StatusOK
+	ms.SetResponse(ep, &itypes.APIResponseNetworkServices{}, &status)
+
+	_, err := eC.GetT0(t.Context(), types.ParamsGetT0{
+		EdgegatewayName: generator.MustGenerate("{resource_name:edgegateway}"),
+	})
+	require.Error(t, err)
+
+	var apiErr *pkgerrors.APIError
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, http.StatusNotFound, apiErr.StatusCode)
+	assert.Equal(t, http.MethodGet, apiErr.Method)
+	assert.NotEmpty(t, apiErr.Endpoint)
 }

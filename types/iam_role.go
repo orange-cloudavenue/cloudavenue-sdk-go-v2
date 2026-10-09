@@ -30,6 +30,33 @@ type ModelToken struct {
 
 	// Href of the token's role
 	RoleHref string `documentation:"Href of the token's role"`
+
+	// Type of token (PROXY or EXTENSION).
+	Type string `documentation:"Type of token"`
+
+	// ExtensionID is the extension URN associated with an extension token.
+	ExtensionID string `documentation:"Extension ID associated with the token"`
+
+	// Token is the secret value returned when a token is created.
+	Token string `documentation:"Token value"`
+
+	// ExpirationTimeUTC is the token expiration timestamp in UTC.
+	ExpirationTimeUTC string `documentation:"Token expiration timestamp in UTC"`
+
+	// OwnerID is the token owner's entity ID.
+	OwnerID string `documentation:"Token owner ID"`
+
+	// OwnerName is the token owner's entity name.
+	OwnerName string `documentation:"Token owner name"`
+
+	// OrgID is the token organization entity ID.
+	OrgID string `documentation:"Token organization ID"`
+
+	// OrgName is the token organization entity name.
+	OrgName string `documentation:"Token organization name"`
+
+	// RequireRotation indicates whether refresh-token rotation is required.
+	RequireRotation *bool `documentation:"Whether refresh-token rotation is required"`
 }
 
 // ParamsGetToken defines parameters for getting a token.
@@ -52,6 +79,8 @@ type ParamsCreateToken struct {
 	RoleName    string
 	Description string
 	IsEnabled   bool
+	Type        string
+	ExtensionID string
 }
 
 // Validate checks ParamsCreateToken structural constraints.
@@ -73,6 +102,8 @@ type ParamsUpdateToken struct {
 	RoleName    string
 	Description string
 	IsEnabled   bool
+	Type        string
+	ExtensionID string
 }
 
 // Validate checks ParamsUpdateToken structural constraints.
@@ -152,6 +183,12 @@ type ModelGlobalRole struct {
 	// Description of the global role
 	Description string `documentation:"Description of the global role"`
 
+	// BundleKey is the read-only rights bundle key.
+	BundleKey string `documentation:"Rights bundle key of the global role"`
+
+	// ReadOnly indicates whether this global role is read-only.
+	ReadOnly bool `documentation:"Whether the global role is read-only"`
+
 	// Rights of the global role
 	Rights []*ModelRight `documentation:"Rights of the global role"`
 
@@ -163,6 +200,9 @@ type ModelGlobalRole struct {
 
 	// IsInternalRole indicates if the global role is an internal role
 	IsInternalRole bool `documentation:"Indicates if the global role is an internal role"`
+
+	// PublishAll indicates whether the role is published to all tenants.
+	PublishAll bool `documentation:"Whether the global role is published to all tenants"`
 }
 
 // ParamsGetGlobalRole defines parameters for getting a global role.
