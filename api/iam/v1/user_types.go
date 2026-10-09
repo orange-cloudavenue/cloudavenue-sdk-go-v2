@@ -90,6 +90,7 @@ type ParamsUpdateUser struct {
 	IsEnabled       *bool
 	DeployedVMQuota *int
 	StoredVMQuota   *int
+	TakeOwnership   bool
 }
 
 // Validate checks ParamsUpdateUser structural constraints.
@@ -158,9 +159,10 @@ func (p ParamsUnlockUser) Validate() error {
 
 // ParamsChangePassword defines parameters for changing a user's password.
 type ParamsChangePassword struct {
-	ID       string
-	Name     string
-	Password string
+	ID              string
+	Name            string
+	Password        string
+	CurrentPassword string
 }
 
 // Validate checks ParamsChangePassword structural constraints.
@@ -170,6 +172,9 @@ func (p ParamsChangePassword) Validate() error {
 	}
 	if p.Password == "" {
 		return fmt.Errorf("password is required")
+	}
+	if p.CurrentPassword == "" {
+		return fmt.Errorf("current_password is required")
 	}
 	return nil
 }
@@ -196,6 +201,9 @@ type ModelUser struct {
 
 	// Indicates if the user is enabled
 	IsEnabled bool `documentation:"Indicates if the user is enabled"`
+
+	// Indicates if the user is locked
+	IsLocked bool `documentation:"Indicates if the user is locked"`
 
 	// Deployed VM quota for the user
 	DeployedVMQuota *int `documentation:"Deployed VM quota for the user"`

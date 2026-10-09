@@ -10,7 +10,7 @@
 package iam
 
 import (
-	"encoding/xml"
+	"encoding/json"
 	"net/http"
 	"testing"
 
@@ -34,9 +34,19 @@ func newClient(t *testing.T) (*Client, *mock.Server) {
 }
 
 func xmlResponse(w http.ResponseWriter, v any) {
-	w.Header().Set("Content-Type", "application/xml")
+	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("X-Cloud-Avenue-Mock", "true")
-	if err := xml.NewEncoder(w).Encode(v); err != nil {
+	switch value := v.(type) {
+	case itypes.User:
+		v = itypes.APIUser{ID: value.ID, Username: value.Name, FullName: value.FullName, Email: value.EmailAddress, Phone: value.Telephone, Description: value.Description, Enabled: &value.IsEnabled, Locked: &value.IsLocked, ProviderType: value.ProviderType, RoleEntityRefs: []itypes.APIObjectReference{{ID: value.Role.ID, Name: value.Role.Name}}, DeployedVMQuota: value.DeployedVMQuota, StoredVMQuota: value.StoredVMQuota}
+	case itypes.Users:
+		users := make([]itypes.APIUser, 0, len(value.Users))
+		for _, user := range value.Users {
+			users = append(users, itypes.APIUser{ID: user.ID, Username: user.Name, FullName: user.FullName, Email: user.EmailAddress, Phone: user.Telephone, Description: user.Description, Enabled: &user.IsEnabled, ProviderType: user.ProviderType, RoleEntityRefs: []itypes.APIObjectReference{{ID: user.Role.ID, Name: user.Role.Name}}, DeployedVMQuota: user.DeployedVMQuota, StoredVMQuota: user.StoredVMQuota})
+		}
+		v = itypes.APIResponseListUsers{Users: users}
+	}
+	if err := json.NewEncoder(w).Encode(v); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -417,26 +427,26 @@ func TestUpdateUserPreservesExistingFields(t *testing.T) {
 
 	ms.CleanResponse(endpoints.UpdateUser())
 	ms.SetResponseFunc(endpoints.UpdateUser(), func(w http.ResponseWriter, r *http.Request) {
-		var body itypes.UserRequest
-		assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
+		var body itypes.APIUser
+		assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
 		assert.Equal(t, "Current Name", body.FullName)
-		assert.Equal(t, "1234567890", body.Telephone)
-		assert.Equal(t, "user1@example.com", body.EmailAddress)
-		if assert.NotNil(t, body.IsEnabled) {
-			assert.True(t, *body.IsEnabled)
+		assert.Equal(t, "1234567890", body.Phone)
+		assert.Equal(t, "user1@example.com", body.Email)
+		if assert.NotNil(t, body.Enabled) {
+			assert.True(t, *body.Enabled)
 		}
 		assert.Equal(t, new(4), body.DeployedVMQuota)
 		assert.Equal(t, new(7), body.StoredVMQuota)
-		xmlResponse(w, itypes.User{
-			Name:            body.Name,
+		xmlResponse(w, itypes.APIUser{
+			Username:        body.Username,
 			FullName:        body.FullName,
-			EmailAddress:    body.EmailAddress,
-			Telephone:       body.Telephone,
+			Email:           body.Email,
+			Phone:           body.Phone,
 			Description:     body.Description,
-			IsEnabled:       body.IsEnabled != nil && *body.IsEnabled,
+			Enabled:         body.Enabled,
 			DeployedVMQuota: body.DeployedVMQuota,
 			StoredVMQuota:   body.StoredVMQuota,
-			Role:            body.Role,
+			RoleEntityRefs:  body.RoleEntityRefs,
 		})
 	})
 
@@ -456,16 +466,16 @@ func TestUpdateUserCanDisableViaXMLPayload(t *testing.T) {
 
 	ms.CleanResponse(endpoints.UpdateUser())
 	ms.SetResponseFunc(endpoints.UpdateUser(), func(w http.ResponseWriter, r *http.Request) {
-		var body itypes.UserRequest
-		assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
-		if assert.NotNil(t, body.IsEnabled) {
-			assert.False(t, *body.IsEnabled)
+		var body itypes.APIUser
+		assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
+		if assert.NotNil(t, body.Enabled) {
+			assert.False(t, *body.Enabled)
 		}
 
-		xmlResponse(w, itypes.User{
-			Name:      "user1",
-			IsEnabled: false,
-			Role:      itypes.Reference{Name: "Organization Administrator"},
+		xmlResponse(w, itypes.APIUser{
+			Username:       "user1",
+			Enabled:        body.Enabled,
+			RoleEntityRefs: []itypes.APIObjectReference{{Name: "Organization Administrator"}},
 		})
 	})
 
@@ -730,16 +740,18 @@ func TestChangePassword(t *testing.T) {
 		{
 			name: "Change Password Success",
 			params: ParamsChangePassword{
-				ID:       generator.MustGenerate("{urn:user}"),
-				Password: "newsecret123",
+				ID:              generator.MustGenerate("{urn:user}"),
+				Password:        "newsecret123",
+				CurrentPassword: "oldsecret123",
 			},
 			expectedErr: false,
 		},
 		{
 			name: "Change Password by Name",
 			params: ParamsChangePassword{
-				Name:     "user1",
-				Password: "newsecret123",
+				Name:            "user1",
+				Password:        "newsecret123",
+				CurrentPassword: "oldsecret123",
 			},
 			expectedErr: false,
 		},
@@ -753,8 +765,9 @@ func TestChangePassword(t *testing.T) {
 		{
 			name: "Change Password Error 404",
 			params: ParamsChangePassword{
-				ID:       generator.MustGenerate("{urn:user}"),
-				Password: "newsecret123",
+				ID:              generator.MustGenerate("{urn:user}"),
+				Password:        "newsecret123",
+				CurrentPassword: "oldsecret123",
 			},
 			mockResponseStatus: 404,
 			expectedErr:        true,

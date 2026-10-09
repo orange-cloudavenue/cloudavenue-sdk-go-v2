@@ -42,7 +42,6 @@ func (c *Client) ListGlobalRoles(ctx context.Context) ([]*types.ModelGlobalRole,
 	resp, err := c.c.Do(
 		ctx,
 		ep,
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.OverrideSetResult(new(itypes.APIResponseListGlobalRoles)),
 	)
 	if err != nil {
@@ -68,7 +67,6 @@ func (c *Client) GetGlobalRole(ctx context.Context, params types.ParamsGetGlobal
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], params.ID),
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.OverrideSetResult(new(itypes.APIResponseGlobalRole)),
 	)
 	if err != nil {
@@ -98,7 +96,6 @@ func (c *Client) CreateGlobalRole(ctx context.Context, params types.ParamsCreate
 	resp, err := c.c.Do(
 		ctx,
 		ep,
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.SetBody(body),
 		cav.OverrideSetResult(new(itypes.APIResponseGlobalRole)),
 	)
@@ -130,7 +127,6 @@ func (c *Client) UpdateGlobalRole(ctx context.Context, params types.ParamsUpdate
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], params.ID),
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.SetBody(body),
 		cav.OverrideSetResult(new(itypes.APIResponseGlobalRole)),
 	)
@@ -157,7 +153,6 @@ func (c *Client) DeleteGlobalRole(ctx context.Context, params types.ParamsDelete
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], params.ID),
-		cav.SetCustomRestyOption(setJSONHeaders),
 	)
 	if err != nil {
 		return fmt.Errorf("%s: %w", opDeleteGlobalRole, err)
@@ -177,7 +172,6 @@ func (c *Client) ListGlobalRoleRights(ctx context.Context, params types.ParamsLi
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], params.ID),
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.OverrideSetResult(new(itypes.APIResponseGlobalRoleRights)),
 	)
 	if err != nil {
@@ -213,7 +207,6 @@ func (c *Client) AddGlobalRoleRights(ctx context.Context, params types.ParamsAdd
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], params.ID),
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.SetBody(body),
 		cav.OverrideSetResult(new(itypes.APIResponseGlobalRoleRights)),
 	)
@@ -250,7 +243,6 @@ func (c *Client) ReplaceGlobalRoleRights(ctx context.Context, params types.Param
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], params.ID),
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.SetBody(body),
 		cav.OverrideSetResult(new(itypes.APIResponseGlobalRoleRights)),
 	)
@@ -277,7 +269,6 @@ func (c *Client) ListGlobalRoleTenants(ctx context.Context, params types.ParamsL
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], params.ID),
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.OverrideSetResult(new(itypes.APIResponseGlobalRoleTenants)),
 	)
 	if err != nil {
@@ -305,7 +296,6 @@ func (c *Client) SetGlobalRoleTenants(ctx context.Context, params types.ParamsSe
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], params.ID),
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.SetBody(body),
 		cav.OverrideSetResult(new(itypes.APIResponseGlobalRoleTenants)),
 	)
@@ -334,7 +324,6 @@ func (c *Client) PublishGlobalRoleTenants(ctx context.Context, params types.Para
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], params.ID),
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.SetBody(body),
 	)
 	if err != nil {
@@ -357,7 +346,6 @@ func (c *Client) UnpublishGlobalRoleTenants(ctx context.Context, params types.Pa
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], params.ID),
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.SetBody(body),
 	)
 	if err != nil {
@@ -378,7 +366,6 @@ func (c *Client) PublishAllGlobalRoleTenants(ctx context.Context, params types.P
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], params.ID),
-		cav.SetCustomRestyOption(setJSONHeaders),
 	)
 	if err != nil {
 		return fmt.Errorf("%s: %w", opPublishAllGlobalRoleTenants, err)
@@ -398,7 +385,6 @@ func (c *Client) UnpublishAllGlobalRoleTenants(ctx context.Context, params types
 		ctx,
 		ep,
 		cav.WithPathParam(ep.PathParams[0], params.ID),
-		cav.SetCustomRestyOption(setJSONHeaders),
 	)
 	if err != nil {
 		return fmt.Errorf("%s: %w", opUnpublishAllGlobalRoleTenants, err)

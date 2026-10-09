@@ -7,5 +7,7 @@
  * or see the "LICENSE" file for more details.
  */
 
-// Package iam manages users through VMware Cloud Director's AdminOrg XML API.
+// Package iam manages organization users through VMware Cloud Director's
+// CloudAPI. IAM user operations are CloudAPI-backed, not Infrapi- or
+// AdminOrg-XML-backed.
 package iam
