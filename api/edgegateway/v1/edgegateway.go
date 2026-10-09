@@ -43,7 +43,7 @@ type updateEdgeGatewayByIDParams struct {
 var (
 	listEdgeGatewayOp = cav.Operation[struct{}, *types.ModelEdgeGateways]{
 		Name:     opListEdgeGateway,
-		Backend:  cav.BackendVMware,
+		Backend:  cav.BackendInfrapi,
 		Endpoint: endpoints.ListEdgeGateway(),
 		Extract: func(resp *cav.Response, _ struct{}) (*types.ModelEdgeGateways, error) {
 			list, ok := resp.Result().(*itypes.APIResponseEdgegateways)
@@ -56,7 +56,7 @@ var (
 	}
 	getEdgeGatewayByIDOp = cav.Operation[getEdgeGatewayByIDParams, *types.ModelEdgeGateway]{
 		Name:     opGetEdgeGateway,
-		Backend:  cav.BackendVMware,
+		Backend:  cav.BackendInfrapi,
 		Endpoint: endpoints.GetEdgeGateway(),
 		Validate: func(p getEdgeGatewayByIDParams) error {
 			if p.ID == "" {
