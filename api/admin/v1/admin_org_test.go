@@ -15,6 +15,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
@@ -133,6 +134,7 @@ func TestGetAdminOrgByID(t *testing.T) {
 
 	ms.CleanResponse(endpoints.GetAdminOrg())
 	ms.SetResponseFunc(endpoints.GetAdminOrg(), func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/api/admin/org/"+mockOrgID, r.URL.Path)
 		org := itypes.AdminOrg{
 			Name:            mockOrgName,
 			ID:              mockOrgID,
@@ -165,6 +167,7 @@ func TestGetAdminOrgByName(t *testing.T) {
 	// First call: list orgs to resolve by name.
 	ms.CleanResponse(endpoints.ListAdminOrgs())
 	ms.SetResponseFunc(endpoints.ListAdminOrgs(), func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/api/admin/orgs", r.URL.Path)
 		orgs := itypes.AdminOrgs{
 			Orgs: []itypes.AdminOrg{
 				{
@@ -182,6 +185,7 @@ func TestGetAdminOrgByName(t *testing.T) {
 	// Second call: get the resolved org by ID.
 	ms.CleanResponse(endpoints.GetAdminOrg())
 	ms.SetResponseFunc(endpoints.GetAdminOrg(), func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/api/admin/org/"+mockOrgID, r.URL.Path)
 		org := itypes.AdminOrg{
 			Name:        mockOrgName,
 			ID:          mockOrgID,
@@ -210,6 +214,19 @@ func TestGetAdminOrg_ValidateError(t *testing.T) {
 
 	_, err := client.GetAdminOrg(t.Context(), types.ParamsGetAdminOrg{})
 	assert.Error(t, err)
+}
+
+func TestGetAdminOrgByName_NotFound(t *testing.T) {
+	client, ms := newClient(t)
+
+	ms.CleanResponse(endpoints.ListAdminOrgs())
+	ms.SetResponseFunc(endpoints.ListAdminOrgs(), func(w http.ResponseWriter, _ *http.Request) {
+		xmlResponse(w, itypes.AdminOrgs{Orgs: []itypes.AdminOrg{{Name: "other-org", ID: mockOrgID}}})
+	})
+
+	result, err := client.GetAdminOrg(t.Context(), types.ParamsGetAdminOrg{Name: mockOrgName})
+	assert.Nil(t, result)
+	require.EqualError(t, err, `Admin.GetOrg: organization with name "org1" not found`)
 }
 
 func TestGetAdminOrg_NotFound(t *testing.T) {
