@@ -85,7 +85,7 @@ func init() {
 				},
 			},
 			{
-				Name:        pathParamVdcName,
+				Name:        pathParamVDCName,
 				Description: "The name of the VDC where the edge gateway will be created.",
 				Required:    true,
 			},

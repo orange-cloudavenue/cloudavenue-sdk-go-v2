@@ -28,8 +28,12 @@ const (
 	// These duplicate cav.DocURLVMware and cav.DocURLCerberus on purpose: the
 	// endpoint generator renders a cross-package reference as "pkg.Name", not as
 	// the value, so aliasing them would blank every generated comment here.
-	docURLVMware   = "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/"
-	docURLCerberus = "https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API"
+	headerAccept      = "Accept"
+	headerContentType = "Content-Type"
+	headerXML         = "application/xml"
+	descUserURN       = "User URN"
+	docURLVMware      = "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/"
+	docURLCerberus    = "https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API"
 
 	queryParamFilter   = "filter"
 	queryParamQ        = "q"

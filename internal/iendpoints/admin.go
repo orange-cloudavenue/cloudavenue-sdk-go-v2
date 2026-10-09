@@ -24,7 +24,7 @@ func init() {
 		Description:      "List organizations (admin scope)",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
+		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
 		PathTemplate:     pathAdminOrgs,
 		ResponseType:     itypes.AdminOrgs{},
 	}.Register()
@@ -36,7 +36,7 @@ func init() {
 		Description:      "Get an organization by ID (admin scope)",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
+		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
 		PathTemplate:     pathAdminOrg,
 		PathParams:       []cav.PathParam{{Name: pathParamOrgID, Description: descOrgID, Required: true}},
 		ResponseType:     itypes.AdminOrg{},
@@ -50,7 +50,7 @@ func init() {
 		Description:      "List catalogs (admin scope)",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
+		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
 		PathTemplate:     pathAdminCatalogs,
 		ResponseType:     itypes.AdminCatalogs{},
 	}.Register()
@@ -62,7 +62,7 @@ func init() {
 		Description:      "Get a catalog by ID (admin scope)",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
+		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
 		PathTemplate:     pathAdminCatalog,
 		PathParams: []cav.PathParam{
 			{
@@ -81,7 +81,7 @@ func init() {
 		Description:      "Create a catalog (admin scope)",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
+		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
 		PathTemplate:     pathAdminOrgCatalogs,
 		PathParams: []cav.PathParam{
 			{
@@ -101,7 +101,7 @@ func init() {
 		Description:      "Update a catalog (admin scope)",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
+		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
 		PathTemplate:     pathAdminCatalog,
 		PathParams: []cav.PathParam{
 			{
@@ -121,7 +121,7 @@ func init() {
 		Description:      "Delete a catalog (admin scope)",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
+		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
 		PathTemplate:     pathAdminCatalog,
 		PathParams: []cav.PathParam{
 			{
@@ -134,12 +134,12 @@ func init() {
 
 	// GetAdminCatalogACL
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/",
+		DocumentationURL: docURLVMware,
 		Name:             "GetAdminCatalogACL",
 		Description:      "Get catalog ACL (admin scope)",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
+		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
 		PathTemplate:     pathAdminCatalogControlAccess,
 		PathParams: []cav.PathParam{
 			{
@@ -153,12 +153,12 @@ func init() {
 
 	// SetAdminCatalogACL
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/",
+		DocumentationURL: docURLVMware,
 		Name:             "SetAdminCatalogACL",
 		Description:      "Set catalog ACL (admin scope)",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{"Accept": "application/xml", "Content-Type": "application/xml"},
+		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
 		PathTemplate:     pathAdminCatalogControlAccessAction,
 		PathParams: []cav.PathParam{
 			{
