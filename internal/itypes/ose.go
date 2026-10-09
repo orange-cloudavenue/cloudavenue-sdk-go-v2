@@ -9,15 +9,12 @@
 
 package itypes
 
-// APIResponseAssociatedTenant represents a tenant associated with the current user.
-type APIResponseAssociatedTenant struct {
+// APIResponseListAssociatedTenants represents the response for listing associated tenants.
+type APIResponseListAssociatedTenants []struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description,omitempty"`
 }
-
-// APIResponseListAssociatedTenants represents the response for listing associated tenants.
-type APIResponseListAssociatedTenants []APIResponseAssociatedTenant
 
 // APIResponseS3Credentials represents S3 access credentials returned by OSE.
 type APIResponseS3Credentials struct {
