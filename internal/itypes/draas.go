@@ -15,7 +15,6 @@ import (
 
 type (
 	APIResponseListDraasOnPremise []string
-	APIRequestAddDraasOnPremiseIP string
 )
 
 func (r APIResponseListDraasOnPremise) ToModel() *types.ModelListDraasOnPremise {

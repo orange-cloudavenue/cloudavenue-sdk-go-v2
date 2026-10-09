@@ -102,7 +102,6 @@ type APIResponseLDAPUser struct {
 // APIResponseLDAPGroup represents a single LDAP group returned by SearchLDAPGroups.
 type APIResponseLDAPGroup struct {
 	Name string `json:"name,omitempty"`
-	ID   string `json:"id,omitempty"`
 }
 
 // ToModel converts the APIResponseLDAPTestResult to ModelLDAPTestResult.
