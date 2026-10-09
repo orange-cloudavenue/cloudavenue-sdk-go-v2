@@ -7,5 +7,8 @@
  * or see the "LICENSE" file for more details.
  */
 
-// Package admin provides CloudAvenue admin API clients for VMware Cloud Director admin operations (/api/admin).
+// Package admin provides CloudAvenue admin API clients for VMware Cloud Director
+// admin operations (/api/admin). AdminOrg views are read-only and XML-backed;
+// use the organization API for organization configuration updates, including
+// state changes through Infrapi.
 package admin

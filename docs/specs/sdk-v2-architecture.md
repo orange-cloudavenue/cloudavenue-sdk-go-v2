@@ -634,22 +634,21 @@ here, recorded for traceability):
   support a shared abstraction better than the old architecture did. This
   should be **re-examined**, not assumed settled, when the vdc/vdcgroup
   domain is implemented.
-- **IAM (Users)**: prior conclusion in this section relied on VMware
-  `cloudapi` paths, not on the true customer API surface. That basis is not
-  sufficient for assigning IAM Users to `BackendInfrapi`, so that decision is
-  retracted here.
+- **IAM (Users)**: IAM user operations use VMware `cloudapi`, not the true
+  customer API surface. That basis is not sufficient for assigning IAM Users
+  to `BackendInfrapi`.
 
-  Current verified implementation remains the VMware Cloud Director AdminOrg
-  XML API used by `api/iam/v1` today. True customer API support for IAM user
-  CRUD through infrapi/Cerberus is **unverified** against this repository's
-  customer API source of truth,
-  `docs/infrapi/NGP_Api_for_Customer_Cerberus_Cloud_Avenue.yml`.
+  Current verified implementation uses VMware CloudAPI for IAM users through
+  `api/iam/v1`. IAM user CRUD is therefore CloudAPI-backed, not AdminOrg XML-
+  backed or Infrapi-backed. True customer API support for IAM user CRUD through
+  infrapi/Cerberus remains **unverified** against this repository's customer API
+  source of truth, `docs/infrapi/NGP_Api_for_Customer_Cerberus_Cloud_Avenue.yml`.
 
   VMware `cloudapi` remains a separate source of truth at
   `docs/vmware/cloudapi.json`. Evidence from VMware `/cloudapi/...` endpoints
   does not, by itself, establish customer API coverage for IAM Users.
 
-  No backend migration decision is made in this document for IAM Users.
+  No migration to Infrapi is implied by the VMware CloudAPI implementation.
 - **Org Properties**: the endpoint-identity question is **resolved**. v1's
   `infrapicustomerproxy` path and v2's `UpdateOrganization` are the same
   operation: both are `PUT /infrapicustomerproxy/v2.0/configurations`, so
@@ -791,8 +790,9 @@ Four of the five questions previously open are resolved; item 3 is explicitly no
    no infrapi credential-exchange surface exists for NetBackup; it keeps its
    own OAuth2 password-grant flow as a documented, explicit exception to
    §8.1.
-3. **IAM user CRUD REST availability** (§9.5) — **NOT resolved: no backend
-   decision is made for IAM Users.** A live GET probe on 2026-09-30 (org
+3. **IAM user CRUD backend identity** (§9.5) — **resolved: IAM Users use
+   VMware CloudAPI, not Infrapi or the legacy AdminOrg XML API.** A live GET
+   probe on 2026-09-30 (org
    `cav01xxxxxxxxxxx6205`, console1; GET/OPTIONS only, no writes) returned
    **200** for `GET /cloudapi/1.0.0/users`, **200** for a FIQL-filtered
    `?filter=username==…` query, and **200** for a URN-keyed
@@ -803,14 +803,13 @@ Four of the five questions previously open are resolved; item 3 is explicitly no
    customer API coverage: `/cloudapi/1.0.0/...` is a VMware path, and §9.5
    states that evidence from VMware `/cloudapi/...` endpoints does not by
    itself establish customer API coverage. It therefore cannot support a
-   `BackendInfrapi` assignment, which would additionally require retiring the
-   AdminOrg XML path. The customer API source of truth records no IAM user
-   CRUD surface at all, so the target contract remains unproven.
+    `BackendInfrapi` assignment. The customer API source of truth records no
+    IAM user CRUD surface, so an Infrapi-backed implementation remains
+    unproven.
 
-   Current code is `BackendVMware` on the AdminOrg XML API
-   (`internal/iendpoints/iam.go`), consistent with the above. The earlier
-   "resolved" wording in this section is retracted: it drew a backend
-   conclusion from the evidence class §9.5 explicitly excludes.
+    Current code is `BackendVMware` on VMware CloudAPI
+    (`internal/iendpoints/iam.go`). No AdminOrg XML path is used for IAM user
+    operations.
 
    If IAM Users is later migrated, the documented JSON contract is
    `VcdUser`, and its `deployedVmQuota`/`storedVmQuota` fields are
