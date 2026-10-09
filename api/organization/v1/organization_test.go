@@ -10,11 +10,15 @@
 package organization
 
 import (
+	"context"
+	"encoding/json"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
@@ -200,6 +204,51 @@ func TestUpdateOrganization(t *testing.T) {
 			assert.Nil(t, err, "expected no error but got: %v", err)
 			assert.NotNil(t, resp, "expected a response but got nil")
 			assert.NotEmpty(t, resp, "expected a non-empty response but got empty")
+		})
+	}
+}
+
+func TestOrganizationEnableDisableUseInfrapiIsEnabled(t *testing.T) {
+	tests := []struct {
+		name    string
+		enabled bool
+		call    func(*Client, context.Context) (*types.ModelGetOrganization, error)
+	}{
+		{
+			name:    "enable",
+			enabled: true,
+			call:    (*Client).EnableOrganization,
+		},
+		{
+			name:    "disable",
+			enabled: false,
+			call:    (*Client).DisableOrganization,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+			ms.CleanResponse(endpoints.GetOrganization())
+			ms.SetResponse(endpoints.GetOrganization(), &itypes.APIResponseGetOrg{
+				Name:                "org",
+				FullName:            "Current organization",
+				Description:         "Current description",
+				IsEnabled:           !tt.enabled,
+				CustomerMail:        "org@example.com",
+				InternetBillingMode: internetBillingModePAYG,
+			}, nil)
+			ms.CleanResponse(endpoints.UpdateOrganization())
+			ms.SetResponseFunc(endpoints.UpdateOrganization(), func(w http.ResponseWriter, r *http.Request) {
+				var body itypes.APIRequestUpdateOrg
+				assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
+				assert.Equal(t, tt.enabled, body.IsEnabled)
+				w.WriteHeader(http.StatusAccepted)
+			})
+
+			result, err := tt.call(client, t.Context())
+			assert.NoError(t, err)
+			assert.NotNil(t, result)
 		})
 	}
 }
