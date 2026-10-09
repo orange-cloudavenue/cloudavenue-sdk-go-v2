@@ -33,14 +33,13 @@ func UpdateOrganization() *cav.Endpoint {
 }
 // GetCatalogAccessControl - List catalog access control grants
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/catalogs/catalogUrn/accessControls/get/
 func GetCatalogAccessControl() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetCatalogAccessControl")
 }
 // SetCatalogAccessControl - Set catalog access control grants
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/catalogs/catalogUrn/accessControls/put/
 func SetCatalogAccessControl() *cav.Endpoint {
 	return cav.MustGetEndpoint("SetCatalogAccessControl")
 }
-
