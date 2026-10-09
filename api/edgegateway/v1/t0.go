@@ -15,6 +15,7 @@ import (
 	"net/http"
 
 	"github.com/orange-cloudavenue/common-go/urn"
+	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
@@ -28,9 +29,7 @@ const nodeTypeEdgeGateway = "edge-gateway"
 
 // ListT0 lists T0 routers visible to organization.
 func (c *Client) ListT0(ctx context.Context) (*types.ModelT0s, error) {
-	ep := endpoints.ListT0()
-
-	resp, err := c.c.Do(ctx, ep)
+	resp, err := c.c.Do(ctx, endpoints.ListT0())
 	if err != nil {
 		return nil, fmt.Errorf("error listing T0s: %w", err)
 	}
@@ -44,6 +43,14 @@ func (c *Client) GetT0(ctx context.Context, params types.ParamsGetT0) (*types.Mo
 		return c.getT0ByName(ctx, params)
 	}
 
+	if params.EdgegatewayID == "" && params.EdgegatewayName == "" {
+		return nil, fmt.Errorf("edge gateway id or name is required when t0 name is not provided")
+	}
+
+	if err := validateEdgeGatewayRef(params.EdgegatewayID, params.EdgegatewayName); err != nil {
+		return nil, err
+	}
+
 	return c.getT0ByEdgeGateway(ctx, params)
 }
 
@@ -52,12 +59,12 @@ func (c *Client) getT0ByName(ctx context.Context, params types.ParamsGetT0) (*ty
 
 	resp, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], params.T0Name))
 	if err != nil {
-		return nil, fmt.Errorf("error getting T0: %w", err)
+		return nil, wrapT0APIError("GetT0", err, resp)
 	}
 
 	result := resp.Result().(*itypes.APIResponseT0).ToModel()
 	if len(result.T0s) == 0 || result.T0s[0].Name == "" {
-		return nil, newT0NotFoundError(params)
+		return nil, newT0NotFoundError(params, resp)
 	}
 
 	return &result.T0s[0], nil
@@ -66,12 +73,12 @@ func (c *Client) getT0ByName(ctx context.Context, params types.ParamsGetT0) (*ty
 func (c *Client) getT0ByEdgeGateway(ctx context.Context, params types.ParamsGetT0) (*types.ModelT0, error) {
 	resp, err := c.c.Do(ctx, endpoints.GetEdgeGatewayServices())
 	if err != nil {
-		return nil, fmt.Errorf("error getting T0: %w", err)
+		return nil, wrapT0APIError("GetT0", err, resp)
 	}
 
 	t0Name := findT0NameForEdgeGateway(resp.Result().(*itypes.APIResponseNetworkServices), params)
 	if t0Name == "" {
-		return nil, newT0NotFoundError(params)
+		return nil, newT0NotFoundError(params, resp)
 	}
 
 	return c.getT0ByName(ctx, types.ParamsGetT0{T0Name: t0Name})
@@ -103,8 +110,8 @@ func findT0NameForEdgeGateway(t0s *itypes.APIResponseNetworkServices, params typ
 	return ""
 }
 
-func newT0NotFoundError(params types.ParamsGetT0) error {
-	return &errors.APIError{
+func newT0NotFoundError(params types.ParamsGetT0, resp *resty.Response) error {
+	apiErr := &errors.APIError{
 		Operation:     "GetT0",
 		StatusCode:    http.StatusNotFound,
 		StatusMessage: http.StatusText(http.StatusNotFound),
@@ -118,4 +125,38 @@ func newT0NotFoundError(params types.ParamsGetT0) error {
 			return fmt.Sprintf("T0 for edge gateway with name %s not found", params.EdgegatewayName)
 		}(),
 	}
+	if resp != nil {
+		apiErr.Duration = resp.Duration()
+		if resp.Request != nil {
+			apiErr.Endpoint = resp.Request.URL
+			apiErr.Method = resp.Request.Method
+		}
+	}
+
+	return apiErr
+}
+
+func wrapT0APIError(operation string, err error, resp *resty.Response) error {
+	if err == nil {
+		return nil
+	}
+
+	var apiErr *errors.APIError
+	if !errors.As(err, &apiErr) {
+		return fmt.Errorf("error getting T0: %w", err)
+	}
+
+	if resp != nil {
+		apiErr.Duration = resp.Duration()
+		if resp.Request != nil {
+			apiErr.Endpoint = resp.Request.URL
+			apiErr.Method = resp.Request.Method
+		}
+	}
+
+	if apiErr.Operation == "" {
+		apiErr.Operation = operation
+	}
+
+	return apiErr
 }

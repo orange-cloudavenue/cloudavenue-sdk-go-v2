@@ -33,10 +33,13 @@ type (
 		ID              string                       `json:"id,omitempty"`
 		Name            string                       `json:"name,omitempty"`
 		Description     string                       `json:"description,omitempty"`
+		BundleKey       string                       `json:"bundleKey,omitempty"`
+		ReadOnly        bool                         `json:"readOnly"`
 		Rights          []APIResponseGlobalRoleRight `json:"rights,omitempty"`
 		NumberOfTenants int                          `json:"numberOfTenants,omitempty"`
-		CanPublish      bool                         `json:"canPublish,omitempty"`
-		IsInternalRole  bool                         `json:"isInternalRole,omitempty"`
+		CanPublish      bool                         `json:"canPublish"`
+		IsInternalRole  bool                         `json:"isInternalRole"`
+		PublishAll      bool                         `json:"publishAll"`
 	}
 
 	// APIResponseGlobalRoleRight represents a right in a global role response.
@@ -47,7 +50,7 @@ type (
 		BundleKey        string `json:"bundleKey,omitempty"`
 		Category         string `json:"category,omitempty"`
 		RightType        string `json:"rightType,omitempty"`
-		IsPublishable    bool   `json:"isPublishable,omitempty"`
+		IsPublishable    bool   `json:"isPublishable"`
 		ServiceNamespace string `json:"serviceNamespace,omitempty"`
 	}
 
@@ -105,10 +108,13 @@ func (api *APIResponseGlobalRole) ToModel() *types.ModelGlobalRole {
 		ID:              api.ID,
 		Name:            api.Name,
 		Description:     api.Description,
+		BundleKey:       api.BundleKey,
+		ReadOnly:        api.ReadOnly,
 		Rights:          rights,
 		NumberOfTenants: api.NumberOfTenants,
 		CanPublish:      api.CanPublish,
 		IsInternalRole:  api.IsInternalRole,
+		PublishAll:      api.PublishAll,
 	}
 }
 
@@ -193,17 +199,26 @@ type (
 		ID          string             `json:"id,omitempty"`
 		Name        string             `json:"name,omitempty"`
 		Description string             `json:"description,omitempty"`
+		Type        string             `json:"type,omitempty"`
+		ExtensionID string             `json:"extensionId,omitempty"`
 		Role        APIObjectReference `json:"role,omitempty"`
-		Enabled     bool               `json:"enabled,omitempty"`
+		Enabled     bool               `json:"enabled"`
 	}
 
 	// APIResponseToken represents a token response.
 	APIResponseToken struct {
-		ID          string             `json:"id,omitempty"`
-		Name        string             `json:"name,omitempty"`
-		Description string             `json:"description,omitempty"`
-		Enabled     bool               `json:"enabled,omitempty"`
-		Role        APIObjectReference `json:"role,omitempty"`
+		ID                string             `json:"id,omitempty"`
+		Name              string             `json:"name,omitempty"`
+		Description       string             `json:"description,omitempty"`
+		Token             string             `json:"token,omitempty"`
+		ExpirationTimeUTC string             `json:"expirationTimeUtc,omitempty"`
+		ExtensionID       string             `json:"extensionId,omitempty"`
+		Owner             APIObjectReference `json:"owner,omitempty"`
+		Org               APIObjectReference `json:"org,omitempty"`
+		Type              string             `json:"type,omitempty"`
+		RequireRotation   *bool              `json:"requireRotation,omitempty"`
+		Enabled           bool               `json:"enabled"`
+		Role              APIObjectReference `json:"role,omitempty"`
 	}
 
 	// APIResponseListTokens represents the wrapper for a list of tokens.
@@ -219,12 +234,21 @@ func (api *APIResponseToken) ToModel() *types.ModelToken {
 	}
 
 	return &types.ModelToken{
-		ID:          api.ID,
-		Name:        api.Name,
-		Description: api.Description,
-		Enabled:     api.Enabled,
-		RoleName:    api.Role.Name,
-		RoleHref:    api.Role.ID,
+		ID:                api.ID,
+		Name:              api.Name,
+		Description:       api.Description,
+		Enabled:           api.Enabled,
+		RoleName:          api.Role.Name,
+		RoleHref:          api.Role.ID,
+		Type:              api.Type,
+		ExtensionID:       api.ExtensionID,
+		Token:             api.Token,
+		ExpirationTimeUTC: api.ExpirationTimeUTC,
+		OwnerID:           api.Owner.ID,
+		OwnerName:         api.Owner.Name,
+		OrgID:             api.Org.ID,
+		OrgName:           api.Org.Name,
+		RequireRotation:   api.RequireRotation,
 	}
 }
 
