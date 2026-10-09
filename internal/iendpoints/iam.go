@@ -156,14 +156,7 @@ func init() {
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathTokenGet,
-		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
-		},
-		ResponseType: itypes.APIResponseListTokens{},
+		ResponseType:     itypes.APIResponseListTokens{},
 	}.Register()
 
 	// GetToken
@@ -263,6 +256,7 @@ func init() {
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathLDAPTest,
+		PathParams:       []cav.PathParam{{Name: pathParamOrgID, Description: descOrgID, Required: true}},
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        "username",
@@ -282,6 +276,7 @@ func init() {
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathLDAPSync,
+		PathParams:       []cav.PathParam{{Name: pathParamOrgID, Description: descOrgID, Required: true}},
 		BodyRequestType:  nil, // No request body for this endpoint.
 		ResponseType:     struct{}{},
 	}.Register()
@@ -294,6 +289,7 @@ func init() {
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathLDAPSearchUsers,
+		PathParams:       []cav.PathParam{{Name: pathParamOrgID, Description: descOrgID, Required: true}},
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        queryParamQ,
@@ -312,6 +308,7 @@ func init() {
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathLDAPSearchGroups,
+		PathParams:       []cav.PathParam{{Name: pathParamOrgID, Description: descOrgID, Required: true}},
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        queryParamQ,
