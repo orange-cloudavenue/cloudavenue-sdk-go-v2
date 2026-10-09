@@ -98,6 +98,10 @@ func (c *Client) EnableCloudavenueServices(ctx context.Context, params types.Par
 		return fmt.Errorf("id or name is required")
 	}
 
+	if err := validateEdgeGatewayRef(params.ID, params.Name); err != nil {
+		return err
+	}
+
 	ep := endpoints.EnableCloudavenueServices()
 
 	if params.ID == "" {
