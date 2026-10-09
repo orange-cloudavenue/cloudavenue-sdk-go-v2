@@ -40,7 +40,6 @@ func (c *Client) TestLDAP(ctx context.Context, params types.ParamsTestLDAP) (*ty
 
 	ep := endpoints.TestLDAP()
 	opts := []cav.EndpointRequestOption{
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.SetBody(body),
 		cav.OverrideSetResult(new(itypes.APIResponseLDAPTestResult)),
 	}
@@ -72,7 +71,6 @@ func (c *Client) SyncLDAP(ctx context.Context, params types.ParamsSyncLDAP) erro
 	_, err := c.c.Do(
 		ctx,
 		ep,
-		cav.SetCustomRestyOption(setJSONHeaders),
 	)
 	if err != nil {
 		return fmt.Errorf("%s: %w", opSyncLDAP, err)
@@ -90,7 +88,6 @@ func (c *Client) SearchLDAPUsers(ctx context.Context, params types.ParamsSearchL
 
 	ep := endpoints.SearchLDAPUsers()
 	opts := []cav.EndpointRequestOption{
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.OverrideSetResult(new([]itypes.APIResponseLDAPUser)),
 	}
 
@@ -123,7 +120,6 @@ func (c *Client) SearchLDAPGroups(ctx context.Context, params types.ParamsSearch
 
 	ep := endpoints.SearchLDAPGroups()
 	opts := []cav.EndpointRequestOption{
-		cav.SetCustomRestyOption(setJSONHeaders),
 		cav.OverrideSetResult(new([]itypes.APIResponseLDAPGroup)),
 	}
 

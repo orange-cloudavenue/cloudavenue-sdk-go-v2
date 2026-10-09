@@ -30,8 +30,8 @@ type (
 		OrgVDC                  *APIObjectReference `json:"orgVdcRef,omitempty"`
 
 		// Values are in MB
-		Limit int `json:"storageLimitMb" fake:"{number:100000,81920000}"` //nolint:tagliatelle
-		Used  int `json:"storageUsedMB" fake:"{number:1000,100000}"`      //nolint:tagliatelle
+		Limit int `json:"storageLimitMb" fake:"{number:100000,81920000}"`
+		Used  int `json:"storageUsedMB" fake:"{number:1000,100000}"` //nolint:tagliatelle // upstream field spelling
 
 		// VDC information
 		VDCID   string `json:"vdc" fake:"{href_uuid}"`
@@ -52,8 +52,8 @@ func (r *APIResponseListStorageProfile) UnmarshalJSON(data []byte) error {
 		OrgVDC                  *APIObjectReference `json:"orgVdcRef"`
 		LegacyOrgVDC            *APIObjectReference `json:"orgVdc"`
 		Limit                   int                 `json:"storageLimitMb"`
-		LegacyLimit             int                 `json:"storageLimitMB"`
-		Used                    int                 `json:"storageUsedMB"`
+		LegacyLimit             int                 `json:"storageLimitMB"` //nolint:tagliatelle
+		Used                    int                 `json:"storageUsedMB"`  //nolint:tagliatelle
 		VDCID                   string              `json:"vdc"`
 		VDCName                 string              `json:"vdcName"`
 	}
