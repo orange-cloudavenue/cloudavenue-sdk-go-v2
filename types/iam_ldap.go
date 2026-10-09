@@ -33,9 +33,6 @@ type ModelLDAPUser struct {
 	// Name is the LDAP user name (sAMAccountName / uid).
 	Name string `documentation:"Name of the LDAP user"`
 
-	// DN is the distinguished name of the user.
-	DN string `documentation:"Distinguished name of the LDAP user"`
-
 	// Email is the LDAP user email address.
 	Email string `documentation:"Email address of the LDAP user"`
 
@@ -48,11 +45,6 @@ type ModelLDAPGroup struct {
 	// Name is the LDAP group name.
 	Name string `documentation:"Name of the LDAP group"`
 
-	// DN is the distinguished name of the group.
-	DN string `documentation:"Distinguished name of the LDAP group"`
-
-	// Members is the list of distinguished names of the group members.
-	Members []string `documentation:"List of distinguished names of the group members"`
 }
 
 // ParamsTestLDAP defines parameters for testing an LDAP connection.
@@ -166,15 +158,6 @@ func (p ParamsSyncLDAP) Validate() error {
 type ParamsSearchLDAP struct {
 	// Filter is an LDAP search filter.
 	Filter string
-
-	// MaxResults is the maximum number of results to return.
-	MaxResults string
-
-	// PageSize is the page size for paginated searches.
-	PageSize string
-
-	// Page is the page index to fetch.
-	Page string
 }
 
 // Validate checks ParamsSearchLDAP structural constraints.
