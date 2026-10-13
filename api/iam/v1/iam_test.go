@@ -86,6 +86,7 @@ func TestListUsers(t *testing.T) {
 			} else {
 				ms.CleanResponse(endpoints.ListUsers())
 				ms.SetResponseFunc(endpoints.ListUsers(), func(w http.ResponseWriter, r *http.Request) {
+					assert.Equal(t, "application/json;version=39.1", r.Header.Get("Accept"))
 					users := itypes.Users{
 						Users: []itypes.User{
 							{Name: "user1", FullName: "User One", EmailAddress: "user1@example.com", IsEnabled: true, Role: itypes.Reference{Name: "Organization Administrator"}},
