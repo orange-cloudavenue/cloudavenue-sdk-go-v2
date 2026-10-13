@@ -50,21 +50,21 @@ func DeleteVDCNetwork() *cav.Endpoint {
 
 // GetNetworkDhcpConfig - Get the DHCP configuration of an Org VDC Network
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp/get/
 func GetNetworkDhcpConfig() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetNetworkDhcpConfig")
 }
 
 // UpdateNetworkDhcpConfig - Update the DHCP configuration of an Org VDC Network
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp/put/
 func UpdateNetworkDhcpConfig() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateNetworkDhcpConfig")
 }
 
 // DeleteNetworkDhcpConfig - Delete the DHCP configuration of an Org VDC Network
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp/delete/
 func DeleteNetworkDhcpConfig() *cav.Endpoint {
 	return cav.MustGetEndpoint("DeleteNetworkDhcpConfig")
 }
