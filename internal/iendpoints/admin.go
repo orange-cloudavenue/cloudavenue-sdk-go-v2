@@ -132,7 +132,9 @@ func init() {
 		},
 	}.Register()
 
-	// GetAdminCatalogACL
+	// GetAdminCatalogACL has no corresponding operation in Broadcom's published
+	// VMware Cloud Director documentation. Its route and XML contract are
+	// reverse-engineered from the admin API behavior and covered by SDK tests.
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-ControlAccessParams-catalog.html",
 		Name:             "GetAdminCatalogACL",
@@ -151,7 +153,9 @@ func init() {
 		ResponseType: itypes.ControlAccessParams{},
 	}.Register()
 
-	// SetAdminCatalogACL
+	// SetAdminCatalogACL has no corresponding operation in Broadcom's published
+	// VMware Cloud Director documentation. Its route and XML contract are
+	// reverse-engineered from the admin API behavior and covered by SDK tests.
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-ControlAccess-catalog.html",
 		Name:             "SetAdminCatalogACL",
