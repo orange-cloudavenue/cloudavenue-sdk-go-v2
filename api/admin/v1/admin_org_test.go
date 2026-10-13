@@ -83,6 +83,7 @@ func TestListAdminOrgs(t *testing.T) {
 			} else {
 				ms.CleanResponse(endpoints.ListAdminOrgs())
 				ms.SetResponseFunc(endpoints.ListAdminOrgs(), func(w http.ResponseWriter, r *http.Request) {
+					assert.Equal(t, "application/xml;version=39.1", r.Header.Get("Accept"))
 					orgs := itypes.AdminOrgs{
 						Orgs: []itypes.AdminOrg{
 							{
