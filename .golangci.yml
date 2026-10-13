@@ -42,7 +42,6 @@ linters:
     - rowserrcheck # checks whether Err of rows is checked successfully [fast: false, auto-fix: false]
     - sqlclosecheck # Checks that sql.Rows and sql.Stmt are closed. [fast: false, auto-fix: false]
     - staticcheck # Staticcheck is `go vet` on steroids [fast: false, auto-fix: false]
-    - tagliatelle # Checks for the presence of struct tags [fast: false, auto-fix: false]
     - tparallel # tparallel detects inappropriate usage of t.Parallel() method in your Go test codes [fast: false, auto-fix: false]
     - unconvert # Remove unnecessary type conversions [fast: false, auto-fix: false]
     - unparam # Finds function parameters that are not used [fast: false, auto-fix: false]
@@ -69,6 +68,7 @@ linters:
     - varnamelen
     - wrapcheck
     - wsl
+    - tagliatelle # Checks for the presence of struct tags [fast: false, auto-fix: false]
   settings:
     gosec:
       excludes:
