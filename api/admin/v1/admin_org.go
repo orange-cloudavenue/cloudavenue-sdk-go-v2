@@ -59,13 +59,11 @@ func (c *Client) GetAdminOrg(ctx context.Context, params types.ParamsGetAdminOrg
 	}
 
 	idOrName := params.ID
-	if idOrName == "" {
-		idOrName = params.Name
-	}
 
 	// If only the name is provided, resolve it against the admin org list so the
 	// path parameter receives a value vCD accepts (name or id).
 	if params.ID == "" && params.Name != "" {
+		idOrName = params.Name
 		orgs, err := c.ListAdminOrgs(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("%s: list orgs: %w", opGetAdminOrg, err)
