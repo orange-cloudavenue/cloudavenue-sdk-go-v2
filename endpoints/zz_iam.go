@@ -92,9 +92,16 @@ func ListTokens() *cav.Endpoint {
 
 // GetToken - Get token by ID
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/sessions/id/token/get/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/tokens/id/get/
 func GetToken() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetToken")
+}
+
+// GetSessionToken - Get token associated with a session
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/sessions/id/token/get/
+func GetSessionToken() *cav.Endpoint {
+	return cav.MustGetEndpoint("GetSessionToken")
 }
 
 // CreateToken - Create a new token in organization

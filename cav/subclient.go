@@ -25,6 +25,7 @@ const (
 	ClientCerberus  subClientName = "cerberus"
 	ClientOSE       subClientName = "ose"
 	ClientNetbackup subClientName = "netbackup"
+	ClientIHM       subClientName = "ihm"
 )
 
 type subclient struct {
@@ -54,6 +55,7 @@ var subClients = map[subClientName]subClientInterface{
 	ClientCerberus:  newCerberusClient(),
 	ClientOSE:       newOSEClient(),
 	ClientNetbackup: newNetbackupClient(),
+	ClientIHM:       newIHMClient(),
 }
 
 func (s *subclient) getCredential() auth {

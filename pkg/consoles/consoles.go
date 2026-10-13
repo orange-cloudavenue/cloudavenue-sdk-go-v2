@@ -321,6 +321,14 @@ func (c ConsoleName) GetAPIVCDEndpoint() string {
 	return consoles[c].Services.APIVCD.GetEndpoint()
 }
 
+// GetIHMEndpoint returns the console-native IHM endpoint.
+func (c ConsoleName) GetIHMEndpoint() string {
+	mu.RLock()
+	defer mu.RUnlock()
+
+	return consoles[c].Services.IHM.GetEndpoint()
+}
+
 // GetAPICerberusEndpoint returns customer API endpoint routed/authenticated
 // through Cerberus.
 func (c ConsoleName) GetAPICerberusEndpoint() string {
