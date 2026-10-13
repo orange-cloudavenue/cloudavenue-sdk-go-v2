@@ -20,11 +20,12 @@ import (
 )
 
 const (
-	opListTokens  = "IAM.ListTokens" //nolint:gosec
-	opGetToken    = "IAM.GetToken"
-	opCreateToken = "IAM.CreateToken"
-	opUpdateToken = "IAM.UpdateToken"
-	opDeleteToken = "IAM.DeleteToken"
+	opListTokens      = "IAM.ListTokens" //nolint:gosec
+	opGetToken        = "IAM.GetToken"
+	opGetSessionToken = "IAM.GetSessionToken"
+	opCreateToken     = "IAM.CreateToken"
+	opUpdateToken     = "IAM.UpdateToken"
+	opDeleteToken     = "IAM.DeleteToken"
 )
 
 // ListTokens lists all tokens in the organization.
@@ -33,7 +34,6 @@ func (c *Client) ListTokens(ctx context.Context) ([]*types.ModelToken, error) {
 	resp, err := c.c.Do(
 		ctx,
 		ep,
-		withOrgID(ep.PathParams[0]),
 		cav.OverrideSetResult(new(itypes.APIResponseListTokens)),
 	)
 	if err != nil {
@@ -55,25 +55,34 @@ func (c *Client) ListTokens(ctx context.Context) ([]*types.ModelToken, error) {
 
 // GetToken retrieves a token by ID.
 func (c *Client) GetToken(ctx context.Context, params types.ParamsGetToken) (*types.ModelToken, error) {
+	return c.getToken(ctx, params, endpoints.GetToken(), opGetToken)
+}
+
+// GetSessionToken retrieves the token associated with a session ID.
+//
+// CloudAPI exposes this operation at /cloudapi/1.0.0/sessions/{id}/token.
+func (c *Client) GetSessionToken(ctx context.Context, params types.ParamsGetToken) (*types.ModelToken, error) {
+	return c.getToken(ctx, params, cav.MustGetEndpoint("GetSessionToken"), opGetSessionToken)
+}
+
+func (c *Client) getToken(ctx context.Context, params types.ParamsGetToken, ep *cav.Endpoint, operation string) (*types.ModelToken, error) {
 	if err := params.Validate(); err != nil {
-		return nil, fmt.Errorf("%s: validate: %w", opGetToken, err)
+		return nil, fmt.Errorf("%s: validate: %w", operation, err)
 	}
 
-	ep := endpoints.GetToken()
 	resp, err := c.c.Do(
 		ctx,
 		ep,
-		withOrgID(ep.PathParams[0]),
-		cav.WithPathParam(ep.PathParams[1], params.ID),
+		cav.WithPathParam(ep.PathParams[0], params.ID),
 		cav.OverrideSetResult(new(itypes.APIResponseToken)),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", opGetToken, err)
+		return nil, fmt.Errorf("%s: %w", operation, err)
 	}
 
 	token, ok := resp.Result().(*itypes.APIResponseToken)
 	if !ok {
-		return nil, fmt.Errorf("%s: unexpected response type %T", opGetToken, resp.Result())
+		return nil, fmt.Errorf("%s: unexpected response type %T", operation, resp.Result())
 	}
 
 	return token.ToModel(), nil

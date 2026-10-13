@@ -155,27 +155,40 @@ func init() {
 		Description:      "List tokens in organization",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathTokenGet,
+		PathTemplate:     pathTokens,
 		ResponseType:     itypes.APIResponseListTokens{},
 	}.Register()
 
 	// GetToken
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/sessions/id/token/get/",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/tokens/id/get/",
 		Name:             "GetToken",
 		Description:      "Get token by ID",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathTokenGetByID,
+		PathTemplate:     pathTokenByID,
 		PathParams: []cav.PathParam{
-			{
-				Name:        pathParamOrgID,
-				Description: descOrgID,
-				Required:    true,
-			},
 			{
 				Name:        pathParamID,
 				Description: descTokenID,
+				Required:    true,
+			},
+		},
+		ResponseType: itypes.APIResponseToken{},
+	}.Register()
+
+	// GetSessionToken
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/sessions/id/token/get/",
+		Name:             "GetSessionToken",
+		Description:      "Get token associated with a session",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathSessionToken,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: "Session ID",
 				Required:    true,
 			},
 		},
@@ -189,7 +202,7 @@ func init() {
 		Description:      "Create a new token in organization",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathTokenCreate,
+		PathTemplate:     pathTokens,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamOrgID,
@@ -208,7 +221,7 @@ func init() {
 		Description:      "Update an existing token",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathTokenUpdateByID,
+		PathTemplate:     pathTokenByID,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamOrgID,
@@ -232,7 +245,7 @@ func init() {
 		Description:      "Delete a token",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathTokenDeleteByID,
+		PathTemplate:     pathTokenByID,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamOrgID,
