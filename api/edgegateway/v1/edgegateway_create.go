@@ -54,46 +54,8 @@ type listVDCGroupByOwnerNameParams struct {
 }
 
 var (
-	createEdgeGatewaySubmitOp = cav.Operation[createEdgeGatewaySubmitParams, string]{
-		Name:     opCreateEdgeGatewaySubmit,
-		Backend:  cav.BackendInfrapi,
-		Endpoint: endpoints.CreateEdgeGateway(),
-		Validate: func(p createEdgeGatewaySubmitParams) error {
-			if p.OwnerType == "" {
-				return fmt.Errorf("owner type is required")
-			}
-			if p.OwnerName == "" {
-				return fmt.Errorf("owner name is required")
-			}
-			if p.T0Name == "" {
-				return fmt.Errorf("t0 name is required")
-			}
-
-			return nil
-		},
-		RequestOptions: func(p createEdgeGatewaySubmitParams) ([]cav.EndpointRequestOption, error) {
-			ep := endpoints.CreateEdgeGateway()
-			return []cav.EndpointRequestOption{
-				cav.WithPathParam(ep.PathParams[0], p.OwnerType),
-				cav.WithPathParam(ep.PathParams[1], p.OwnerName),
-			}, nil
-		},
-		Transform: func(p createEdgeGatewaySubmitParams) (any, error) {
-			return itypes.APIRequestEdgeGateway{T0Name: p.T0Name}, nil
-		},
-		Extract: func(resp *cav.Response, _ createEdgeGatewaySubmitParams) (string, error) {
-			created, ok := resp.Result().(*cav.CerberusJobCreatedAPIResponse)
-			if !ok || created == nil {
-				return "", fmt.Errorf("unexpected create response type %T", resp.Result())
-			}
-
-			if created.ID == "" {
-				return "", errors.New("job id not found in create response")
-			}
-
-			return created.ID, nil
-		},
-	}
+	createEdgeGatewaySubmitOp           = createEdgeGatewaySubmitOperation(endpoints.CreateEdgeGateway())
+	createEdgeGatewayVDCGroupSubmitOp   = createEdgeGatewaySubmitOperation(endpoints.CreateEdgeGatewayVDCGroup())
 	updateCreatedEdgeGatewayBandwidthOp = cav.Operation[updateCreatedEdgeGatewayBandwidthParams, struct{}]{
 		Name:     opUpdateEdgeGatewayBandwidthCreate,
 		Backend:  cav.BackendInfrapi,
@@ -172,6 +134,48 @@ var (
 	}
 )
 
+func createEdgeGatewaySubmitOperation(endpoint *cav.Endpoint) cav.Operation[createEdgeGatewaySubmitParams, string] {
+	return cav.Operation[createEdgeGatewaySubmitParams, string]{
+		Name:     opCreateEdgeGatewaySubmit,
+		Backend:  cav.BackendInfrapi,
+		Endpoint: endpoint,
+		Validate: func(p createEdgeGatewaySubmitParams) error {
+			if p.OwnerType == "" {
+				return fmt.Errorf("owner type is required")
+			}
+			if p.OwnerName == "" {
+				return fmt.Errorf("owner name is required")
+			}
+			if p.T0Name == "" {
+				return fmt.Errorf("t0 name is required")
+			}
+
+			return nil
+		},
+		RequestOptions: func(p createEdgeGatewaySubmitParams) ([]cav.EndpointRequestOption, error) {
+			ep := endpoint
+			return []cav.EndpointRequestOption{
+				cav.WithPathParam(ep.PathParams[0], p.OwnerName),
+			}, nil
+		},
+		Transform: func(p createEdgeGatewaySubmitParams) (any, error) {
+			return itypes.APIRequestEdgeGateway{T0Name: p.T0Name}, nil
+		},
+		Extract: func(resp *cav.Response, _ createEdgeGatewaySubmitParams) (string, error) {
+			created, ok := resp.Result().(*cav.CerberusJobCreatedAPIResponse)
+			if !ok || created == nil {
+				return "", fmt.Errorf("unexpected create response type %T", resp.Result())
+			}
+
+			if created.ID == "" {
+				return "", errors.New("job id not found in create response")
+			}
+
+			return created.ID, nil
+		},
+	}
+}
+
 // CreateEdgeGateway creates an edge gateway for a VDC or VDC group owner.
 func (c *Client) CreateEdgeGateway(ctx context.Context, params types.ParamsCreateEdgeGateway) (*types.ModelEdgeGateway, error) {
 	if params.OwnerName == "" {
@@ -201,7 +205,11 @@ func (c *Client) CreateEdgeGateway(ctx context.Context, params types.ParamsCreat
 		return nil, fmt.Errorf("%s: resolve owner: %w", opCreateEdgeGateway, err)
 	}
 
-	jobID, err := cav.Execute(ctx, c.c, createEdgeGatewaySubmitOp, createEdgeGatewaySubmitParams{
+	createOp := createEdgeGatewaySubmitOp
+	if ownerType == "vdcgroup" {
+		createOp = createEdgeGatewayVDCGroupSubmitOp
+	}
+	jobID, err := cav.Execute(ctx, c.c, createOp, createEdgeGatewaySubmitParams{
 		OwnerType: ownerType,
 		OwnerName: ownerName,
 		T0Name:    t0.Name,
