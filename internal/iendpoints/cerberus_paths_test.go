@@ -33,22 +33,24 @@ const (
 // anchor: the mock chi router is built from PathTemplate itself, so no
 // behavioural test can tell a stale prefix from a live one.
 const (
-	expectedPathDraasIPList    = "/infrapicustomerproxy/v2.0/vcda/ips"
-	expectedPathDraasIP        = "/infrapicustomerproxy/v2.0/vcda/ips/{ip}"
-	expectedPathEdgeCreate     = "/infrapicustomerproxy/v2.0/{vdcType}/{vdcName}/edges"
-	expectedPathEdgeList       = "/infrapicustomerproxy/v2.0/edges"
-	expectedPathEdgeByID       = "/infrapicustomerproxy/v2.0/edges/{edgeId}"
-	expectedPathNetwork        = "/infrapicustomerproxy/v2.0/network"
-	expectedPathServices       = "/infrapicustomerproxy/v2.0/services"
-	expectedPathServiceByID    = "/infrapicustomerproxy/v2.0/services/{serviceId}"
-	expectedPathConfigurations = "/infrapicustomerproxy/v2.0/configurations"
-	expectedPathVDCList        = "/infrapicustomerproxy/v2.0/vdcs"
-	expectedPathVDCByName      = "/infrapicustomerproxy/v2.0/vdcs/{vdcName}"
-	expectedPathT0List         = "/infrapicustomerproxy/v2.0/tier-0-vrfs"
-	expectedPathT0ByName       = "/infrapicustomerproxy/v2.0/tier-0-vrfs/{tier0Name}"
-	expectedPathJobByTaskID    = "/infrapicustomerproxy/v1.0/jobs/{taskId}"
-	expectedPathJobs           = "/infrapicustomerproxy/v2.0/jobs"
-	expectedPathBMS            = "/infrapicustomerproxy/v2.0/bms"
+	expectedPathDraasIPList     = "/infrapicustomerproxy/v2.0/vcda/ips"
+	expectedPathDraasIP         = "/infrapicustomerproxy/v2.0/vcda/ips/{ip}"
+	expectedPathEdgeCreate      = "/infrapicustomerproxy/v2.0/vdcs/{vdcName}/edges"
+	expectedPathEdgeGroupCreate = "/infrapicustomerproxy/v2.0/vdc-groups/{vdcGroupName}/edges"
+	expectedPathEdgeList        = "/infrapicustomerproxy/v2.0/edges"
+	expectedPathEdgeByID        = "/infrapicustomerproxy/v2.0/edges/{edgeId}"
+	expectedPathNetwork         = "/infrapicustomerproxy/v2.0/network"
+	expectedPathServices        = "/infrapicustomerproxy/v2.0/services"
+	expectedPathServiceByID     = "/infrapicustomerproxy/v2.0/services/{serviceId}"
+	expectedPathConfigurations  = "/infrapicustomerproxy/v2.0/configurations"
+	expectedPathVDCList         = "/infrapicustomerproxy/v2.0/vdcs"
+	expectedPathVDCByName       = "/infrapicustomerproxy/v2.0/vdcs/{vdcName}"
+	expectedPathT0List          = "/infrapicustomerproxy/v2.0/tier-0-vrfs"
+	expectedPathT0ByName        = "/infrapicustomerproxy/v2.0/tier-0-vrfs/{tier0Name}"
+	expectedPathJobByTaskID     = "/infrapicustomerproxy/v1.0/jobs/{taskId}"
+	expectedPathJobs            = "/infrapicustomerproxy/v2.0/jobs"
+	expectedPathBMS             = "/infrapicustomerproxy/v2.0/bms"
+	expectedPathNetworkService  = "/infrapicustomerproxy/v2.0/services/{service_id}"
 )
 
 // cerberusEndpoints pins the literal PathTemplate of every BackendInfrapi
@@ -61,6 +63,7 @@ var cerberusEndpoints = []struct {
 	{"AddDraasOnPremiseIP", expectedPathDraasIP},
 	{"RemoveDraasOnPremiseIP", expectedPathDraasIP},
 	{"CreateEdgeGateway", expectedPathEdgeCreate},
+	{"CreateEdgeGatewayVDCGroup", expectedPathEdgeGroupCreate},
 	{"GetEdgeGateway", expectedPathEdgeByID},
 	{"QueryEdgeGateway", expectedPathEdgeList},
 	{"ListEdgeGateway", expectedPathEdgeList},
@@ -80,6 +83,7 @@ var cerberusEndpoints = []struct {
 	{"GetJobCerberus", expectedPathJobByTaskID},
 	{"GetJobs", expectedPathJobs},
 	{"GetBMSList", expectedPathBMS},
+	{"UpdateNetworkService", expectedPathNetworkService},
 	{"ListT0", expectedPathT0List},
 	{"GetT0", expectedPathT0ByName},
 }

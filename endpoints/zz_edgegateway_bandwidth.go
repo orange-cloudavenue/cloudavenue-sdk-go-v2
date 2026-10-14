@@ -15,7 +15,7 @@ import (
 
 // UpdateEdgeGatewayBandwidth - Update EdgeGateway Bandwidth
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/updateEdge
 func UpdateEdgeGatewayBandwidth() *cav.Endpoint {
 	return cav.MustGetEndpoint("UpdateEdgeGatewayBandwidth")
 }

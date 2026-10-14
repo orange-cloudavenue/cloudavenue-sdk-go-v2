@@ -18,7 +18,7 @@ import (
 
 func init() {
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/addNetworkConnectivity",
 		Name:             "CreatePublicIP",
 		Description:      "Create a new public IP",
 		Method:           cav.MethodPOST,

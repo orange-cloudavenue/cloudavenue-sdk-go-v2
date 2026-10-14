@@ -98,7 +98,7 @@ func init() {
 
 	// EnableUser
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/userUrn/put/",
 		Name:             "EnableUser",
 		Description:      "Enable a user",
 		Method:           cav.MethodPUT,
@@ -111,7 +111,7 @@ func init() {
 
 	// DisableUser
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/userUrn/put/",
 		Name:             "DisableUser",
 		Description:      "Disable a user",
 		Method:           cav.MethodPUT,
@@ -124,7 +124,7 @@ func init() {
 
 	// UnlockUser
 	cav.Endpoint{
-		DocumentationURL: docURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/userUrn/post/",
 		Name:             "UnlockUser",
 		Description:      "Unlock a user",
 		Method:           cav.MethodPOST,

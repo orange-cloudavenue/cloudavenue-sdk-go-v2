@@ -21,7 +21,7 @@ import (
 func init() {
 	// * ListDraasOnPremiseIP
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/VCDA/getVcdaIPs",
 		Name:             "ListDraasOnPremiseIP",
 		Description:      "List of on premise IP addresses allowed for this organization's draas offer",
 		Method:           cav.MethodGET,
@@ -32,7 +32,7 @@ func init() {
 
 	// * AddDraasOnPremiseIP
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/VCDA/createVcdaIP",
 		Name:             "AddDraasOnPremiseIP",
 		Description:      "Allow a new on premise IP address for this organization's draas offer",
 		Method:           cav.MethodPOST,
@@ -52,7 +52,7 @@ func init() {
 
 	// * RemoveDraasOnPremiseIP
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/VCDA/deleteVcdaIP",
 		Name:             "RemoveDraasOnPremiseIP",
 		Description:      "Remove an on premise IP address from this organization's draas offer",
 		Method:           cav.MethodDELETE,
