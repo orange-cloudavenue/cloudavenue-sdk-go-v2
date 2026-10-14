@@ -39,3 +39,9 @@ type APIResponseBMSStorageDetails struct {
 	StorageClass string `json:"storageClass"`
 	Size         string `json:"size"`
 }
+
+type APIRequestNetworkServiceUpdate struct {
+	Adm *bool `json:"adm,omitempty"`
+	Os  *bool `json:"os,omitempty"`
+	Tf  *bool `json:"tf,omitempty"`
+}
