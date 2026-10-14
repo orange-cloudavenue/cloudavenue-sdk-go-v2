@@ -9,6 +9,12 @@
 
 package iendpoints
 
+// OAuth endpoints.
+const (
+	pathOAuthTenantRegister = "/oauth/tenant/{tenantId}/register"
+	pathOAuthTenantToken    = "/oauth/tenant/{tenantId}/token" //nolint:gosec
+)
+
 // S3 endpoints
 const (
 	// pathOSEAssociatedTenants lists OSE tenants associated with current user.
@@ -34,6 +40,7 @@ const (
 )
 
 const (
+	pathParamTenantID       = "tenantId"
 	pathParamOrganizationID = "organizationID"
 	pathParamUserName       = "userName"
 )
