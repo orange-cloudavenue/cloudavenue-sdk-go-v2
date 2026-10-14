@@ -225,6 +225,115 @@ func init() {
 		BodyRequestType: itypes.NewPassword{},
 		ResponseType:    struct{}{},
 	}.Register()
+	const pathTokens = "/cloudapi/1.0.0/tokens"
+
+	// ListTokens
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-Tokens.html",
+		Name:             "ListTokens",
+		Description:      "List tokens in organization",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathTokens + "/get/",
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamOrgID,
+				Description: descOrgID,
+				Required:    true,
+			},
+		},
+		ResponseType: itypes.APIResponseListTokens{},
+	}.Register()
+
+	// GetToken
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-Token.html",
+		Name:             "GetToken",
+		Description:      "Get token by ID",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathTokens + "/id/get/",
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamOrgID,
+				Description: descOrgID,
+				Required:    true,
+			},
+			{
+				Name:        pathParamTokenID,
+				Description: descTokenID,
+				Required:    true,
+			},
+		},
+		ResponseType: itypes.APIResponseToken{},
+	}.Register()
+
+	// CreateToken
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-Token.html",
+		Name:             "CreateToken",
+		Description:      "Create a new token in organization",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathTokens + "/post/",
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamOrgID,
+				Description: descOrgID,
+				Required:    true,
+			},
+		},
+		BodyRequestType: itypes.APIRequestToken{},
+		ResponseType:    itypes.APIResponseToken{},
+	}.Register()
+
+	// UpdateToken
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-Token.html",
+		Name:             "UpdateToken",
+		Description:      "Update an existing token",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathTokens + "/id/put/",
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamOrgID,
+				Description: descOrgID,
+				Required:    true,
+			},
+			{
+				Name:        pathParamTokenID,
+				Description: descTokenID,
+				Required:    true,
+			},
+		},
+		BodyRequestType: itypes.APIRequestToken{},
+		ResponseType:    itypes.APIResponseToken{},
+	}.Register()
+
+	// DeleteToken
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/DELETE-Token.html",
+		Name:             "DeleteToken",
+		Description:      "Delete a token",
+		Method:           cav.MethodDELETE,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathTokens + "/id/delete/",
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamOrgID,
+				Description: descOrgID,
+				Required:    true,
+			},
+			{
+				Name:        pathParamTokenID,
+				Description: descTokenID,
+				Required:    true,
+			},
+		},
+		ResponseType: struct{}{},
+	}.Register()
+
 	const pathGlobalRoles = "/cloudapi/1.0.0/globalRoles"
 
 	// TestLDAP
