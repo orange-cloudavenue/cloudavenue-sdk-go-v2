@@ -24,6 +24,7 @@ const (
 	BackendVMware
 	BackendOSE
 	BackendNetBackup
+	BackendIHM
 )
 
 // Response wraps raw resty responses for typed operations.
