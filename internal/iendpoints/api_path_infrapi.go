@@ -26,9 +26,6 @@ const (
 	// pathCerberusEdgeGateways lists edge gateways.
 	pathCerberusEdgeGateways = "/infrapicustomerproxy/v2.0/edges"
 
-	// pathCerberusEdgeGatewayCreate creates an edge gateway under a VDC or VDC group.
-	pathCerberusEdgeGatewayCreate = "/infrapicustomerproxy/v2.0/{vdcType}/{vdcName}/edges"
-
 	// pathCerberusCloudavenueServices lists and creates CloudAvenue services.
 	pathCerberusCloudavenueServices = "/infrapicustomerproxy/v2.0/services"
 

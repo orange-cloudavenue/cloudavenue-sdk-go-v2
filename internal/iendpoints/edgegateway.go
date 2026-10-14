@@ -10,8 +10,6 @@
 package iendpoints
 
 import (
-	"fmt"
-
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/validators"
 
@@ -19,12 +17,17 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 )
 
+const (
+	pathCerberusEdgeGatewayVDCCreate      = "/infrapicustomerproxy/v2.0/vdcs/{vdcName}/edges"
+	pathCerberusEdgeGatewayVDCGroupCreate = "/infrapicustomerproxy/v2.0/vdc-groups/{vdcGroupName}/edges"
+)
+
 //go:generate endpoint-generator -path edgegateway.go -output edgegateway
 
 func init() {
 	// GetEdgeGateway
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/getEdgeById",
 		Name:             "GetEdgeGateway",
 		Description:      "Get EdgeGateway",
 		Method:           cav.MethodGET,
@@ -46,7 +49,7 @@ func init() {
 
 	// QueryEdgeGateway
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/getEdges",
 		Name:             "QueryEdgeGateway",
 		Description:      "List EdgeGateways (compatibility alias)",
 		Method:           cav.MethodGET,
@@ -60,44 +63,45 @@ func init() {
 
 	// CreateEdgeGateway
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/createVdcEdge",
 		Name:             "CreateEdgeGateway",
-		Description:      "Create EdgeGateway",
+		Description:      "Create EdgeGateway in a VDC",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     pathCerberusEdgeGatewayCreate,
+		PathTemplate:     pathCerberusEdgeGatewayVDCCreate,
 		PathParams: []cav.PathParam{
-			{
-				Name:        "vdcType",
-				Description: "The type of the VDC where the edge gateway will be created.",
-				Required:    true,
-				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "oneof=vdc vdcgroup")
-				},
-				TransformFunc: func(value string) (string, error) {
-					switch value {
-					case queryParamVDC:
-						return "vdcs", nil
-					case "vdcgroup":
-						return "vdc-groups", nil
-					}
-					return "", fmt.Errorf("invalid vdcType: %s", value)
-				},
-			},
 			{
 				Name:        pathParamVDCName,
 				Description: "The name of the VDC where the edge gateway will be created.",
 				Required:    true,
 			},
 		},
-		QueryParams:     nil,
+		BodyRequestType: itypes.APIRequestEdgeGateway{},
+		ResponseType:    cav.CerberusJobCreatedAPIResponse{},
+	}.Register()
+
+	// CreateEdgeGatewayVDCGroup
+	cav.Endpoint{
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/createVdcGroupEdge",
+		Name:             "CreateEdgeGatewayVDCGroup",
+		Description:      "Create EdgeGateway in a VDC group",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendInfrapi,
+		PathTemplate:     pathCerberusEdgeGatewayVDCGroupCreate,
+		PathParams: []cav.PathParam{
+			{
+				Name:        "vdcGroupName",
+				Description: "The name of the VDC group where the edge gateway will be created.",
+				Required:    true,
+			},
+		},
 		BodyRequestType: itypes.APIRequestEdgeGateway{},
 		ResponseType:    cav.CerberusJobCreatedAPIResponse{},
 	}.Register()
 
 	// DeleteEdgeGateway
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/deleteEdge",
 		Name:             "DeleteEdgeGateway",
 		Description:      "Delete EdgeGateway",
 		Method:           cav.MethodDELETE,
@@ -121,7 +125,7 @@ func init() {
 
 	// ListEdgeGateway
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/getEdges",
 		Name:             "ListEdgeGateway",
 		Description:      "List EdgeGateways",
 		Method:           cav.MethodGET,
