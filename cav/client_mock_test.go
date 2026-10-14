@@ -40,7 +40,7 @@ func newMockClient() (Client, error) {
 		WithCustomEndpoints(consoles.Services{
 			IHM: consoles.Service{
 				Enabled:  true,
-				Endpoint: hts.URL + "/ihm",
+				Endpoint: hts.URL,
 			},
 			APIVCD: consoles.Service{
 				Enabled:  true,

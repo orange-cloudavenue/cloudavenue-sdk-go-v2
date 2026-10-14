@@ -52,7 +52,7 @@ func WithCloudAvenueCredential(username, password string) ClientOption {
 			return err
 		}
 
-		for _, client := range []subClientName{ClientCerberus, ClientVmware} {
+		for _, client := range []subClientName{ClientCerberus, ClientVmware, ClientIHM} {
 			if _, ok := s.SubClients[client]; !ok {
 				s.SubClients[client] = subClients[client]
 			}
