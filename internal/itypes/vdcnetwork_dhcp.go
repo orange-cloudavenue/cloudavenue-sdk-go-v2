@@ -11,74 +11,48 @@ package itypes
 
 import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 
-// DhcpConfig represents the DHCP configuration of an Org VDC Network.
+// DhcpConfig is the VMware CloudAPI VdcNetworkDhcpConfig wire model.
 type DhcpConfig struct {
-	ID                       string                 `json:"id,omitempty"`
-	VDCNetworkID             string                 `json:"vdcNetworkId,omitempty"`
-	DHCPServerIPAddress      string                 `json:"dhcpServerIpAddress,omitempty"`
-	DHCPServerPort           int                    `json:"dhcpServerPort,omitempty"`
-	DHCPRelayServerIPAddress string                 `json:"dhcpRelayServerIpAddress,omitempty"`
-	DHCPEnabled              bool                   `json:"dhcpEnabled,omitempty"`
-	DHCPServerCredentials    *DHCPServerCredentials `json:"dhcpServerCredentials,omitempty"`
-	DHCPLeaseTime            int                    `json:"dhcpLeaseTime,omitempty"`
-	DHCPIPAddress            string                 `json:"dhcpIpRange,omitempty"`
-	DHCPPoolIPAddress        string                 `json:"dhcpPoolIpAddress,omitempty"`
-	DHCPSubnetMask           string                 `json:"dhcpSubnetMask,omitempty"`
-	DHCPDefaultGateway       string                 `json:"dhcpDefaultGateway,omitempty"`
-	DHCPDNS1IPAddress        string                 `json:"dhcpDns1IpAddress,omitempty"`
-	DHCPDNS2IPAddress        string                 `json:"dhcpDns2IpAddress,omitempty"`
-	DHCPSearchDomain         string                 `json:"dhcpSearchDomain,omitempty"`
-	DHCPOptions              []DHCPOption           `json:"dhcpOptions,omitempty"`
+	Enabled    bool       `json:"enabled"`
+	LeaseTime  int64      `json:"leaseTime,omitempty"`
+	DhcpPools  []DhcpPool `json:"dhcpPools,omitempty"`
+	Mode       string     `json:"mode,omitempty"`
+	IPAddress  string     `json:"ipAddress,omitempty"`
+	DNSServers []string   `json:"dnsServers,omitempty"`
 }
 
-// DHCPServerCredentials holds the credentials used by the DHCP server.
-type DHCPServerCredentials struct {
-	Username string `json:"username,omitempty"`
-	Password string `json:"password,omitempty"`
+// DhcpPool is a DHCP address pool in the CloudAPI response.
+type DhcpPool struct {
+	Enabled          bool    `json:"enabled,omitempty"`
+	IPRange          IPRange `json:"ipRange"`
+	MaxLeaseTime     int64   `json:"maxLeaseTime,omitempty"`
+	DefaultLeaseTime int64   `json:"defaultLeaseTime,omitempty"`
 }
 
-// DHCPOption represents a single DHCP option (code + value).
-type DHCPOption struct {
-	Code  string `json:"code,omitempty"`
-	Value string `json:"value,omitempty"`
+// IPRange is an inclusive IP address range.
+type IPRange struct {
+	StartAddress string `json:"startAddress,omitempty"`
+	EndAddress   string `json:"endAddress,omitempty"`
 }
 
-// APIRequestDhcpConfig is the request payload shape used by PUT /dhcp/put/.
-// It mirrors DhcpConfig and is used as BodyRequestType.
+// APIRequestDhcpConfig is the request payload for PUT /dhcp.
 type APIRequestDhcpConfig = DhcpConfig
 
-// ToModel converts the internal DhcpConfig to the public model.
+// ToModel converts the internal DHCP configuration to the public model.
 func (r *DhcpConfig) ToModel() types.ModelDhcpConfig {
 	m := types.ModelDhcpConfig{
-		ID:                       r.ID,
-		VDCNetworkID:             r.VDCNetworkID,
-		DHCPServerIPAddress:      r.DHCPServerIPAddress,
-		DHCPServerPort:           r.DHCPServerPort,
-		DHCPRelayServerIPAddress: r.DHCPRelayServerIPAddress,
-		DHCPEnabled:              r.DHCPEnabled,
-		DHCPLeaseTime:            r.DHCPLeaseTime,
-		DHCPIPAddress:            r.DHCPIPAddress,
-		DHCPPoolIPAddress:        r.DHCPPoolIPAddress,
-		DHCPSubnetMask:           r.DHCPSubnetMask,
-		DHCPDefaultGateway:       r.DHCPDefaultGateway,
-		DHCPDNS1IPAddress:        r.DHCPDNS1IPAddress,
-		DHCPDNS2IPAddress:        r.DHCPDNS2IPAddress,
-		DHCPSearchDomain:         r.DHCPSearchDomain,
+		Enabled:           r.Enabled,
+		LeaseTime:         r.LeaseTime,
+		Mode:              r.Mode,
+		ListenerIPAddress: r.IPAddress,
+		DNSServers:        append([]string(nil), r.DNSServers...),
+		Pools:             make([]types.ModelDhcpPool, 0, len(r.DhcpPools)),
 	}
 
-	if r.DHCPServerCredentials != nil {
-		creds := types.ModelDhcpServerCredentials{
-			Username: r.DHCPServerCredentials.Username,
-			Password: r.DHCPServerCredentials.Password,
-		}
-		m.DHCPServerCredentials = &creds
-	}
-
-	m.DHCPOptions = make([]types.ModelDhcpOption, 0, len(r.DHCPOptions))
-	for _, opt := range r.DHCPOptions {
-		m.DHCPOptions = append(m.DHCPOptions, types.ModelDhcpOption{
-			Code:  opt.Code,
-			Value: opt.Value,
+	for _, pool := range r.DhcpPools {
+		m.Pools = append(m.Pools, types.ModelDhcpPool{
+			StartAddress: pool.IPRange.StartAddress,
+			EndAddress:   pool.IPRange.EndAddress,
 		})
 	}
 
