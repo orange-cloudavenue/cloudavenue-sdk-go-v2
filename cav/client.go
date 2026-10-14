@@ -128,6 +128,8 @@ func backendToSubClientName(backend BackendTarget) (subClientName, error) {
 		return ClientOSE, nil
 	case BackendNetBackup:
 		return ClientNetbackup, nil
+	case BackendIHM:
+		return ClientIHM, nil
 	default:
 		return "", fmt.Errorf("unknown backend %d", backend)
 	}
