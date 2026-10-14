@@ -21,22 +21,13 @@ import (
 )
 
 const (
-	// Canonical documentation roots. Per-operation links drift and are not
-	// stable. VMware is pinned to 39.1 to match the API version the client sends.
-	// OSE and NetBackup have no public documentation and keep their own URLs.
-	//
-	// These duplicate cav.DocURLVMware and cav.DocURLCerberus on purpose: the
-	// endpoint generator renders a cross-package reference as "pkg.Name", not as
-	// the value, so aliasing them would blank every generated comment here.
 	headerAccept      = "Accept"
 	headerContentType = "Content-Type"
 	// VMware VCD negotiates both JSON and XML responses by API version. Keep
 	// endpoint-specific media types versioned rather than relying on a
 	// subclient default that may be overridden by an endpoint.
-	headerXML      = "application/xml;version=39.1"
-	descUserURN    = "User URN"
-	docURLVMware   = "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/"
-	docURLCerberus = "https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API"
+	headerXML   = "application/xml;version=39.1"
+	descUserURN = "User URN"
 
 	queryParamFilter   = "filter"
 	queryParamQ        = "q"

@@ -57,21 +57,21 @@ func DeleteUser() *cav.Endpoint {
 
 // EnableUser - Enable a user
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/userUrn/put/
 func EnableUser() *cav.Endpoint {
 	return cav.MustGetEndpoint("EnableUser")
 }
 
 // DisableUser - Disable a user
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/userUrn/put/
 func DisableUser() *cav.Endpoint {
 	return cav.MustGetEndpoint("DisableUser")
 }
 
 // UnlockUser - Unlock a user
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/userUrn/post/
 func UnlockUser() *cav.Endpoint {
 	return cav.MustGetEndpoint("UnlockUser")
 }
