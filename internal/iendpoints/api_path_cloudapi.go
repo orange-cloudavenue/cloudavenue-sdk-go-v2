@@ -64,18 +64,12 @@ const (
 	pathDFWPolicyDefault = "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}/dfwPolicies/default"
 	// pathDFWPolicyDefaultRules manages rules of the default distributed firewall policy.
 	pathDFWPolicyDefaultRules = "/cloudapi/1.0.0/vdcGroups/{vdcGroupId}/dfwPolicies/default/rules"
-	// pathTokens manages API tokens.
-	// pathTokenByID gets, updates, or deletes one token by ID.
-	// pathTokenGet lists tokens through the compatibility get route.
-	pathTokenGet = "/cloudapi/1.0.0/tokens/get/"
-	// pathTokenGetByID gets one token through the compatibility get route.
-	pathTokenGetByID = "/cloudapi/1.0.0/tokens/id/get/"
-	// pathTokenCreate creates a token through the compatibility post route.
-	pathTokenCreate = "/cloudapi/1.0.0/tokens/post/"
-	// pathTokenUpdateByID updates one token through the compatibility put route.
-	pathTokenUpdateByID = "/cloudapi/1.0.0/tokens/id/put/"
-	// pathTokenDeleteByID deletes one token through the compatibility delete route.
-	pathTokenDeleteByID = "/cloudapi/1.0.0/tokens/id/delete/"
+	// pathTokens lists and creates API tokens.
+	pathTokens = "/cloudapi/1.0.0/tokens"
+	// pathTokenByID gets, updates, or deletes one API token by ID.
+	pathTokenByID = "/cloudapi/1.0.0/tokens/{id}"
+	// pathSessionToken gets the token associated with a session.
+	pathSessionToken = "/cloudapi/1.0.0/sessions/{id}/token"
 	// pathLDAP manages LDAP operations.
 	// pathLDAPTest tests LDAP configuration.
 	pathLDAPTest = "/cloudapi/1.0.0/ldap/{orgId}/test"
