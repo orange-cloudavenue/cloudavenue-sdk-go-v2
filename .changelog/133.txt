@@ -1,0 +1,31 @@
+```release-note:feature
+feat(admin): add admin organization and catalog API surface. Adds admin organization read operations, admin catalog CRUD operations, and admin catalog ACL read/write support, with the matching public types, internal wire models, endpoint definitions, generated wrappers, and tests.
+```
+
+```release-note:feature
+feat(iam): expand IAM API coverage. Adds global role operations, token lifecycle operations, LDAP operations, tenant OAuth flows, and console OAuth/session-token support. Also migrates the user surface to CloudAPI-backed behavior.
+```
+
+```release-note:feature
+feat(organization): expand organization and Cerberus coverage. Adds organization catalog ACL operations, organization enable/disable support, Cerberus jobs listing, and Cerberus jobs/BMS/service endpoint registrations with the matching types and wrappers.
+```
+
+```release-note:feature
+feat(edgegateway): expand edge gateway API coverage. Routes edge gateway reads through Infrapi, adds network service update support, improves Tier-0/network hierarchy handling, and splits create endpoint handling by owner type.
+```
+
+```release-note:feature
+feat(vdc,vdcgroup,vapp): expand VDC, VDC group, and vApp coverage. Routes VDC operations through Infrapi, adds VDC group DHCP support, adds vApp lease settings, and replaces the old CreateVApp flow with compose, instantiate, and lifecycle operations.
+```
+
+```release-note:fix
+fix(api): align backend routes, contracts, and runtime behavior. Corrects CloudAPI, VMware, and Cerberus endpoint usage; fixes token and LDAP route/doc mismatches; preserves explicit false values in typed payloads; preserves response metadata in error paths; and improves edge gateway public IP, service lookup, and Tier-0 handling.
+```
+
+```release-note:fix
+fix(cav): support endpoint-specific headers and improve API error handling. Adds per-endpoint header overrides needed by mixed backend flows, improves session cache ciphertext handling, and treats VMware WAF HTML responses as API errors instead of successful responses.
+```
+
+```release-note:chore
+chore(endpoints): refresh endpoint plumbing and documentation metadata. Regenerates endpoint wrappers, aligns path constants and endpoint documentation links, fixes parser constant resolution for generated output, and updates supporting specs/docs to reflect current backend ownership and verified operation links.
+```

@@ -59,16 +59,77 @@ type (
 		Name string
 	}
 
-	// ParamsCreateVApp is the parameters for the CreateVApp command.
-	ParamsCreateVApp struct {
-		// Name is the name of the VApp to create.
+	// VAppReference identifies a VCD resource used by a creation request.
+	VAppReference struct {
+		HREF string
+		ID   string
+		Type string
+		Name string
+	}
+
+	// VAppSourcedItem describes the source item included by ComposeVApp.
+	VAppSourcedItem struct {
+		Source            VAppReference
+		SourceDelete      bool
+		VAppScopedLocalID string
+		StorageProfile    *VAppReference
+	}
+
+	// VAppInstantiationParams contains optional OVF network sections. More
+	// sections can be added without conflating compose and template requests.
+	VAppInstantiationParams struct {
+		NetworkConfigSection     *VAppNetworkConfigSection
+		NetworkConnectionSection *VAppNetworkConnectionSection
+	}
+
+	VAppNetworkConfigSection struct {
+		Info          string
+		NetworkConfig []VAppNetworkConfig
+	}
+
+	VAppNetworkConfig struct {
+		NetworkName string
+		Network     string
+	}
+
+	VAppNetworkConnectionSection struct {
+		Info                          string
+		PrimaryNetworkConnectionIndex int
+	}
+
+	// ParamsComposeVApp is the parameters for the documented ComposeVApp
+	// operation. Compose accepts a sourced item and optional OVF sections.
+	ParamsComposeVApp struct {
+		// Name is the name of the VApp to compose.
 		Name string
 
 		// Description is the description of the VApp to create.
 		Description string
 
-		// VDCID is the VDC ID where the VApp will be created.
+		// VDCID is the VDC ID where the VApp will be composed.
 		VDCID string
+
+		Deploy              bool
+		PowerOn             bool
+		LinkedClone         bool
+		AllEULAsAccepted    bool
+		SourcedItem         *VAppSourcedItem
+		InstantiationParams *VAppInstantiationParams
+	}
+
+	// ParamsInstantiateVAppTemplate is the parameters for instantiating a VApp
+	// from a catalog/template resource.
+	ParamsInstantiateVAppTemplate struct {
+		Name        string
+		Description string
+		VDCID       string
+		TemplateID  string
+
+		Deploy              bool
+		PowerOn             bool
+		LinkedClone         bool
+		AllEULAsAccepted    bool
+		InstantiationParams *VAppInstantiationParams
 	}
 
 	// ParamsUpdateVApp is the parameters for the UpdateVApp command.
@@ -97,6 +158,35 @@ type (
 		// Name is the name of the VApp to delete.
 		Name string
 	}
+
+	// ModelVAppLeaseSettings contains org/VDC-level lease settings.
+	ModelVAppLeaseSettings struct {
+		DeploymentLeaseInSeconds int `documentation:"Deployment lease in seconds"`
+		StorageLeaseInSeconds    int `documentation:"Storage lease in seconds"`
+	}
+
+	// ParamsGetVAppLeaseSettings defines the parameters for getting org/VDC-level lease settings.
+	ParamsGetVAppLeaseSettings struct {
+		// OrgID is the unique identifier of the organization.
+		// Example: urn:vcloud:org:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+		OrgID string
+
+		// OrgName is the name of the organization.
+		OrgName string
+	}
+
+	// ParamsUpdateVAppLeaseSettings defines the parameters for updating org/VDC-level lease settings.
+	ParamsUpdateVAppLeaseSettings struct {
+		// OrgID is the unique identifier of the organization.
+		// Example: urn:vcloud:org:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+		OrgID string
+
+		// OrgName is the name of the organization.
+		OrgName string
+
+		// LeaseSettings are the lease settings to apply.
+		LeaseSettings ModelVAppLeaseSettings
+	}
 )
 
 // Validate checks ParamsGetVApp structural constraints.
@@ -107,9 +197,17 @@ func (p ParamsGetVApp) Validate() error {
 	return nil
 }
 
-// Validate checks ParamsCreateVApp structural constraints.
-func (p ParamsCreateVApp) Validate() error {
+// Validate checks ParamsComposeVApp structural constraints.
+func (p ParamsComposeVApp) Validate() error {
 	if p.Name == "" || p.VDCID == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	return nil
+}
+
+// Validate checks ParamsInstantiateVAppTemplate structural constraints.
+func (p ParamsInstantiateVAppTemplate) Validate() error {
+	if p.Name == "" || p.VDCID == "" || p.TemplateID == "" {
 		return fmt.Errorf("missing required parameters")
 	}
 	return nil
@@ -129,6 +227,22 @@ func (p ParamsUpdateVApp) Validate() error {
 // Validate checks ParamsDeleteVApp structural constraints.
 func (p ParamsDeleteVApp) Validate() error {
 	if p.ID == "" && p.Name == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	return nil
+}
+
+// Validate checks ParamsGetVAppLeaseSettings structural constraints.
+func (p ParamsGetVAppLeaseSettings) Validate() error {
+	if p.OrgID == "" && p.OrgName == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	return nil
+}
+
+// Validate checks ParamsUpdateVAppLeaseSettings structural constraints.
+func (p ParamsUpdateVAppLeaseSettings) Validate() error {
+	if p.OrgID == "" && p.OrgName == "" {
 		return fmt.Errorf("missing required parameters")
 	}
 	return nil

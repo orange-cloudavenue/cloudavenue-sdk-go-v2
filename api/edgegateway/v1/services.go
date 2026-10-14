@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	"github.com/orange-cloudavenue/common-go/urn"
+	"github.com/orange-cloudavenue/common-go/validators"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
@@ -22,10 +23,37 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
+// cavServicesNetworkType is the network type of the Cloudavenue services
+// network attached to an edge gateway.
+const cavServicesNetworkType = "cav-services"
+
+// validateEdgeGatewayRef checks the edge gateway reference carried by
+// params. The network hierarchy endpoint takes no query parameters, so the
+// validation previously expressed by the endpoint definition lives here.
+func validateEdgeGatewayRef(id, name string) error {
+	if id != "" {
+		if err := validators.New().Var(id, "urn=edgegateway"); err != nil {
+			return fmt.Errorf("invalid edge gateway ID: %w", err)
+		}
+	}
+
+	if name != "" {
+		if err := validators.New().Var(name, "resource_name=edgegateway"); err != nil {
+			return fmt.Errorf("invalid edge gateway name: %w", err)
+		}
+	}
+
+	return nil
+}
+
 // GetServices returns network service state for an edge gateway.
 func (c *Client) GetServices(ctx context.Context, params types.ParamsEdgeGateway) (*types.ModelEdgeGatewayServices, error) {
 	if params.ID == "" && params.Name == "" {
 		return nil, fmt.Errorf("id or name is required")
+	}
+
+	if err := validateEdgeGatewayRef(params.ID, params.Name); err != nil {
+		return nil, err
 	}
 
 	ep := endpoints.GetEdgeGatewayServices()
@@ -41,8 +69,6 @@ func (c *Client) GetServices(ctx context.Context, params types.ParamsEdgeGateway
 	resp, err := c.c.Do(
 		ctx,
 		ep,
-		cav.WithQueryParam(ep.QueryParams[0], params.ID),
-		cav.WithQueryParam(ep.QueryParams[1], params.Name),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error retrieving network services for edge gateway %s: %w", params.ID, err)
@@ -72,6 +98,10 @@ func (c *Client) EnableCloudavenueServices(ctx context.Context, params types.Par
 		return fmt.Errorf("id or name is required")
 	}
 
+	if err := validateEdgeGatewayRef(params.ID, params.Name); err != nil {
+		return err
+	}
+
 	ep := endpoints.EnableCloudavenueServices()
 
 	if params.ID == "" {
@@ -83,7 +113,7 @@ func (c *Client) EnableCloudavenueServices(ctx context.Context, params types.Par
 	}
 
 	requestBody := &itypes.APIRequestNetworkServicesCavSvc{
-		NetworkType:   "cav-services",
+		NetworkType:   cavServicesNetworkType,
 		EdgeGatewayID: urn.ExtractUUID(params.ID),
 		Properties: struct {
 			PrefixLength int "json:\"prefixLength,omitempty\" validate:\"omitempty,min=25,max=28\" default:\"27\""

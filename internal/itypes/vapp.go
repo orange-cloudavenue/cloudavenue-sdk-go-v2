@@ -9,7 +9,11 @@
 
 package itypes
 
-import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
+import (
+	"encoding/xml"
+
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
+)
 
 // APIResponseListVApp contains VApp records returned by list operations.
 type APIResponseListVApp struct {
@@ -121,11 +125,77 @@ type APIResponseMetadata struct {
 	Type  string `json:"type" fake:"string"`
 }
 
-// APIRequestCreateVApp contains the request payload for creating a VApp.
-type APIRequestCreateVApp struct {
-	XMLNS       string `json:"xmlns" fake:"http://www.vmware.com/vcloud/v1.5"`
-	Name        string `json:"name" fake:"mockvapp-{word}"`
-	Description string `json:"description,omitempty" fake:"{sentence}"`
+// APIRequestVAppReference identifies a VCD resource in an XML request.
+type APIRequestVAppReference struct {
+	HREF string `xml:"href,attr,omitempty"`
+	ID   string `xml:"id,attr,omitempty"`
+	Type string `xml:"type,attr,omitempty"`
+	Name string `xml:"name,attr,omitempty"`
+}
+
+// APIRequestVAppInstantiationParams carries optional OVF instantiation
+// sections. Sections are deliberately represented explicitly instead of using
+// the old name/description-only JSON payload.
+type APIRequestVAppInstantiationParams struct {
+	NetworkConfigSection     *APIRequestVAppNetworkConfigSection     `xml:"NetworkConfigSection,omitempty"`
+	NetworkConnectionSection *APIRequestVAppNetworkConnectionSection `xml:"NetworkConnectionSection,omitempty"`
+}
+
+type APIRequestVAppNetworkConfigSection struct {
+	Info          string                        `xml:"Info,omitempty"`
+	NetworkConfig []APIRequestVAppNetworkConfig `xml:"NetworkConfig,omitempty"`
+}
+
+type APIRequestVAppNetworkConfig struct {
+	NetworkName string `xml:"networkName,attr,omitempty"`
+	Network     string `xml:"network,attr,omitempty"`
+}
+
+type APIRequestVAppNetworkConnectionSection struct {
+	Info                          string `xml:"Info,omitempty"`
+	PrimaryNetworkConnectionIndex int    `xml:"PrimaryNetworkConnectionIndex,omitempty"`
+}
+
+// APIRequestVAppSourcedItem describes the source included by ComposeVApp.
+type APIRequestVAppSourcedItem struct {
+	Source            APIRequestVAppReference  `xml:"Source"`
+	SourceDelete      bool                     `xml:"sourceDelete,attr,omitempty"`
+	VAppScopedLocalID string                   `xml:"VAppScopedLocalId,omitempty"`
+	StorageProfile    *APIRequestVAppReference `xml:"StorageProfile,omitempty"`
+}
+
+// APIRequestComposeVApp is the documented ComposeVApp XML request.
+type APIRequestComposeVApp struct {
+	XMLName             xml.Name                           `xml:"ComposeVAppParams"`
+	OVF                 string                             `xml:"xmlns:ovf,attr"`
+	XSI                 string                             `xml:"xmlns:xsi,attr"`
+	XMLNS               string                             `xml:"xmlns,attr"`
+	Name                string                             `xml:"name,attr"`
+	Deploy              bool                               `xml:"deploy,attr"`
+	PowerOn             bool                               `xml:"powerOn,attr"`
+	LinkedClone         bool                               `xml:"linkedClone,attr,omitempty"`
+	Description         string                             `xml:"Description,omitempty"`
+	InstantiationParams *APIRequestVAppInstantiationParams `xml:"InstantiationParams,omitempty"`
+	SourcedItem         *APIRequestVAppSourcedItem         `xml:"SourcedItem,omitempty"`
+	AllEULAsAccepted    bool                               `xml:"AllEULAsAccepted,omitempty"`
+}
+
+// APIRequestInstantiateVAppTemplate is the documented
+// InstantiateVAppTemplate XML request.
+type APIRequestInstantiateVAppTemplate struct {
+	XMLName             xml.Name                           `xml:"InstantiateVAppTemplateParams"`
+	OVF                 string                             `xml:"xmlns:ovf,attr"`
+	XSI                 string                             `xml:"xmlns:xsi,attr,omitempty"`
+	XMLNS               string                             `xml:"xmlns,attr"`
+	Name                string                             `xml:"name,attr"`
+	Deploy              bool                               `xml:"deploy,attr"`
+	PowerOn             bool                               `xml:"powerOn,attr"`
+	LinkedClone         bool                               `xml:"linkedClone,attr,omitempty"`
+	Description         string                             `xml:"Description,omitempty"`
+	InstantiationParams *APIRequestVAppInstantiationParams `xml:"InstantiationParams,omitempty"`
+	Source              APIRequestVAppReference            `xml:"Source"`
+	IsSourceDelete      bool                               `xml:"IsSourceDelete,omitempty"`
+	AllEULAsAccepted    bool                               `xml:"AllEULAsAccepted,omitempty"`
 }
 
 // APIRequestUpdateVApp contains the request payload for updating a VApp.
@@ -140,6 +210,18 @@ type APIRequestUpdateVApp struct {
 type APIRequestLeaseSettings struct {
 	DeploymentLeaseInSeconds *int `json:"deploymentLeaseInSeconds,omitempty"`
 	StorageLeaseInSeconds    *int `json:"storageLeaseInSeconds,omitempty"`
+}
+
+// APIResponseOrgLeaseSettings contains org/VDC-level lease settings.
+type APIResponseOrgLeaseSettings struct {
+	DeploymentLeaseInSeconds int `json:"deploymentLeaseInSeconds"`
+	StorageLeaseInSeconds    int `json:"storageLeaseInSeconds"`
+}
+
+// APIRequestOrgLeaseSettings is the request payload for updating org/VDC-level lease settings.
+type APIRequestOrgLeaseSettings struct {
+	DeploymentLeaseInSeconds int `json:"deploymentLeaseInSeconds"`
+	StorageLeaseInSeconds    int `json:"storageLeaseInSeconds"`
 }
 
 // APIRequestUndeployVApp contains the request payload for undeploying a VApp.

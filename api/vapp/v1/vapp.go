@@ -26,20 +26,33 @@ import (
 )
 
 const (
-	opListVApp   = "VApp.List"
-	opGetVApp    = "VApp.Get"
-	opCreateVApp = "VApp.Create"
-	opUpdateVApp = "VApp.Update"
-	opDeleteVApp = "VApp.Delete"
+	opListVApp                = "VApp.List"
+	opGetVApp                 = "VApp.Get"
+	opComposeVApp             = "VApp.Compose"
+	opInstantiateVAppTemplate = "VApp.InstantiateTemplate"
+	opUpdateVApp              = "VApp.Update"
+	opDeleteVApp              = "VApp.Delete"
+	opDeployVApp              = "VApp.Deploy"
+	opPowerOffVApp            = "VApp.PowerOff"
+	opPowerOnVApp             = "VApp.PowerOn"
+	opRebootVApp              = "VApp.Reboot"
+	opResetVApp               = "VApp.Reset"
+	opShutdownVApp            = "VApp.Shutdown"
+	opSuspendVApp             = "VApp.Suspend"
 )
 
 type getVAppByIDParams struct {
 	ID string
 }
 
-type createVAppParams struct {
+type composeVAppParams struct {
 	VDCID string
-	Body  itypes.APIRequestCreateVApp
+	Body  itypes.APIRequestComposeVApp
+}
+
+type instantiateVAppTemplateParams struct {
+	VDCID string
+	Body  itypes.APIRequestInstantiateVAppTemplate
 }
 
 type updateVAppByIDParams struct {
@@ -108,26 +121,47 @@ var (
 			return vapp, nil
 		},
 	}
-	createVAppOp = cav.Operation[createVAppParams, cav.Job]{
-		Name:     opCreateVApp,
+	composeVAppOp = cav.Operation[composeVAppParams, cav.Job]{
+		Name:     opComposeVApp,
 		Backend:  cav.BackendVMware,
-		Endpoint: endpoints.CreateVApp(),
-		Validate: func(p createVAppParams) error {
-			if p.VDCID == "" || p.Body.Name == "" {
-				return fmt.Errorf("vdc id and name are required")
+		Endpoint: endpoints.ComposeVApp(),
+		Validate: func(p composeVAppParams) error {
+			if p.VDCID == "" || p.Body.Name == "" || p.Body.SourcedItem == nil {
+				return fmt.Errorf("vdc id, name, and sourced item are required")
 			}
 
 			return nil
 		},
-		RequestOptions: func(p createVAppParams) ([]cav.EndpointRequestOption, error) {
-			ep := endpoints.CreateVApp()
+		RequestOptions: func(p composeVAppParams) ([]cav.EndpointRequestOption, error) {
+			ep := endpoints.ComposeVApp()
 			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.VDCID)}, nil
 		},
-		Transform: func(p createVAppParams) (any, error) {
+		Transform: func(p composeVAppParams) (any, error) {
 			return p.Body, nil
 		},
-		Extract: func(resp *cav.Response, _ createVAppParams) (cav.Job, error) {
-			return extractVMwareJob(resp, "create")
+		Extract: func(resp *cav.Response, _ composeVAppParams) (cav.Job, error) {
+			return extractVMwareJob(resp, "compose")
+		},
+	}
+	instantiateVAppTemplateOp = cav.Operation[instantiateVAppTemplateParams, cav.Job]{
+		Name:     opInstantiateVAppTemplate,
+		Backend:  cav.BackendVMware,
+		Endpoint: endpoints.InstantiateVAppTemplate(),
+		Validate: func(p instantiateVAppTemplateParams) error {
+			if p.VDCID == "" || p.Body.Name == "" || p.Body.Source.ID == "" && p.Body.Source.HREF == "" {
+				return fmt.Errorf("vdc id, name, and template source are required")
+			}
+			return nil
+		},
+		RequestOptions: func(p instantiateVAppTemplateParams) ([]cav.EndpointRequestOption, error) {
+			ep := endpoints.InstantiateVAppTemplate()
+			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.VDCID)}, nil
+		},
+		Transform: func(p instantiateVAppTemplateParams) (any, error) {
+			return p.Body, nil
+		},
+		Extract: func(resp *cav.Response, _ instantiateVAppTemplateParams) (cav.Job, error) {
+			return extractVMwareJob(resp, "instantiate template")
 		},
 	}
 	updateVAppByIDOp = cav.Operation[updateVAppByIDParams, cav.Job]{
@@ -212,7 +246,35 @@ var (
 			return extractVMwareJob(resp, "undeploy")
 		},
 	}
+	deployVAppOp   = newVAppActionOperation(opDeployVApp, endpoints.DeployVApp, "deploy")
+	powerOffVAppOp = newVAppActionOperation(opPowerOffVApp, endpoints.PowerOffVApp, "power off")
+	powerOnVAppOp  = newVAppActionOperation(opPowerOnVApp, endpoints.PowerOnVApp, "power on")
+	rebootVAppOp   = newVAppActionOperation(opRebootVApp, endpoints.RebootVApp, "reboot")
+	resetVAppOp    = newVAppActionOperation(opResetVApp, endpoints.ResetVApp, "reset")
+	shutdownVAppOp = newVAppActionOperation(opShutdownVApp, endpoints.ShutdownVApp, "shutdown")
+	suspendVAppOp  = newVAppActionOperation(opSuspendVApp, endpoints.SuspendVApp, "suspend")
 )
+
+func newVAppActionOperation(name string, endpoint func() *cav.Endpoint, action string) cav.Operation[getVAppByIDParams, cav.Job] {
+	return cav.Operation[getVAppByIDParams, cav.Job]{
+		Name:     name,
+		Backend:  cav.BackendVMware,
+		Endpoint: endpoint(),
+		Validate: func(p getVAppByIDParams) error {
+			if p.ID == "" {
+				return fmt.Errorf("id is required")
+			}
+			return nil
+		},
+		RequestOptions: func(p getVAppByIDParams) ([]cav.EndpointRequestOption, error) {
+			ep := endpoint()
+			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
+		},
+		Extract: func(resp *cav.Response, _ getVAppByIDParams) (cav.Job, error) {
+			return extractVMwareJob(resp, action)
+		},
+	}
+}
 
 // ListVApp lists VApps in a VDC.
 func (c *Client) ListVApp(ctx context.Context, vdcID string) ([]*types.ModelVApp, error) {
@@ -278,32 +340,82 @@ func (c *Client) GetVApp(ctx context.Context, params types.ParamsGetVApp) (*type
 	return &m, nil
 }
 
-// CreateVApp creates a VApp and returns the created VApp.
-func (c *Client) CreateVApp(ctx context.Context, params types.ParamsCreateVApp) (*types.ModelVApp, error) {
+// ComposeVApp composes a VApp from one or more source resources and returns it.
+func (c *Client) ComposeVApp(ctx context.Context, params types.ParamsComposeVApp) (*types.ModelVApp, error) {
 	if err := params.Validate(); err != nil {
-		return nil, fmt.Errorf("%s: validate: %w", opCreateVApp, err)
+		return nil, fmt.Errorf("%s: validate: %w", opComposeVApp, err)
 	}
 
-	body := itypes.APIRequestCreateVApp{
-		Name:        params.Name,
-		Description: params.Description,
+	body := itypes.APIRequestComposeVApp{
+		OVF:              "http://schemas.dmtf.org/ovf/envelope/1",
+		XSI:              "http://www.w3.org/2001/XMLSchema-instance",
+		XMLNS:            "http://www.vmware.com/vcloud/v1.5",
+		Name:             params.Name,
+		Description:      params.Description,
+		Deploy:           params.Deploy,
+		PowerOn:          params.PowerOn,
+		LinkedClone:      params.LinkedClone,
+		AllEULAsAccepted: params.AllEULAsAccepted,
 	}
+	if params.SourcedItem == nil {
+		return nil, fmt.Errorf("%s: sourced item is required", opComposeVApp)
+	}
+	body.SourcedItem = &itypes.APIRequestVAppSourcedItem{
+		Source:            toVAppReference(params.SourcedItem.Source),
+		SourceDelete:      params.SourcedItem.SourceDelete,
+		VAppScopedLocalID: params.SourcedItem.VAppScopedLocalID,
+	}
+	if params.SourcedItem.StorageProfile != nil {
+		ref := toVAppReference(*params.SourcedItem.StorageProfile)
+		body.SourcedItem.StorageProfile = &ref
+	}
+	body.InstantiationParams = toInstantiationParams(params.InstantiationParams)
 
-	job, err := cav.Execute(ctx, c.c, createVAppOp, createVAppParams{VDCID: params.VDCID, Body: body})
+	job, err := cav.Execute(ctx, c.c, composeVAppOp, composeVAppParams{VDCID: params.VDCID, Body: body})
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", opCreateVApp, err)
+		return nil, fmt.Errorf("%s: %w", opComposeVApp, err)
 	}
 
-	if err := awaitVAppJob(ctx, c.c, opCreateVApp, job.ID); err != nil {
+	if err := awaitVAppJob(ctx, c.c, opComposeVApp, job.ID); err != nil {
 		return nil, err
 	}
 
 	m, err := c.GetVApp(ctx, types.ParamsGetVApp{Name: params.Name})
 	if err != nil {
-		return nil, fmt.Errorf("%s: get created: %w", opCreateVApp, err)
+		return nil, fmt.Errorf("%s: get composed: %w", opComposeVApp, err)
 	}
 
 	return m, nil
+}
+
+// InstantiateVAppTemplate creates a VApp from a VApp template and returns it.
+func (c *Client) InstantiateVAppTemplate(ctx context.Context, params types.ParamsInstantiateVAppTemplate) (*types.ModelVApp, error) {
+	if err := params.Validate(); err != nil {
+		return nil, fmt.Errorf("%s: validate: %w", opInstantiateVAppTemplate, err)
+	}
+
+	body := itypes.APIRequestInstantiateVAppTemplate{
+		OVF:                 "http://schemas.dmtf.org/ovf/envelope/1",
+		XSI:                 "http://www.w3.org/2001/XMLSchema-instance",
+		XMLNS:               "http://www.vmware.com/vcloud/v1.5",
+		Name:                params.Name,
+		Description:         params.Description,
+		Deploy:              params.Deploy,
+		PowerOn:             params.PowerOn,
+		LinkedClone:         params.LinkedClone,
+		AllEULAsAccepted:    params.AllEULAsAccepted,
+		InstantiationParams: toInstantiationParams(params.InstantiationParams),
+		Source:              itypes.APIRequestVAppReference{ID: params.TemplateID},
+	}
+
+	job, err := cav.Execute(ctx, c.c, instantiateVAppTemplateOp, instantiateVAppTemplateParams{VDCID: params.VDCID, Body: body})
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", opInstantiateVAppTemplate, err)
+	}
+	if err := awaitVAppJob(ctx, c.c, opInstantiateVAppTemplate, job.ID); err != nil {
+		return nil, err
+	}
+	return c.GetVApp(ctx, types.ParamsGetVApp{Name: params.Name})
 }
 
 // UpdateVApp updates a VApp and returns the updated VApp.
@@ -415,6 +527,52 @@ func (c *Client) DeleteVApp(ctx context.Context, params types.ParamsDeleteVApp) 
 	return nil
 }
 
+// DeployVApp deploys a VApp by ID.
+func (c *Client) DeployVApp(ctx context.Context, id string) error {
+	return c.executeVAppAction(ctx, id, deployVAppOp, opDeployVApp)
+}
+
+// PowerOffVApp powers off a VApp by ID.
+func (c *Client) PowerOffVApp(ctx context.Context, id string) error {
+	return c.executeVAppAction(ctx, id, powerOffVAppOp, opPowerOffVApp)
+}
+
+// PowerOnVApp powers on a VApp by ID.
+func (c *Client) PowerOnVApp(ctx context.Context, id string) error {
+	return c.executeVAppAction(ctx, id, powerOnVAppOp, opPowerOnVApp)
+}
+
+// RebootVApp reboots a VApp by ID.
+func (c *Client) RebootVApp(ctx context.Context, id string) error {
+	return c.executeVAppAction(ctx, id, rebootVAppOp, opRebootVApp)
+}
+
+// ResetVApp resets a VApp by ID.
+func (c *Client) ResetVApp(ctx context.Context, id string) error {
+	return c.executeVAppAction(ctx, id, resetVAppOp, opResetVApp)
+}
+
+// ShutdownVApp shuts down a VApp by ID.
+func (c *Client) ShutdownVApp(ctx context.Context, id string) error {
+	return c.executeVAppAction(ctx, id, shutdownVAppOp, opShutdownVApp)
+}
+
+// SuspendVApp suspends a VApp by ID.
+func (c *Client) SuspendVApp(ctx context.Context, id string) error {
+	return c.executeVAppAction(ctx, id, suspendVAppOp, opSuspendVApp)
+}
+
+func (c *Client) executeVAppAction(ctx context.Context, id string, op cav.Operation[getVAppByIDParams, cav.Job], name string) error {
+	job, err := cav.Execute(ctx, c.c, op, getVAppByIDParams{ID: id})
+	if err != nil {
+		return fmt.Errorf("%s: %w", name, err)
+	}
+	if err := awaitVAppJob(ctx, c.c, name, job.ID); err != nil {
+		return err
+	}
+	return nil
+}
+
 // IsVAppOrgNetwork checks if a network is an org network.
 // This is a helper preserved from v1 SDK.
 func IsVAppOrgNetwork(networkHREF string) bool {
@@ -448,6 +606,35 @@ func networkHrefPath(networkHREF string) string {
 		return networkHREF
 	}
 	return parsed.Path
+}
+
+func toVAppReference(ref types.VAppReference) itypes.APIRequestVAppReference {
+	return itypes.APIRequestVAppReference{HREF: ref.HREF, ID: ref.ID, Type: ref.Type, Name: ref.Name}
+}
+
+func toInstantiationParams(params *types.VAppInstantiationParams) *itypes.APIRequestVAppInstantiationParams {
+	if params == nil {
+		return nil
+	}
+
+	result := &itypes.APIRequestVAppInstantiationParams{}
+	if params.NetworkConfigSection != nil {
+		section := &itypes.APIRequestVAppNetworkConfigSection{Info: params.NetworkConfigSection.Info}
+		for _, network := range params.NetworkConfigSection.NetworkConfig {
+			section.NetworkConfig = append(section.NetworkConfig, itypes.APIRequestVAppNetworkConfig{
+				NetworkName: network.NetworkName,
+				Network:     network.Network,
+			})
+		}
+		result.NetworkConfigSection = section
+	}
+	if params.NetworkConnectionSection != nil {
+		result.NetworkConnectionSection = &itypes.APIRequestVAppNetworkConnectionSection{
+			Info:                          params.NetworkConnectionSection.Info,
+			PrimaryNetworkConnectionIndex: params.NetworkConnectionSection.PrimaryNetworkConnectionIndex,
+		}
+	}
+	return result
 }
 
 func extractVMwareJob(resp *cav.Response, action string) (cav.Job, error) {

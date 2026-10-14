@@ -10,9 +10,6 @@
 package iendpoints
 
 import (
-	"github.com/orange-cloudavenue/common-go/extractor"
-	"github.com/orange-cloudavenue/common-go/validators"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 )
@@ -27,37 +24,8 @@ func init() {
 		Description:      "Get EdgeGateway Network Services",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/api/customers/v2.0/network",
+		PathTemplate:     pathCerberusNetwork,
 		ResponseType:     itypes.APIResponseNetworkServices{},
-		QueryParams: []cav.QueryParam{
-			// Query parameters are not used in this endpoint, but can be added
-			// for the mock response if needed
-			{
-				Name:        pathParamEdgeID,
-				Description: "The ID of the edge gateway to get network services for",
-				Required:    false,
-				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, urnEdgeGateway)
-				},
-				TransformFunc: extractor.ExtractUUID,
-			},
-			{
-				Name:        "edgeName",
-				Description: "The name of the edge gateway to get network services for",
-				Required:    false,
-				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, ruleResourceNameEdgeGateway)
-				},
-			},
-			{
-				Name:        "publicIP",
-				Description: "The public IP address of the edge gateway",
-				Required:    false,
-				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, "ipv4")
-				},
-			},
-		},
 	}.Register()
 
 	cav.Endpoint{
@@ -66,7 +34,7 @@ func init() {
 		Description:      "Enable Cloud Avenue Services",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/api/customers/v2.0/services",
+		PathTemplate:     pathCerberusCloudavenueServices,
 		ResponseType:     cav.Job{},
 		BodyRequestType:  itypes.APIRequestNetworkServicesCavSvc{},
 	}.Register()
@@ -77,7 +45,7 @@ func init() {
 		Description:      "Disable Cloud Avenue Services",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendInfrapi,
-		PathTemplate:     "/api/customers/v2.0/services/{serviceId}",
+		PathTemplate:     pathCerberusCloudavenueServiceByID,
 		PathParams: []cav.PathParam{
 			{
 				Name:        pathParamServiceID,
@@ -86,5 +54,19 @@ func init() {
 			},
 		},
 		ResponseType: cav.Job{},
+	}.Register()
+
+	cav.Endpoint{
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/updateNetworkService",
+		Name:             "UpdateNetworkService",
+		Description:      "Update network service",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendInfrapi,
+		PathTemplate:     pathCerberusNetworkServiceByID,
+		PathParams: []cav.PathParam{{
+			Name: pathParamNetworkServiceID, Description: "The ID of the service to update", Required: true,
+		}},
+		BodyRequestType: itypes.APIRequestNetworkServiceUpdate{},
+		ResponseType:    cav.CerberusJobCreatedAPIResponse{},
 	}.Register()
 }

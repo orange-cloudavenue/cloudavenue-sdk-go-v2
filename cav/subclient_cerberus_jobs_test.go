@@ -28,7 +28,7 @@ func TestCerberusJobStatusParser(t *testing.T) {
 		{"pending", JobQueued, false},
 		{"in_progress", JobRunning, false},
 		{"failed", JobError, false},
-		{"done", JobSuccess, false},
+		{jobStatusDone, JobSuccess, false},
 		{"unknown", JobStatus(""), true},
 	}
 	for _, tt := range tests {
@@ -49,13 +49,13 @@ func TestCerberusJobParser_NormalResponse(t *testing.T) {
 			StatusCode: http.StatusOK,
 		},
 		Request: &resty.Request{
-			PathParams: map[string]string{"taskId": "id-123"},
+			PathParams: map[string]string{jobTaskID: "id-123"},
 			URL:        "http://example.com/job",
 			Result: &CerberusJobAPIResponse{
 				{
 					Name:        "test-job",
 					Description: "desc",
-					Status:      "done",
+					Status:      jobStatusDone,
 				},
 			},
 		},
@@ -77,7 +77,7 @@ func TestCerberusJobParser_FailedStatus(t *testing.T) {
 			StatusCode: http.StatusOK,
 		},
 		Request: &resty.Request{
-			PathParams: map[string]string{"taskId": "id-123"},
+			PathParams: map[string]string{jobTaskID: "id-123"},
 			URL:        "http://example.com/job",
 			Result: &CerberusJobAPIResponse{
 				{
@@ -101,7 +101,7 @@ func TestCerberusJobParser_EmptyResponse(t *testing.T) {
 			StatusCode: http.StatusOK,
 		},
 		Request: &resty.Request{
-			PathParams: map[string]string{"taskId": "id-123"},
+			PathParams: map[string]string{jobTaskID: "id-123"},
 			URL:        "http://example.com/job",
 			Result:     &CerberusJobAPIResponse{},
 		},
@@ -125,7 +125,7 @@ func TestCerberusJobParser_UnknownJobStatus(t *testing.T) {
 			StatusCode: http.StatusOK,
 		},
 		Request: &resty.Request{
-			PathParams: map[string]string{"taskId": "id-123"},
+			PathParams: map[string]string{jobTaskID: "id-123"},
 			URL:        "http://example.com/job",
 			Result: &CerberusJobAPIResponse{
 				{
@@ -141,14 +141,14 @@ func TestCerberusJobParser_UnknownJobStatus(t *testing.T) {
 	assert.Nil(t, job)
 }
 
-func TestCerberusJobParser_CerberusErrorResponse(t *testing.T) {
+func TestCerberusJobParser_RoutedAPIErrorResponse(t *testing.T) {
 	v := &cerberus{}
 	resp := &resty.Response{
 		RawResponse: &http.Response{
 			StatusCode: http.StatusInternalServerError,
 		},
 		Request: &resty.Request{
-			PathParams: map[string]string{"taskId": "id-123"},
+			PathParams: map[string]string{jobTaskID: "id-123"},
 			URL:        "http://example.com/job",
 		},
 	}
@@ -164,7 +164,7 @@ func TestCerberusJobParser_InvalidResponseType(t *testing.T) {
 			StatusCode: http.StatusOK,
 		},
 		Request: &resty.Request{
-			PathParams: map[string]string{"taskId": "id-123"},
+			PathParams: map[string]string{jobTaskID: "id-123"},
 			URL:        "http://example.com/job",
 			Result:     "invalid response type",
 		},

@@ -23,11 +23,19 @@ import (
 )
 
 const (
-	opGetOrganization    = "Organization.Get"
-	opUpdateOrganization = "Organization.Update"
+	opGetOrganization         = "Organization.Get"
+	opUpdateOrganization      = "Organization.Update"
+	opGetCatalogAccessControl = "CatalogAccessControl.Get"
+	opSetCatalogAccessControl = "CatalogAccessControl.Set"
 )
 
-// GetOrganization gets detailed information about organization.
+const (
+	internetBillingModePAYG          = "PAYG"
+	internetBillingModeTrafficVolume = "TRAFFIC_VOLUME"
+)
+
+// GetOrganization combines organization details from VMware CloudAPI with
+// configuration and state from the Infrapi endpoint.
 func (c *Client) GetOrganization(ctx context.Context) (*types.ModelGetOrganization, error) {
 	logger := c.logger.WithGroup("GetOrganization")
 
@@ -83,13 +91,15 @@ func (c *Client) GetOrganization(ctx context.Context) (*types.ModelGetOrganizati
 	}, nil
 }
 
-// UpdateOrganization updates existing organization details.
+// UpdateOrganization updates organization configuration through the Infrapi
+// /infrapicustomerproxy/v2.0/configurations endpoint. Organization state
+// changes belong here rather than in the read-only, XML-backed AdminOrg view.
 func (c *Client) UpdateOrganization(ctx context.Context, p types.ParamsUpdateOrganization) (*types.ModelGetOrganization, error) {
 	if err := validateUpdateOrganizationParams(p); err != nil {
 		return nil, fmt.Errorf("%s: validate: %w", opUpdateOrganization, err)
 	}
 
-	if p.FullName == "" && p.Email == "" && p.InternetBillingMode == "" && p.Description == nil {
+	if p.FullName == "" && p.Email == "" && p.InternetBillingMode == "" && p.Description == nil && p.Enabled == nil {
 		return nil, fmt.Errorf("%s: no parameters provided for organization update", opUpdateOrganization)
 	}
 
@@ -106,6 +116,7 @@ func (c *Client) UpdateOrganization(ctx context.Context, p types.ParamsUpdateOrg
 		Description:         data.Description,
 		CustomerMail:        data.Email,
 		InternetBillingMode: data.InternetBillingMode,
+		IsEnabled:           data.Enabled,
 	}
 	if p.FullName != "" {
 		reqBody.FullName = p.FullName
@@ -119,6 +130,9 @@ func (c *Client) UpdateOrganization(ctx context.Context, p types.ParamsUpdateOrg
 	if p.InternetBillingMode != "" {
 		reqBody.InternetBillingMode = p.InternetBillingMode
 	}
+	if p.Enabled != nil {
+		reqBody.IsEnabled = *p.Enabled
+	}
 
 	if _, err = c.c.Do(ctx, endpoints.UpdateOrganization(), cav.SetBody(reqBody)); err != nil {
 		return nil, fmt.Errorf("%s: update: %w", opUpdateOrganization, err)
@@ -127,6 +141,20 @@ func (c *Client) UpdateOrganization(ctx context.Context, p types.ParamsUpdateOrg
 	logger.DebugContext(ctx, "Successfully initiated organization update")
 
 	return c.GetOrganization(ctx)
+}
+
+// EnableOrganization enables this organization through the Infrapi
+// configuration endpoint.
+func (c *Client) EnableOrganization(ctx context.Context) (*types.ModelGetOrganization, error) {
+	enabled := true
+	return c.UpdateOrganization(ctx, types.ParamsUpdateOrganization{Enabled: &enabled})
+}
+
+// DisableOrganization disables this organization through the Infrapi
+// configuration endpoint.
+func (c *Client) DisableOrganization(ctx context.Context) (*types.ModelGetOrganization, error) {
+	enabled := false
+	return c.UpdateOrganization(ctx, types.ParamsUpdateOrganization{Enabled: &enabled})
 }
 
 func validateUpdateOrganizationParams(p types.ParamsUpdateOrganization) error {
@@ -144,9 +172,60 @@ func validateUpdateOrganizationParams(p types.ParamsUpdateOrganization) error {
 		}
 	}
 
-	if p.InternetBillingMode != "" && p.InternetBillingMode != "PAYG" && p.InternetBillingMode != "TRAFFIC_VOLUME" {
+	if p.InternetBillingMode != "" && p.InternetBillingMode != internetBillingModePAYG && p.InternetBillingMode != internetBillingModeTrafficVolume {
 		return fmt.Errorf("internet_billing_mode must be one of PAYG, TRAFFIC_VOLUME")
 	}
 
 	return nil
+}
+
+// GetCatalogAccessControl retrieves the list of access control grants for a catalog.
+func (c *Client) GetCatalogAccessControl(ctx context.Context, params types.ParamsGetCatalogAccessControl) (*types.ModelListCatalogAccessControlGrant, error) {
+	if err := params.Validate(); err != nil {
+		return nil, fmt.Errorf("%s: validate: %w", opGetCatalogAccessControl, err)
+	}
+
+	ep := endpoints.GetCatalogAccessControl()
+	resp, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], params.CatalogURN))
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", opGetCatalogAccessControl, err)
+	}
+
+	grants, ok := resp.Result().(*itypes.APIResponseCatalogAccessControlGrants)
+	if !ok || grants == nil {
+		return nil, fmt.Errorf("%s: unexpected response type %T", opGetCatalogAccessControl, resp.Result())
+	}
+
+	return grants.ToModel(), nil
+}
+
+// SetCatalogAccessControl sets the access control grants for a catalog.
+func (c *Client) SetCatalogAccessControl(ctx context.Context, params types.ParamsSetCatalogAccessControl) (*types.ModelListCatalogAccessControlGrant, error) {
+	if err := params.Validate(); err != nil {
+		return nil, fmt.Errorf("%s: validate: %w", opSetCatalogAccessControl, err)
+	}
+
+	body := itypes.APIRequestCatalogAccessControlGrants{
+		Values: make([]itypes.APIRequestCatalogAccessControlGrant, 0, len(params.Grants)),
+	}
+	for _, grant := range params.Grants {
+		body.Values = append(body.Values, itypes.APIRequestCatalogAccessControlGrant{
+			SubjectName: grant.SubjectName,
+			SubjectType: grant.SubjectType,
+			RoleURN:     grant.RoleURN,
+		})
+	}
+
+	ep := endpoints.SetCatalogAccessControl()
+	resp, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], params.CatalogURN), cav.SetBody(body))
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", opSetCatalogAccessControl, err)
+	}
+
+	grants, ok := resp.Result().(*itypes.APIResponseCatalogAccessControlGrants)
+	if !ok || grants == nil {
+		return nil, fmt.Errorf("%s: unexpected response type %T", opSetCatalogAccessControl, resp.Result())
+	}
+
+	return grants.ToModel(), nil
 }
