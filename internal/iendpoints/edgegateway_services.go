@@ -1,8 +1,8 @@
 /*
- * SPDX-FileCopyrightText: Copyright (c) 2025 Orange
+ * SPDX-FileCopyrightText: Copyright (c) 2026 Orange
  * SPDX-License-Identifier: Mozilla Public License 2.0
  *
- * This software is distributed under the MPL-2.0 license.
+ * This software is licensed under the MPL-2.0 license.
  * the text of which is available at https://www.mozilla.org/en-US/MPL/2.0/
  * or see the "LICENSE" file for more details.
  */
@@ -19,7 +19,7 @@ import (
 func init() {
 	// * GetEdgeGatewayServices
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/getNetworkHierarchy",
 		Name:             "GetEdgeGatewayServices",
 		Description:      "Get EdgeGateway Network Services",
 		Method:           cav.MethodGET,
@@ -29,7 +29,7 @@ func init() {
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/addNetworkConnectivity",
 		Name:             "EnableCloudavenueServices",
 		Description:      "Enable Cloud Avenue Services",
 		Method:           cav.MethodPOST,
@@ -40,7 +40,7 @@ func init() {
 	}.Register()
 
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/deleteNetworkService",
 		Name:             "DisableCloudavenueServices",
 		Description:      "Disable Cloud Avenue Services",
 		Method:           cav.MethodDELETE,
@@ -54,5 +54,19 @@ func init() {
 			},
 		},
 		ResponseType: cav.Job{},
+	}.Register()
+
+	cav.Endpoint{
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/updateNetworkService",
+		Name:             "UpdateNetworkService",
+		Description:      "Update network service",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendInfrapi,
+		PathTemplate:     pathCerberusNetworkServiceByID,
+		PathParams: []cav.PathParam{{
+			Name: pathParamNetworkServiceID, Description: "The ID of the service to update", Required: true,
+		}},
+		BodyRequestType: itypes.APIRequestNetworkServiceUpdate{},
+		ResponseType:    cav.CerberusJobCreatedAPIResponse{},
 	}.Register()
 }

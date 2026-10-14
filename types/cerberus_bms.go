@@ -44,3 +44,11 @@ type ModelBMSStorageDetails struct {
 	StorageClass string `documentation:"Drive class"`
 	Size         string `documentation:"Drive size"`
 }
+
+// ParamsUpdateNetworkService defines CAV standard service properties.
+type ParamsUpdateNetworkService struct {
+	ServiceID string `documentation:"Network service identifier"`
+	Adm       *bool  `documentation:"Activate tooling zone connection"`
+	Os        *bool  `documentation:"Activate object storage connection"`
+	Tf        *bool  `documentation:"Activate Tufin connection"`
+}

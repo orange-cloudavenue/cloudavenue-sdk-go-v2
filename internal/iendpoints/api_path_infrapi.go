@@ -31,6 +31,7 @@ const (
 
 	// pathCerberusCloudavenueServiceByID addresses one CloudAvenue service by ID.
 	pathCerberusCloudavenueServiceByID = "/infrapicustomerproxy/v2.0/services/{serviceId}"
+	pathCerberusNetworkServiceByID     = "/infrapicustomerproxy/v2.0/services/{service_id}"
 
 	// pathCerberusNetwork manages edge network-related operations.
 	pathCerberusNetwork = "/infrapicustomerproxy/v2.0/network"
@@ -52,7 +53,8 @@ const (
 )
 
 const (
-	pathParamEdgeID    = "edgeId"
-	pathParamServiceID = "serviceId"
-	pathParamVDCName   = "vdcName"
+	pathParamEdgeID           = "edgeId"
+	pathParamServiceID        = "serviceId"
+	pathParamNetworkServiceID = "service_id"
+	pathParamVDCName          = "vdcName"
 )
