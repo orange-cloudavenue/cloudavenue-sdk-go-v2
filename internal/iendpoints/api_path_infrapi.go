@@ -10,6 +10,10 @@
 package iendpoints
 
 const (
+	// pathCerberusJobs lists the current root jobs for an organization.
+	pathCerberusJobs = "/infrapicustomerproxy/v2.0/jobs"
+	// pathCerberusBMS lists BMS and network details.
+	pathCerberusBMS = "/infrapicustomerproxy/v2.0/bms"
 	// pathCerberusDraasOnPremiseIP addresses one on-premise DRAAS IP.
 	pathCerberusDraasOnPremiseIP = "/infrapicustomerproxy/v2.0/vcda/ips/{ip}"
 
@@ -30,6 +34,7 @@ const (
 
 	// pathCerberusCloudavenueServiceByID addresses one CloudAvenue service by ID.
 	pathCerberusCloudavenueServiceByID = "/infrapicustomerproxy/v2.0/services/{serviceId}"
+	pathCerberusNetworkServiceByID     = "/infrapicustomerproxy/v2.0/services/{service_id}"
 
 	// pathCerberusNetwork manages edge network-related operations.
 	pathCerberusNetwork = "/infrapicustomerproxy/v2.0/network"
@@ -51,7 +56,8 @@ const (
 )
 
 const (
-	pathParamEdgeID    = "edgeId"
-	pathParamServiceID = "serviceId"
-	pathParamVDCName   = "vdcName"
+	pathParamEdgeID           = "edgeId"
+	pathParamServiceID        = "serviceId"
+	pathParamNetworkServiceID = "service_id"
+	pathParamVDCName          = "vdcName"
 )
