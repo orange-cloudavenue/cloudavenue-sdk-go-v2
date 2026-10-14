@@ -75,3 +75,87 @@ func UnlockUser() *cav.Endpoint {
 func ChangePassword() *cav.Endpoint {
 	return cav.MustGetEndpoint("ChangePassword")
 }
+// ListGlobalRoles - List global roles
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-GlobalRoles.html
+func ListGlobalRoles() *cav.Endpoint {
+	return cav.MustGetEndpoint("ListGlobalRoles")
+}
+// GetGlobalRole - Get global role by ID
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-GlobalRole.html
+func GetGlobalRole() *cav.Endpoint {
+	return cav.MustGetEndpoint("GetGlobalRole")
+}
+// CreateGlobalRole - Create a global role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-GlobalRole.html
+func CreateGlobalRole() *cav.Endpoint {
+	return cav.MustGetEndpoint("CreateGlobalRole")
+}
+// UpdateGlobalRole - Update a global role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-GlobalRole.html
+func UpdateGlobalRole() *cav.Endpoint {
+	return cav.MustGetEndpoint("UpdateGlobalRole")
+}
+// DeleteGlobalRole - Delete a global role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/DELETE-GlobalRole.html
+func DeleteGlobalRole() *cav.Endpoint {
+	return cav.MustGetEndpoint("DeleteGlobalRole")
+}
+// ListGlobalRoleRights - List rights of a global role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-GlobalRoleRights.html
+func ListGlobalRoleRights() *cav.Endpoint {
+	return cav.MustGetEndpoint("ListGlobalRoleRights")
+}
+// AddGlobalRoleRights - Add rights to a global role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-GlobalRoleRights.html
+func AddGlobalRoleRights() *cav.Endpoint {
+	return cav.MustGetEndpoint("AddGlobalRoleRights")
+}
+// ReplaceGlobalRoleRights - Replace rights of a global role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-GlobalRoleRights.html
+func ReplaceGlobalRoleRights() *cav.Endpoint {
+	return cav.MustGetEndpoint("ReplaceGlobalRoleRights")
+}
+// ListGlobalRoleTenants - List tenants of a global role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-GlobalRoleTenants.html
+func ListGlobalRoleTenants() *cav.Endpoint {
+	return cav.MustGetEndpoint("ListGlobalRoleTenants")
+}
+// SetGlobalRoleTenants - Set tenants of a global role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-GlobalRoleTenants.html
+func SetGlobalRoleTenants() *cav.Endpoint {
+	return cav.MustGetEndpoint("SetGlobalRoleTenants")
+}
+// PublishGlobalRoleTenants - Publish tenants of a global role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-GlobalRoleTenantsPublish.html
+func PublishGlobalRoleTenants() *cav.Endpoint {
+	return cav.MustGetEndpoint("PublishGlobalRoleTenants")
+}
+// UnpublishGlobalRoleTenants - Unpublish tenants of a global role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-GlobalRoleTenantsUnpublish.html
+func UnpublishGlobalRoleTenants() *cav.Endpoint {
+	return cav.MustGetEndpoint("UnpublishGlobalRoleTenants")
+}
+// PublishAllGlobalRoleTenants - Publish all tenants of a global role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-GlobalRoleTenantsPublishAll.html
+func PublishAllGlobalRoleTenants() *cav.Endpoint {
+	return cav.MustGetEndpoint("PublishAllGlobalRoleTenants")
+}
+// UnpublishAllGlobalRoleTenants - Unpublish all tenants of a global role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-GlobalRoleTenantsUnpublishAll.html
+func UnpublishAllGlobalRoleTenants() *cav.Endpoint {
+	return cav.MustGetEndpoint("UnpublishAllGlobalRoleTenants")
+}
