@@ -25,7 +25,7 @@ func init() {
 		Description:      "Get VMware Job",
 		Method:           MethodGET,
 		Backend:          BackendVMware,
-		DocumentationURL: DocURLVMware,
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-Task.html",
 		PathTemplate:     "/api/task/{taskId}",
 		PathParams: []PathParam{
 			{

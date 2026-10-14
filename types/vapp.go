@@ -59,16 +59,77 @@ type (
 		Name string
 	}
 
-	// ParamsCreateVApp is the parameters for the CreateVApp command.
-	ParamsCreateVApp struct {
-		// Name is the name of the VApp to create.
+	// VAppReference identifies a VCD resource used by a creation request.
+	VAppReference struct {
+		HREF string
+		ID   string
+		Type string
+		Name string
+	}
+
+	// VAppSourcedItem describes the source item included by ComposeVApp.
+	VAppSourcedItem struct {
+		Source            VAppReference
+		SourceDelete      bool
+		VAppScopedLocalID string
+		StorageProfile    *VAppReference
+	}
+
+	// VAppInstantiationParams contains optional OVF network sections. More
+	// sections can be added without conflating compose and template requests.
+	VAppInstantiationParams struct {
+		NetworkConfigSection     *VAppNetworkConfigSection
+		NetworkConnectionSection *VAppNetworkConnectionSection
+	}
+
+	VAppNetworkConfigSection struct {
+		Info          string
+		NetworkConfig []VAppNetworkConfig
+	}
+
+	VAppNetworkConfig struct {
+		NetworkName string
+		Network     string
+	}
+
+	VAppNetworkConnectionSection struct {
+		Info                          string
+		PrimaryNetworkConnectionIndex int
+	}
+
+	// ParamsComposeVApp is the parameters for the documented ComposeVApp
+	// operation. Compose accepts a sourced item and optional OVF sections.
+	ParamsComposeVApp struct {
+		// Name is the name of the VApp to compose.
 		Name string
 
 		// Description is the description of the VApp to create.
 		Description string
 
-		// VDCID is the VDC ID where the VApp will be created.
+		// VDCID is the VDC ID where the VApp will be composed.
 		VDCID string
+
+		Deploy              bool
+		PowerOn             bool
+		LinkedClone         bool
+		AllEULAsAccepted    bool
+		SourcedItem         *VAppSourcedItem
+		InstantiationParams *VAppInstantiationParams
+	}
+
+	// ParamsInstantiateVAppTemplate is the parameters for instantiating a VApp
+	// from a catalog/template resource.
+	ParamsInstantiateVAppTemplate struct {
+		Name        string
+		Description string
+		VDCID       string
+		TemplateID  string
+
+		Deploy              bool
+		PowerOn             bool
+		LinkedClone         bool
+		AllEULAsAccepted    bool
+		InstantiationParams *VAppInstantiationParams
 	}
 
 	// ParamsUpdateVApp is the parameters for the UpdateVApp command.
@@ -136,9 +197,17 @@ func (p ParamsGetVApp) Validate() error {
 	return nil
 }
 
-// Validate checks ParamsCreateVApp structural constraints.
-func (p ParamsCreateVApp) Validate() error {
+// Validate checks ParamsComposeVApp structural constraints.
+func (p ParamsComposeVApp) Validate() error {
 	if p.Name == "" || p.VDCID == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	return nil
+}
+
+// Validate checks ParamsInstantiateVAppTemplate structural constraints.
+func (p ParamsInstantiateVAppTemplate) Validate() error {
+	if p.Name == "" || p.VDCID == "" || p.TemplateID == "" {
 		return fmt.Errorf("missing required parameters")
 	}
 	return nil

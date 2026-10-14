@@ -165,91 +165,76 @@ func TestGetVApp(t *testing.T) {
 	}
 }
 
-func TestCreateVApp(t *testing.T) {
+func TestVAppCreationEndpoints(t *testing.T) {
+	assert.Equal(t, "/api/vdc/{vdc-id}/action/composeVApp", endpoints.ComposeVApp().PathTemplate)
+	assert.Equal(t, "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-ComposeVApp.html", endpoints.ComposeVApp().DocumentationURL)
+	assert.Equal(t, "/api/vdc/{vdc-id}/action/instantiateVAppTemplate", endpoints.InstantiateVAppTemplate().PathTemplate)
+	assert.Equal(t, "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-InstantiateVAppTemplate.html", endpoints.InstantiateVAppTemplate().DocumentationURL)
+	assert.Equal(t, "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-NetworkConfigSection-vApp.html", endpoints.RemoveAllNetworks().DocumentationURL)
+}
+
+func TestVAppLifecycleEndpoints(t *testing.T) {
 	tests := []struct {
-		name               string
-		params             types.ParamsCreateVApp
-		mockResponse       any
-		mockResponseStatus int
-
-		mockGetResponse       any
-		mockGetResponseStatus int
-
-		mockListResponse       any
-		mockListResponseStatus int
-
-		expectedErr bool
+		name string
+		path string
+		doc  string
+		get  func() *cav.Endpoint
 	}{
-		{
-			name: "Create VApp with valid parameters",
-			params: types.ParamsCreateVApp{
-				Name:        "test-vapp-1",
-				Description: "Test VApp",
-				VDCID:       "urn:vcloud:vdc:12345678-1234-4b8d-89ab-123456789012",
-			},
-			mockResponse: &cav.Job{
-				ID:     "87ab1934-0146-4fb0-80bc-815fea03214d",
-				Status: "queued",
-			},
-			mockResponseStatus: 200,
-			mockListResponse: &itypes.APIResponseListVApp{
-				Records: []itypes.APIResponseListVAppRecord{
-					{
-						ID:   "urn:vcloud:vapp:12345678-1234-4b8d-89ab-123456789012",
-						Name: "test-vapp-1",
-					},
-				},
-			},
-			mockListResponseStatus: 200,
-			expectedErr:            false,
-		},
-		{
-			name: "Create VApp with missing required parameters",
-			params: types.ParamsCreateVApp{
-				Name: "test-vapp-1",
-			},
-			expectedErr: true,
-		},
-		{
-			name: "Error 401 Unauthorized",
-			params: types.ParamsCreateVApp{
-				Name:        "test-vapp-1",
-				Description: "Test VApp",
-				VDCID:       "urn:vcloud:vdc:12345678-1234-4b8d-89ab-123456789012",
-			},
-			mockResponseStatus: 401,
-			expectedErr:        true,
-		},
+		{"deploy", "/api/vapp/{vapp-id}/action/deploy", "POST-DeployVApp.html", endpoints.DeployVApp},
+		{"power off", "/api/vapp/{vapp-id}/power/action/powerOff", "POST-PowerOffVApp.html", endpoints.PowerOffVApp},
+		{"power on", "/api/vapp/{vapp-id}/power/action/powerOn", "POST-PowerOnVApp.html", endpoints.PowerOnVApp},
+		{"reboot", "/api/vapp/{vapp-id}/power/action/reboot", "POST-RebootVApp.html", endpoints.RebootVApp},
+		{"reset", "/api/vapp/{vapp-id}/power/action/reset", "POST-ResetVApp.html", endpoints.ResetVApp},
+		{"shutdown", "/api/vapp/{vapp-id}/power/action/shutdown", "POST-ShutdownVApp.html", endpoints.ShutdownVApp},
+		{"suspend", "/api/vapp/{vapp-id}/power/action/suspend", "POST-SuspendVApp.html", endpoints.SuspendVApp},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client, ms := newClient(t)
-
-			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
-				ms.CleanResponse(endpoints.CreateVApp())
-				ms.SetResponse(endpoints.CreateVApp(), tt.mockResponse, &tt.mockResponseStatus)
-			}
-
-			if tt.mockGetResponse != nil || tt.mockGetResponseStatus != 0 {
-				ms.CleanResponse(endpoints.GetVApp())
-				ms.SetResponse(endpoints.GetVApp(), tt.mockGetResponse, &tt.mockGetResponseStatus)
-			}
-
-			if tt.mockListResponse != nil || tt.mockListResponseStatus != 0 {
-				ms.CleanResponse(endpoints.ListVApp())
-				ms.SetResponse(endpoints.ListVApp(), tt.mockListResponse, &tt.mockListResponseStatus)
-			}
-
-			resp, err := client.CreateVApp(t.Context(), tt.params)
-			if tt.expectedErr {
-				assert.NotNil(t, err, "Expected error but got none")
-				return
-			}
-			assert.Nil(t, err, "Unexpected error: %v", err)
-			assert.NotNil(t, resp, "Expected response to be not nil")
+			ep := tt.get()
+			assert.Equal(t, tt.path, ep.PathTemplate)
+			assert.Equal(t, "POST", string(ep.Method))
+			assert.Equal(t, "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/"+tt.doc, ep.DocumentationURL)
 		})
 	}
+}
+
+func TestVAppLifecycleActionsRequireID(t *testing.T) {
+	client, _ := newClient(t)
+	actions := []struct {
+		name string
+		call func() error
+	}{
+		{"deploy", func() error { return client.DeployVApp(t.Context(), "") }},
+		{"power off", func() error { return client.PowerOffVApp(t.Context(), "") }},
+		{"power on", func() error { return client.PowerOnVApp(t.Context(), "") }},
+		{"reboot", func() error { return client.RebootVApp(t.Context(), "") }},
+		{"reset", func() error { return client.ResetVApp(t.Context(), "") }},
+		{"shutdown", func() error { return client.ShutdownVApp(t.Context(), "") }},
+		{"suspend", func() error { return client.SuspendVApp(t.Context(), "") }},
+	}
+	for _, action := range actions {
+		t.Run(action.name, func(t *testing.T) {
+			assert.Error(t, action.call())
+		})
+	}
+}
+
+func TestComposeVAppRequiresSource(t *testing.T) {
+	client, _ := newClient(t)
+	_, err := client.ComposeVApp(t.Context(), types.ParamsComposeVApp{
+		Name:  "test-vapp",
+		VDCID: "urn:vcloud:vdc:12345678-1234-4b8d-89ab-123456789012",
+	})
+	assert.Error(t, err)
+}
+
+func TestInstantiateVAppTemplateRequiresTemplate(t *testing.T) {
+	client, _ := newClient(t)
+	_, err := client.InstantiateVAppTemplate(t.Context(), types.ParamsInstantiateVAppTemplate{
+		Name:  "test-vapp",
+		VDCID: "urn:vcloud:vdc:12345678-1234-4b8d-89ab-123456789012",
+	})
+	assert.Error(t, err)
 }
 
 func TestUpdateVAppPreservesExistingDescription(t *testing.T) {

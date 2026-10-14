@@ -20,6 +20,55 @@ func ListVApp() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListVApp")
 }
 
+// DeployVApp - Deploy a VApp
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-DeployVApp.html
+func DeployVApp() *cav.Endpoint {
+	return cav.MustGetEndpoint("DeployVApp")
+}
+
+// PowerOffVApp - Power off a VApp
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-PowerOffVApp.html
+func PowerOffVApp() *cav.Endpoint {
+	return cav.MustGetEndpoint("PowerOffVApp")
+}
+
+// PowerOnVApp - Power on a VApp
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-PowerOnVApp.html
+func PowerOnVApp() *cav.Endpoint {
+	return cav.MustGetEndpoint("PowerOnVApp")
+}
+
+// RebootVApp - Reboot a VApp
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-RebootVApp.html
+func RebootVApp() *cav.Endpoint {
+	return cav.MustGetEndpoint("RebootVApp")
+}
+
+// ResetVApp - Reset a VApp
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-ResetVApp.html
+func ResetVApp() *cav.Endpoint {
+	return cav.MustGetEndpoint("ResetVApp")
+}
+
+// ShutdownVApp - Shut down a VApp
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-ShutdownVApp.html
+func ShutdownVApp() *cav.Endpoint {
+	return cav.MustGetEndpoint("ShutdownVApp")
+}
+
+// SuspendVApp - Suspend a VApp
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-SuspendVApp.html
+func SuspendVApp() *cav.Endpoint {
+	return cav.MustGetEndpoint("SuspendVApp")
+}
+
 // GetVApp - Get VApp
 //
 // DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-VApp.html
@@ -27,11 +76,18 @@ func GetVApp() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetVApp")
 }
 
-// CreateVApp - Create a new VApp
+// ComposeVApp - Compose a new VApp
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
-func CreateVApp() *cav.Endpoint {
-	return cav.MustGetEndpoint("CreateVApp")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-ComposeVApp.html
+func ComposeVApp() *cav.Endpoint {
+	return cav.MustGetEndpoint("ComposeVApp")
+}
+
+// InstantiateVAppTemplate - Instantiate a VApp from a template
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-InstantiateVAppTemplate.html
+func InstantiateVAppTemplate() *cav.Endpoint {
+	return cav.MustGetEndpoint("InstantiateVAppTemplate")
 }
 
 // UpdateVApp - Update an existing VApp
@@ -50,7 +106,7 @@ func DeleteVApp() *cav.Endpoint {
 
 // RemoveAllNetworks - Remove all networks from a VApp
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-NetworkConfigSection-vApp.html
 func RemoveAllNetworks() *cav.Endpoint {
 	return cav.MustGetEndpoint("RemoveAllNetworks")
 }
