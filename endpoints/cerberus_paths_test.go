@@ -51,6 +51,8 @@ func Test_GeneratedWrappers_ResolveCerberusPaths(t *testing.T) {
 		"GetJobCerberus":             endpoints.GetJobCerberus(),
 		"ListT0":                     endpoints.ListT0(),
 		"GetT0":                      endpoints.GetT0(),
+		"GetJobs":                    endpoints.GetJobs(),
+		"GetBMSList":                 endpoints.GetBMSList(),
 	}
 
 	for name, ep := range wrappers {

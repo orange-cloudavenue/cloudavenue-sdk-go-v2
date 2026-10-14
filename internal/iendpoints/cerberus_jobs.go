@@ -1,0 +1,29 @@
+/*
+ * SPDX-FileCopyrightText: Copyright (c) 2026 Orange
+ * SPDX-License-Identifier: Mozilla Public License 2.0
+ *
+ * This software is licensed under the MPL-2.0 license.
+ * the text of which is available at https://www.mozilla.org/en-US/MPL/2.0/
+ * or see the "LICENSE" file for more details.
+ */
+
+package iendpoints
+
+import (
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+)
+
+//go:generate endpoint-generator -path cerberus_jobs.go -output cerberus_jobs
+
+func init() {
+	cav.Endpoint{
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Jobs/getJobs",
+		Name:             "GetJobs",
+		Description:      "Get current root job id of an organization",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendInfrapi,
+		PathTemplate:     pathCerberusJobs,
+		ResponseType:     itypes.APIResponseJobs{},
+	}.Register()
+}
