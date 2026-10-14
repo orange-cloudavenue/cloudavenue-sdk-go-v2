@@ -159,3 +159,33 @@ func PublishAllGlobalRoleTenants() *cav.Endpoint {
 func UnpublishAllGlobalRoleTenants() *cav.Endpoint {
 	return cav.MustGetEndpoint("UnpublishAllGlobalRoleTenants")
 }
+// ListTokens - List tokens in organization
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-Tokens.html
+func ListTokens() *cav.Endpoint {
+	return cav.MustGetEndpoint("ListTokens")
+}
+// GetToken - Get token by ID
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/GET-Token.html
+func GetToken() *cav.Endpoint {
+	return cav.MustGetEndpoint("GetToken")
+}
+// CreateToken - Create a new token in organization
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/POST-Token.html
+func CreateToken() *cav.Endpoint {
+	return cav.MustGetEndpoint("CreateToken")
+}
+// UpdateToken - Update an existing token
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/PUT-Token.html
+func UpdateToken() *cav.Endpoint {
+	return cav.MustGetEndpoint("UpdateToken")
+}
+// DeleteToken - Delete a token
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/latest/doc/operations/DELETE-Token.html
+func DeleteToken() *cav.Endpoint {
+	return cav.MustGetEndpoint("DeleteToken")
+}
