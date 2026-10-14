@@ -64,13 +64,11 @@ func (c *Client) GetAdminCatalog(ctx context.Context, params types.ParamsGetAdmi
 	}
 
 	idOrName := params.ID
-	if idOrName == "" {
-		idOrName = params.Name
-	}
 
 	// If only the name is provided, resolve it against the admin catalog list so the
 	// path parameter receives a value vCD accepts (name or id).
 	if params.ID == "" && params.Name != "" {
+		idOrName = params.Name
 		catalogs, err := c.ListAdminCatalogs(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("%s: list catalogs: %w", opGetAdminCatalog, err)

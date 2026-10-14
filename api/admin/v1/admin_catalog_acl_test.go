@@ -108,7 +108,7 @@ func TestSetAdminCatalogACL(t *testing.T) {
 		assert.Len(t, body.AccessSettings.AccessSetting, 1)
 		setting := body.AccessSettings.AccessSetting[0]
 		assert.NotNil(t, setting.Subject)
-		assert.Equal(t, "https://api.cloudavenue.org/api/admin/user/22222222-2222-2222-2222-222222222222", setting.Subject.HREF)
+		assert.Equal(t, client.c.GetConsole().GetAPIVCDEndpoint()+"/api/admin/user/22222222-2222-2222-2222-222222222222", setting.Subject.HREF)
 		assert.Equal(t, "urn:vcloud:orguser", setting.Subject.Type)
 		assert.Equal(t, mockACLAccessLevel, setting.AccessLevel)
 
