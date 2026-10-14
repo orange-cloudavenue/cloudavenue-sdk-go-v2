@@ -41,8 +41,19 @@ const (
 	pathVAppRemoveAllNetworks = "/api/vapp/{vapp-id}/action/removeAllNetworks"
 	// pathVAppUndeploy undeploys one vApp.
 	pathVAppUndeploy = "/api/vapp/{vapp-id}/action/undeploy"
-	// pathVAppCreate creates a vApp under a VDC in the legacy XML API.
-	pathVAppCreate = "/api/vdc/{vdc-id}/action/createVApp"
+	// pathVAppDeploy deploys one vApp.
+	pathVAppDeploy = "/api/vapp/{vapp-id}/action/deploy"
+	// vApp power action paths operate on one vApp or VM.
+	pathVAppPowerOff = "/api/vapp/{vapp-id}/power/action/powerOff"
+	pathVAppPowerOn  = "/api/vapp/{vapp-id}/power/action/powerOn"
+	pathVAppReboot   = "/api/vapp/{vapp-id}/power/action/reboot"
+	pathVAppReset    = "/api/vapp/{vapp-id}/power/action/reset"
+	pathVAppShutdown = "/api/vapp/{vapp-id}/power/action/shutdown"
+	pathVAppSuspend  = "/api/vapp/{vapp-id}/power/action/suspend"
+	// pathVAppCompose composes a vApp under a VDC in the legacy XML API.
+	pathVAppCompose = "/api/vdc/{vdc-id}/action/composeVApp"
+	// pathVAppInstantiateTemplate instantiates a vApp template under a VDC.
+	pathVAppInstantiateTemplate = "/api/vdc/{vdc-id}/action/instantiateVAppTemplate"
 	// pathVDCMetadata gets VDC metadata through the legacy XML API.
 	pathVDCMetadata = "/api/vdc/{vdc-id}/metadata"
 	// pathVAppLeaseSettings gets or updates organization vApp lease settings in the legacy XML API.

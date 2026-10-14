@@ -9,14 +9,14 @@
 
 package cav
 
-// Canonical documentation roots. Per-operation deep links drift and operation
+// Runtime documentation roots. Per-operation deep links drift and operation
 // pages are unstable, so every endpoint of a backend shares one root. VMware is
 // pinned to the API version the client sends.
 //
-// internal/iendpoints keeps its own copy of these literals: the endpoint
-// generator renders a cross-package reference as "pkg.Name" rather than as the
-// value, so aliasing them would blank every generated comment there. Keep both
-// sets as literals and in sync.
+// internal/iendpoints intentionally keeps generator-readable literal copies.
+// The endpoint generator resolves constants from source, but would render a
+// cross-package reference as "pkg.Name" instead of its value in generated
+// comments. Keep both sets as literals and in sync.
 const (
 	// DocURLVMware is the VMware Cloud Director OpenAPI root.
 	DocURLVMware = "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/"
