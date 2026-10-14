@@ -10,6 +10,10 @@
 package iendpoints
 
 const (
+	// pathCerberusJobs lists the current root jobs for an organization.
+	pathCerberusJobs = "/infrapicustomerproxy/v2.0/jobs"
+	// pathCerberusBMS lists BMS and network details.
+	pathCerberusBMS = "/infrapicustomerproxy/v2.0/bms"
 	// pathCerberusDraasOnPremiseIP addresses one on-premise DRAAS IP.
 	pathCerberusDraasOnPremiseIP = "/infrapicustomerproxy/v2.0/vcda/ips/{ip}"
 
