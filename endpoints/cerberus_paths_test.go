@@ -37,6 +37,7 @@ func Test_GeneratedWrappers_ResolveCerberusPaths(t *testing.T) {
 		"AddDraasOnPremiseIP":        endpoints.AddDraasOnPremiseIP(),
 		"RemoveDraasOnPremiseIP":     endpoints.RemoveDraasOnPremiseIP(),
 		"CreateEdgeGateway":          endpoints.CreateEdgeGateway(),
+		"CreateEdgeGatewayVDCGroup":  endpoints.CreateEdgeGatewayVDCGroup(),
 		"DeleteEdgeGateway":          endpoints.DeleteEdgeGateway(),
 		"UpdateEdgeGatewayBandwidth": endpoints.UpdateEdgeGatewayBandwidth(),
 		"GetEdgeGatewayServices":     endpoints.GetEdgeGatewayServices(),
@@ -49,10 +50,11 @@ func Test_GeneratedWrappers_ResolveCerberusPaths(t *testing.T) {
 		"UpdateVDC":                  endpoints.UpdateVDC(),
 		"DeleteVDC":                  endpoints.DeleteVDC(),
 		"GetJobCerberus":             endpoints.GetJobCerberus(),
-		"ListT0":                     endpoints.ListT0(),
-		"GetT0":                      endpoints.GetT0(),
 		"GetJobs":                    endpoints.GetJobs(),
 		"GetBMSList":                 endpoints.GetBMSList(),
+		"UpdateNetworkService":       endpoints.UpdateNetworkService(),
+		"ListT0":                     endpoints.ListT0(),
+		"GetT0":                      endpoints.GetT0(),
 	}
 
 	for name, ep := range wrappers {

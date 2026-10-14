@@ -22,7 +22,7 @@ import (
 func init() {
 	// ListVDC
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/vDC/getOrgVdcs",
 		Name:             "ListVDC",
 		Description:      "List VDCs",
 		Method:           cav.MethodGET,
@@ -33,7 +33,7 @@ func init() {
 
 	// GetVDC
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/vDC/getOrgVdcByName",
 		Name:             "GetVDC",
 		Description:      "Get VDC",
 		Method:           cav.MethodGET,
@@ -68,7 +68,7 @@ func init() {
 
 	// CreateVDC
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/vDC/createOrgVdc",
 		Name:             "CreateVDC",
 		Description:      "Create a new Org VDC",
 		Method:           cav.MethodPOST,
@@ -80,7 +80,7 @@ func init() {
 
 	// UpdateVDC
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/vDC/updateOrgVdc",
 		Name:             "UpdateVDC",
 		Description:      "Update an existing Org VDC",
 		Method:           cav.MethodPUT,
@@ -99,7 +99,7 @@ func init() {
 
 	// DeleteVDC
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/vDC/deleteOrgVdc",
 		Name:             "DeleteVDC",
 		Description:      "Delete an existing Org VDC",
 		Method:           cav.MethodDELETE,

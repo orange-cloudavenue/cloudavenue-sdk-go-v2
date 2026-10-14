@@ -22,7 +22,7 @@ import (
 func init() {
 	// * UpdateEdgeGatewayBandwidth
 	cav.Endpoint{
-		DocumentationURL: docURLCerberus,
+		DocumentationURL: "https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/updateEdge",
 		Name:             "UpdateEdgeGatewayBandwidth",
 		Description:      "Update EdgeGateway Bandwidth",
 		Method:           cav.MethodPUT,
