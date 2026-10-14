@@ -47,6 +47,8 @@ const (
 	expectedPathT0List         = "/infrapicustomerproxy/v2.0/tier-0-vrfs"
 	expectedPathT0ByName       = "/infrapicustomerproxy/v2.0/tier-0-vrfs/{tier0Name}"
 	expectedPathJobByTaskID    = "/infrapicustomerproxy/v1.0/jobs/{taskId}"
+	expectedPathJobs           = "/infrapicustomerproxy/v2.0/jobs"
+	expectedPathBMS            = "/infrapicustomerproxy/v2.0/bms"
 )
 
 // cerberusEndpoints pins the literal PathTemplate of every BackendInfrapi
@@ -76,6 +78,8 @@ var cerberusEndpoints = []struct {
 	{"UpdateVDC", expectedPathVDCByName},
 	{"DeleteVDC", expectedPathVDCByName},
 	{"GetJobCerberus", expectedPathJobByTaskID},
+	{"GetJobs", expectedPathJobs},
+	{"GetBMSList", expectedPathBMS},
 	{"ListT0", expectedPathT0List},
 	{"GetT0", expectedPathT0ByName},
 }
