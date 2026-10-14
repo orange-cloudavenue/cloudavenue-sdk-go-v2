@@ -15,35 +15,42 @@ import (
 
 // GetEdgeGateway - Get EdgeGateway
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/getEdgeById
 func GetEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetEdgeGateway")
 }
 
 // QueryEdgeGateway - List EdgeGateways (compatibility alias)
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/getEdges
 func QueryEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("QueryEdgeGateway")
 }
 
-// CreateEdgeGateway - Create EdgeGateway
+// CreateEdgeGateway - Create EdgeGateway in a VDC
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/createVdcEdge
 func CreateEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("CreateEdgeGateway")
 }
 
+// CreateEdgeGatewayVDCGroup - Create EdgeGateway in a VDC group
+//
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/createVdcGroupEdge
+func CreateEdgeGatewayVDCGroup() *cav.Endpoint {
+	return cav.MustGetEndpoint("CreateEdgeGatewayVDCGroup")
+}
+
 // DeleteEdgeGateway - Delete EdgeGateway
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/deleteEdge
 func DeleteEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("DeleteEdgeGateway")
 }
 
 // ListEdgeGateway - List EdgeGateways
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/?urls.primaryName=[NGP+Cerberus]+Cloud+Avenue+API
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Edge%20Gateways/getEdges
 func ListEdgeGateway() *cav.Endpoint {
 	return cav.MustGetEndpoint("ListEdgeGateway")
 }
