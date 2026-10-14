@@ -225,6 +225,7 @@ func init() {
 		BodyRequestType: itypes.NewPassword{},
 		ResponseType:    struct{}{},
 	}.Register()
+
 	const pathTokens = "/cloudapi/1.0.0/tokens"
 
 	// ListTokens
@@ -333,6 +334,8 @@ func init() {
 		},
 		ResponseType: struct{}{},
 	}.Register()
+
+	const pathLDAP = "/cloudapi/1.0.0/ldap"
 
 	const pathGlobalRoles = "/cloudapi/1.0.0/globalRoles"
 
@@ -670,5 +673,4 @@ func init() {
 		},
 		ResponseType: struct{}{},
 	}.Register()
-}
 }
