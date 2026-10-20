@@ -1,0 +1,3 @@
+```release-note:docs
+docs(architecture): add and correct rewrite architecture sources. Updates the top-level architecture and contribution documents, adds the SDK v2 architecture specification and supporting source documents under `docs/`, and removes the unsupported internal InfrAPI endpoint reference from the spec set.
+```
