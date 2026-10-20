@@ -25,7 +25,7 @@ func init() {
 		Description:      "List certificate library items",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/ssl/certificateLibrary",
+		PathTemplate:     pathCertificateLibraryBase,
 		QueryParams:      []cav.QueryParam{{Name: queryParamFilter, Description: "Filter to apply to the list of certificates."}, {Name: queryParamPageSize, Description: descPageSize, Value: pageSize100}, {Name: queryParamPage, Description: descPage, Value: "1"}},
 		ResponseType:     itypes.APIResponseListCertificate{},
 	}.Register()
@@ -54,7 +54,7 @@ func init() {
 		Description:      "Create a certificate library item",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/ssl/certificateLibrary",
+		PathTemplate:     pathCertificateLibraryBase,
 		BodyRequestType:  itypes.APIRequestCertificate{},
 		ResponseType:     itypes.APIResponseCertificate{},
 	}.Register()

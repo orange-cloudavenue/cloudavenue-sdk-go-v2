@@ -128,6 +128,8 @@ func backendToSubClientName(backend BackendTarget) (subClientName, error) {
 		return ClientOSE, nil
 	case BackendNetBackup:
 		return ClientNetbackup, nil
+	case BackendIHM:
+		return ClientIHM, nil
 	default:
 		return "", fmt.Errorf("unknown backend %d", backend)
 	}
@@ -196,6 +198,10 @@ func (c *client) NewRequestWithBackend(ctx context.Context, backend BackendTarge
 		SetRetryWaitTime(retryWaitTime).
 		AddRetryConditions(retryConditions...).
 		SetRetryAllowNonIdempotent(retryIdempotent)
+
+	for name, value := range endpoint.Headers {
+		hR.SetHeader(name, value)
+	}
 
 	for _, q := range endpoint.QueryParams {
 		if q.Value != "" {

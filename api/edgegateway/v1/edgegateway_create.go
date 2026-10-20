@@ -54,46 +54,8 @@ type listVDCGroupByOwnerNameParams struct {
 }
 
 var (
-	createEdgeGatewaySubmitOp = cav.Operation[createEdgeGatewaySubmitParams, string]{
-		Name:     opCreateEdgeGatewaySubmit,
-		Backend:  cav.BackendInfrapi,
-		Endpoint: endpoints.CreateEdgeGateway(),
-		Validate: func(p createEdgeGatewaySubmitParams) error {
-			if p.OwnerType == "" {
-				return fmt.Errorf("owner type is required")
-			}
-			if p.OwnerName == "" {
-				return fmt.Errorf("owner name is required")
-			}
-			if p.T0Name == "" {
-				return fmt.Errorf("t0 name is required")
-			}
-
-			return nil
-		},
-		RequestOptions: func(p createEdgeGatewaySubmitParams) ([]cav.EndpointRequestOption, error) {
-			ep := endpoints.CreateEdgeGateway()
-			return []cav.EndpointRequestOption{
-				cav.WithPathParam(ep.PathParams[0], p.OwnerType),
-				cav.WithPathParam(ep.PathParams[1], p.OwnerName),
-			}, nil
-		},
-		Transform: func(p createEdgeGatewaySubmitParams) (any, error) {
-			return itypes.APIRequestEdgeGateway{T0Name: p.T0Name}, nil
-		},
-		Extract: func(resp *cav.Response, _ createEdgeGatewaySubmitParams) (string, error) {
-			created, ok := resp.Result().(*cav.CerberusJobCreatedAPIResponse)
-			if !ok || created == nil {
-				return "", fmt.Errorf("unexpected create response type %T", resp.Result())
-			}
-
-			if created.ID == "" {
-				return "", errors.New("job id not found in create response")
-			}
-
-			return created.ID, nil
-		},
-	}
+	createEdgeGatewaySubmitOp           = createEdgeGatewaySubmitOperation(endpoints.CreateEdgeGateway())
+	createEdgeGatewayVDCGroupSubmitOp   = createEdgeGatewaySubmitOperation(endpoints.CreateEdgeGatewayVDCGroup())
 	updateCreatedEdgeGatewayBandwidthOp = cav.Operation[updateCreatedEdgeGatewayBandwidthParams, struct{}]{
 		Name:     opUpdateEdgeGatewayBandwidthCreate,
 		Backend:  cav.BackendInfrapi,
@@ -123,7 +85,7 @@ var (
 	}
 	listVDCByOwnerNameOp = cav.Operation[listVDCByOwnerNameParams, *itypes.APIResponseListVDC]{
 		Name:     opListVDCByOwnerName,
-		Backend:  cav.BackendVMware,
+		Backend:  cav.BackendInfrapi,
 		Endpoint: endpoints.ListVDC(),
 		Validate: func(p listVDCByOwnerNameParams) error {
 			if p.OwnerName == "" {
@@ -133,10 +95,7 @@ var (
 			return nil
 		},
 		RequestOptions: func(p listVDCByOwnerNameParams) ([]cav.EndpointRequestOption, error) {
-			ep := endpoints.ListVDC()
-			return []cav.EndpointRequestOption{
-				cav.WithQueryParam(ep.QueryParams[0], "name=="+p.OwnerName),
-			}, nil
+			return nil, nil
 		},
 		Extract: func(resp *cav.Response, _ listVDCByOwnerNameParams) (*itypes.APIResponseListVDC, error) {
 			list, ok := resp.Result().(*itypes.APIResponseListVDC)
@@ -175,13 +134,55 @@ var (
 	}
 )
 
+func createEdgeGatewaySubmitOperation(endpoint *cav.Endpoint) cav.Operation[createEdgeGatewaySubmitParams, string] {
+	return cav.Operation[createEdgeGatewaySubmitParams, string]{
+		Name:     opCreateEdgeGatewaySubmit,
+		Backend:  cav.BackendInfrapi,
+		Endpoint: endpoint,
+		Validate: func(p createEdgeGatewaySubmitParams) error {
+			if p.OwnerType == "" {
+				return fmt.Errorf("owner type is required")
+			}
+			if p.OwnerName == "" {
+				return fmt.Errorf("owner name is required")
+			}
+			if p.T0Name == "" {
+				return fmt.Errorf("t0 name is required")
+			}
+
+			return nil
+		},
+		RequestOptions: func(p createEdgeGatewaySubmitParams) ([]cav.EndpointRequestOption, error) {
+			ep := endpoint
+			return []cav.EndpointRequestOption{
+				cav.WithPathParam(ep.PathParams[0], p.OwnerName),
+			}, nil
+		},
+		Transform: func(p createEdgeGatewaySubmitParams) (any, error) {
+			return itypes.APIRequestEdgeGateway{T0Name: p.T0Name}, nil
+		},
+		Extract: func(resp *cav.Response, _ createEdgeGatewaySubmitParams) (string, error) {
+			created, ok := resp.Result().(*cav.CerberusJobCreatedAPIResponse)
+			if !ok || created == nil {
+				return "", fmt.Errorf("unexpected create response type %T", resp.Result())
+			}
+
+			if created.ID == "" {
+				return "", errors.New("job id not found in create response")
+			}
+
+			return created.ID, nil
+		},
+	}
+}
+
 // CreateEdgeGateway creates an edge gateway for a VDC or VDC group owner.
 func (c *Client) CreateEdgeGateway(ctx context.Context, params types.ParamsCreateEdgeGateway) (*types.ModelEdgeGateway, error) {
 	if params.OwnerName == "" {
 		return nil, fmt.Errorf("%s: validate: owner name is required", opCreateEdgeGateway)
 	}
 
-	dependencies, err := c.resolveCreateEdgeGatewayDependencies(ctx, params.OwnerName)
+	dependencies, err := c.resolveCreateEdgeGatewayDependencies(ctx, params.OwnerName, params.T0Name)
 	if err != nil {
 		return nil, fmt.Errorf("%s: resolve dependencies: %w", opCreateEdgeGateway, err)
 	}
@@ -204,7 +205,11 @@ func (c *Client) CreateEdgeGateway(ctx context.Context, params types.ParamsCreat
 		return nil, fmt.Errorf("%s: resolve owner: %w", opCreateEdgeGateway, err)
 	}
 
-	jobID, err := cav.Execute(ctx, c.c, createEdgeGatewaySubmitOp, createEdgeGatewaySubmitParams{
+	createOp := createEdgeGatewaySubmitOp
+	if ownerType == "vdcgroup" {
+		createOp = createEdgeGatewayVDCGroupSubmitOp
+	}
+	jobID, err := cav.Execute(ctx, c.c, createOp, createEdgeGatewaySubmitParams{
 		OwnerType: ownerType,
 		OwnerName: ownerName,
 		T0Name:    t0.Name,
@@ -247,7 +252,7 @@ type createEdgeGatewayDependencies struct {
 	t0s       *types.ModelT0s
 }
 
-func (c *Client) resolveCreateEdgeGatewayDependencies(ctx context.Context, ownerName string) (*createEdgeGatewayDependencies, error) {
+func (c *Client) resolveCreateEdgeGatewayDependencies(ctx context.Context, ownerName, t0Name string) (*createEdgeGatewayDependencies, error) {
 	dependencies := &createEdgeGatewayDependencies{}
 	errGroup, errCtx := errgroup.WithContext(ctx)
 
@@ -276,6 +281,27 @@ func (c *Client) resolveCreateEdgeGatewayDependencies(ctx context.Context, owner
 		dependencies.t0s, err = c.ListT0(errCtx)
 		if err != nil {
 			return fmt.Errorf("failed to list T0 routers: %w", err)
+		}
+
+		// The Tier-0 list endpoint returns names only, so the selected T0 needs a
+		// detail lookup to carry its bandwidth. resolveEdgeGatewayCreateT0 consumes
+		// exactly one T0, so hydrate only that one.
+		if dependencies.t0s == nil {
+			return nil
+		}
+
+		for i, t0 := range dependencies.t0s.T0s {
+			if len(dependencies.t0s.T0s) > 1 && (t0Name == "" || t0Name != t0.Name) {
+				continue
+			}
+
+			detail, getErr := c.GetT0(errCtx, types.ParamsGetT0{T0Name: t0.Name})
+			if getErr != nil {
+				return fmt.Errorf("failed to get T0 router %s: %w", t0.Name, getErr)
+			}
+			dependencies.t0s.T0s[i] = *detail
+
+			return nil
 		}
 
 		return nil

@@ -237,4 +237,37 @@ type (
 		StartAddress string `documentation:"First IP address of the range"`
 		EndAddress   string `documentation:"Last IP address of the range"`
 	}
+
+	// * DHCP
+	ParamsGetNetworkDhcpConfig struct {
+		// VDCNetworkID is the unique identifier of the Org VDC Network.
+		VDCNetworkID string
+	}
+
+	ParamsUpdateNetworkDhcpConfig struct {
+		// VDCNetworkID is the unique identifier of the Org VDC Network.
+		VDCNetworkID string
+
+		// Config is the DHCP configuration to apply.
+		Config ModelDhcpConfig
+	}
+
+	ParamsDeleteNetworkDhcpConfig struct {
+		// VDCNetworkID is the unique identifier of the Org VDC Network.
+		VDCNetworkID string
+	}
+
+	ModelDhcpConfig struct {
+		Enabled           bool            `documentation:"Whether the DHCP service is enabled"`
+		LeaseTime         int64           `documentation:"DHCP lease time in seconds"`
+		ListenerIPAddress string          `documentation:"IP address of the DHCP listener"`
+		Mode              string          `documentation:"DHCP mode (EDGE, NETWORK, or RELAY)"`
+		Pools             []ModelDhcpPool `documentation:"DHCP address pools"`
+		DNSServers        []string        `documentation:"DNS servers assigned by DHCP"`
+	}
+
+	ModelDhcpPool struct {
+		StartAddress string `documentation:"First IP address in the DHCP pool"`
+		EndAddress   string `documentation:"Last IP address in the DHCP pool"`
+	}
 )

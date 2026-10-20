@@ -33,7 +33,7 @@ func init() {
 		Description:      "List Org VDC Networks (routed and isolated)",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/orgVdcNetworks",
+		PathTemplate:     pathOrgVDCNetworksBase,
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        queryParamFilter,
@@ -81,7 +81,7 @@ func init() {
 		Description:      "Create an Org VDC Network (routed or isolated)",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     "/cloudapi/1.0.0/orgVdcNetworks",
+		PathTemplate:     pathOrgVDCNetworksBase,
 		BodyRequestType:  itypes.APIRequestVDCNetwork{},
 		ResponseType:     itypes.APIResponseVDCNetwork{},
 	}.Register()
@@ -126,5 +126,69 @@ func init() {
 				},
 			},
 		},
+	}.Register()
+
+	// GetNetworkDhcpConfig
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp/get/",
+		Name:             "GetNetworkDhcpConfig",
+		Description:      "Get the DHCP configuration of an Org VDC Network",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathOrgVDCNetworkDHCP,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamVDCNetworkID,
+				Description: descVDCNetworkID,
+				Required:    true,
+				ValidatorFunc: func(value string) error {
+					return validators.New().Var(value, urnNetwork)
+				},
+			},
+		},
+		ResponseType: itypes.DhcpConfig{},
+	}.Register()
+
+	// UpdateNetworkDhcpConfig
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp/put/",
+		Name:             "UpdateNetworkDhcpConfig",
+		Description:      "Update the DHCP configuration of an Org VDC Network",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathOrgVDCNetworkDHCP,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamVDCNetworkID,
+				Description: descVDCNetworkID,
+				Required:    true,
+				ValidatorFunc: func(value string) error {
+					return validators.New().Var(value, urnNetwork)
+				},
+			},
+		},
+		BodyRequestType: itypes.APIRequestDhcpConfig{},
+		ResponseType:    cav.Job{},
+	}.Register()
+
+	// DeleteNetworkDhcpConfig
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/orgVdcNetworks/vdcNetworkId/dhcp/delete/",
+		Name:             "DeleteNetworkDhcpConfig",
+		Description:      "Delete the DHCP configuration of an Org VDC Network",
+		Method:           cav.MethodDELETE,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathOrgVDCNetworkDHCP,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamVDCNetworkID,
+				Description: descVDCNetworkID,
+				Required:    true,
+				ValidatorFunc: func(value string) error {
+					return validators.New().Var(value, urnNetwork)
+				},
+			},
+		},
+		ResponseType: cav.Job{},
 	}.Register()
 }

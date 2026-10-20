@@ -7,5 +7,8 @@
  * or see the "LICENSE" file for more details.
  */
 
-// Package organization provides CloudAvenue organization API clients.
+// Package organization provides CloudAvenue organization API clients. Infrapi
+// is authoritative for organization configuration and state; VMware CloudAPI
+// supplies complementary organization details. The legacy AdminOrg XML view
+// is read-only and is not used for organization writes.
 package organization

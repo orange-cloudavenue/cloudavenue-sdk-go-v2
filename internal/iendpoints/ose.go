@@ -22,7 +22,7 @@ func init() {
 		Description:      "List tenants associated with the current user",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendOSE,
-		PathTemplate:     "/api/v1/core/associated-tenants",
+		PathTemplate:     pathOSEAssociatedTenants,
 		QueryParams: []cav.QueryParam{
 			{
 				Name:        "accessible-only",
@@ -40,15 +40,15 @@ func init() {
 		Description:      "Get S3 credentials for a user in an organization",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendOSE,
-		PathTemplate:     "/api/v1/core/tenants/{organizationID}/users/{userName}/credentials",
+		PathTemplate:     pathOSEUserCredentials,
 		PathParams: []cav.PathParam{
 			{
-				Name:        "organizationID",
+				Name:        pathParamOrganizationID,
 				Description: "Organization identifier",
 				Required:    true,
 			},
 			{
-				Name:        "userName",
+				Name:        pathParamUserName,
 				Description: "User name",
 				Required:    true,
 			},
