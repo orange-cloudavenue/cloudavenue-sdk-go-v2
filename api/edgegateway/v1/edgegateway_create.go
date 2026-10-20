@@ -32,6 +32,7 @@ const (
 	opUpdateEdgeGatewayBandwidthCreate = "EdgeGateway.Create.UpdateBandwidth"
 	opListVDCByOwnerName               = "EdgeGateway.Create.ListVDCByOwnerName"
 	opListVDCGroupByOwnerName          = "EdgeGateway.Create.ListVDCGroupByOwnerName"
+	defaultSharedT0EdgeGatewayBandwidth = 5
 )
 
 type createEdgeGatewaySubmitParams struct {
@@ -226,7 +227,7 @@ func (c *Client) CreateEdgeGateway(ctx context.Context, params types.ParamsCreat
 		return nil, fmt.Errorf("%s: get created: %w", opCreateEdgeGateway, err)
 	}
 
-	if bandwidth > 5 {
+	if bandwidth > defaultSharedT0EdgeGatewayBandwidth {
 		if _, err := cav.Execute(ctx, c.c, updateCreatedEdgeGatewayBandwidthOp, updateCreatedEdgeGatewayBandwidthParams{
 			EdgeGatewayID: edgeCreated.ID,
 			Bandwidth:     bandwidth,
@@ -364,7 +365,7 @@ func resolveEdgeGatewayCreateT0(t0s *types.ModelT0s, params types.ParamsCreateEd
 		selected := t0s.T0s[0]
 		bandwidth := params.Bandwidth
 		if !selected.Bandwidth.AllowUnlimited && bandwidth <= 0 {
-			bandwidth = 5
+			bandwidth = defaultSharedT0EdgeGatewayBandwidth
 		}
 		return selected, bandwidth, nil
 	}
@@ -376,7 +377,7 @@ func resolveEdgeGatewayCreateT0(t0s *types.ModelT0s, params types.ParamsCreateEd
 
 		bandwidth := params.Bandwidth
 		if !t0Model.Bandwidth.AllowUnlimited && bandwidth <= 0 {
-			bandwidth = 5
+			bandwidth = defaultSharedT0EdgeGatewayBandwidth
 		}
 		return t0Model, bandwidth, nil
 	}

@@ -16,13 +16,13 @@ import (
 )
 
 func TestApiResponseVdcNetworkToModelPreservesAllSubnets(t *testing.T) {
-	network := APIResponseVDCNetwork{
-		Subnets: APIVDCNetworkSubnets{
-			Values: []APIVDCNetworkSubnetValue{
+	network := ApiResponseVdcNetwork{
+		Subnets: ApiVdcNetworkSubnets{
+			Values: []ApiVdcNetworkSubnetValue{
 				{
 					Gateway:      "10.0.0.1",
 					PrefixLength: 24,
-					IPRanges: APIVDCNetworkIPRanges{Values: []APIVDCNetworkIPRangeValue{{
+					IPRanges: ApiVdcNetworkIPRanges{Values: []ApiVdcNetworkIPRangeValue{{
 						StartAddress: "10.0.0.10",
 						EndAddress:   "10.0.0.20",
 					}}},
@@ -30,7 +30,7 @@ func TestApiResponseVdcNetworkToModelPreservesAllSubnets(t *testing.T) {
 				{
 					Gateway:      "10.0.1.1",
 					PrefixLength: 24,
-					IPRanges: APIVDCNetworkIPRanges{Values: []APIVDCNetworkIPRangeValue{{
+					IPRanges: ApiVdcNetworkIPRanges{Values: []ApiVdcNetworkIPRangeValue{{
 						StartAddress: "10.0.1.10",
 						EndAddress:   "10.0.1.20",
 					}}},
