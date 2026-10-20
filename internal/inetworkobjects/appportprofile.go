@@ -48,7 +48,12 @@ func FindAppPortProfile(ctx context.Context, c cav.Client, idOrName, vdcGroupID 
 			return nil, err
 		}
 
-		return resp.Result().(*itypes.ApiResponseAppPortProfile), nil
+		profile, ok := resp.Result().(*itypes.ApiResponseAppPortProfile)
+		if !ok || profile == nil {
+			return nil, fmt.Errorf("unexpected get app port profile response type %T", resp.Result())
+		}
+
+		return profile, nil
 	}
 
 	var found []itypes.ApiResponseAppPortProfile
@@ -64,7 +69,10 @@ func FindAppPortProfile(ctx context.Context, c cav.Client, idOrName, vdcGroupID 
 			continue
 		}
 
-		list := resp.Result().(*itypes.ApiResponseListAppPortProfile)
+		list, ok := resp.Result().(*itypes.ApiResponseListAppPortProfile)
+		if !ok || list == nil {
+			return nil, fmt.Errorf("unexpected list app port profile response type %T", resp.Result())
+		}
 		if len(list.Values) == 0 {
 			continue
 		}

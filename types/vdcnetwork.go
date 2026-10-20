@@ -212,6 +212,8 @@ type (
 		OwnerID   string `documentation:"ID of the owner (VDC or VdcGroup) of the Org VDC Network"`
 		OwnerName string `documentation:"Name of the owner (VDC or VdcGroup) of the Org VDC Network"`
 
+		Subnets []ModelVdcNetworkSubnet `documentation:"Subnet configurations of the Org VDC Network"`
+
 		Subnet ModelVdcNetworkSubnet `documentation:"Subnet configuration of the Org VDC Network"`
 
 		GuestVlanTaggingAllowed *bool `documentation:"Defines if guest VLAN tagging is allowed on this network"`

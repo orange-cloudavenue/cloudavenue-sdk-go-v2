@@ -35,6 +35,23 @@ type User struct {
 	ProviderType    string   `xml:"ProviderType,omitempty"`
 }
 
+// UserRequest represents the VMware vCD AdminOrg User XML request body.
+type UserRequest struct {
+	XMLName         xml.Name  `xml:"User"`
+	Name            string    `xml:"name,attr"`
+	ID              string    `xml:"id,attr"`
+	Role            Reference `xml:"Role"`
+	Description     string    `xml:"Description,omitempty"`
+	FullName        string    `xml:"FullName,omitempty"`
+	EmailAddress    string    `xml:"EmailAddress,omitempty"`
+	Telephone       string    `xml:"Telephone,omitempty"`
+	IsEnabled       *bool     `xml:"IsEnabled,omitempty"`
+	DeployedVmQuota int       `xml:"DeployedVmQuota,omitempty"`
+	StoredVmQuota   int       `xml:"StoredVmQuota,omitempty"`
+	Password        string    `xml:"Password,omitempty"`
+	ProviderType    string    `xml:"ProviderType,omitempty"`
+}
+
 // Users represents the wrapper for a list of users in VMware vCD AdminOrg API.
 type Users struct {
 	XMLName xml.Name `xml:"Users"`

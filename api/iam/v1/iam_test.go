@@ -397,6 +397,34 @@ func TestUpdateUser(t *testing.T) {
 	}
 }
 
+func TestUpdateUserCanDisableViaXMLPayload(t *testing.T) {
+	client, ms := newClient(t)
+	disabled := false
+
+	ms.CleanResponse(endpoints.UpdateUser())
+	ms.SetResponseFunc(endpoints.UpdateUser(), func(w http.ResponseWriter, r *http.Request) {
+		var body itypes.UserRequest
+		assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
+		if assert.NotNil(t, body.IsEnabled) {
+			assert.False(t, *body.IsEnabled)
+		}
+
+		xmlResponse(w, itypes.User{
+			Name:      "user1",
+			IsEnabled: false,
+			Role:      itypes.Reference{Name: "Organization Administrator"},
+		})
+	})
+
+	result, err := client.UpdateUser(t.Context(), ParamsUpdateUser{
+		ID:        generator.MustGenerate("{urn:user}"),
+		IsEnabled: &disabled,
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.False(t, result.IsEnabled)
+}
+
 func TestDeleteUser(t *testing.T) {
 	tests := []struct {
 		name               string

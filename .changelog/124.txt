@@ -1,0 +1,3 @@
+```release-note:fix
+fix(internal): harden typed endpoint and payload behavior. Removes a duplicate rebase-merge test, aligns typed test naming, improves IAM XML and VDC network payload handling, and adds focused tests for app port profile and VDC network typed behavior.
+```
