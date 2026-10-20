@@ -11,7 +11,7 @@ feat(organization): expand organization and Cerberus coverage. Adds organization
 ```
 
 ```release-note:feature
-feat(edgegateway): expand edge gateway API coverage. Routes edge gateway reads through Infrapi, adds network service update support, improves Tier-0/network hierarchy handling, and splits create endpoint handling by owner type.
+feat(edgegateway): expand edge gateway API coverage. Routes edge gateway reads through Infrapi, adds network service update support, improves Tier-0 and network hierarchy handling, and splits create endpoint handling by owner type.
 ```
 
 ```release-note:feature
@@ -19,7 +19,7 @@ feat(vdc,vdcgroup,vapp): expand VDC, VDC group, and vApp coverage. Routes VDC op
 ```
 
 ```release-note:fix
-fix(api): align backend routes, contracts, and runtime behavior. Corrects CloudAPI, VMware, and Cerberus endpoint usage; fixes token and LDAP route/doc mismatches; preserves explicit false values in typed payloads; preserves response metadata in error paths; and improves edge gateway public IP, service lookup, and Tier-0 handling.
+fix(api): align backend routes, contracts, and runtime behavior. Corrects CloudAPI, VMware, and Cerberus endpoint usage; fixes token and LDAP route and contract mismatches; preserves explicit false values in typed payloads; and improves edge gateway public IP, service lookup, and Tier-0 handling.
 ```
 
 ```release-note:fix
@@ -27,5 +27,5 @@ fix(cav): support endpoint-specific headers and improve API error handling. Adds
 ```
 
 ```release-note:chore
-chore(endpoints): refresh endpoint plumbing and documentation metadata. Regenerates endpoint wrappers, aligns path constants and endpoint documentation links, fixes parser constant resolution for generated output, and updates supporting specs/docs to reflect current backend ownership and verified operation links.
+chore(endpoints): refresh endpoint plumbing and documentation metadata. Regenerates endpoint wrappers, aligns path constants and endpoint documentation links, fixes parser constant resolution for generated output, and updates supporting specs and docs to reflect current backend ownership and verified operation links.
 ```
