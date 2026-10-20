@@ -21,85 +21,85 @@ import (
 )
 
 const (
-	opListVdcNetwork           = "VdcNetwork.List"
-	opGetVdcNetworkIsolated    = "VdcNetworkIsolated.Get"
-	opCreateVdcNetworkIsolated = "VdcNetworkIsolated.Create"
-	opUpdateVdcNetworkIsolated = "VdcNetworkIsolated.Update"
-	opDeleteVdcNetworkIsolated = "VdcNetworkIsolated.Delete"
+	opListVDCNetwork           = "VDCNetwork.List"
+	opGetVDCNetworkIsolated    = "VdcNetworkIsolated.Get"
+	opCreateVDCNetworkIsolated = "VdcNetworkIsolated.Create"
+	opUpdateVDCNetworkIsolated = "VdcNetworkIsolated.Update"
+	opDeleteVDCNetworkIsolated = "VdcNetworkIsolated.Delete"
 )
 
-// ListVdcNetwork lists routed and isolated VDC networks owned by a VDC group.
-func (c *Client) ListVdcNetwork(ctx context.Context, params types.ParamsListVdcNetwork) (*types.ModelListVdcNetwork, error) {
-	resp, err := listVdcNetworkModel(ctx, c.c, params.VdcGroupID, params.VdcGroupName)
+// ListVDCNetwork lists routed and isolated VDC networks owned by a VDC group.
+func (c *Client) ListVDCNetwork(ctx context.Context, params types.ParamsListVDCNetwork) (*types.ModelListVDCNetwork, error) {
+	resp, err := listVDCNetworkModel(ctx, c.c, params.VDCGroupID, params.VDCGroupName)
 	if err != nil {
-		return nil, fmt.Errorf("%s: list: %w", opListVdcNetwork, err)
+		return nil, fmt.Errorf("%s: list: %w", opListVDCNetwork, err)
 	}
 
 	return resp, nil
 }
 
-// GetVdcNetworkIsolated returns an isolated VDC network by ID or name.
-func (c *Client) GetVdcNetworkIsolated(ctx context.Context, params types.ParamsGetVdcNetworkIsolated) (*types.ModelGetVdcNetwork, error) {
-	resp, err := getVdcNetworkModel(ctx, c.c, params.ID, params.Name, params.VdcGroupID, params.VdcGroupName, types.VdcNetworkTypeIsolated)
+// GetVDCNetworkIsolated returns an isolated VDC network by ID or name.
+func (c *Client) GetVDCNetworkIsolated(ctx context.Context, params types.ParamsGetVDCNetworkIsolated) (*types.ModelGetVDCNetwork, error) {
+	resp, err := getVDCNetworkModel(ctx, c.c, params.ID, params.Name, params.VDCGroupID, params.VDCGroupName, types.VDCNetworkTypeIsolated)
 	if err != nil {
-		return nil, fmt.Errorf("%s: get: %w", opGetVdcNetworkIsolated, err)
+		return nil, fmt.Errorf("%s: get: %w", opGetVDCNetworkIsolated, err)
 	}
 
 	return resp, nil
 }
 
-func createVdcNetworkIsolatedBody(ctx context.Context, c cav.Client, params types.ParamsCreateVdcNetworkIsolated) (itypes.ApiRequestVdcNetwork, error) {
-	vdcGroupID, vdcGroupName, err := resolveVdcGroupRef(ctx, c, params.VdcGroupID, params.VdcGroupName)
+func createVDCNetworkIsolatedBody(ctx context.Context, c cav.Client, params types.ParamsCreateVDCNetworkIsolated) (itypes.APIRequestVDCNetwork, error) {
+	vdcGroupID, vdcGroupName, err := resolveVDCGroupRef(ctx, c, params.VDCGroupID, params.VDCGroupName)
 	if err != nil {
-		return itypes.ApiRequestVdcNetwork{}, err
+		return itypes.APIRequestVDCNetwork{}, err
 	}
 
-	return itypes.ApiRequestVdcNetwork{
+	return itypes.APIRequestVDCNetwork{
 		Name:        params.Name,
 		Description: params.Description,
-		NetworkType: types.VdcNetworkTypeIsolated,
-		OwnerRef:    &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
-		Subnets: itypes.ApiVdcNetworkSubnets{
-			Values: []itypes.ApiVdcNetworkSubnetValue{{
+		NetworkType: types.VDCNetworkTypeIsolated,
+		OwnerRef:    &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		Subnets: itypes.APIVDCNetworkSubnets{
+			Values: []itypes.APIVDCNetworkSubnetValue{{
 				Gateway:      params.Subnet.Gateway,
 				PrefixLength: params.Subnet.PrefixLength,
 				DNSServer1:   params.Subnet.DNSServer1,
 				DNSServer2:   params.Subnet.DNSServer2,
 				DNSSuffix:    params.Subnet.DNSSuffix,
-				IPRanges: itypes.ApiVdcNetworkIPRanges{
-					Values: createVdcNetworkIPRanges(params.Subnet.IPRanges),
+				IPRanges: itypes.APIVDCNetworkIPRanges{
+					Values: createVDCNetworkIPRanges(params.Subnet.IPRanges),
 				},
 			}},
 		},
-		GuestVlanTaggingAllowed: params.GuestVlanTaggingAllowed,
+		GuestVLANTaggingAllowed: params.GuestVLANTaggingAllowed,
 		Shared:                  new(true),
 	}, nil
 }
 
-// CreateVdcNetworkIsolated creates an isolated VDC network in a VDC group.
-func (c *Client) CreateVdcNetworkIsolated(ctx context.Context, params types.ParamsCreateVdcNetworkIsolated) (*types.ModelGetVdcNetwork, error) {
-	body, err := createVdcNetworkIsolatedBody(ctx, c.c, params)
+// CreateVDCNetworkIsolated creates an isolated VDC network in a VDC group.
+func (c *Client) CreateVDCNetworkIsolated(ctx context.Context, params types.ParamsCreateVDCNetworkIsolated) (*types.ModelGetVDCNetwork, error) {
+	body, err := createVDCNetworkIsolatedBody(ctx, c.c, params)
 	if err != nil {
-		return nil, fmt.Errorf("%s: transform: %w", opCreateVdcNetworkIsolated, err)
+		return nil, fmt.Errorf("%s: transform: %w", opCreateVDCNetworkIsolated, err)
 	}
 
-	ep := endpoints.CreateVdcNetwork()
+	ep := endpoints.CreateVDCNetwork()
 	resp, err := c.c.Do(ctx, ep, cav.SetBody(body))
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", opCreateVdcNetworkIsolated, err)
+		return nil, fmt.Errorf("%s: %w", opCreateVDCNetworkIsolated, err)
 	}
 
-	network, ok := resp.Result().(*itypes.ApiResponseVdcNetwork)
+	network, ok := resp.Result().(*itypes.APIResponseVDCNetwork)
 	if !ok || network == nil {
-		return nil, fmt.Errorf("%s: unexpected create response type %T", opCreateVdcNetworkIsolated, resp.Result())
+		return nil, fmt.Errorf("%s: unexpected create response type %T", opCreateVDCNetworkIsolated, resp.Result())
 	}
 
 	model := network.ToModel()
 	return &model, nil
 }
 
-// mergeVdcNetworkIsolatedUpdate applies optional update params onto the current network state.
-func mergeVdcNetworkIsolatedUpdate(current *itypes.ApiResponseVdcNetwork, params types.ParamsUpdateVdcNetworkIsolated) itypes.ApiRequestVdcNetwork {
+// mergeVDCNetworkIsolatedUpdate applies optional update params onto the current network state.
+func mergeVDCNetworkIsolatedUpdate(current *itypes.APIResponseVDCNetwork, params types.ParamsUpdateVDCNetworkIsolated) itypes.APIRequestVDCNetwork {
 	description := current.Description
 	if params.Description != "" {
 		description = params.Description
@@ -107,75 +107,75 @@ func mergeVdcNetworkIsolatedUpdate(current *itypes.ApiResponseVdcNetwork, params
 
 	subnets := current.Subnets
 	if params.Subnet != nil {
-		subnets = itypes.ApiVdcNetworkSubnets{
-			Values: []itypes.ApiVdcNetworkSubnetValue{{
+		subnets = itypes.APIVDCNetworkSubnets{
+			Values: []itypes.APIVDCNetworkSubnetValue{{
 				Gateway:      params.Subnet.Gateway,
 				PrefixLength: params.Subnet.PrefixLength,
 				DNSServer1:   params.Subnet.DNSServer1,
 				DNSServer2:   params.Subnet.DNSServer2,
 				DNSSuffix:    params.Subnet.DNSSuffix,
-				IPRanges:     itypes.ApiVdcNetworkIPRanges{Values: createVdcNetworkIPRanges(params.Subnet.IPRanges)},
+				IPRanges:     itypes.APIVDCNetworkIPRanges{Values: createVDCNetworkIPRanges(params.Subnet.IPRanges)},
 			}},
 		}
 	}
 
-	guestVlanTaggingAllowed := current.GuestVlanTaggingAllowed
-	if params.GuestVlanTaggingAllowed != nil {
-		guestVlanTaggingAllowed = params.GuestVlanTaggingAllowed
+	guestVLANTaggingAllowed := current.GuestVLANTaggingAllowed
+	if params.GuestVLANTaggingAllowed != nil {
+		guestVLANTaggingAllowed = params.GuestVLANTaggingAllowed
 	}
 
-	return itypes.ApiRequestVdcNetwork{
+	return itypes.APIRequestVDCNetwork{
 		ID:                      current.ID,
 		Name:                    current.Name,
 		Description:             description,
 		NetworkType:             current.NetworkType,
 		OwnerRef:                current.OwnerRef,
 		Subnets:                 subnets,
-		GuestVlanTaggingAllowed: guestVlanTaggingAllowed,
+		GuestVLANTaggingAllowed: guestVLANTaggingAllowed,
 		Shared:                  current.Shared,
 	}
 }
 
-// UpdateVdcNetworkIsolated updates an isolated VDC network in a VDC group.
-func (c *Client) UpdateVdcNetworkIsolated(ctx context.Context, params types.ParamsUpdateVdcNetworkIsolated) (*types.ModelGetVdcNetwork, error) {
-	current, err := getVdcNetworkWithRetry(ctx, c.c, params.ID, "")
+// UpdateVDCNetworkIsolated updates an isolated VDC network in a VDC group.
+func (c *Client) UpdateVDCNetworkIsolated(ctx context.Context, params types.ParamsUpdateVDCNetworkIsolated) (*types.ModelGetVDCNetwork, error) {
+	current, err := getVDCNetworkWithRetry(ctx, c.c, params.ID, "")
 	if err != nil {
-		return nil, fmt.Errorf("%s: resolve target: %w", opUpdateVdcNetworkIsolated, err)
+		return nil, fmt.Errorf("%s: resolve target: %w", opUpdateVDCNetworkIsolated, err)
 	}
 
-	if current.NetworkType != types.VdcNetworkTypeIsolated {
-		return nil, fmt.Errorf("%s: %w", opUpdateVdcNetworkIsolated, errors.Newf("org vdc network %q is not an isolated network", params.ID))
+	if current.NetworkType != types.VDCNetworkTypeIsolated {
+		return nil, fmt.Errorf("%s: %w", opUpdateVDCNetworkIsolated, errors.Newf("org vdc network %q is not an isolated network", params.ID))
 	}
 
-	body := mergeVdcNetworkIsolatedUpdate(current, params)
+	body := mergeVDCNetworkIsolatedUpdate(current, params)
 
-	ep := endpoints.UpdateVdcNetwork()
+	ep := endpoints.UpdateVDCNetwork()
 	if _, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], current.ID), cav.SetBody(body)); err != nil {
-		return nil, fmt.Errorf("%s: %w", opUpdateVdcNetworkIsolated, err)
+		return nil, fmt.Errorf("%s: %w", opUpdateVDCNetworkIsolated, err)
 	}
 
 	model := body.ToModel()
 	return &model, nil
 }
 
-// DeleteVdcNetworkIsolated deletes an isolated VDC network from a VDC group.
-func (c *Client) DeleteVdcNetworkIsolated(ctx context.Context, params types.ParamsDeleteVdcNetworkIsolated) error {
-	current, err := deleteVdcNetworkTarget(ctx, c.c, params.ID, params.Name, params.VdcGroupID, params.VdcGroupName)
+// DeleteVDCNetworkIsolated deletes an isolated VDC network from a VDC group.
+func (c *Client) DeleteVDCNetworkIsolated(ctx context.Context, params types.ParamsDeleteVDCNetworkIsolated) error {
+	current, err := deleteVDCNetworkTarget(ctx, c.c, params.ID, params.Name, params.VDCGroupID, params.VDCGroupName)
 	if err != nil {
-		return fmt.Errorf("%s: resolve target: %w", opDeleteVdcNetworkIsolated, err)
+		return fmt.Errorf("%s: resolve target: %w", opDeleteVDCNetworkIsolated, err)
 	}
 
-	if current.NetworkType != types.VdcNetworkTypeIsolated {
+	if current.NetworkType != types.VDCNetworkTypeIsolated {
 		idOrName := params.ID
 		if idOrName == "" {
 			idOrName = params.Name
 		}
-		return fmt.Errorf("%s: %w", opDeleteVdcNetworkIsolated, errors.Newf("org vdc network %q is not an isolated network", idOrName))
+		return fmt.Errorf("%s: %w", opDeleteVDCNetworkIsolated, errors.Newf("org vdc network %q is not an isolated network", idOrName))
 	}
 
-	ep := endpoints.DeleteVdcNetwork()
+	ep := endpoints.DeleteVDCNetwork()
 	if _, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], current.ID)); err != nil {
-		return fmt.Errorf("%s: %w", opDeleteVdcNetworkIsolated, err)
+		return fmt.Errorf("%s: %w", opDeleteVDCNetworkIsolated, err)
 	}
 
 	return nil

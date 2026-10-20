@@ -1,0 +1,3 @@
+```release-note:refactor
+refactor(endpoints): align naming conventions and endpoint documentation metadata. Normalizes exported names and typed identifiers across API, endpoint, and model layers; refreshes generated endpoint wrappers and documentation URLs; and applies the supporting lint and mechanical cleanup needed for the naming alignment.
+```

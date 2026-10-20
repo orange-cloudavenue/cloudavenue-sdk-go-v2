@@ -19,7 +19,7 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
 )
 
-func newClient(t *testing.T) (*Client, *mock.MockServer) {
+func newClient(t *testing.T) (*Client, *mock.Server) {
 	t.Helper()
 
 	mC, ms, err := mock.NewClient(

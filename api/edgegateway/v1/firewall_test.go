@@ -20,17 +20,17 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
-func TestGetFirewallRequiresVdcGroupOwner(t *testing.T) {
+func TestGetFirewallRequiresVDCGroupOwner(t *testing.T) {
 	edgeGatewayID := generator.MustGenerate("{urn:edgegateway}")
 	vdcID := generator.MustGenerate("{urn:vdc}")
 
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetEdgeGateway())
-	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.ApiResponseEdgegateway{
+	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.APIResponseEdgegateway{
 		ID:       edgeGatewayID,
 		Name:     "edge-1",
-		OwnerRef: &itypes.ApiObjectReference{ID: vdcID, Name: "vdc-1"},
+		OwnerRef: &itypes.APIObjectReference{ID: vdcID, Name: "vdc-1"},
 	}, nil)
 
 	resp, err := client.GetFirewall(t.Context(), types.ParamsGetEdgeGatewayFirewall{EdgeGatewayID: edgeGatewayID})
@@ -53,40 +53,40 @@ func TestCreateFirewall(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetEdgeGateway())
-	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.ApiResponseEdgegateway{
+	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.APIResponseEdgegateway{
 		ID:       edgeGatewayID,
 		Name:     "edge-1",
-		OwnerRef: &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		OwnerRef: &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 	}, nil)
 
-	ms.CleanResponse(endpoints.UpdateDfwPolicies())
-	ms.SetResponse(endpoints.UpdateDfwPolicies(), &itypes.ApiDfwPolicies{Enabled: true}, nil)
+	ms.CleanResponse(endpoints.UpdateDFWPolicies())
+	ms.SetResponse(endpoints.UpdateDFWPolicies(), &itypes.APIDFWPolicies{Enabled: true}, nil)
 
-	ms.CleanResponse(endpoints.GetDfwPolicies())
-	ms.SetResponse(endpoints.GetDfwPolicies(), &itypes.ApiDfwPolicies{
+	ms.CleanResponse(endpoints.GetDFWPolicies())
+	ms.SetResponse(endpoints.GetDFWPolicies(), &itypes.APIDFWPolicies{
 		Enabled:       true,
-		DefaultPolicy: &itypes.ApiDfwDefaultPolicy{ID: "default-policy", Name: "Default", Enabled: &enabledFalse},
+		DefaultPolicy: &itypes.APIDfwDefaultPolicy{ID: "default-policy", Name: "Default", Enabled: &enabledFalse},
 	}, nil)
 
-	ms.CleanResponse(endpoints.UpdateDfwDefaultPolicy())
-	ms.SetResponse(endpoints.UpdateDfwDefaultPolicy(), &itypes.ApiDfwDefaultPolicy{
+	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
+	ms.SetResponse(endpoints.UpdateDFWDefaultPolicy(), &itypes.APIDfwDefaultPolicy{
 		ID:      "default-policy",
 		Name:    "Default",
 		Enabled: &enabledTrue,
 	}, nil)
 
-	ms.CleanResponse(endpoints.UpdateDfwRules())
-	ms.SetResponse(endpoints.UpdateDfwRules(), &itypes.ApiDistributedFirewallRules{
-		Values: []itypes.ApiDistributedFirewallRule{{
+	ms.CleanResponse(endpoints.UpdateDFWRules())
+	ms.SetResponse(endpoints.UpdateDFWRules(), &itypes.APIDistributedFirewallRules{
+		Values: []itypes.APIDistributedFirewallRule{{
 			ID:                     "rule-1",
 			Name:                   "allow-web",
 			Description:            "allow web traffic",
 			Enabled:                true,
 			Direction:              types.FirewallRuleDirectionInOut,
-			IpProtocol:             types.FirewallRuleIPProtocolIPv4,
+			IPProtocol:             types.FirewallRuleIPProtocolIPv4,
 			ActionValue:            types.FirewallRuleActionAllow,
 			Logging:                true,
-			NetworkContextProfiles: []itypes.ApiObjectReference{{ID: ncpID, Name: "ncp-1"}},
+			NetworkContextProfiles: []itypes.APIObjectReference{{ID: ncpID, Name: "ncp-1"}},
 		}},
 	}, nil)
 
@@ -115,10 +115,10 @@ func TestCreateFirewall(t *testing.T) {
 	assert.Equal(t, ncpID, resp.Rules[0].NetworkContextProfiles[0].ID)
 
 	ms.CleanResponse(endpoints.GetEdgeGateway())
-	ms.CleanResponse(endpoints.UpdateDfwPolicies())
-	ms.CleanResponse(endpoints.GetDfwPolicies())
-	ms.CleanResponse(endpoints.UpdateDfwDefaultPolicy())
-	ms.CleanResponse(endpoints.UpdateDfwRules())
+	ms.CleanResponse(endpoints.UpdateDFWPolicies())
+	ms.CleanResponse(endpoints.GetDFWPolicies())
+	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
+	ms.CleanResponse(endpoints.UpdateDFWRules())
 }
 
 func TestGetFirewall(t *testing.T) {
@@ -131,30 +131,30 @@ func TestGetFirewall(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetEdgeGateway())
-	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.ApiResponseEdgegateway{
+	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.APIResponseEdgegateway{
 		ID:       edgeGatewayID,
 		Name:     "edge-1",
-		OwnerRef: &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		OwnerRef: &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 	}, nil)
 
-	ms.CleanResponse(endpoints.GetDfwPolicies())
-	ms.SetResponse(endpoints.GetDfwPolicies(), &itypes.ApiDfwPolicies{
+	ms.CleanResponse(endpoints.GetDFWPolicies())
+	ms.SetResponse(endpoints.GetDFWPolicies(), &itypes.APIDFWPolicies{
 		Enabled:       true,
-		DefaultPolicy: &itypes.ApiDfwDefaultPolicy{ID: "default-policy", Name: "Default", Enabled: &enabledTrue},
+		DefaultPolicy: &itypes.APIDfwDefaultPolicy{ID: "default-policy", Name: "Default", Enabled: &enabledTrue},
 	}, nil)
 
-	ms.CleanResponse(endpoints.GetDfwRules())
-	ms.SetResponse(endpoints.GetDfwRules(), &itypes.ApiDistributedFirewallRules{
-		Values: []itypes.ApiDistributedFirewallRule{{
+	ms.CleanResponse(endpoints.GetDFWRules())
+	ms.SetResponse(endpoints.GetDFWRules(), &itypes.APIDistributedFirewallRules{
+		Values: []itypes.APIDistributedFirewallRule{{
 			ID:                     "rule-1",
 			Name:                   "allow-web",
 			Description:            "allow web traffic",
 			Enabled:                true,
 			Direction:              types.FirewallRuleDirectionInOut,
-			IpProtocol:             types.FirewallRuleIPProtocolIPv4,
+			IPProtocol:             types.FirewallRuleIPProtocolIPv4,
 			ActionValue:            types.FirewallRuleActionAllow,
 			Logging:                true,
-			NetworkContextProfiles: []itypes.ApiObjectReference{{ID: ncpID, Name: "ncp-1"}},
+			NetworkContextProfiles: []itypes.APIObjectReference{{ID: ncpID, Name: "ncp-1"}},
 		}},
 	}, nil)
 
@@ -170,8 +170,8 @@ func TestGetFirewall(t *testing.T) {
 	assert.Equal(t, ncpID, resp.Rules[0].NetworkContextProfiles[0].ID)
 
 	ms.CleanResponse(endpoints.GetEdgeGateway())
-	ms.CleanResponse(endpoints.GetDfwPolicies())
-	ms.CleanResponse(endpoints.GetDfwRules())
+	ms.CleanResponse(endpoints.GetDFWPolicies())
+	ms.CleanResponse(endpoints.GetDFWRules())
 }
 
 func TestUpdateFirewall(t *testing.T) {
@@ -185,36 +185,36 @@ func TestUpdateFirewall(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetEdgeGateway())
-	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.ApiResponseEdgegateway{
+	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.APIResponseEdgegateway{
 		ID:       edgeGatewayID,
 		Name:     "edge-1",
-		OwnerRef: &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		OwnerRef: &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 	}, nil)
 
-	ms.CleanResponse(endpoints.GetDfwPolicies())
-	ms.SetResponse(endpoints.GetDfwPolicies(), &itypes.ApiDfwPolicies{
+	ms.CleanResponse(endpoints.GetDFWPolicies())
+	ms.SetResponse(endpoints.GetDFWPolicies(), &itypes.APIDFWPolicies{
 		Enabled:       true,
-		DefaultPolicy: &itypes.ApiDfwDefaultPolicy{ID: "default-policy", Name: "Default", Enabled: &enabledTrue},
+		DefaultPolicy: &itypes.APIDfwDefaultPolicy{ID: "default-policy", Name: "Default", Enabled: &enabledTrue},
 	}, nil)
 
-	ms.CleanResponse(endpoints.UpdateDfwDefaultPolicy())
-	ms.SetResponse(endpoints.UpdateDfwDefaultPolicy(), &itypes.ApiDfwDefaultPolicy{
+	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
+	ms.SetResponse(endpoints.UpdateDFWDefaultPolicy(), &itypes.APIDfwDefaultPolicy{
 		ID:      "default-policy",
 		Name:    "Default",
 		Enabled: &enabledFalse,
 	}, nil)
 
-	ms.CleanResponse(endpoints.UpdateDfwRules())
-	ms.SetResponse(endpoints.UpdateDfwRules(), &itypes.ApiDistributedFirewallRules{
-		Values: []itypes.ApiDistributedFirewallRule{{
+	ms.CleanResponse(endpoints.UpdateDFWRules())
+	ms.SetResponse(endpoints.UpdateDFWRules(), &itypes.APIDistributedFirewallRules{
+		Values: []itypes.APIDistributedFirewallRule{{
 			ID:                     "rule-2",
 			Name:                   "deny-web",
 			Description:            "deny web traffic",
 			Enabled:                true,
 			Direction:              types.FirewallRuleDirectionOut,
-			IpProtocol:             types.FirewallRuleIPProtocolIPv6,
+			IPProtocol:             types.FirewallRuleIPProtocolIPv6,
 			ActionValue:            types.FirewallRuleActionDrop,
-			NetworkContextProfiles: []itypes.ApiObjectReference{{ID: ncpID, Name: "ncp-1"}},
+			NetworkContextProfiles: []itypes.APIObjectReference{{ID: ncpID, Name: "ncp-1"}},
 		}},
 	}, nil)
 
@@ -242,9 +242,9 @@ func TestUpdateFirewall(t *testing.T) {
 	assert.Equal(t, ncpID, resp.Rules[0].NetworkContextProfiles[0].ID)
 
 	ms.CleanResponse(endpoints.GetEdgeGateway())
-	ms.CleanResponse(endpoints.GetDfwPolicies())
-	ms.CleanResponse(endpoints.UpdateDfwDefaultPolicy())
-	ms.CleanResponse(endpoints.UpdateDfwRules())
+	ms.CleanResponse(endpoints.GetDFWPolicies())
+	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
+	ms.CleanResponse(endpoints.UpdateDFWRules())
 }
 
 func TestDeleteFirewall(t *testing.T) {
@@ -257,34 +257,34 @@ func TestDeleteFirewall(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetEdgeGateway())
-	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.ApiResponseEdgegateway{
+	ms.SetResponse(endpoints.GetEdgeGateway(), &itypes.APIResponseEdgegateway{
 		ID:       edgeGatewayID,
 		Name:     "edge-1",
-		OwnerRef: &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		OwnerRef: &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 	}, nil)
 
-	ms.CleanResponse(endpoints.UpdateDfwRules())
-	ms.CleanResponse(endpoints.GetDfwPolicies())
-	ms.SetResponse(endpoints.GetDfwPolicies(), &itypes.ApiDfwPolicies{
+	ms.CleanResponse(endpoints.UpdateDFWRules())
+	ms.CleanResponse(endpoints.GetDFWPolicies())
+	ms.SetResponse(endpoints.GetDFWPolicies(), &itypes.APIDFWPolicies{
 		Enabled:       true,
-		DefaultPolicy: &itypes.ApiDfwDefaultPolicy{ID: "default-policy", Name: "Default", Enabled: &enabledTrue},
+		DefaultPolicy: &itypes.APIDfwDefaultPolicy{ID: "default-policy", Name: "Default", Enabled: &enabledTrue},
 	}, nil)
-	ms.CleanResponse(endpoints.UpdateDfwDefaultPolicy())
-	ms.SetResponse(endpoints.UpdateDfwDefaultPolicy(), &itypes.ApiDfwDefaultPolicy{
+	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
+	ms.SetResponse(endpoints.UpdateDFWDefaultPolicy(), &itypes.APIDfwDefaultPolicy{
 		ID:      "default-policy",
 		Name:    "Default",
 		Enabled: &enabledFalse,
 	}, nil)
-	ms.CleanResponse(endpoints.UpdateDfwPolicies())
-	ms.SetResponse(endpoints.UpdateDfwPolicies(), &itypes.ApiDfwPolicies{Enabled: false}, nil)
+	ms.CleanResponse(endpoints.UpdateDFWPolicies())
+	ms.SetResponse(endpoints.UpdateDFWPolicies(), &itypes.APIDFWPolicies{Enabled: false}, nil)
 
 	err := client.DeleteFirewall(t.Context(), types.ParamsDeleteEdgeGatewayFirewall{EdgeGatewayID: edgeGatewayID})
 
 	assert.NoError(t, err)
 
 	ms.CleanResponse(endpoints.GetEdgeGateway())
-	ms.CleanResponse(endpoints.UpdateDfwRules())
-	ms.CleanResponse(endpoints.GetDfwPolicies())
-	ms.CleanResponse(endpoints.UpdateDfwDefaultPolicy())
-	ms.CleanResponse(endpoints.UpdateDfwPolicies())
+	ms.CleanResponse(endpoints.UpdateDFWRules())
+	ms.CleanResponse(endpoints.GetDFWPolicies())
+	ms.CleanResponse(endpoints.UpdateDFWDefaultPolicy())
+	ms.CleanResponse(endpoints.UpdateDFWPolicies())
 }

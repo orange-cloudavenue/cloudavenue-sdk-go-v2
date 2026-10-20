@@ -42,7 +42,6 @@ func FieldsOf[P any]() iter.Seq[reflect.StructField] {
 	return func(yield func(reflect.StructField) bool) {
 		t := reflect.TypeFor[P]()
 		for field := range t.Fields() {
-			field := field
 			if !field.IsExported() {
 				continue
 			}

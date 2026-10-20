@@ -30,5 +30,5 @@ func (c *Client) retrieveEdgeGatewayIDByName(ctx context.Context, name string) (
 	}
 
 	// Record is already checked in the middleware.
-	return respQuery.Result().(*itypes.ApiResponseQueryEdgeGateway).Record[0].ID, nil
+	return respQuery.Result().(*itypes.APIResponseQueryEdgeGateway).Record[0].ID, nil
 }

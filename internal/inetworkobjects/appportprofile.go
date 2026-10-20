@@ -35,7 +35,7 @@ func IsAppPortProfileURN(idOrName string) bool {
 	return urn.IsAppPortProfile(idOrName)
 }
 
-func FindAppPortProfile(ctx context.Context, c cav.Client, idOrName, vdcGroupID string) (*itypes.ApiResponseAppPortProfile, error) {
+func FindAppPortProfile(ctx context.Context, c cav.Client, idOrName, vdcGroupID string) (*itypes.APIResponseAppPortProfile, error) {
 	if IsAppPortProfileURN(idOrName) {
 		ep := endpoints.GetAppPortProfile()
 
@@ -48,7 +48,7 @@ func FindAppPortProfile(ctx context.Context, c cav.Client, idOrName, vdcGroupID 
 			return nil, err
 		}
 
-		profile, ok := resp.Result().(*itypes.ApiResponseAppPortProfile)
+		profile, ok := resp.Result().(*itypes.APIResponseAppPortProfile)
 		if !ok || profile == nil {
 			return nil, fmt.Errorf("unexpected get app port profile response type %T", resp.Result())
 		}
@@ -56,7 +56,8 @@ func FindAppPortProfile(ctx context.Context, c cav.Client, idOrName, vdcGroupID 
 		return profile, nil
 	}
 
-	var found []itypes.ApiResponseAppPortProfile
+	var found []itypes.APIResponseAppPortProfile
+	var lastErr error
 	for _, scope := range appPortProfileScopes {
 		ep := endpoints.ListAppPortProfile()
 
@@ -66,10 +67,16 @@ func FindAppPortProfile(ctx context.Context, c cav.Client, idOrName, vdcGroupID 
 			cav.WithQueryParam(ep.QueryParams[0], fmt.Sprintf("name==%s;scope==%s;_context==%s", idOrName, scope, vdcGroupID)),
 		)
 		if err != nil {
+			var apiErr *pkgerrors.APIError
+			if pkgerrors.As(err, &apiErr) && apiErr.IsNotFound() {
+				continue
+			}
+
+			lastErr = err
 			continue
 		}
 
-		list, ok := resp.Result().(*itypes.ApiResponseListAppPortProfile)
+		list, ok := resp.Result().(*itypes.APIResponseListAppPortProfile)
 		if !ok || list == nil {
 			return nil, fmt.Errorf("unexpected list app port profile response type %T", resp.Result())
 		}
@@ -84,6 +91,9 @@ func FindAppPortProfile(ctx context.Context, c cav.Client, idOrName, vdcGroupID 
 	}
 
 	if len(found) == 0 {
+		if lastErr != nil {
+			return nil, lastErr
+		}
 		return nil, &pkgerrors.APIError{Operation: "GetAppPortProfile", StatusCode: 404, Message: fmt.Sprintf("application port profile %q not found", idOrName)}
 	}
 
@@ -114,10 +124,10 @@ func ValidateAppPortProfileApplicationPorts(ports []types.ParamsAppPortProfilePo
 	return nil
 }
 
-func ToApiAppPortProfilePorts(ports []types.ParamsAppPortProfilePort) []itypes.ApiAppPortProfilePort {
-	out := make([]itypes.ApiAppPortProfilePort, 0, len(ports))
+func ToAPIAppPortProfilePorts(ports []types.ParamsAppPortProfilePort) []itypes.APIAppPortProfilePort {
+	out := make([]itypes.APIAppPortProfilePort, 0, len(ports))
 	for _, p := range ports {
-		out = append(out, itypes.ApiAppPortProfilePort{
+		out = append(out, itypes.APIAppPortProfilePort{
 			Protocol:         p.Protocol,
 			DestinationPorts: p.DestinationPorts,
 		})

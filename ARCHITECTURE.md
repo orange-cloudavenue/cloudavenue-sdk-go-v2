@@ -17,7 +17,6 @@ cloudavenue-sdk-go-v2/
 ├── pkg/                    # Shared utilities (consoles, errors)
 ├── cmd/
 │   └── endpoint-generator/ # Generates endpoints/zz_*.go from internal/iendpoints/
-└── ruleguard/              # Custom lint rules enforcing naming conventions
 ```
 
 ## Layer Responsibilities

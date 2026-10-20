@@ -72,7 +72,7 @@ linters:
   settings:
     gosec:
       excludes:
-        - G115  # Potential integer overflow when converting between integer types
+        - G115 # Potential integer overflow when converting between integer types
     staticcheck:
       checks:
         - -QF1008
@@ -151,6 +151,7 @@ linters:
       - third_party$
       - builtin$
       - examples$
+      - zz_.*\.go$
     rules:
       - linters:
           - goconst
@@ -161,7 +162,7 @@ issues:
 formatters:
   enable:
     - gci
-    - gofmt
+    # - gofmt
     - gofumpt
   settings:
     gci:
@@ -191,3 +192,4 @@ formatters:
       - third_party$
       - builtin$
       - examples$
+      - zz_.*\.go$

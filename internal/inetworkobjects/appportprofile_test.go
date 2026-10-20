@@ -57,7 +57,7 @@ func (f fakeClient) Close() error {
 
 func TestFindAppPortProfileRejectsUnexpectedGetResponseType(t *testing.T) {
 	client := fakeClient{do: func(context.Context, *cav.Endpoint, ...cav.EndpointRequestOption) (*resty.Response, error) {
-		return &resty.Response{Request: &resty.Request{Result: &itypes.ApiResponseListAppPortProfile{}}}, nil
+		return &resty.Response{Request: &resty.Request{Result: &itypes.APIResponseListAppPortProfile{}}}, nil
 	}}
 
 	profile, err := FindAppPortProfile(t.Context(), client, generator.MustGenerate("{urn:applicationPortProfile}"), "")
@@ -67,7 +67,7 @@ func TestFindAppPortProfileRejectsUnexpectedGetResponseType(t *testing.T) {
 
 func TestFindAppPortProfileRejectsUnexpectedListResponseType(t *testing.T) {
 	client := fakeClient{do: func(context.Context, *cav.Endpoint, ...cav.EndpointRequestOption) (*resty.Response, error) {
-		return &resty.Response{Request: &resty.Request{Result: &itypes.ApiResponseAppPortProfile{}}}, nil
+		return &resty.Response{Request: &resty.Request{Result: &itypes.APIResponseAppPortProfile{}}}, nil
 	}}
 
 	profile, err := FindAppPortProfile(t.Context(), client, "app-1", "urn:vcloud:vdcGroup:12345678-1234-1234-1234-123456789012")

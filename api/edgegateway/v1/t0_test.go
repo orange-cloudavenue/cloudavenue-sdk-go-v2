@@ -46,11 +46,11 @@ func Test_ListT0(t *testing.T) {
 		},
 		{
 			name: "Simulate unknown class of service",
-			mockResponse: &itypes.ApiResponseT0s{
+			mockResponse: &itypes.APIResponseT0s{
 				{
 					Type:       "edge-gateway",
 					Name:       generator.MustGenerate("{resource_name:edgegateway}"),
-					Properties: itypes.ApiResponseT0Properties{ClassOfService: "unknown"},
+					Properties: itypes.APIResponseT0Properties{ClassOfService: "unknown"},
 				},
 			},
 			expectedErr:        false,
@@ -94,7 +94,7 @@ func Test_GetT0(t *testing.T) {
 			params: types.ParamsGetT0{
 				T0Name: "prvrf01eocb0001234allsp01",
 			},
-			mockResponse: &itypes.ApiResponseT0s{
+			mockResponse: &itypes.APIResponseT0s{
 				{
 					Type: "tier-0-vrf",
 					Name: "prvrf01eocb0001234allsp01",
@@ -123,7 +123,7 @@ func Test_GetT0(t *testing.T) {
 			params: types.ParamsGetT0{
 				T0Name: generator.MustGenerate("{resource_name:t0}"),
 			},
-			mockResponse:       &itypes.ApiResponseT0s{},
+			mockResponse:       &itypes.APIResponseT0s{},
 			mockResponseStatus: http.StatusOK,
 			expectedErr:        true,
 		},
@@ -132,7 +132,7 @@ func Test_GetT0(t *testing.T) {
 			params: types.ParamsGetT0{
 				EdgegatewayName: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
-			mockResponse:       &itypes.ApiResponseT0s{},
+			mockResponse:       &itypes.APIResponseT0s{},
 			mockResponseStatus: http.StatusOK,
 			expectedErr:        true,
 		},
@@ -141,7 +141,7 @@ func Test_GetT0(t *testing.T) {
 			params: types.ParamsGetT0{
 				EdgegatewayID: generator.MustGenerate("{urn:edgegateway}"),
 			},
-			mockResponse:       &itypes.ApiResponseT0s{},
+			mockResponse:       &itypes.APIResponseT0s{},
 			mockResponseStatus: http.StatusOK,
 			expectedErr:        true,
 		},

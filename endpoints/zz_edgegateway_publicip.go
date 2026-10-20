@@ -13,9 +13,9 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
 
-// CreatePublicIp - Create a new public IP
+// CreatePublicIP - Create a new public IP
 //
-// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/addNetworkConnectivity
-func CreatePublicIp() *cav.Endpoint {
-	return cav.MustGetEndpoint("CreatePublicIp")
+// DocumentationURL: https://swagger.cloudavenue.orange-business.com/#/Network%20%26%20connectivity/addNetworkConnectivity 
+func CreatePublicIP() *cav.Endpoint {
+	return cav.MustGetEndpoint("CreatePublicIP")
 }

@@ -46,13 +46,13 @@ type ModelGetOrganization struct {
 
 type ModelGetOrganizationResources struct {
 	// Number of Org VDCs
-	Vdc int `documentation:"Number of VDC(s) in your organization"`
+	VDC int `documentation:"Number of VDC(s) in your organization"`
 
 	// Number of Catalog media(s)
 	Catalog int `documentation:"Number of Catalog media(s)"`
 
 	// Number of vApps
-	Vapp int `documentation:"Number of vApp(s)"`
+	VApp int `documentation:"Number of vApp(s)"`
 
 	// Number of VM(s) in power on state
 	VMRunning int `documentation:"Number of VM(s) in state power on"`

@@ -11,6 +11,11 @@ package itypes
 
 import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 
+const (
+	protocolTCP = "tcp"
+	protocolUDP = "udp"
+)
+
 var ListOfServices = []types.ModelCloudavenueServicesCatalog{
 	{
 		Category: "administration",
@@ -21,49 +26,49 @@ var ListOfServices = []types.ModelCloudavenueServicesCatalog{
 				Description: "Linux (Debian, Ubuntu, CentOS) package repository",
 				IPs:         []string{"57.199.209.214"},
 				FQDNs:       []string{"repo.service.cav"},
-				Ports:       []types.ModelCloudavenueServicesCatalogServicePort{{Port: 3142, Protocol: "tcp"}},
+				Ports:       []types.ModelCloudavenueServicesCatalogServicePort{{Port: 3142, Protocol: protocolTCP}},
 			},
 			{
 				Name:        "rhui-repository",
 				Description: "Red Hat (RHUI) package repository",
 				IPs:         []string{"57.199.209.197"},
 				FQDNs:       []string{"rhui.service.cav"},
-				Ports:       []types.ModelCloudavenueServicesCatalogServicePort{{Port: 8080, Protocol: "tcp"}},
+				Ports:       []types.ModelCloudavenueServicesCatalogServicePort{{Port: 8080, Protocol: protocolTCP}},
 			},
 			{
 				Name:        "windows-repository",
 				Description: "Windows (WSUS) package repository",
 				IPs:         []string{"57.199.209.212"},
 				FQDNs:       []string{"wsus.service.cav"},
-				Ports:       []types.ModelCloudavenueServicesCatalogServicePort{{Port: 8530, Protocol: "tcp"}, {Port: 8531, Protocol: "tcp"}},
+				Ports:       []types.ModelCloudavenueServicesCatalogServicePort{{Port: 8530, Protocol: protocolTCP}, {Port: 8531, Protocol: protocolTCP}},
 			},
 			{
 				Name:        "windows-kms",
 				Description: "Windows (KMS) license server",
 				IPs:         []string{"57.199.209.210"},
 				FQDNs:       []string{"kms.service.cav"},
-				Ports:       []types.ModelCloudavenueServicesCatalogServicePort{{Port: 1688, Protocol: "tcp"}},
+				Ports:       []types.ModelCloudavenueServicesCatalogServicePort{{Port: 1688, Protocol: protocolTCP}},
 			},
 			{
 				Name:        "ntp",
 				Description: "Network Time Protocol (NTP) server",
 				IPs:         []string{"57.199.209.217", "57.199.209.218"},
 				FQDNs:       []string{"ntp1.service.cav", "ntp2.service.cav"},
-				Ports:       []types.ModelCloudavenueServicesCatalogServicePort{{Port: 123, Protocol: "udp"}},
+				Ports:       []types.ModelCloudavenueServicesCatalogServicePort{{Port: 123, Protocol: protocolUDP}},
 			},
 			{
 				Name:             "dns-authoritative",
 				Description:      "DNS authoritative server. Use for resolving cloudavenue services names",
 				DocumentationURL: "https://cloud.orange-business.com/en/offres/infrastructure-iaas/cloud-avenue/wiki-cloud-avenue/practical-sheets/services-area/services-en/service-zone-dns/",
 				IPs:              []string{"57.199.209.207", "57.199.209.208"},
-				Ports:            []types.ModelCloudavenueServicesCatalogServicePort{{Port: 53, Protocol: "tcp"}, {Port: 53, Protocol: "udp"}},
+				Ports:            []types.ModelCloudavenueServicesCatalogServicePort{{Port: 53, Protocol: protocolTCP}, {Port: 53, Protocol: protocolUDP}},
 			},
 			{
 				Name:             "dns-resolver",
 				Description:      "DNS resolver. Use for resolving cloudavenue services names and public names",
 				DocumentationURL: "https://cloud.orange-business.com/en/offres/infrastructure-iaas/cloud-avenue/wiki-cloud-avenue/practical-sheets/services-area/services-en/service-zone-dns/",
 				IPs:              []string{"57.199.209.220", "57.199.209.221"},
-				Ports:            []types.ModelCloudavenueServicesCatalogServicePort{{Port: 53, Protocol: "tcp"}, {Port: 53, Protocol: "udp"}},
+				Ports:            []types.ModelCloudavenueServicesCatalogServicePort{{Port: 53, Protocol: protocolTCP}, {Port: 53, Protocol: protocolUDP}},
 			},
 			{
 				Name:             "smtp",
@@ -71,7 +76,7 @@ var ListOfServices = []types.ModelCloudavenueServicesCatalog{
 				DocumentationURL: "https://cloud.orange-business.com/en/offres/infrastructure-iaas/cloud-avenue/wiki-cloud-avenue/practical-sheets/services-area/services-en/smtp-service-2/",
 				IPs:              []string{"57.199.209.206"},
 				FQDNs:            []string{"smtp.service.cav"},
-				Ports:            []types.ModelCloudavenueServicesCatalogServicePort{{Port: 25, Protocol: "tcp"}},
+				Ports:            []types.ModelCloudavenueServicesCatalogServicePort{{Port: 25, Protocol: protocolTCP}},
 			},
 		},
 	},
@@ -84,7 +89,7 @@ var ListOfServices = []types.ModelCloudavenueServicesCatalog{
 			DocumentationURL: "https://cloud.orange-business.com/offres/infrastructure-iaas/cloud-avenue/wiki-cloud-avenue/fiches-pratiques/stockage/stockage-objet-s3/guide-de-demarrage/premiere-utilisation-stockage-objet/",
 			IPs:              []string{"194.206.55.5"},
 			FQDNs:            []string{"s3-region01-priv.cloudavenue.orange-business.com"},
-			Ports:            []types.ModelCloudavenueServicesCatalogServicePort{{Port: 443, Protocol: "tcp"}},
+			Ports:            []types.ModelCloudavenueServicesCatalogServicePort{{Port: 443, Protocol: protocolTCP}},
 		}},
 	},
 }

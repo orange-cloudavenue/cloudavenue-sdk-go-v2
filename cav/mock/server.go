@@ -29,23 +29,23 @@ type mockResponse struct {
 	handler    http.HandlerFunc
 }
 
-// MockServer holds mock response state for all endpoints.
-type MockServer struct {
+// Server holds mock response state for all endpoints.
+type Server struct {
 	mu        sync.RWMutex
 	responses map[string]*mockResponse
 	logger    *slog.Logger
 }
 
-// newServer creates MockServer.
-func newServer(logger *slog.Logger) *MockServer {
-	return &MockServer{
+// newServer creates Server.
+func newServer(logger *slog.Logger) *Server {
+	return &Server{
 		responses: make(map[string]*mockResponse),
 		logger:    logger,
 	}
 }
 
 // SetResponse sets mock response payload and status code for endpoint.
-func (ms *MockServer) SetResponse(ep *cav.Endpoint, data any, statusCode *int) {
+func (ms *Server) SetResponse(ep *cav.Endpoint, data any, statusCode *int) {
 	ms.mu.Lock()
 	defer ms.mu.Unlock()
 
@@ -63,7 +63,7 @@ func (ms *MockServer) SetResponse(ep *cav.Endpoint, data any, statusCode *int) {
 }
 
 // SetResponseFunc sets custom handler for endpoint.
-func (ms *MockServer) SetResponseFunc(ep *cav.Endpoint, handler http.HandlerFunc) {
+func (ms *Server) SetResponseFunc(ep *cav.Endpoint, handler http.HandlerFunc) {
 	ms.mu.Lock()
 	defer ms.mu.Unlock()
 
@@ -81,7 +81,7 @@ func (ms *MockServer) SetResponseFunc(ep *cav.Endpoint, handler http.HandlerFunc
 }
 
 // CleanResponse removes mock override for endpoint.
-func (ms *MockServer) CleanResponse(ep *cav.Endpoint) {
+func (ms *Server) CleanResponse(ep *cav.Endpoint) {
 	ms.mu.Lock()
 	defer ms.mu.Unlock()
 
@@ -90,7 +90,7 @@ func (ms *MockServer) CleanResponse(ep *cav.Endpoint) {
 }
 
 // handlerFor builds handler for endpoint.
-func (ms *MockServer) handlerFor(ep *cav.Endpoint) http.HandlerFunc {
+func (ms *Server) handlerFor(ep *cav.Endpoint) http.HandlerFunc {
 	if ep.ResponseType != nil {
 		bodyType := reflect.TypeOf(ep.ResponseType)
 		if bodyType.Kind() == reflect.Pointer {
@@ -105,7 +105,7 @@ func (ms *MockServer) handlerFor(ep *cav.Endpoint) http.HandlerFunc {
 }
 
 // makeHandler builds default request handler for endpoint.
-func (ms *MockServer) makeHandler(ep *cav.Endpoint) http.HandlerFunc {
+func (ms *Server) makeHandler(ep *cav.Endpoint) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ms.mu.RLock()
 		mr, ok := ms.responses[ep.Name]
@@ -152,7 +152,7 @@ func (ms *MockServer) makeHandler(ep *cav.Endpoint) http.HandlerFunc {
 }
 
 // handlerForGroup routes colliding method/path pairs by query parameters.
-func (ms *MockServer) handlerForGroup(eps []*cav.Endpoint) http.HandlerFunc {
+func (ms *Server) handlerForGroup(eps []*cav.Endpoint) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ep := ms.matchEndpoint(r, eps)
 		handler := ms.handlerFor(ep)
@@ -161,7 +161,7 @@ func (ms *MockServer) handlerForGroup(eps []*cav.Endpoint) http.HandlerFunc {
 }
 
 // matchEndpoint returns best matching endpoint for request.
-func (ms *MockServer) matchEndpoint(r *http.Request, eps []*cav.Endpoint) *cav.Endpoint {
+func (ms *Server) matchEndpoint(r *http.Request, eps []*cav.Endpoint) *cav.Endpoint {
 	sort.Slice(eps, func(i, j int) bool {
 		return eps[i].Name < eps[j].Name
 	})
@@ -198,7 +198,7 @@ func (ms *MockServer) matchEndpoint(r *http.Request, eps []*cav.Endpoint) *cav.E
 }
 
 // hasMock reports whether endpoint has explicit mock override.
-func (ms *MockServer) hasMock(ep *cav.Endpoint) bool {
+func (ms *Server) hasMock(ep *cav.Endpoint) bool {
 	ms.mu.RLock()
 	defer ms.mu.RUnlock()
 	mr, ok := ms.responses[ep.Name]
@@ -206,13 +206,13 @@ func (ms *MockServer) hasMock(ep *cav.Endpoint) bool {
 }
 
 // writeErrorResponse writes error response for status codes >= 300.
-func (ms *MockServer) writeErrorResponse(w http.ResponseWriter, ep *cav.Endpoint, statusCode int) {
+func (ms *Server) writeErrorResponse(w http.ResponseWriter, ep *cav.Endpoint, statusCode int) {
 	ms.logger.Debug("Mock error response", slog.String("endpoint", ep.Name), slog.Int("statusCode", statusCode))
 	http.Error(w, http.StatusText(statusCode), statusCode)
 }
 
 // generateBody auto-generates response body from endpoint ResponseType.
-func (ms *MockServer) generateBody(ep *cav.Endpoint) any {
+func (ms *Server) generateBody(ep *cav.Endpoint) any {
 	bodyType := reflect.TypeOf(ep.ResponseType)
 	if bodyType.Kind() == reflect.Pointer {
 		bodyType = bodyType.Elem()
@@ -246,7 +246,7 @@ func (ms *MockServer) generateBody(ep *cav.Endpoint) any {
 }
 
 // writeJSONResponse writes JSON response with status code.
-func (ms *MockServer) writeJSONResponse(w http.ResponseWriter, ep *cav.Endpoint, statusCode int, data any) {
+func (ms *Server) writeJSONResponse(w http.ResponseWriter, ep *cav.Endpoint, statusCode int, data any) {
 	bodyEncoded, err := json.Marshal(data)
 	if err != nil {
 		ms.logger.Error("Error encoding mock response", slog.String("endpoint", ep.Name), slog.Any("error", err))
@@ -268,7 +268,7 @@ func (ms *MockServer) writeJSONResponse(w http.ResponseWriter, ep *cav.Endpoint,
 }
 
 // jobHandlerFor builds handler for job-oriented endpoints.
-func (ms *MockServer) jobHandlerFor(ep *cav.Endpoint) http.HandlerFunc {
+func (ms *Server) jobHandlerFor(ep *cav.Endpoint) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ms.mu.RLock()
 		mr, ok := ms.responses[ep.Name]

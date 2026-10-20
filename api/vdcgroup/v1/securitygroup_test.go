@@ -28,29 +28,29 @@ func TestCreateSecurityGroup(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.CreateFirewallGroup())
-	ms.SetResponse(endpoints.CreateFirewallGroup(), &itypes.ApiResponseFirewallGroup{ID: createdID}, nil)
+	ms.SetResponse(endpoints.CreateFirewallGroup(), &itypes.APIResponseFirewallGroup{ID: createdID}, nil)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
-		Values: []itypes.ApiResponseListVdcGroupDetails{{
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.SetResponse(endpoints.ListVDCGroup(), &itypes.APIResponseListVDCGroup{
+		Values: []itypes.APIResponseListVDCGroupDetails{{
 			ID:   vdcGroupID,
 			Name: vdcGroupName,
 		}},
 	}, nil)
 
 	ms.CleanResponse(endpoints.GetFirewallGroup())
-	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.ApiResponseFirewallGroup{
+	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.APIResponseFirewallGroup{
 		ID:          createdID,
 		Name:        "sg-1",
 		Description: "desc",
 		TypeValue:   itypes.FirewallGroupTypeSecurityGroup,
-		OwnerRef:    &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+		OwnerRef:    &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 	}, nil)
 
 	resp, err := client.CreateSecurityGroup(t.Context(), types.ParamsCreateSecurityGroup{
 		Name:         "sg-1",
 		Description:  "desc",
-		VdcGroupName: vdcGroupName,
+		VDCGroupName: vdcGroupName,
 	})
 
 	assert.NoError(t, err)
@@ -60,7 +60,7 @@ func TestCreateSecurityGroup(t *testing.T) {
 	assert.Equal(t, vdcGroupName, resp.OwnerName)
 
 	ms.CleanResponse(endpoints.CreateFirewallGroup())
-	ms.CleanResponse(endpoints.ListVdcGroup())
+	ms.CleanResponse(endpoints.ListVDCGroup())
 	ms.CleanResponse(endpoints.GetFirewallGroup())
 }
 
@@ -71,22 +71,22 @@ func TestListSecurityGroup(t *testing.T) {
 
 	client, ms := newClient(t)
 
-	ms.CleanResponse(endpoints.ListVdcGroup())
-	ms.SetResponse(endpoints.ListVdcGroup(), &itypes.ApiResponseListVdcGroup{
-		Values: []itypes.ApiResponseListVdcGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
+	ms.CleanResponse(endpoints.ListVDCGroup())
+	ms.SetResponse(endpoints.ListVDCGroup(), &itypes.APIResponseListVDCGroup{
+		Values: []itypes.APIResponseListVDCGroupDetails{{ID: vdcGroupID, Name: vdcGroupName}},
 	}, nil)
 
 	ms.CleanResponse(endpoints.ListFirewallGroup())
-	ms.SetResponse(endpoints.ListFirewallGroup(), &itypes.ApiResponseListFirewallGroup{
-		Values: []itypes.ApiResponseFirewallGroup{{
+	ms.SetResponse(endpoints.ListFirewallGroup(), &itypes.APIResponseListFirewallGroup{
+		Values: []itypes.APIResponseFirewallGroup{{
 			ID:        groupID,
 			Name:      "sg-1",
 			TypeValue: itypes.FirewallGroupTypeSecurityGroup,
-			OwnerRef:  &itypes.ApiObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+			OwnerRef:  &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
 		}},
 	}, nil)
 
-	resp, err := client.ListSecurityGroup(t.Context(), types.ParamsListSecurityGroup{VdcGroupName: vdcGroupName})
+	resp, err := client.ListSecurityGroup(t.Context(), types.ParamsListSecurityGroup{VDCGroupName: vdcGroupName})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
@@ -95,7 +95,7 @@ func TestListSecurityGroup(t *testing.T) {
 	assert.Equal(t, vdcGroupID, resp.FirewallGroups[0].OwnerID)
 
 	ms.CleanResponse(endpoints.ListFirewallGroup())
-	ms.CleanResponse(endpoints.ListVdcGroup())
+	ms.CleanResponse(endpoints.ListVDCGroup())
 }
 
 func TestGetSecurityGroup(t *testing.T) {
@@ -104,7 +104,7 @@ func TestGetSecurityGroup(t *testing.T) {
 	client, ms := newClient(t)
 
 	ms.CleanResponse(endpoints.GetFirewallGroup())
-	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.ApiResponseFirewallGroup{
+	ms.SetResponse(endpoints.GetFirewallGroup(), &itypes.APIResponseFirewallGroup{
 		ID:        groupID,
 		Name:      "sg-1",
 		TypeValue: itypes.FirewallGroupTypeSecurityGroup,

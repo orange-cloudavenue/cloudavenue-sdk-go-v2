@@ -16,6 +16,13 @@ import (
 
 var mu = &sync.RWMutex{}
 
+const (
+	consoleEndpoint1 = "https://console1.cloudavenue.orange-business.com"
+	consoleEndpoint2 = "https://console2.cloudavenue.orange-business.com"
+	consoleEndpoint4 = "https://console4.cloudavenue.orange-business.com"
+	consoleEndpoint5 = "https://console5.cloudavenue-cha.itn.intraorange"
+)
+
 type (
 	ConsoleName  string
 	LocationCode string
@@ -66,15 +73,15 @@ var consoles = map[ConsoleName]Console{
 		Services: Services{
 			IHM: Service{
 				Enabled:  true,
-				Endpoint: "https://console1.cloudavenue.orange-business.com",
+				Endpoint: consoleEndpoint1,
 			},
 			APIVCD: Service{
 				Enabled:  true,
-				Endpoint: "https://console1.cloudavenue.orange-business.com",
+				Endpoint: consoleEndpoint1,
 			},
 			APICerberus: Service{
 				Enabled:  true,
-				Endpoint: "https://console1.cloudavenue.orange-business.com",
+				Endpoint: consoleEndpoint1,
 			},
 			S3: Service{
 				Enabled:  true,
@@ -94,15 +101,15 @@ var consoles = map[ConsoleName]Console{
 		Services: Services{
 			IHM: Service{
 				Enabled:  true,
-				Endpoint: "https://console2.cloudavenue.orange-business.com",
+				Endpoint: consoleEndpoint2,
 			},
 			APIVCD: Service{
 				Enabled:  true,
-				Endpoint: "https://console2.cloudavenue.orange-business.com",
+				Endpoint: consoleEndpoint2,
 			},
 			APICerberus: Service{
 				Enabled:  true,
-				Endpoint: "https://console2.cloudavenue.orange-business.com",
+				Endpoint: consoleEndpoint2,
 			},
 			S3: Service{
 				Enabled:  true,
@@ -123,15 +130,15 @@ var consoles = map[ConsoleName]Console{
 		Services: Services{
 			IHM: Service{
 				Enabled:  true,
-				Endpoint: "https://console4.cloudavenue.orange-business.com",
+				Endpoint: consoleEndpoint4,
 			},
 			APIVCD: Service{
 				Enabled:  true,
-				Endpoint: "https://console4.cloudavenue.orange-business.com",
+				Endpoint: consoleEndpoint4,
 			},
 			APICerberus: Service{
 				Enabled:  true,
-				Endpoint: "https://console4.cloudavenue.orange-business.com",
+				Endpoint: consoleEndpoint4,
 			},
 			Netbackup: Service{
 				Enabled:  true,
@@ -147,15 +154,15 @@ var consoles = map[ConsoleName]Console{
 		Services: Services{
 			IHM: Service{
 				Enabled:  true,
-				Endpoint: "https://console5.cloudavenue-cha.itn.intraorange",
+				Endpoint: consoleEndpoint5,
 			},
 			APIVCD: Service{
 				Enabled:  true,
-				Endpoint: "https://console5.cloudavenue-cha.itn.intraorange",
+				Endpoint: consoleEndpoint5,
 			},
 			APICerberus: Service{
 				Enabled:  true,
-				Endpoint: "https://console5.cloudavenue-cha.itn.intraorange",
+				Endpoint: consoleEndpoint5,
 			},
 			Netbackup: Service{
 				Enabled:  true,

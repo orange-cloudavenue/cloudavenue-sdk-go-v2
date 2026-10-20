@@ -36,19 +36,19 @@ var (
 
 type (
 	ParamsGetFirewall struct {
-		// VdcGroupID is the ID of the Vdc Group owning the Distributed Firewall.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning the Distributed Firewall.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning the Distributed Firewall.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning the Distributed Firewall.
+		VDCGroupName string
 	}
 
 	ParamsCreateFirewall struct {
-		// VdcGroupID is the ID of the Vdc Group owning the Distributed Firewall.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning the Distributed Firewall.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning the Distributed Firewall.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning the Distributed Firewall.
+		VDCGroupName string
 
 		// Enabled activates or deactivates the Distributed Firewall.
 		Enabled bool
@@ -58,11 +58,11 @@ type (
 	}
 
 	ParamsUpdateFirewall struct {
-		// VdcGroupID is the ID of the Vdc Group owning the Distributed Firewall.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning the Distributed Firewall.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning the Distributed Firewall.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning the Distributed Firewall.
+		VDCGroupName string
 
 		// Enabled activates or deactivates the Distributed Firewall.
 		Enabled bool
@@ -72,11 +72,11 @@ type (
 	}
 
 	ParamsDeleteFirewall struct {
-		// VdcGroupID is the ID of the Vdc Group owning the Distributed Firewall.
-		VdcGroupID string
+		// VDCGroupID is the ID of the Vdc Group owning the Distributed Firewall.
+		VDCGroupID string
 
-		// VdcGroupName is the name of the Vdc Group owning the Distributed Firewall.
-		VdcGroupName string
+		// VDCGroupName is the name of the Vdc Group owning the Distributed Firewall.
+		VDCGroupName string
 	}
 
 	ParamsFirewallRule struct {

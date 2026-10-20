@@ -29,8 +29,8 @@ type User struct {
 	EmailAddress    string    `xml:"EmailAddress,omitempty"`
 	Telephone       string    `xml:"Telephone,omitempty"`
 	IsEnabled       bool      `xml:"IsEnabled,omitempty"`
-	DeployedVmQuota *int      `xml:"DeployedVmQuota,omitempty"`
-	StoredVmQuota   *int      `xml:"StoredVmQuota,omitempty"`
+	DeployedVMQuota *int      `xml:"DeployedVmQuota,omitempty"`
+	StoredVMQuota   *int      `xml:"StoredVmQuota,omitempty"`
 	Password        string    `xml:"Password,omitempty"`
 	ProviderType    string    `xml:"ProviderType,omitempty"`
 }
@@ -46,8 +46,8 @@ type UserRequest struct {
 	EmailAddress    string    `xml:"EmailAddress,omitempty"`
 	Telephone       string    `xml:"Telephone,omitempty"`
 	IsEnabled       *bool     `xml:"IsEnabled,omitempty"`
-	DeployedVmQuota *int      `xml:"DeployedVmQuota,omitempty"`
-	StoredVmQuota   *int      `xml:"StoredVmQuota,omitempty"`
+	DeployedVMQuota *int      `xml:"DeployedVmQuota,omitempty"`
+	StoredVMQuota   *int      `xml:"StoredVmQuota,omitempty"`
 	Password        string    `xml:"Password,omitempty"`
 	ProviderType    string    `xml:"ProviderType,omitempty"`
 }
