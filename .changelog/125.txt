@@ -1,0 +1,7 @@
+```release-note:feature
+feat(api): introduce the typed public API surface. Adds versioned API domain packages under `api/`, user-facing types under `types/`, and internal endpoint and payload infrastructure used by the typed clients.
+```
+
+```release-note:fix
+fix(api): preserve optional-field semantics in typed operations. Uses pointer-based optional user fields, preserves partial user updates and vApp job behavior, and hardens edge gateway bandwidth handling for missing targets.
+```
