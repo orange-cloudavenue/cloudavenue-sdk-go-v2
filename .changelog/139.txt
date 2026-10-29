@@ -1,0 +1,7 @@
+```release-note:feature
+feat(iam): add org role and rights CloudAPI surface. Adds org-scoped role CRUD, role rights list/add/replace/remove-all, and right lookup/list operations backed by /cloudapi/1.0.0 endpoints, with paginated list leaves, the matching public types, endpoint definitions, generated wrappers, and tests.
+```
+
+```release-note:fix
+fix(iam): align token creation with CloudAPI TokenParameters. ParamsCreateToken no longer requires role_name, as the role is derived server-side, and request bodies omit the role object when unset.
+```
