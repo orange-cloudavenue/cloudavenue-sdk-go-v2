@@ -12,6 +12,7 @@ package errors
 import (
 	stderrors "errors"
 	"fmt"
+	"net/http"
 	"time"
 )
 
@@ -49,62 +50,62 @@ type APIError struct {
 
 // IsNotFound checks if the APIError indicates a "not found" error.
 func (e *APIError) IsNotFound() bool {
-	return e.StatusCode == 404 || stderrors.Is(e, ErrNotFound)
+	return e.StatusCode == http.StatusNotFound || stderrors.Is(e, ErrNotFound)
 }
 
 // IsBadRequest checks if the APIError indicates a "bad request" error.
 func (e *APIError) IsBadRequest() bool {
-	return e.StatusCode == 400 || stderrors.Is(e, ErrBadRequest)
+	return e.StatusCode == http.StatusBadRequest || stderrors.Is(e, ErrBadRequest)
 }
 
 // IsUnauthorized checks if the APIError indicates a "unauthorized" error.
 func (e *APIError) IsUnauthorized() bool {
-	return e.StatusCode == 401 || stderrors.Is(e, ErrUnauthorized)
+	return e.StatusCode == http.StatusUnauthorized || stderrors.Is(e, ErrUnauthorized)
 }
 
 // IsForbidden checks if the APIError indicates a "forbidden" error.
 func (e *APIError) IsForbidden() bool {
-	return e.StatusCode == 403 || stderrors.Is(e, ErrForbidden)
+	return e.StatusCode == http.StatusForbidden || stderrors.Is(e, ErrForbidden)
 }
 
 // IsMethodNotAllowed checks if the APIError indicates a "method not allowed" error.
 func (e *APIError) IsMethodNotAllowed() bool {
-	return e.StatusCode == 405 || stderrors.Is(e, ErrMethodNotAllowed)
+	return e.StatusCode == http.StatusMethodNotAllowed || stderrors.Is(e, ErrMethodNotAllowed)
 }
 
 // IsRequestTimeout checks if the APIError indicates a "request timeout" error.
 func (e *APIError) IsRequestTimeout() bool {
-	return e.StatusCode == 408 || stderrors.Is(e, ErrRequestTimeout)
+	return e.StatusCode == http.StatusRequestTimeout || stderrors.Is(e, ErrRequestTimeout)
 }
 
 // IsConflict checks if the APIError indicates a "conflict" error.
 func (e *APIError) IsConflict() bool {
-	return e.StatusCode == 409 || stderrors.Is(e, ErrConflict)
+	return e.StatusCode == http.StatusConflict || stderrors.Is(e, ErrConflict)
 }
 
 // IsTooManyRequests checks if the APIError indicates a "too many requests" error.
 func (e *APIError) IsTooManyRequests() bool {
-	return e.StatusCode == 429 || stderrors.Is(e, ErrTooManyRequests)
+	return e.StatusCode == http.StatusTooManyRequests || stderrors.Is(e, ErrTooManyRequests)
 }
 
 // IsInternalServerError checks if the APIError indicates an "internal server error".
 func (e *APIError) IsInternalServerError() bool {
-	return e.StatusCode == 500 || stderrors.Is(e, ErrInternalServerError)
+	return e.StatusCode == http.StatusInternalServerError || stderrors.Is(e, ErrInternalServerError)
 }
 
 // IsBadGateway checks if the APIError indicates a "bad gateway" error.
 func (e *APIError) IsBadGateway() bool {
-	return e.StatusCode == 502 || stderrors.Is(e, ErrBadGateway)
+	return e.StatusCode == http.StatusBadGateway || stderrors.Is(e, ErrBadGateway)
 }
 
 // IsServiceUnavailable checks if the APIError indicates a "service unavailable" error.
 func (e *APIError) IsServiceUnavailable() bool {
-	return e.StatusCode == 503 || stderrors.Is(e, ErrServiceUnavailable)
+	return e.StatusCode == http.StatusServiceUnavailable || stderrors.Is(e, ErrServiceUnavailable)
 }
 
 // IsGatewayTimeout checks if the APIError indicates a "gateway timeout" error.
 func (e *APIError) IsGatewayTimeout() bool {
-	return e.StatusCode == 504 || stderrors.Is(e, ErrGatewayTimeout)
+	return e.StatusCode == http.StatusGatewayTimeout || stderrors.Is(e, ErrGatewayTimeout)
 }
 
 // Unwrap returns underlying sentinel/root cause when present.
