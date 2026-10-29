@@ -213,12 +213,12 @@ type (
 		Token             string             `json:"token,omitempty"`
 		ExpirationTimeUTC string             `json:"expirationTimeUtc,omitempty"`
 		ExtensionID       string             `json:"extensionId,omitempty"`
-		Owner             APIObjectReference `json:"owner,omitempty"`
-		Org               APIObjectReference `json:"org,omitempty"`
+		Owner             APIObjectReference `json:"owner"`
+		Org               APIObjectReference `json:"org"`
 		Type              string             `json:"type,omitempty"`
 		RequireRotation   *bool              `json:"requireRotation,omitempty"`
 		Enabled           bool               `json:"enabled"`
-		Role              APIObjectReference `json:"role,omitempty"`
+		Role              APIObjectReference `json:"role"`
 	}
 
 	// APIResponseListTokens represents the wrapper for a list of tokens.
