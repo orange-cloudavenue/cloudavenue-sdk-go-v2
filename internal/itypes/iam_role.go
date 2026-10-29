@@ -265,3 +265,199 @@ func (api *APIResponseListTokens) ToModel() []*types.ModelToken {
 
 	return result
 }
+
+// * Request / Response API for Org-scoped Roles
+
+type (
+	// APIRequestRole represents the request body for role operations.
+	APIRequestRole struct {
+		ID          string                `json:"id,omitempty"`
+		Name        string                `json:"name,omitempty"`
+		Description string                `json:"description,omitempty"`
+		BundleKey   string                `json:"bundleKey,omitempty"`
+		Rights      []APIRequestRoleRight `json:"rights,omitempty"`
+	}
+
+	// APIRequestRoleRight represents a right reference in a role request.
+	APIRequestRoleRight struct {
+		ID   string `json:"id,omitempty"`
+		Name string `json:"name,omitempty"`
+	}
+
+	// APIResponseRole represents a role response.
+	APIResponseRole struct {
+		ID          string                 `json:"id,omitempty"`
+		Name        string                 `json:"name,omitempty"`
+		Description string                 `json:"description,omitempty"`
+		BundleKey   string                 `json:"bundleKey,omitempty"`
+		ReadOnly    bool                   `json:"readOnly"`
+		Rights      []APIResponseRoleRight `json:"rights,omitempty"`
+	}
+
+	// APIResponseRoleRight represents a right in a role response.
+	APIResponseRoleRight struct {
+		ID               string               `json:"id,omitempty"`
+		Name             string               `json:"name,omitempty"`
+		Description      string               `json:"description,omitempty"`
+		BundleKey        string               `json:"bundleKey,omitempty"`
+		Category         string               `json:"category,omitempty"`
+		RightType        string               `json:"rightType,omitempty"`
+		IsPublishable    bool                 `json:"isPublishable"`
+		ServiceNamespace string               `json:"serviceNamespace,omitempty"`
+		ImpliedRights    []APIEntityReference `json:"impliedRights,omitempty"`
+	}
+
+	// APIResponseListRoles represents the wrapper for a list of roles.
+	APIResponseListRoles struct {
+		Roles []APIResponseRole `json:"roles,omitempty"`
+	}
+
+	// APIResponseRoleRights represents the wrapper for a list of role rights.
+	APIResponseRoleRights struct {
+		Rights []APIResponseRoleRight `json:"rights,omitempty"`
+	}
+
+	// APIRequestRoleRights represents the request body for adding/replacing role rights.
+	APIRequestRoleRights struct {
+		Rights []APIRequestRoleRight `json:"rights,omitempty"`
+	}
+)
+
+// ToModel converts the APIResponseRole to ModelRole.
+func (api *APIResponseRole) ToModel() *types.ModelRole {
+	if api == nil {
+		return nil
+	}
+
+	rights := make([]*types.ModelRight, len(api.Rights))
+	for i, r := range api.Rights {
+		rights[i] = r.ToModel()
+	}
+
+	return &types.ModelRole{
+		ID:          api.ID,
+		Name:        api.Name,
+		Description: api.Description,
+		BundleKey:   api.BundleKey,
+		ReadOnly:    api.ReadOnly,
+		Rights:      rights,
+	}
+}
+
+// ToModel converts each role in the list to ModelRole.
+func (api *APIResponseListRoles) ToModel() []*types.ModelRole {
+	if api == nil {
+		return nil
+	}
+
+	result := make([]*types.ModelRole, len(api.Roles))
+	for i, r := range api.Roles {
+		result[i] = r.ToModel()
+	}
+
+	return result
+}
+
+// ToModel converts the APIResponseRoleRight to ModelRight.
+func (api *APIResponseRoleRight) ToModel() *types.ModelRight {
+	if api == nil {
+		return nil
+	}
+
+	impliedRights := make([]*types.ModelRight, len(api.ImpliedRights))
+	for i, ir := range api.ImpliedRights {
+		impliedRights[i] = &types.ModelRight{
+			ID:   ir.ID,
+			Name: ir.Name,
+		}
+	}
+
+	return &types.ModelRight{
+		ID:               api.ID,
+		Name:             api.Name,
+		Description:      api.Description,
+		BundleKey:        api.BundleKey,
+		Category:         api.Category,
+		RightType:        api.RightType,
+		IsPublishable:    api.IsPublishable,
+		ServiceNamespace: api.ServiceNamespace,
+		ImpliedRights:    impliedRights,
+	}
+}
+
+// ToModel converts each right in the list to ModelRight.
+func (api *APIResponseRoleRights) ToModel() []*types.ModelRight {
+	if api == nil {
+		return nil
+	}
+
+	result := make([]*types.ModelRight, len(api.Rights))
+	for i, r := range api.Rights {
+		result[i] = r.ToModel()
+	}
+
+	return result
+}
+
+// * Request / Response API for Rights
+
+type (
+	// APIResponseRight represents a right response.
+	APIResponseRight struct {
+		ID               string               `json:"id,omitempty"`
+		Name             string               `json:"name,omitempty"`
+		Description      string               `json:"description,omitempty"`
+		BundleKey        string               `json:"bundleKey,omitempty"`
+		Category         string               `json:"category,omitempty"`
+		RightType        string               `json:"rightType,omitempty"`
+		IsPublishable    bool                 `json:"isPublishable"`
+		ServiceNamespace string               `json:"serviceNamespace,omitempty"`
+		ImpliedRights    []APIEntityReference `json:"impliedRights,omitempty"`
+	}
+
+	// APIResponseListRights represents the wrapper for a list of rights.
+	APIResponseListRights struct {
+		Rights []APIResponseRight `json:"rights,omitempty"`
+	}
+)
+
+// ToModel converts the APIResponseRight to ModelRight.
+func (api *APIResponseRight) ToModel() *types.ModelRight {
+	if api == nil {
+		return nil
+	}
+
+	impliedRights := make([]*types.ModelRight, len(api.ImpliedRights))
+	for i, ir := range api.ImpliedRights {
+		impliedRights[i] = &types.ModelRight{
+			ID:   ir.ID,
+			Name: ir.Name,
+		}
+	}
+
+	return &types.ModelRight{
+		ID:               api.ID,
+		Name:             api.Name,
+		Description:      api.Description,
+		BundleKey:        api.BundleKey,
+		Category:         api.Category,
+		RightType:        api.RightType,
+		IsPublishable:    api.IsPublishable,
+		ServiceNamespace: api.ServiceNamespace,
+		ImpliedRights:    impliedRights,
+	}
+}
+
+// ToModel converts each right in the list to ModelRight.
+func (api *APIResponseListRights) ToModel() []*types.ModelRight {
+	if api == nil {
+		return nil
+	}
+
+	result := make([]*types.ModelRight, len(api.Rights))
+	for i, r := range api.Rights {
+		result[i] = r.ToModel()
+	}
+
+	return result
+}
