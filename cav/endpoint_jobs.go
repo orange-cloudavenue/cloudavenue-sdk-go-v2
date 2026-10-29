@@ -12,4 +12,4 @@ package cav
 // SetJobExtractorFunc remains for compatibility with pre-Operation callers.
 //
 // Job extraction now happens explicitly via AwaitJob, so this method is a no-op.
-func (e *Endpoint) SetJobExtractorFunc(_ ExtractorFunc) {}
+func (Endpoint) SetJobExtractorFunc(_ ExtractorFunc) {}
