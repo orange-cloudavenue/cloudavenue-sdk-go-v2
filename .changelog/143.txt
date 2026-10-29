@@ -1,0 +1,7 @@
+```release-note:fix
+fix(iam): omit the empty token role from API request payloads. An unset role was previously serialised as an empty reference object, which is not part of the CloudAPI token parameters contract.
+```
+
+```release-note:chore
+chore(lint): resolve all golangci-lint findings. Applies the modernize, staticcheck, unused and recvcheck fixes across the API, internal and package layers: net/http status constants in API error checks, removal of no-op JSON omitempty tags, direct VDC model to create-parameters conversion, a value receiver on the endpoint job extractor setter, lowercased wrapped error messages, and test-only simplifications.
+```

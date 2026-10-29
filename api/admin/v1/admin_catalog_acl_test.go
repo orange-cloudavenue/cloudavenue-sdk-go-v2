@@ -54,7 +54,7 @@ func TestGetAdminCatalogACLByID(t *testing.T) {
 				xmlResponse(w, itypes.ControlAccessParams{
 					Xmlns:               "http://www.vmware.com/vcloud/v1.5",
 					IsSharedToEveryone:  true,
-					EveryoneAccessLevel: stringPtr("ReadOnly"),
+					EveryoneAccessLevel: new("ReadOnly"),
 					AccessSettings: &itypes.AccessSettingList{
 						AccessSetting: []*itypes.AccessSetting{
 							{
@@ -160,8 +160,4 @@ func TestSetAdminCatalogACL_ValidateError(t *testing.T) {
 
 	_, err := client.SetAdminCatalogACL(t.Context(), types.ParamsSetAdminCatalogACL{})
 	assert.Error(t, err)
-}
-
-func stringPtr(s string) *string {
-	return &s
 }

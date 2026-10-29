@@ -79,7 +79,7 @@ func remainingVDCGroupMembers(current []types.ModelGetVDCGroupVDC, removals []ty
 
 	vdcs := make([]types.ParamsCreateVDCGroupVDC, 0, len(filtered))
 	for _, vdc := range filtered {
-		vdcs = append(vdcs, types.ParamsCreateVDCGroupVDC{ID: vdc.ID, Name: vdc.Name})
+		vdcs = append(vdcs, types.ParamsCreateVDCGroupVDC(vdc))
 	}
 
 	return vdcs

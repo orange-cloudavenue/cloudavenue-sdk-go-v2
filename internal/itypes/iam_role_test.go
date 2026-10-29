@@ -87,7 +87,7 @@ func TestAPIRequestTokenSerializesExtensionFields(t *testing.T) {
 
 	encoded, err := json.Marshal(body)
 	require.NoError(t, err)
-	assert.JSONEq(t, `{"name":"extension-token","type":"EXTENSION","extensionId":"urn:vcloud:extension:11111111-1111-1111-1111-111111111111","role":{"id":"","name":""},"enabled":true}`, string(encoded))
+	assert.JSONEq(t, `{"name":"extension-token","type":"EXTENSION","extensionId":"urn:vcloud:extension:11111111-1111-1111-1111-111111111111","enabled":true}`, string(encoded))
 }
 
 func TestAPIRequestTokenSerializesExplicitFalse(t *testing.T) {
@@ -95,5 +95,5 @@ func TestAPIRequestTokenSerializesExplicitFalse(t *testing.T) {
 
 	encoded, err := json.Marshal(body)
 	require.NoError(t, err)
-	assert.JSONEq(t, `{"enabled":false,"role":{"id":"","name":""}}`, string(encoded))
+	assert.JSONEq(t, `{"enabled":false}`, string(encoded))
 }

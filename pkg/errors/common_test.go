@@ -19,7 +19,7 @@ import (
 func TestIsAPIError(t *testing.T) {
 	var apiErr error = &APIError{}
 	var clientErr error = &ClientError{}
-	var stdErr error = errors.New("standard error")
+	stdErr := errors.New("standard error")
 	var nilErr error
 
 	if !IsAPIError(apiErr) {
@@ -39,7 +39,7 @@ func TestIsAPIError(t *testing.T) {
 func TestIsClientError(t *testing.T) {
 	var apiErr error = &APIError{}
 	var clientErr error = &ClientError{}
-	var stdErr error = errors.New("standard error")
+	stdErr := errors.New("standard error")
 	var nilErr error
 
 	if !IsClientError(clientErr) {
