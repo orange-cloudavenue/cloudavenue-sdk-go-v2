@@ -51,6 +51,8 @@ const (
 
 	descPageSize                 = "The number of items per page."
 	descPage                     = "Page to fetch, zero offset."
+	descIAMPage                  = "Page to fetch"
+	descIAMPageSize              = "Results per page to fetch"
 	descFormatResponse           = "The format of the response."
 	descTypeOfObjectQuery        = "The type of object to query"
 	descEdgeGatewayID            = "The ID of the edge gateway."
@@ -87,6 +89,7 @@ const (
 	descOrgID        = "Organization ID"
 	descUserID       = "User ID or name"
 	descTokenID      = "Token ID"
+	descRoleID       = "Role ID"
 	descGlobalRoleID = "Global Role ID"
 	queryParamVDC    = "vdc"
 

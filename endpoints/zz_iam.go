@@ -250,3 +250,73 @@ func PublishAllGlobalRoleTenants() *cav.Endpoint {
 func UnpublishAllGlobalRoleTenants() *cav.Endpoint {
 	return cav.MustGetEndpoint("UnpublishAllGlobalRoleTenants")
 }
+
+// ListRoles - List roles in organization
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/roles/get/
+func ListRoles() *cav.Endpoint {
+	return cav.MustGetEndpoint("ListRoles")
+}
+
+// GetRole - Get role by ID
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/roles/id/get/
+func GetRole() *cav.Endpoint {
+	return cav.MustGetEndpoint("GetRole")
+}
+
+// CreateRole - Create a new role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/roles/post/
+func CreateRole() *cav.Endpoint {
+	return cav.MustGetEndpoint("CreateRole")
+}
+
+// UpdateRole - Update a role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/roles/id/put/
+func UpdateRole() *cav.Endpoint {
+	return cav.MustGetEndpoint("UpdateRole")
+}
+
+// DeleteRole - Delete a role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/roles/id/delete/
+func DeleteRole() *cav.Endpoint {
+	return cav.MustGetEndpoint("DeleteRole")
+}
+
+// ListRoleRights - List rights of a role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/roles/id/rights/get/
+func ListRoleRights() *cav.Endpoint {
+	return cav.MustGetEndpoint("ListRoleRights")
+}
+
+// AddRoleRights - Add rights to a role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/roles/id/rights/post/
+func AddRoleRights() *cav.Endpoint {
+	return cav.MustGetEndpoint("AddRoleRights")
+}
+
+// ReplaceRoleRights - Replace rights of a role
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/roles/id/rights/put/
+func ReplaceRoleRights() *cav.Endpoint {
+	return cav.MustGetEndpoint("ReplaceRoleRights")
+}
+
+// ListRights - List rights
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/rights/get/
+func ListRights() *cav.Endpoint {
+	return cav.MustGetEndpoint("ListRights")
+}
+
+// GetRight - Get right by ID
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/rights/id/get/
+func GetRight() *cav.Endpoint {
+	return cav.MustGetEndpoint("GetRight")
+}

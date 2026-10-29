@@ -97,6 +97,16 @@ const (
 	pathGlobalRoleTenantsUnpublishAll = "/cloudapi/1.0.0/globalRoles/{id}/tenants/unpublishAll"
 	// pathOrgVDCStoragePolicies lists Org VDC storage policies.
 	pathOrgVDCStoragePolicies = "/cloudapi/1.0.0/orgVdcStoragePolicies"
+	// pathRoles lists and creates org-scoped roles (CloudAPI).
+	pathRoles = "/cloudapi/1.0.0/roles"
+	// pathRoleByID addresses one role by ID.
+	pathRoleByID = "/cloudapi/1.0.0/roles/{id}"
+	// pathRoleRights manages rights for one role.
+	pathRoleRights = "/cloudapi/1.0.0/roles/{id}/rights"
+	// pathRights lists all rights.
+	pathRights = "/cloudapi/1.0.0/rights"
+	// pathRightByID addresses one right by ID.
+	pathRightByID = "/cloudapi/1.0.0/rights/{id}"
 
 	// docURLCloudapiUpdateUserByUrn modifies basic details of the specified user.
 	docURLCloudapiUpdateUserByUrn = "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/users/userUrn/put/"
