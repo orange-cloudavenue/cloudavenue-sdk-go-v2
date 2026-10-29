@@ -23,13 +23,13 @@ func debugNewClient(t *testing.T) (*Client, *mock.Server) {
 	t.Helper()
 
 	results := reflect.ValueOf(newClient).Call([]reflect.Value{reflect.ValueOf(t)})
-	client, _ := results[0].Interface().(*Client)
+	client, _ := reflect.TypeAssert[*Client](results[0])
 
 	if len(results) < 2 || results[1].IsNil() {
 		return client, nil
 	}
 
-	ms, _ := results[1].Interface().(*mock.Server)
+	ms, _ := reflect.TypeAssert[*mock.Server](results[1])
 	return client, ms
 }
 
