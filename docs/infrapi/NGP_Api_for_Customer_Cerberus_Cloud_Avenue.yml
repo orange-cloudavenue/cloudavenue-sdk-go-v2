@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 Orange
+#
+# SPDX-License-Identifier: MPL-2.0
+
 openapi: 3.0.0
 info:
   title: Cloud Avenue API
