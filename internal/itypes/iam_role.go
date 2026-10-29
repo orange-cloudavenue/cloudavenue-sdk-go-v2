@@ -201,7 +201,7 @@ type (
 		Description string             `json:"description,omitempty"`
 		Type        string             `json:"type,omitempty"`
 		ExtensionID string             `json:"extensionId,omitempty"`
-		Role        APIObjectReference `json:"role,omitempty"`
+		Role        APIObjectReference `json:"role,omitzero"`
 		Enabled     bool               `json:"enabled"`
 	}
 
