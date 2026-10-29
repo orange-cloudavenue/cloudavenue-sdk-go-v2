@@ -12,6 +12,7 @@ package iam
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
@@ -24,32 +25,39 @@ const (
 	opGetRight   = "IAM.GetRight"
 )
 
-// ListRights lists all rights.
+// ListRights lists all rights, fetching every page.
 func (c *Client) ListRights(ctx context.Context, params types.ParamsListRights) ([]*types.ModelRight, error) {
-	ep := endpoints.ListRights()
+	var result []*types.ModelRight
 
-	opts := []cav.EndpointRequestOption{
-		cav.OverrideSetResult(new(itypes.APIResponseListRights)),
+	for page := 1; ; page++ {
+		ep := endpoints.ListRights()
+
+		opts := []cav.EndpointRequestOption{
+			cav.WithQueryParam(endpointQueryParam(ep, "page"), strconv.Itoa(page)),
+			cav.OverrideSetResult(new(itypes.APIResponseListRights)),
+		}
+
+		if params.Filter != "" {
+			opts = append(opts, cav.WithQueryParam(endpointQueryParam(ep, "filter"), params.Filter))
+		}
+
+		resp, err := c.c.Do(ctx, ep, opts...)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", opListRights, err)
+		}
+
+		rights, ok := resp.Result().(*itypes.APIResponseListRights)
+		if !ok {
+			return nil, fmt.Errorf("%s: unexpected response type %T", opListRights, resp.Result())
+		}
+
+		result = append(result, rights.ToModel()...)
+		if len(rights.Rights) == 0 || page >= rights.PageCount {
+			break
+		}
 	}
 
-	if params.Filter != "" {
-		opts = append(opts, cav.WithQueryParam(
-			cav.QueryParam{Name: "filter", Description: "Filter for a query. FIQL format."},
-			params.Filter,
-		))
-	}
-
-	resp, err := c.c.Do(ctx, ep, opts...)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", opListRights, err)
-	}
-
-	rights, ok := resp.Result().(*itypes.APIResponseListRights)
-	if !ok {
-		return nil, fmt.Errorf("%s: unexpected response type %T", opListRights, resp.Result())
-	}
-
-	return rights.ToModel(), nil
+	return result, nil
 }
 
 // GetRight retrieves a right by ID.

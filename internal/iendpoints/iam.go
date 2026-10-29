@@ -586,6 +586,7 @@ func init() {
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathRoles,
 		QueryParams: []cav.QueryParam{
+			{Name: queryParamFilter, Description: "Filter to apply to the list of roles. Format: key==value. Allowed keys: name, description, readOnly."},
 			{Name: queryParamPage, Description: descIAMPage, Required: true, Value: "1"},
 			{Name: queryParamPageSize, Description: descIAMPageSize, Required: true, Value: pageSize128},
 		},
@@ -728,6 +729,7 @@ func init() {
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathRights,
 		QueryParams: []cav.QueryParam{
+			{Name: queryParamFilter, Description: "Filter to apply to the list of rights. Format: key==value. Allowed keys: name, description, category, rightType."},
 			{Name: queryParamPage, Description: descIAMPage, Required: true, Value: "1"},
 			{Name: queryParamPageSize, Description: descIAMPageSize, Required: true, Value: pageSize128},
 		},
