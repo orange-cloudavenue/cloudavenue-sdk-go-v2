@@ -12,12 +12,22 @@ package iam
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
+
+// toAPIEntityReferences converts public reference params to their API representation.
+func toAPIEntityReferences(refs []types.ParamsEntityReference) []itypes.APIEntityReference {
+	result := make([]itypes.APIEntityReference, len(refs))
+	for i, r := range refs {
+		result[i] = itypes.APIEntityReference{ID: r.ID, Name: r.Name}
+	}
+	return result
+}
 
 const (
 	opListOrgRoles           = "IAM.ListOrgRoles"
@@ -31,24 +41,45 @@ const (
 	opRemoveAllOrgRoleRights = "IAM.RemoveAllOrgRoleRights"
 )
 
-// ListOrgRoles lists all org-scoped roles.
+// endpointQueryParam returns the endpoint query parameter registered under name.
+// It falls back to a bare parameter so callers stay correct if registration evolves.
+func endpointQueryParam(ep *cav.Endpoint, name string) cav.QueryParam {
+	for _, p := range ep.QueryParams {
+		if p.Name == name {
+			return p
+		}
+	}
+	return cav.QueryParam{Name: name}
+}
+
+// ListOrgRoles lists all org-scoped roles, fetching every page.
 func (c *Client) ListOrgRoles(ctx context.Context) ([]*types.ModelRole, error) {
-	ep := endpoints.ListRoles()
-	resp, err := c.c.Do(
-		ctx,
-		ep,
-		cav.OverrideSetResult(new(itypes.APIResponseListRoles)),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", opListOrgRoles, err)
+	var result []*types.ModelRole
+
+	for page := 1; ; page++ {
+		ep := endpoints.ListRoles()
+		resp, err := c.c.Do(
+			ctx,
+			ep,
+			cav.WithQueryParam(endpointQueryParam(ep, "page"), strconv.Itoa(page)),
+			cav.OverrideSetResult(new(itypes.APIResponseListRoles)),
+		)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", opListOrgRoles, err)
+		}
+
+		roles, ok := resp.Result().(*itypes.APIResponseListRoles)
+		if !ok {
+			return nil, fmt.Errorf("%s: unexpected response type %T", opListOrgRoles, resp.Result())
+		}
+
+		result = append(result, roles.ToModel()...)
+		if len(roles.Roles) == 0 || page >= roles.PageCount {
+			break
+		}
 	}
 
-	roles, ok := resp.Result().(*itypes.APIResponseListRoles)
-	if !ok {
-		return nil, fmt.Errorf("%s: unexpected response type %T", opListOrgRoles, resp.Result())
-	}
-
-	return roles.ToModel(), nil
+	return result, nil
 }
 
 // GetOrgRole retrieves a role by ID.
@@ -157,29 +188,40 @@ func (c *Client) DeleteOrgRole(ctx context.Context, params types.ParamsDeleteOrg
 	return nil
 }
 
-// ListOrgRoleRights lists the rights of a role.
+// ListOrgRoleRights lists the rights of a role, fetching every page.
+// CloudAPI serves role rights as entity references, so only ID and Name are set.
 func (c *Client) ListOrgRoleRights(ctx context.Context, params types.ParamsListOrgRoleRights) ([]*types.ModelRight, error) {
 	if err := params.Validate(); err != nil {
 		return nil, fmt.Errorf("%s: validate: %w", opListOrgRoleRights, err)
 	}
 
-	ep := endpoints.ListRoleRights()
-	resp, err := c.c.Do(
-		ctx,
-		ep,
-		cav.WithPathParam(ep.PathParams[0], params.ID),
-		cav.OverrideSetResult(new(itypes.APIResponseRoleRights)),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", opListOrgRoleRights, err)
+	var result []*types.ModelRight
+
+	for page := 1; ; page++ {
+		ep := endpoints.ListRoleRights()
+		resp, err := c.c.Do(
+			ctx,
+			ep,
+			cav.WithPathParam(ep.PathParams[0], params.ID),
+			cav.WithQueryParam(endpointQueryParam(ep, "page"), strconv.Itoa(page)),
+			cav.OverrideSetResult(new(itypes.APIResponseRoleRights)),
+		)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", opListOrgRoleRights, err)
+		}
+
+		rights, ok := resp.Result().(*itypes.APIResponseRoleRights)
+		if !ok {
+			return nil, fmt.Errorf("%s: unexpected response type %T", opListOrgRoleRights, resp.Result())
+		}
+
+		result = append(result, rights.ToModel()...)
+		if len(rights.Rights) == 0 || page >= rights.PageCount {
+			break
+		}
 	}
 
-	rights, ok := resp.Result().(*itypes.APIResponseRoleRights)
-	if !ok {
-		return nil, fmt.Errorf("%s: unexpected response type %T", opListOrgRoleRights, resp.Result())
-	}
-
-	return rights.ToModel(), nil
+	return result, nil
 }
 
 // AddOrgRoleRights adds rights to a role.
@@ -189,13 +231,7 @@ func (c *Client) AddOrgRoleRights(ctx context.Context, params types.ParamsAddOrg
 	}
 
 	body := itypes.APIRequestRoleRights{
-		Rights: make([]itypes.APIRequestRoleRight, len(params.Rights)),
-	}
-	for i, r := range params.Rights {
-		body.Rights[i] = itypes.APIRequestRoleRight{
-			ID:   r.ID,
-			Name: r.Name,
-		}
+		Rights: toAPIEntityReferences(params.Rights),
 	}
 
 	ep := endpoints.AddRoleRights()
@@ -225,13 +261,7 @@ func (c *Client) ReplaceOrgRoleRights(ctx context.Context, params types.ParamsRe
 	}
 
 	body := itypes.APIRequestRoleRights{
-		Rights: make([]itypes.APIRequestRoleRight, len(params.Rights)),
-	}
-	for i, r := range params.Rights {
-		body.Rights[i] = itypes.APIRequestRoleRight{
-			ID:   r.ID,
-			Name: r.Name,
-		}
+		Rights: toAPIEntityReferences(params.Rights),
 	}
 
 	ep := endpoints.ReplaceRoleRights()
@@ -262,7 +292,7 @@ func (c *Client) RemoveAllOrgRoleRights(ctx context.Context, params types.Params
 	}
 
 	body := itypes.APIRequestRoleRights{
-		Rights: []itypes.APIRequestRoleRight{},
+		Rights: []itypes.APIEntityReference{},
 	}
 
 	ep := endpoints.ReplaceRoleRights()

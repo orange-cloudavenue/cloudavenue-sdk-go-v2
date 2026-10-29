@@ -418,9 +418,6 @@ type ModelRole struct {
 
 	// ReadOnly indicates whether this role is read-only.
 	ReadOnly bool `documentation:"Whether the role is read-only"`
-
-	// Rights of the role
-	Rights []*ModelRight `documentation:"Rights of the role"`
 }
 
 // ParamsGetOrgRole defines parameters for getting an org role.

@@ -11,6 +11,8 @@ package iam
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"testing"
 
@@ -60,13 +62,10 @@ func TestListOrgRoles(t *testing.T) {
 					return
 				}
 				assert.Equal(t, "application/json;version=39.1", r.Header.Get("Accept"))
-				resp := itypes.APIResponseListRoles{
-					Roles: []itypes.APIResponseRole{
-						{ID: "role-1", Name: "Role 1", Description: "Description 1"},
-						{ID: "role-2", Name: "Role 2", Description: "Description 2"},
-					},
-				}
-				jsonResponse(w, resp)
+				// Raw payload pins the CloudAPI pageable wire format (Page + values).
+				w.Header().Set("Content-Type", "application/json")
+				w.Header().Set("X-Cloud-Avenue-Mock", "true")
+				fmt.Fprint(w, `{"values":[{"id":"role-1","name":"Role 1","description":"Description 1"},{"id":"role-2","name":"Role 2","description":"Description 2"}],"resultTotal":2,"pageCount":1,"page":1,"pageSize":128}`)
 			})
 
 			result, err := client.ListOrgRoles(t.Context())
@@ -78,6 +77,29 @@ func TestListOrgRoles(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestListOrgRolesPagination(t *testing.T) {
+	client, ms := newClient(t)
+
+	var requests []string
+	ms.CleanResponse(endpoints.ListRoles())
+	ms.SetResponseFunc(endpoints.ListRoles(), func(w http.ResponseWriter, r *http.Request) {
+		page := r.URL.Query().Get("page")
+		requests = append(requests, page)
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("X-Cloud-Avenue-Mock", "true")
+		if page == "1" {
+			fmt.Fprint(w, `{"values":[{"id":"role-1","name":"Role 1"}],"resultTotal":2,"pageCount":2,"page":1,"pageSize":1}`)
+			return
+		}
+		fmt.Fprint(w, `{"values":[{"id":"role-2","name":"Role 2"}],"resultTotal":2,"pageCount":2,"page":2,"pageSize":1}`)
+	})
+
+	result, err := client.ListOrgRoles(t.Context())
+	assert.Nil(t, err)
+	assert.Len(t, result, 2)
+	assert.Equal(t, []string{"1", "2"}, requests)
 }
 
 func TestGetOrgRole(t *testing.T) {
@@ -239,20 +261,24 @@ func TestDeleteOrgRole(t *testing.T) {
 func TestListOrgRoleRights(t *testing.T) {
 	client, ms := newClient(t)
 
+	var requests []string
 	ms.CleanResponse(endpoints.ListRoleRights())
 	ms.SetResponseFunc(endpoints.ListRoleRights(), func(w http.ResponseWriter, r *http.Request) {
-		resp := itypes.APIResponseRoleRights{
-			Rights: []itypes.APIResponseRoleRight{
-				{ID: "right-1", Name: "Right 1"},
-				{ID: "right-2", Name: "Right 2"},
-			},
+		page := r.URL.Query().Get("page")
+		requests = append(requests, page)
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("X-Cloud-Avenue-Mock", "true")
+		if page == "1" {
+			fmt.Fprint(w, `{"values":[{"id":"right-1","name":"Right 1"}],"resultTotal":2,"pageCount":2,"page":1,"pageSize":1}`)
+			return
 		}
-		jsonResponse(w, resp)
+		fmt.Fprint(w, `{"values":[{"id":"right-2","name":"Right 2"}],"resultTotal":2,"pageCount":2,"page":2,"pageSize":1}`)
 	})
 
 	result, err := client.ListOrgRoleRights(t.Context(), types.ParamsListOrgRoleRights{ID: "role-1"})
 	assert.Nil(t, err)
 	assert.Len(t, result, 2)
+	assert.Equal(t, []string{"1", "2"}, requests)
 }
 
 func TestAddOrgRoleRights(t *testing.T) {
@@ -260,8 +286,13 @@ func TestAddOrgRoleRights(t *testing.T) {
 
 	ms.CleanResponse(endpoints.AddRoleRights())
 	ms.SetResponseFunc(endpoints.AddRoleRights(), func(w http.ResponseWriter, r *http.Request) {
+		// Pin the request wire format: EntityReferences collection under "values".
+		var body map[string][]itypes.APIEntityReference
+		assert.Nil(t, json.NewDecoder(r.Body).Decode(&body))
+		assert.Contains(t, body, "values")
+
 		resp := itypes.APIResponseRoleRights{
-			Rights: []itypes.APIResponseRoleRight{
+			Rights: []itypes.APIEntityReference{
 				{ID: "right-1", Name: "Right 1"},
 			},
 		}
@@ -284,7 +315,7 @@ func TestReplaceOrgRoleRights(t *testing.T) {
 	ms.CleanResponse(endpoints.ReplaceRoleRights())
 	ms.SetResponseFunc(endpoints.ReplaceRoleRights(), func(w http.ResponseWriter, r *http.Request) {
 		resp := itypes.APIResponseRoleRights{
-			Rights: []itypes.APIResponseRoleRight{
+			Rights: []itypes.APIEntityReference{
 				{ID: "right-2", Name: "Right 2"},
 			},
 		}
@@ -306,16 +337,16 @@ func TestRemoveAllOrgRoleRights(t *testing.T) {
 
 	ms.CleanResponse(endpoints.ReplaceRoleRights())
 	ms.SetResponseFunc(endpoints.ReplaceRoleRights(), func(w http.ResponseWriter, r *http.Request) {
-		// Verify empty rights list is sent in PUT body
-		var body itypes.APIRequestRoleRights
-		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		// Verify the PUT body carries an explicit empty values list.
+		raw, err := io.ReadAll(r.Body)
+		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		assert.Empty(t, body.Rights, "RemoveAllOrgRoleRights should send empty rights list")
+		assert.JSONEq(t, `{"values":[]}`, string(raw))
 
 		resp := itypes.APIResponseRoleRights{
-			Rights: []itypes.APIResponseRoleRight{},
+			Rights: []itypes.APIEntityReference{},
 		}
 		jsonResponse(w, resp)
 	})
@@ -359,11 +390,15 @@ func TestListRights(t *testing.T) {
 
 			ms.CleanResponse(endpoints.ListRights())
 			ms.SetResponseFunc(endpoints.ListRights(), func(w http.ResponseWriter, r *http.Request) {
+				if tt.params.Filter != "" {
+					assert.Equal(t, tt.params.Filter, r.URL.Query().Get("filter"))
+				}
 				resp := itypes.APIResponseListRights{
 					Rights: []itypes.APIResponseRight{
 						{ID: "right-1", Name: "Right 1"},
 						{ID: "right-2", Name: "Right 2"},
 					},
+					PageCount: 1,
 				}
 				if tt.checkImplied {
 					resp = itypes.APIResponseListRights{
@@ -376,6 +411,7 @@ func TestListRights(t *testing.T) {
 								},
 							},
 						},
+						PageCount: 1,
 					}
 				}
 				jsonResponse(w, resp)
@@ -391,6 +427,29 @@ func TestListRights(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestListRightsPagination(t *testing.T) {
+	client, ms := newClient(t)
+
+	var requests []string
+	ms.CleanResponse(endpoints.ListRights())
+	ms.SetResponseFunc(endpoints.ListRights(), func(w http.ResponseWriter, r *http.Request) {
+		page := r.URL.Query().Get("page")
+		requests = append(requests, page)
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("X-Cloud-Avenue-Mock", "true")
+		if page == "1" {
+			fmt.Fprint(w, `{"values":[{"id":"right-1","name":"Right 1"}],"resultTotal":2,"pageCount":2,"page":1,"pageSize":1}`)
+			return
+		}
+		fmt.Fprint(w, `{"values":[{"id":"right-2","name":"Right 2"}],"resultTotal":2,"pageCount":2,"page":2,"pageSize":1}`)
+	})
+
+	result, err := client.ListRights(t.Context(), types.ParamsListRights{})
+	assert.Nil(t, err)
+	assert.Len(t, result, 2)
+	assert.Equal(t, []string{"1", "2"}, requests)
 }
 
 func TestGetRight(t *testing.T) {
