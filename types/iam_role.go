@@ -84,12 +84,11 @@ type ParamsCreateToken struct {
 }
 
 // Validate checks ParamsCreateToken structural constraints.
+// CloudAPI TokenParameters accepts only name, type and extensionId: the role is
+// derived server-side from the authenticated user, so RoleName is not required.
 func (p ParamsCreateToken) Validate() error {
 	if p.Name == "" {
 		return fmt.Errorf("name is required")
-	}
-	if p.RoleName == "" {
-		return fmt.Errorf("role_name is required")
 	}
 	return nil
 }
