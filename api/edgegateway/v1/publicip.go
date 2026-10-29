@@ -64,14 +64,14 @@ func (c *Client) CreatePublicIP(ctx context.Context, params types.ParamsEdgeGate
 		cav.SetBody(body),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to create public IP: %w", err)
+		return nil, fmt.Errorf("failed to create public IP: %w", err)
 	}
 
 	// Parse jobID from customer API create response (HTTP 201 with
 	// {"jobId":"...","message":"..."}) routed through Cerberus.
 	jobID := resp.Result().(*cav.CerberusJobCreatedAPIResponse).ID
 	if jobID == "" {
-		return nil, fmt.Errorf("Failed to create public IP: %w", errors.New("job id not found in create response"))
+		return nil, fmt.Errorf("failed to create public IP: %w", errors.New("job id not found in create response"))
 	}
 
 	// Poll customer job completion and extract created public IP from job
@@ -98,7 +98,7 @@ func (c *Client) CreatePublicIP(ctx context.Context, params types.ParamsEdgeGate
 		return "", errors.New("public IP not found in job response")
 	})
 	if err != nil {
-		return nil, fmt.Errorf("Failed to create public IP: %w", err)
+		return nil, fmt.Errorf("failed to create public IP: %w", err)
 	}
 
 	return c.GetPublicIP(ctx, types.ParamsGetEdgeGatewayPublicIP{
