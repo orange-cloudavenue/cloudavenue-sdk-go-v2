@@ -12,15 +12,38 @@ package iam
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 )
+
+// mockRoleURN is the deterministic role URN served by mockRoleListEcho.
+const mockRoleURN = "urn:vcloud:role:00000000-0000-0000-0000-000000000001"
+
+// mockRoleListEcho registers a ListRoles handler that echoes back the role
+// name extracted from the FIQL filter, so role resolution in user leaves
+// stays deterministic.
+func mockRoleListEcho(t *testing.T, ms *mock.Server) {
+	t.Helper()
+	ms.CleanResponse(endpoints.ListRoles())
+	ms.SetResponseFunc(endpoints.ListRoles(), func(w http.ResponseWriter, r *http.Request) {
+		name := strings.TrimPrefix(r.URL.Query().Get("filter"), "name==")
+		w.Header().Set("Content-Type", "application/json")
+		require.NoError(t, json.NewEncoder(w).Encode(itypes.APIResponseListRoles{
+			Roles:       []itypes.APIResponseRole{{ID: mockRoleURN, Name: name}},
+			ResultTotal: 1,
+			PageCount:   1,
+			Page:        1,
+		}))
+	})
+}
 
 func newClient(t *testing.T) (*Client, *mock.Server) {
 	t.Helper()
@@ -233,6 +256,7 @@ func TestCreateLocalUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			client, ms := newClient(t)
+			mockRoleListEcho(t, ms)
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				ms.CleanResponse(endpoints.CreateUser())
@@ -245,6 +269,11 @@ func TestCreateLocalUser(t *testing.T) {
 			} else {
 				ms.CleanResponse(endpoints.CreateUser())
 				ms.SetResponseFunc(endpoints.CreateUser(), func(w http.ResponseWriter, r *http.Request) {
+					var body itypes.APIUser
+					require.NoError(t, json.NewDecoder(r.Body).Decode(&body))
+					require.Len(t, body.RoleEntityRefs, 1)
+					assert.Equal(t, mockRoleURN, body.RoleEntityRefs[0].ID)
+					assert.Equal(t, tt.params.RoleName, body.RoleEntityRefs[0].Name)
 					user := itypes.User{
 						Name:         tt.params.Name,
 						FullName:     tt.params.FullName,
@@ -300,6 +329,7 @@ func TestCreateSAMLUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			client, ms := newClient(t)
+			mockRoleListEcho(t, ms)
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				ms.CleanResponse(endpoints.CreateUser())

@@ -455,6 +455,12 @@ type ModelRole struct {
 	ReadOnly bool `documentation:"Whether the role is read-only"`
 }
 
+// ParamsListOrgRoles defines parameters for listing org roles.
+type ParamsListOrgRoles struct {
+	// Filter is a FIQL filter applied server-side (allowed keys: name, description, readOnly).
+	Filter string
+}
+
 // ParamsGetOrgRole defines parameters for getting an org role.
 type ParamsGetOrgRole struct {
 	ID string
