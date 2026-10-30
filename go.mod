@@ -1,6 +1,6 @@
 module github.com/orange-cloudavenue/cloudavenue-sdk-go-v2
 
-go 1.26.6
+go 1.26.10
 
 // replace (
 // 	github.com/orange-cloudavenue/common-go => ../common-go
