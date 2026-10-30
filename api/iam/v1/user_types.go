@@ -214,6 +214,17 @@ type ModelUser struct {
 	// Provider type of the user (e.g., INTEGRATED, SAML)
 	ProviderType string `documentation:"Provider type of the user"`
 
+	// NameInSource is the immutable identity-source name of the user.
+	// CloudAPI user PUT rejects payloads that omit or change it.
+	NameInSource string `documentation:"Identity source name of the user"`
+
+	// OrgEntityID is the URN of the organization owning the user.
+	// CloudAPI user PUT rejects payloads that omit or change it.
+	OrgEntityID string `documentation:"URN of the organization owning the user"`
+
+	// OrgEntityName is the name of the organization owning the user.
+	OrgEntityName string `documentation:"Name of the organization owning the user"`
+
 	// Name of the user's role
 	RoleName string `documentation:"Name of the user's role"`
 

@@ -61,11 +61,11 @@ func xmlResponse(w http.ResponseWriter, v any) {
 	w.Header().Set("X-Cloud-Avenue-Mock", "true")
 	switch value := v.(type) {
 	case itypes.User:
-		v = itypes.APIUser{ID: value.ID, Username: value.Name, FullName: value.FullName, Email: value.EmailAddress, Phone: value.Telephone, Description: value.Description, Enabled: &value.IsEnabled, Locked: &value.IsLocked, ProviderType: value.ProviderType, RoleEntityRefs: []itypes.APIObjectReference{{ID: value.Role.ID, Name: value.Role.Name}}, DeployedVMQuota: value.DeployedVMQuota, StoredVMQuota: value.StoredVMQuota}
+		v = itypes.APIUser{ID: value.ID, Username: value.Name, FullName: value.FullName, Email: value.EmailAddress, Phone: &value.Telephone, Description: value.Description, Enabled: &value.IsEnabled, Locked: &value.IsLocked, ProviderType: value.ProviderType, RoleEntityRefs: []itypes.APIObjectReference{{ID: value.Role.ID, Name: value.Role.Name}}, DeployedVMQuota: value.DeployedVMQuota, StoredVMQuota: value.StoredVMQuota}
 	case itypes.Users:
 		users := make([]itypes.APIUser, 0, len(value.Users))
 		for _, user := range value.Users {
-			users = append(users, itypes.APIUser{ID: user.ID, Username: user.Name, FullName: user.FullName, Email: user.EmailAddress, Phone: user.Telephone, Description: user.Description, Enabled: &user.IsEnabled, ProviderType: user.ProviderType, RoleEntityRefs: []itypes.APIObjectReference{{ID: user.Role.ID, Name: user.Role.Name}}, DeployedVMQuota: user.DeployedVMQuota, StoredVMQuota: user.StoredVMQuota})
+			users = append(users, itypes.APIUser{ID: user.ID, Username: user.Name, FullName: user.FullName, Email: user.EmailAddress, Phone: &user.Telephone, Description: user.Description, Enabled: &user.IsEnabled, ProviderType: user.ProviderType, RoleEntityRefs: []itypes.APIObjectReference{{ID: user.Role.ID, Name: user.Role.Name}}, DeployedVMQuota: user.DeployedVMQuota, StoredVMQuota: user.StoredVMQuota})
 		}
 		v = itypes.APIResponseListUsers{Users: users}
 	}
@@ -441,18 +441,23 @@ func TestUpdateUser(t *testing.T) {
 func TestUpdateUserPreservesExistingFields(t *testing.T) {
 	client, ms := newClient(t)
 
+	phone := "0000"
 	ms.CleanResponse(endpoints.GetUser())
 	ms.SetResponseFunc(endpoints.GetUser(), func(w http.ResponseWriter, r *http.Request) {
-		xmlResponse(w, itypes.User{
-			Name:            "user1",
+		xmlResponse(w, itypes.APIUser{
+			ID:              "urn:vcloud:user:1",
+			Username:        "user1",
 			FullName:        "Current Name",
-			EmailAddress:    "user1@example.com",
-			Telephone:       "0000",
+			Email:           "user1@example.com",
+			Phone:           &phone,
 			Description:     new("current description"),
-			IsEnabled:       true,
+			Enabled:         new(true),
+			ProviderType:    "LOCAL",
+			NameInSource:    "user1",
+			OrgEntityRef:    &itypes.APIObjectReference{ID: "urn:vcloud:org:1", Name: "org1"},
 			DeployedVMQuota: new(4),
 			StoredVMQuota:   new(7),
-			Role:            itypes.Reference{Name: "Organization Administrator"},
+			RoleEntityRefs:  []itypes.APIObjectReference{{ID: "urn:vcloud:role:1", Name: "Organization Administrator"}},
 		})
 	})
 
@@ -461,7 +466,15 @@ func TestUpdateUserPreservesExistingFields(t *testing.T) {
 		var body itypes.APIUser
 		assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
 		assert.Equal(t, "Current Name", body.FullName)
-		assert.Equal(t, "1234567890", body.Phone)
+		if assert.NotNil(t, body.Phone) {
+			assert.Equal(t, "1234567890", *body.Phone)
+		}
+		assert.Equal(t, "user1", body.NameInSource)
+		assert.Equal(t, "LOCAL", body.ProviderType)
+		assert.Equal(t, maskedPasswordValue, body.Password)
+		if assert.NotNil(t, body.OrgEntityRef) {
+			assert.Equal(t, "urn:vcloud:org:1", body.OrgEntityRef.ID)
+		}
 		assert.Equal(t, "user1@example.com", body.Email)
 		if assert.NotNil(t, body.Enabled) {
 			assert.True(t, *body.Enabled)

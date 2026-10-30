@@ -18,12 +18,14 @@ type APIUser struct {
 	Description     *string              `json:"description,omitempty"`
 	FullName        string               `json:"fullName,omitempty"`
 	Email           string               `json:"email,omitempty"`
-	Phone           string               `json:"phone,omitempty"`
+	Phone           *string              `json:"phone,omitempty"`
 	Enabled         *bool                `json:"enabled,omitempty"`
 	Locked          *bool                `json:"locked,omitempty"`
 	External        bool                 `json:"external,omitempty"`
 	ProviderType    string               `json:"providerType,omitempty"`
 	Password        string               `json:"password,omitempty"`
+	NameInSource    string               `json:"nameInSource,omitempty"`
+	OrgEntityRef    *APIObjectReference  `json:"orgEntityRef,omitempty"`
 	RoleEntityRefs  []APIObjectReference `json:"roleEntityRefs,omitempty"`
 	DeployedVMQuota *int                 `json:"deployedVmQuota,omitempty"`
 	StoredVMQuota   *int                 `json:"storedVmQuota,omitempty"`
@@ -45,7 +47,7 @@ func (r *APIResponseListUsers) UnmarshalXML(d *xml.Decoder, start xml.StartEleme
 	for _, user := range legacy.Users {
 		r.Users = append(r.Users, APIUser{
 			ID: user.ID, Username: user.Name, FullName: user.FullName,
-			Email: user.EmailAddress, Phone: user.Telephone,
+			Email: user.EmailAddress, Phone: &user.Telephone,
 			Description: user.Description, Enabled: &user.IsEnabled,
 			ProviderType:    user.ProviderType,
 			RoleEntityRefs:  []APIObjectReference{{ID: user.Role.ID, Name: user.Role.Name}},
@@ -62,7 +64,8 @@ func (u *APIUser) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		return err
 	}
 	u.ID, u.Username, u.FullName = user.ID, user.Name, user.FullName
-	u.Email, u.Phone, u.Description = user.EmailAddress, user.Telephone, user.Description
+	u.Email, u.Description = user.EmailAddress, user.Description
+	u.Phone = &user.Telephone
 	u.Enabled, u.Locked = &user.IsEnabled, &user.IsLocked
 	u.ProviderType = user.ProviderType
 	u.DeployedVMQuota, u.StoredVMQuota = user.DeployedVMQuota, user.StoredVMQuota

@@ -9,3 +9,7 @@ fix(iam): align token creation with CloudAPI TokenParameters. ParamsCreateToken 
 ```release-note:fix
 fix(iam): resolve role URN before user create and update. CloudAPI rejects user payloads whose role entity reference carries an empty ID, so CreateLocalUser, CreateSAMLUser and UpdateUser now look up the role URN via a filtered ListOrgRoles (new server-side FIQL filter parameter) instead of sending the role name alone.
 ```
+
+```release-note:fix
+fix(iam): preserve user identity fields and phone nullability on user operations. CloudAPI user PUT rejects payloads that omit nameInSource, orgEntityRef, providerType or the masked password sentinel (500 "Unable to perform this action"), and rejects an explicitly empty phone value. Get now captures these identity fields, user PUT echoes them back, and phone serializes as absent when unset.
+```

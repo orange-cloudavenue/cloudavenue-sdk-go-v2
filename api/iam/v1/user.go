@@ -34,6 +34,8 @@ const (
 	opDisableUser       = "IAM.DisableUser"
 	opUnlockUser        = "IAM.UnlockUser"
 	opChangePassword    = "IAM.ChangePassword"
+
+	maskedPasswordValue = "******"
 )
 
 // ListUsers lists all users in the organization.
@@ -84,7 +86,7 @@ func (c *Client) CreateLocalUser(ctx context.Context, params ParamsCreateLocalUs
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", opCreateLocalUser, err)
 	}
-	body := itypes.APIUser{Username: params.Name, Password: params.Password, FullName: params.FullName, Email: params.EmailAddress, Phone: params.Telephone, Description: params.Description, Enabled: &params.IsEnabled, ProviderType: "LOCAL", DeployedVMQuota: params.DeployedVMQuota, StoredVMQuota: params.StoredVMQuota, RoleEntityRefs: []itypes.APIObjectReference{roleRef}}
+	body := itypes.APIUser{Username: params.Name, Password: params.Password, FullName: params.FullName, Email: params.EmailAddress, Phone: emptyStringAsNil(params.Telephone), Description: params.Description, Enabled: &params.IsEnabled, ProviderType: "LOCAL", DeployedVMQuota: params.DeployedVMQuota, StoredVMQuota: params.StoredVMQuota, RoleEntityRefs: []itypes.APIObjectReference{roleRef}}
 	return c.createUser(ctx, body, opCreateLocalUser)
 }
 
@@ -97,7 +99,7 @@ func (c *Client) CreateSAMLUser(ctx context.Context, params ParamsCreateSAMLUser
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", opCreateSAMLUser, err)
 	}
-	body := itypes.APIUser{Username: params.Name, FullName: params.FullName, Email: params.EmailAddress, Phone: params.Telephone, Description: params.Description, Enabled: &params.IsEnabled, ProviderType: "SAML", RoleEntityRefs: []itypes.APIObjectReference{roleRef}}
+	body := itypes.APIUser{Username: params.Name, FullName: params.FullName, Email: params.EmailAddress, Phone: emptyStringAsNil(params.Telephone), Description: params.Description, Enabled: &params.IsEnabled, ProviderType: "SAML", RoleEntityRefs: []itypes.APIObjectReference{roleRef}}
 	return c.createUser(ctx, body, opCreateSAMLUser)
 }
 
@@ -278,9 +280,6 @@ func (c *Client) resolveUserID(ctx context.Context, id, name string) (string, er
 	return name, nil
 }
 
-// resolveRoleRef resolves a role name to its entity reference. CloudAPI
-// rejects user payloads whose role reference carries an empty ID, so the
-// role URN must be looked up before user create/update.
 func (c *Client) resolveRoleRef(ctx context.Context, roleName string) (itypes.APIObjectReference, error) {
 	roles, err := c.ListOrgRoles(ctx, types.ParamsListOrgRoles{Filter: "name==" + roleName})
 	if err != nil {
@@ -307,7 +306,13 @@ func withOrgID(pp cav.PathParam) cav.EndpointRequestOption {
 }
 
 func iamCloudAPIUserToModel(u itypes.APIUser) *ModelUser {
-	model := &ModelUser{ID: u.ID, Name: u.Username, FullName: u.FullName, EmailAddress: u.Email, Telephone: u.Phone, Description: u.Description, ProviderType: u.ProviderType, DeployedVMQuota: u.DeployedVMQuota, StoredVMQuota: u.StoredVMQuota}
+	model := &ModelUser{ID: u.ID, Name: u.Username, FullName: u.FullName, EmailAddress: u.Email, Description: u.Description, ProviderType: u.ProviderType, NameInSource: u.NameInSource, DeployedVMQuota: u.DeployedVMQuota, StoredVMQuota: u.StoredVMQuota}
+	if u.Phone != nil {
+		model.Telephone = *u.Phone
+	}
+	if u.OrgEntityRef != nil {
+		model.OrgEntityID, model.OrgEntityName = u.OrgEntityRef.ID, u.OrgEntityRef.Name
+	}
 	if u.Enabled != nil {
 		model.IsEnabled = *u.Enabled
 	}
@@ -323,7 +328,15 @@ func iamCloudAPIUserToModel(u itypes.APIUser) *ModelUser {
 
 func modelUserToCloudAPI(current *ModelUser, params ParamsUpdateUser, roleRef *itypes.APIObjectReference) itypes.APIUser {
 	enabled := current.IsEnabled
-	body := itypes.APIUser{ID: current.ID, Username: current.Name, FullName: current.FullName, Email: current.EmailAddress, Phone: current.Telephone, Description: current.Description, Enabled: &enabled, DeployedVMQuota: current.DeployedVMQuota, StoredVMQuota: current.StoredVMQuota, Locked: &current.IsLocked, RoleEntityRefs: []itypes.APIObjectReference{{ID: current.RoleHref, Name: current.RoleName}}}
+	body := itypes.APIUser{
+		ID: current.ID, Username: current.Name, FullName: current.FullName, Email: current.EmailAddress, Phone: emptyStringAsNil(current.Telephone),
+		Description: current.Description, Enabled: &enabled, DeployedVMQuota: current.DeployedVMQuota, StoredVMQuota: current.StoredVMQuota,
+		Locked: &current.IsLocked, ProviderType: current.ProviderType, NameInSource: current.NameInSource,
+		Password: maskedPasswordValue, RoleEntityRefs: []itypes.APIObjectReference{{ID: current.RoleHref, Name: current.RoleName}},
+	}
+	if current.OrgEntityID != "" {
+		body.OrgEntityRef = &itypes.APIObjectReference{ID: current.OrgEntityID, Name: current.OrgEntityName}
+	}
 	if params.Name != "" {
 		body.Username = params.Name
 	}
@@ -340,7 +353,7 @@ func modelUserToCloudAPI(current *ModelUser, params ParamsUpdateUser, roleRef *i
 		body.Email = params.EmailAddress
 	}
 	if params.Telephone != "" {
-		body.Phone = params.Telephone
+		body.Phone = emptyStringAsNil(params.Telephone)
 	}
 	if params.Description != nil {
 		body.Description = params.Description
@@ -355,4 +368,12 @@ func modelUserToCloudAPI(current *ModelUser, params ParamsUpdateUser, roleRef *i
 		body.Enabled = params.IsEnabled
 	}
 	return body
+}
+
+func emptyStringAsNil(value string) *string {
+	if value == "" {
+		return nil
+	}
+
+	return &value
 }
