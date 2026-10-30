@@ -42,6 +42,21 @@ func init() {
 		ResponseType:     itypes.AdminOrg{},
 	}.Register()
 
+	// GetAdminUser reads one user through the legacy admin XML API. CloudAPI
+	// user responses omit the deployed/stored VM quotas, which only this
+	// representation exposes.
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-User.html",
+		Name:             "GetAdminUser",
+		Description:      "Get a user by ID (admin scope)",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		Headers:          map[string]string{headerAccept: headerXMLAdminUser},
+		PathTemplate:     pathAdminUserByID,
+		PathParams:       []cav.PathParam{{Name: pathParamUserID, Description: "User ID (UUID)", Required: true}},
+		ResponseType:     itypes.AdminUser{},
+	}.Register()
+
 	const descCatalogID = "Catalog ID"
 	// ListAdminCatalogs
 	cav.Endpoint{
