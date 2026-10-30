@@ -5,3 +5,7 @@ feat(iam): add org role and rights CloudAPI surface. Adds org-scoped role CRUD, 
 ```release-note:fix
 fix(iam): align token creation with CloudAPI TokenParameters. ParamsCreateToken no longer requires role_name, as the role is derived server-side, and request bodies omit the role object when unset.
 ```
+
+```release-note:fix
+fix(iam): resolve role URN before user create and update. CloudAPI rejects user payloads whose role entity reference carries an empty ID, so CreateLocalUser, CreateSAMLUser and UpdateUser now look up the role URN via a filtered ListOrgRoles (new server-side FIQL filter parameter) instead of sending the role name alone.
+```

@@ -17,6 +17,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
@@ -68,7 +69,7 @@ func TestListOrgRoles(t *testing.T) {
 				fmt.Fprint(w, `{"values":[{"id":"role-1","name":"Role 1","description":"Description 1"},{"id":"role-2","name":"Role 2","description":"Description 2"}],"resultTotal":2,"pageCount":1,"page":1,"pageSize":128}`)
 			})
 
-			result, err := client.ListOrgRoles(t.Context())
+			result, err := client.ListOrgRoles(t.Context(), types.ParamsListOrgRoles{})
 			if tt.expectedErr {
 				assert.Error(t, err)
 			} else {
@@ -96,10 +97,27 @@ func TestListOrgRolesPagination(t *testing.T) {
 		fmt.Fprint(w, `{"values":[{"id":"role-2","name":"Role 2"}],"resultTotal":2,"pageCount":2,"page":2,"pageSize":1}`)
 	})
 
-	result, err := client.ListOrgRoles(t.Context())
+	result, err := client.ListOrgRoles(t.Context(), types.ParamsListOrgRoles{})
 	assert.Nil(t, err)
 	assert.Len(t, result, 2)
 	assert.Equal(t, []string{"1", "2"}, requests)
+}
+
+func TestListOrgRolesFilterPassthrough(t *testing.T) {
+	client, ms := newClient(t)
+
+	ms.CleanResponse(endpoints.ListRoles())
+	ms.SetResponseFunc(endpoints.ListRoles(), func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "name==Organization Administrator", r.URL.Query().Get("filter"))
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("X-Cloud-Avenue-Mock", "true")
+		fmt.Fprint(w, `{"values":[{"id":"urn:vcloud:role:1","name":"Organization Administrator"}],"resultTotal":1,"pageCount":1,"page":1,"pageSize":128}`)
+	})
+
+	result, err := client.ListOrgRoles(t.Context(), types.ParamsListOrgRoles{Filter: "name==Organization Administrator"})
+	require.NoError(t, err)
+	require.Len(t, result, 1)
+	assert.Equal(t, "urn:vcloud:role:1", result[0].ID)
 }
 
 func TestGetOrgRole(t *testing.T) {

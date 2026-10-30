@@ -53,17 +53,21 @@ func endpointQueryParam(ep *cav.Endpoint, name string) cav.QueryParam {
 }
 
 // ListOrgRoles lists all org-scoped roles, fetching every page.
-func (c *Client) ListOrgRoles(ctx context.Context) ([]*types.ModelRole, error) {
+func (c *Client) ListOrgRoles(ctx context.Context, params types.ParamsListOrgRoles) ([]*types.ModelRole, error) {
 	var result []*types.ModelRole
 
 	for page := 1; ; page++ {
 		ep := endpoints.ListRoles()
-		resp, err := c.c.Do(
-			ctx,
-			ep,
+
+		opts := []cav.EndpointRequestOption{
 			cav.WithQueryParam(endpointQueryParam(ep, "page"), strconv.Itoa(page)),
 			cav.OverrideSetResult(new(itypes.APIResponseListRoles)),
-		)
+		}
+		if params.Filter != "" {
+			opts = append(opts, cav.WithQueryParam(endpointQueryParam(ep, "filter"), params.Filter))
+		}
+
+		resp, err := c.c.Do(ctx, ep, opts...)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", opListOrgRoles, err)
 		}
