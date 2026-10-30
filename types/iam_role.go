@@ -126,6 +126,42 @@ func (p ParamsDeleteToken) Validate() error {
 	return nil
 }
 
+// ParamsCreateAPIToken defines parameters for creating a user API token.
+type ParamsCreateAPIToken struct {
+	// TenantID is the tenant organization owning the API token.
+	TenantID string
+	// Name is the unique name of the API token.
+	Name string
+}
+
+// Validate checks ParamsCreateAPIToken structural constraints.
+func (p ParamsCreateAPIToken) Validate() error {
+	if p.TenantID == "" {
+		return fmt.Errorf("tenant_id is required")
+	}
+	if p.Name == "" {
+		return fmt.Errorf("name is required")
+	}
+	return nil
+}
+
+// ModelAPIToken represents a created user API token.
+// RefreshToken and InitialAccessToken are secrets that CloudAPI returns only
+// once, at creation time.
+type ModelAPIToken struct {
+	// ID is the URN of the token in the format urn:vcloud:token:<UUID>
+	ID string `documentation:"URN of the token in the format urn:vcloud:token:<UUID>"`
+
+	// Name of the token
+	Name string `documentation:"Name of the token"`
+
+	// RefreshToken is the long-lived API token seed, returned only at creation.
+	RefreshToken string `documentation:"Long-lived API token seed, returned only at creation"`
+
+	// InitialAccessToken is the one-time access token issued at creation.
+	InitialAccessToken string `documentation:"One-time access token issued at creation"`
+}
+
 // ParamsEntityReference represents an entity reference (ID + Name) used in global role params.
 type ParamsEntityReference struct {
 	ID   string
