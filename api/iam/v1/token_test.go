@@ -11,7 +11,9 @@ package iam
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -115,4 +117,56 @@ func TestTokenIDIsInterpolatedIntoRoute(t *testing.T) {
 			require.NoError(t, tt.request(client))
 		})
 	}
+}
+
+func TestCreateAPIToken(t *testing.T) {
+	client, ms := newClient(t)
+	registerEp := endpoints.CreateOAuthClient()
+	tokenEp := endpoints.CreateOAuthToken()
+	ms.CleanResponse(registerEp)
+	ms.CleanResponse(tokenEp)
+
+	ms.SetResponseFunc(registerEp, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/oauth/tenant/tenant-123/register", r.URL.Path)
+		var body map[string]any
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&body))
+		assert.Equal(t, "my-token", body["client_name"])
+		w.Header().Set("Content-Type", "application/json")
+		require.NoError(t, json.NewEncoder(w).Encode(itypes.APIResponseOAuthClient{
+			ClientName: "my-token", ClientID: "client-123",
+		}))
+	})
+	ms.SetResponseFunc(tokenEp, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/oauth/tenant/tenant-123/token", r.URL.Path)
+		body, err := io.ReadAll(r.Body)
+		require.NoError(t, err)
+		form, err := url.ParseQuery(string(body))
+		require.NoError(t, err)
+		assert.Equal(t, "client-123", form.Get("client_id"))
+		assert.Equal(t, "urn:ietf:params:oauth:grant-type:jwt-bearer", form.Get("grant_type"))
+		assert.Equal(t, "mock-access-token", form.Get("assertion"))
+		w.Header().Set("Content-Type", "application/json")
+		require.NoError(t, json.NewEncoder(w).Encode(itypes.APIResponseOAuthToken{ //nolint: gosec
+			AccessToken: "initial-access", TokenType: "Bearer", ExpiresIn: 3600, RefreshToken: "refresh-token",
+		}))
+	})
+
+	result, err := client.CreateAPIToken(t.Context(), types.ParamsCreateAPIToken{
+		TenantID: "tenant-123", Name: "my-token",
+	})
+	require.NoError(t, err)
+	assert.Equal(t, "urn:vcloud:token:client-123", result.ID)
+	assert.Equal(t, "my-token", result.Name)
+	assert.Equal(t, "refresh-token", result.RefreshToken)
+	assert.Equal(t, "initial-access", result.InitialAccessToken)
+}
+
+func TestCreateAPITokenValidation(t *testing.T) {
+	client, _ := newClient(t)
+
+	_, err := client.CreateAPIToken(t.Context(), types.ParamsCreateAPIToken{Name: "my-token"})
+	require.ErrorContains(t, err, "tenant_id is required")
+
+	_, err = client.CreateAPIToken(t.Context(), types.ParamsCreateAPIToken{TenantID: "tenant-123"})
+	require.ErrorContains(t, err, "name is required")
 }

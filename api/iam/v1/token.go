@@ -26,7 +26,57 @@ const (
 	opCreateToken     = "IAM.CreateToken"
 	opUpdateToken     = "IAM.UpdateToken"
 	opDeleteToken     = "IAM.DeleteToken"
+	opCreateAPIToken  = "IAM.CreateAPIToken" //nolint:gosec
+
+	grantTypeJWTBearer = "urn:ietf:params:oauth:grant-type:jwt-bearer" //nolint:gosec // OAuth grant URN, not a credential
 )
+
+// CreateAPIToken registers a user API token for a tenant and performs the
+// one-time JWT-bearer exchange that yields its initial credentials.
+// It composes CreateOAuthClient (OAuth client registration) with
+// CreateOAuthToken (assertion exchange using the client's own bearer).
+// CloudAPI returns RefreshToken and InitialAccessToken only once: the refresh
+// token is the long-lived API token and must be persisted by the caller.
+func (c *Client) CreateAPIToken(ctx context.Context, params types.ParamsCreateAPIToken) (*types.ModelAPIToken, error) {
+	if err := params.Validate(); err != nil {
+		return nil, fmt.Errorf("%s: validate: %w", opCreateAPIToken, err)
+	}
+
+	oauthClient, err := c.CreateOAuthClient(ctx, types.ParamsCreateOAuthClient{
+		TenantID:   params.TenantID,
+		ClientName: params.Name,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("%s: register oauth client: %w", opCreateAPIToken, err)
+	}
+
+	supplier, ok := c.c.(cav.BearerSupplier)
+	if !ok {
+		return nil, fmt.Errorf("%s: client does not expose bearer tokens", opCreateAPIToken)
+	}
+
+	assertion, err := supplier.CurrentBearer(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("%s: bearer assertion: %w", opCreateAPIToken, err)
+	}
+
+	oauthToken, err := c.CreateOAuthToken(ctx, types.ParamsCreateOAuthToken{
+		TenantID:  params.TenantID,
+		ClientID:  oauthClient.ClientID,
+		GrantType: grantTypeJWTBearer,
+		Assertion: assertion,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("%s: exchange initial token: %w", opCreateAPIToken, err)
+	}
+
+	return &types.ModelAPIToken{
+		ID:                 "urn:vcloud:token:" + oauthClient.ClientID,
+		Name:               oauthClient.ClientName,
+		RefreshToken:       oauthToken.RefreshToken,
+		InitialAccessToken: oauthToken.AccessToken,
+	}, nil
+}
 
 // ListTokens lists all tokens in the organization.
 func (c *Client) ListTokens(ctx context.Context) ([]*types.ModelToken, error) {
