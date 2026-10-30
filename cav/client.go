@@ -69,9 +69,44 @@ func NewClient(organization string, opts ...ClientOption) (Client, error) {
 	return client, nil
 }
 
+// BearerSupplier is implemented by clients able to expose their current
+// VMware backend bearer token for out-of-band OAuth exchanges.
+type BearerSupplier interface {
+	// CurrentBearer returns the current VMware backend bearer token,
+	// refreshing the credential when needed. The returned value is a
+	// secret: callers must not log or persist it.
+	CurrentBearer(ctx context.Context) (string, error)
+}
+
 // Logger returns client logger.
 func (c *client) Logger() *slog.Logger {
 	return c.logger
+}
+
+// CurrentBearer implements BearerSupplier for the concrete client.
+func (c *client) CurrentBearer(ctx context.Context) (string, error) {
+	subClient, err := c.identifyClient(ctx, BackendVMware)
+	if err != nil {
+		return "", fmt.Errorf("current bearer: %w", err)
+	}
+
+	credential := subClient.getCredential()
+	if credential == nil {
+		return "", fmt.Errorf("current bearer: no credential configured for VMware backend")
+	}
+
+	if !credential.IsInitialized() {
+		if err := credential.Refresh(ctx); err != nil {
+			return "", fmt.Errorf("current bearer: refresh: %w", err)
+		}
+	}
+
+	bearer, ok := credential.(interface{ currentBearer() string })
+	if !ok {
+		return "", fmt.Errorf("current bearer: credential does not expose bearer tokens")
+	}
+
+	return bearer.currentBearer(), nil
 }
 
 // GetConsole returns client console.
