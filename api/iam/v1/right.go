@@ -33,12 +33,12 @@ func (c *Client) ListRights(ctx context.Context, params types.ParamsListRights) 
 		ep := endpoints.ListRights()
 
 		opts := []cav.EndpointRequestOption{
-			cav.WithQueryParam(endpointQueryParam(ep, "page"), strconv.Itoa(page)),
+			cav.WithQueryParam(cav.QueryParam{Name: queryParamPage}, strconv.Itoa(page)),
 			cav.OverrideSetResult(new(itypes.APIResponseListRights)),
 		}
 
 		if params.Filter != "" {
-			opts = append(opts, cav.WithQueryParam(endpointQueryParam(ep, "filter"), params.Filter))
+			opts = append(opts, cav.WithQueryParam(cav.QueryParam{Name: queryParamFilter}, params.Filter))
 		}
 
 		resp, err := c.c.Do(ctx, ep, opts...)

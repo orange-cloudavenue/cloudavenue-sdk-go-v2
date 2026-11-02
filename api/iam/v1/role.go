@@ -20,15 +20,6 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
-// toAPIEntityReferences converts public reference params to their API representation.
-func toAPIEntityReferences(refs []types.ParamsEntityReference) []itypes.APIEntityReference {
-	result := make([]itypes.APIEntityReference, len(refs))
-	for i, r := range refs {
-		result[i] = itypes.APIEntityReference{ID: r.ID, Name: r.Name}
-	}
-	return result
-}
-
 const (
 	opListOrgRoles           = "IAM.ListOrgRoles"
 	opGetOrgRole             = "IAM.GetOrgRole"
@@ -39,18 +30,10 @@ const (
 	opAddOrgRoleRights       = "IAM.AddOrgRoleRights"
 	opReplaceOrgRoleRights   = "IAM.ReplaceOrgRoleRights"
 	opRemoveAllOrgRoleRights = "IAM.RemoveAllOrgRoleRights"
-)
 
-// endpointQueryParam returns the endpoint query parameter registered under name.
-// It falls back to a bare parameter so callers stay correct if registration evolves.
-func endpointQueryParam(ep *cav.Endpoint, name string) cav.QueryParam {
-	for _, p := range ep.QueryParams {
-		if p.Name == name {
-			return p
-		}
-	}
-	return cav.QueryParam{Name: name}
-}
+	queryParamFilter = "filter"
+	queryParamPage   = "page"
+)
 
 // ListOrgRoles lists all org-scoped roles, fetching every page.
 func (c *Client) ListOrgRoles(ctx context.Context, params types.ParamsListOrgRoles) ([]*types.ModelRole, error) {
@@ -60,11 +43,11 @@ func (c *Client) ListOrgRoles(ctx context.Context, params types.ParamsListOrgRol
 		ep := endpoints.ListRoles()
 
 		opts := []cav.EndpointRequestOption{
-			cav.WithQueryParam(endpointQueryParam(ep, "page"), strconv.Itoa(page)),
+			cav.WithQueryParam(cav.QueryParam{Name: queryParamPage}, strconv.Itoa(page)),
 			cav.OverrideSetResult(new(itypes.APIResponseListRoles)),
 		}
 		if params.Filter != "" {
-			opts = append(opts, cav.WithQueryParam(endpointQueryParam(ep, "filter"), params.Filter))
+			opts = append(opts, cav.WithQueryParam(cav.QueryParam{Name: queryParamFilter}, params.Filter))
 		}
 
 		resp, err := c.c.Do(ctx, ep, opts...)
@@ -207,7 +190,7 @@ func (c *Client) ListOrgRoleRights(ctx context.Context, params types.ParamsListO
 			ctx,
 			ep,
 			cav.WithPathParam(ep.PathParams[0], params.ID),
-			cav.WithQueryParam(endpointQueryParam(ep, "page"), strconv.Itoa(page)),
+			cav.WithQueryParam(cav.QueryParam{Name: queryParamPage}, strconv.Itoa(page)),
 			cav.OverrideSetResult(new(itypes.APIResponseRoleRights)),
 		)
 		if err != nil {
@@ -311,4 +294,13 @@ func (c *Client) RemoveAllOrgRoleRights(ctx context.Context, params types.Params
 	}
 
 	return nil
+}
+
+// toAPIEntityReferences converts public reference params to their API representation.
+func toAPIEntityReferences(refs []types.ParamsEntityReference) []itypes.APIEntityReference {
+	result := make([]itypes.APIEntityReference, len(refs))
+	for i, r := range refs {
+		result[i] = itypes.APIEntityReference{ID: r.ID, Name: r.Name}
+	}
+	return result
 }
