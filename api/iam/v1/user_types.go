@@ -214,9 +214,50 @@ type ModelUser struct {
 	// Provider type of the user (e.g., INTEGRATED, SAML)
 	ProviderType string `documentation:"Provider type of the user"`
 
+	// NameInSource is the immutable identity-source name of the user.
+	// CloudAPI user PUT rejects payloads that omit or change it.
+	NameInSource string `documentation:"Identity source name of the user"`
+
+	// OrgEntityID is the URN of the organization owning the user.
+	// CloudAPI user PUT rejects payloads that omit or change it.
+	OrgEntityID string `documentation:"URN of the organization owning the user"`
+
+	// OrgEntityName is the name of the organization owning the user.
+	OrgEntityName string `documentation:"Name of the organization owning the user"`
+
 	// Name of the user's role
 	RoleName string `documentation:"Name of the user's role"`
 
 	// Href of the user's role
 	RoleHref string `documentation:"Href of the user's role"`
+}
+
+// ParamsGetUserQuotas defines parameters for reading a user's VM quotas.
+type ParamsGetUserQuotas struct {
+	// ID is the user URN (urn:vcloud:user:<UUID>) or UUID.
+	ID string
+}
+
+// Validate checks ParamsGetUserQuotas structural constraints.
+func (p ParamsGetUserQuotas) Validate() error {
+	if p.ID == "" {
+		return fmt.Errorf("id is required")
+	}
+	return nil
+}
+
+// ModelUserQuotas represents the deployed/stored VM quotas of a user.
+// CloudAPI never returns quotas on the user resource itself.
+type ModelUserQuotas struct {
+	// ID of the user in URN format
+	ID string `documentation:"URN of the user in the format urn:vcloud:user:<UUID>"`
+
+	// Name of the user
+	Name string `documentation:"Name of the user"`
+
+	// DeployedVMQuota is the deployed VM quota (0 means unlimited)
+	DeployedVMQuota int `documentation:"Deployed VM quota for the user, 0 means unlimited"`
+
+	// StoredVMQuota is the stored VM quota (0 means unlimited)
+	StoredVMQuota int `documentation:"Stored VM quota for the user, 0 means unlimited"`
 }

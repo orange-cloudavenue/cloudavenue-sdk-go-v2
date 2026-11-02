@@ -28,8 +28,8 @@ func init() {
 		Backend:          cav.BackendVMware,
 		PathTemplate:     pathCloudAPIUsers,
 		QueryParams: []cav.QueryParam{
-			{Name: "page", Description: "Page to fetch", Required: true, Value: "1"},
-			{Name: "pageSize", Description: "Results per page to fetch", Required: true, Value: "128"},
+			{Name: queryParamPage, Description: descIAMPage, Required: true, Value: "1"},
+			{Name: queryParamPageSize, Description: descIAMPageSize, Required: true, Value: pageSize128},
 		},
 		ResponseType: itypes.APIResponseListUsers{},
 	}.Register()
@@ -575,5 +575,182 @@ func init() {
 			},
 		},
 		ResponseType: struct{}{},
+	}.Register()
+
+	// ListRoles lists all org-scoped roles.
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/roles/get/",
+		Name:             "ListRoles",
+		Description:      "List roles in organization",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathRoles,
+		QueryParams: []cav.QueryParam{
+			{Name: queryParamFilter, Description: "Filter to apply to the list of roles. Format: key==value. Allowed keys: name, description, readOnly."},
+			{Name: queryParamPage, Description: descIAMPage, Required: true, Value: "1"},
+			{Name: queryParamPageSize, Description: descIAMPageSize, Required: true, Value: pageSize128},
+		},
+		ResponseType: itypes.APIResponseListRoles{},
+	}.Register()
+
+	// GetRole retrieves a role by ID.
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/roles/id/get/",
+		Name:             "GetRole",
+		Description:      "Get role by ID",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathRoleByID,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: descRoleID,
+				Required:    true,
+			},
+		},
+		ResponseType: itypes.APIResponseRole{},
+	}.Register()
+
+	// CreateRole creates a new role.
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/roles/post/",
+		Name:             "CreateRole",
+		Description:      "Create a new role",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathRoles,
+		BodyRequestType:  itypes.APIRequestRole{},
+		ResponseType:     itypes.APIResponseRole{},
+	}.Register()
+
+	// UpdateRole updates an existing role.
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/roles/id/put/",
+		Name:             "UpdateRole",
+		Description:      "Update a role",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathRoleByID,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: descRoleID,
+				Required:    true,
+			},
+		},
+		BodyRequestType: itypes.APIRequestRole{},
+		ResponseType:    itypes.APIResponseRole{},
+	}.Register()
+
+	// DeleteRole deletes a role by ID.
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/roles/id/delete/",
+		Name:             "DeleteRole",
+		Description:      "Delete a role",
+		Method:           cav.MethodDELETE,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathRoleByID,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: descRoleID,
+				Required:    true,
+			},
+		},
+		ResponseType: struct{}{},
+	}.Register()
+
+	// ListRoleRights lists the rights of a role.
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/roles/id/rights/get/",
+		Name:             "ListRoleRights",
+		Description:      "List rights of a role",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathRoleRights,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: descRoleID,
+				Required:    true,
+			},
+		},
+		QueryParams: []cav.QueryParam{
+			{Name: queryParamPage, Description: descIAMPage, Required: true, Value: "1"},
+			{Name: queryParamPageSize, Description: descIAMPageSize, Required: true, Value: pageSize128},
+		},
+		ResponseType: itypes.APIResponseRoleRights{},
+	}.Register()
+
+	// AddRoleRights adds rights to a role.
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/roles/id/rights/post/",
+		Name:             "AddRoleRights",
+		Description:      "Add rights to a role",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathRoleRights,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: descRoleID,
+				Required:    true,
+			},
+		},
+		BodyRequestType: itypes.APIRequestRoleRights{},
+		ResponseType:    itypes.APIResponseRoleRights{},
+	}.Register()
+
+	// ReplaceRoleRights replaces the rights of a role.
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/roles/id/rights/put/",
+		Name:             "ReplaceRoleRights",
+		Description:      "Replace rights of a role",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathRoleRights,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: descRoleID,
+				Required:    true,
+			},
+		},
+		BodyRequestType: itypes.APIRequestRoleRights{},
+		ResponseType:    itypes.APIResponseRoleRights{},
+	}.Register()
+
+	// ListRights lists all rights.
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/rights/get/",
+		Name:             "ListRights",
+		Description:      "List rights",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathRights,
+		QueryParams: []cav.QueryParam{
+			{Name: queryParamFilter, Description: "Filter to apply to the list of rights. Format: key==value. Allowed keys: name, description, category, rightType."},
+			{Name: queryParamPage, Description: descIAMPage, Required: true, Value: "1"},
+			{Name: queryParamPageSize, Description: descIAMPageSize, Required: true, Value: pageSize128},
+		},
+		ResponseType: itypes.APIResponseListRights{},
+	}.Register()
+
+	// GetRight retrieves a right by ID.
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-openapi/39.1/cloudapi/1.0.0/rights/id/get/",
+		Name:             "GetRight",
+		Description:      "Get right by ID",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathRightByID,
+		PathParams: []cav.PathParam{
+			{
+				Name:        pathParamID,
+				Description: "Right ID",
+				Required:    true,
+			},
+		},
+		ResponseType: itypes.APIResponseRight{},
 	}.Register()
 }

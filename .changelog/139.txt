@@ -1,0 +1,19 @@
+```release-note:feature
+feat(iam): add org role and rights CloudAPI surface. Adds org-scoped role CRUD, role rights list/add/replace/remove-all, and right lookup/list operations backed by /cloudapi/1.0.0 endpoints, with paginated list leaves, the matching public types, endpoint definitions, generated wrappers, and tests.
+```
+
+```release-note:fix
+fix(iam): align token creation with CloudAPI TokenParameters. ParamsCreateToken no longer requires role_name, as the role is derived server-side, and request bodies omit the role object when unset.
+```
+
+```release-note:fix
+fix(iam): resolve role URN before user create and update. CloudAPI rejects user payloads whose role entity reference carries an empty ID, so CreateLocalUser, CreateSAMLUser and UpdateUser now look up the role URN via a filtered ListOrgRoles (new server-side FIQL filter parameter) instead of sending the role name alone.
+```
+
+```release-note:fix
+fix(iam): preserve user identity fields and phone nullability on user operations. CloudAPI user PUT rejects payloads that omit nameInSource, orgEntityRef, providerType or the masked password sentinel (500 "Unable to perform this action"), and rejects an explicitly empty phone value. Get now captures these identity fields, user PUT echoes them back, and phone serializes as absent when unset.
+```
+
+```release-note:feature
+feat(iam): add GetUserQuotas leaf reading deployed/stored VM quotas from the legacy admin XML user record. CloudAPI accepts quotas on user create/update but never returns them; the admin user endpoint (/api/admin/user/{uuid}) is the only source of these values.
+```

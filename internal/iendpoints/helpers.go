@@ -26,8 +26,11 @@ const (
 	// VMware VCD negotiates both JSON and XML responses by API version. Keep
 	// endpoint-specific media types versioned rather than relying on a
 	// subclient default that may be overridden by an endpoint.
-	headerXML   = "application/xml;version=39.1"
-	descUserURN = "User URN"
+	headerXML = "application/xml;version=39.1"
+	// headerXMLAdminUser is the admin user media type: the admin user record
+	// rejects the generic XML accept with HTTP 406.
+	headerXMLAdminUser = "application/vnd.vmware.admin.user+xml;version=39.1"
+	descUserURN        = "User URN"
 
 	queryParamFilter   = "filter"
 	queryParamQ        = "q"
@@ -51,6 +54,8 @@ const (
 
 	descPageSize                 = "The number of items per page."
 	descPage                     = "Page to fetch, zero offset."
+	descIAMPage                  = "Page to fetch"
+	descIAMPageSize              = "Results per page to fetch"
 	descFormatResponse           = "The format of the response."
 	descTypeOfObjectQuery        = "The type of object to query"
 	descEdgeGatewayID            = "The ID of the edge gateway."
@@ -87,6 +92,7 @@ const (
 	descOrgID        = "Organization ID"
 	descUserID       = "User ID or name"
 	descTokenID      = "Token ID"
+	descRoleID       = "Role ID"
 	descGlobalRoleID = "Global Role ID"
 	queryParamVDC    = "vdc"
 

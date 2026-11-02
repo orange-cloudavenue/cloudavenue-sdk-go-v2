@@ -27,6 +27,13 @@ func GetAdminOrg() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetAdminOrg")
 }
 
+// GetAdminUser - Get a user by ID (admin scope)
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-User.html
+func GetAdminUser() *cav.Endpoint {
+	return cav.MustGetEndpoint("GetAdminUser")
+}
+
 // ListAdminCatalogs - List catalogs (admin scope)
 //
 // DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-CatalogsFromQuery.html

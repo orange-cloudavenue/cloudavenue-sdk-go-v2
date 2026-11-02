@@ -12,15 +12,38 @@ package iam
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/orange-cloudavenue/common-go/generator"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 )
+
+// mockRoleURN is the deterministic role URN served by mockRoleListEcho.
+const mockRoleURN = "urn:vcloud:role:00000000-0000-0000-0000-000000000001"
+
+// mockRoleListEcho registers a ListRoles handler that echoes back the role
+// name extracted from the FIQL filter, so role resolution in user leaves
+// stays deterministic.
+func mockRoleListEcho(t *testing.T, ms *mock.Server) {
+	t.Helper()
+	ms.CleanResponse(endpoints.ListRoles())
+	ms.SetResponseFunc(endpoints.ListRoles(), func(w http.ResponseWriter, r *http.Request) {
+		name := strings.TrimPrefix(r.URL.Query().Get("filter"), "name==")
+		w.Header().Set("Content-Type", "application/json")
+		require.NoError(t, json.NewEncoder(w).Encode(itypes.APIResponseListRoles{
+			Roles:       []itypes.APIResponseRole{{ID: mockRoleURN, Name: name}},
+			ResultTotal: 1,
+			PageCount:   1,
+			Page:        1,
+		}))
+	})
+}
 
 func newClient(t *testing.T) (*Client, *mock.Server) {
 	t.Helper()
@@ -38,11 +61,11 @@ func xmlResponse(w http.ResponseWriter, v any) {
 	w.Header().Set("X-Cloud-Avenue-Mock", "true")
 	switch value := v.(type) {
 	case itypes.User:
-		v = itypes.APIUser{ID: value.ID, Username: value.Name, FullName: value.FullName, Email: value.EmailAddress, Phone: value.Telephone, Description: value.Description, Enabled: &value.IsEnabled, Locked: &value.IsLocked, ProviderType: value.ProviderType, RoleEntityRefs: []itypes.APIObjectReference{{ID: value.Role.ID, Name: value.Role.Name}}, DeployedVMQuota: value.DeployedVMQuota, StoredVMQuota: value.StoredVMQuota}
+		v = itypes.APIUser{ID: value.ID, Username: value.Name, FullName: value.FullName, Email: value.EmailAddress, Phone: &value.Telephone, Description: value.Description, Enabled: &value.IsEnabled, Locked: &value.IsLocked, ProviderType: value.ProviderType, RoleEntityRefs: []itypes.APIObjectReference{{ID: value.Role.ID, Name: value.Role.Name}}, DeployedVMQuota: value.DeployedVMQuota, StoredVMQuota: value.StoredVMQuota}
 	case itypes.Users:
 		users := make([]itypes.APIUser, 0, len(value.Users))
 		for _, user := range value.Users {
-			users = append(users, itypes.APIUser{ID: user.ID, Username: user.Name, FullName: user.FullName, Email: user.EmailAddress, Phone: user.Telephone, Description: user.Description, Enabled: &user.IsEnabled, ProviderType: user.ProviderType, RoleEntityRefs: []itypes.APIObjectReference{{ID: user.Role.ID, Name: user.Role.Name}}, DeployedVMQuota: user.DeployedVMQuota, StoredVMQuota: user.StoredVMQuota})
+			users = append(users, itypes.APIUser{ID: user.ID, Username: user.Name, FullName: user.FullName, Email: user.EmailAddress, Phone: &user.Telephone, Description: user.Description, Enabled: &user.IsEnabled, ProviderType: user.ProviderType, RoleEntityRefs: []itypes.APIObjectReference{{ID: user.Role.ID, Name: user.Role.Name}}, DeployedVMQuota: user.DeployedVMQuota, StoredVMQuota: user.StoredVMQuota})
 		}
 		v = itypes.APIResponseListUsers{Users: users}
 	}
@@ -233,6 +256,7 @@ func TestCreateLocalUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			client, ms := newClient(t)
+			mockRoleListEcho(t, ms)
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				ms.CleanResponse(endpoints.CreateUser())
@@ -245,6 +269,11 @@ func TestCreateLocalUser(t *testing.T) {
 			} else {
 				ms.CleanResponse(endpoints.CreateUser())
 				ms.SetResponseFunc(endpoints.CreateUser(), func(w http.ResponseWriter, r *http.Request) {
+					var body itypes.APIUser
+					require.NoError(t, json.NewDecoder(r.Body).Decode(&body))
+					require.Len(t, body.RoleEntityRefs, 1)
+					assert.Equal(t, mockRoleURN, body.RoleEntityRefs[0].ID)
+					assert.Equal(t, tt.params.RoleName, body.RoleEntityRefs[0].Name)
 					user := itypes.User{
 						Name:         tt.params.Name,
 						FullName:     tt.params.FullName,
@@ -300,6 +329,7 @@ func TestCreateSAMLUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			client, ms := newClient(t)
+			mockRoleListEcho(t, ms)
 
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				ms.CleanResponse(endpoints.CreateUser())
@@ -411,18 +441,23 @@ func TestUpdateUser(t *testing.T) {
 func TestUpdateUserPreservesExistingFields(t *testing.T) {
 	client, ms := newClient(t)
 
+	phone := "0000"
 	ms.CleanResponse(endpoints.GetUser())
 	ms.SetResponseFunc(endpoints.GetUser(), func(w http.ResponseWriter, r *http.Request) {
-		xmlResponse(w, itypes.User{
-			Name:            "user1",
+		xmlResponse(w, itypes.APIUser{
+			ID:              "urn:vcloud:user:1",
+			Username:        "user1",
 			FullName:        "Current Name",
-			EmailAddress:    "user1@example.com",
-			Telephone:       "0000",
+			Email:           "user1@example.com",
+			Phone:           &phone,
 			Description:     new("current description"),
-			IsEnabled:       true,
+			Enabled:         new(true),
+			ProviderType:    "LOCAL",
+			NameInSource:    "user1",
+			OrgEntityRef:    &itypes.APIObjectReference{ID: "urn:vcloud:org:1", Name: "org1"},
 			DeployedVMQuota: new(4),
 			StoredVMQuota:   new(7),
-			Role:            itypes.Reference{Name: "Organization Administrator"},
+			RoleEntityRefs:  []itypes.APIObjectReference{{ID: "urn:vcloud:role:1", Name: "Organization Administrator"}},
 		})
 	})
 
@@ -431,7 +466,15 @@ func TestUpdateUserPreservesExistingFields(t *testing.T) {
 		var body itypes.APIUser
 		assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
 		assert.Equal(t, "Current Name", body.FullName)
-		assert.Equal(t, "1234567890", body.Phone)
+		if assert.NotNil(t, body.Phone) {
+			assert.Equal(t, "1234567890", *body.Phone)
+		}
+		assert.Equal(t, "user1", body.NameInSource)
+		assert.Equal(t, "LOCAL", body.ProviderType)
+		assert.Equal(t, maskedPasswordValue, body.Password)
+		if assert.NotNil(t, body.OrgEntityRef) {
+			assert.Equal(t, "urn:vcloud:org:1", body.OrgEntityRef.ID)
+		}
 		assert.Equal(t, "user1@example.com", body.Email)
 		if assert.NotNil(t, body.Enabled) {
 			assert.True(t, *body.Enabled)

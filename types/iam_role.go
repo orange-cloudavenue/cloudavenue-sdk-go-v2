@@ -84,12 +84,11 @@ type ParamsCreateToken struct {
 }
 
 // Validate checks ParamsCreateToken structural constraints.
+// CloudAPI TokenParameters accepts only name, type and extensionId: the role is
+// derived server-side from the authenticated user, so RoleName is not required.
 func (p ParamsCreateToken) Validate() error {
 	if p.Name == "" {
 		return fmt.Errorf("name is required")
-	}
-	if p.RoleName == "" {
-		return fmt.Errorf("role_name is required")
 	}
 	return nil
 }
@@ -127,6 +126,42 @@ func (p ParamsDeleteToken) Validate() error {
 	return nil
 }
 
+// ParamsCreateAPIToken defines parameters for creating a user API token.
+type ParamsCreateAPIToken struct {
+	// TenantID is the tenant organization owning the API token.
+	TenantID string
+	// Name is the unique name of the API token.
+	Name string
+}
+
+// Validate checks ParamsCreateAPIToken structural constraints.
+func (p ParamsCreateAPIToken) Validate() error {
+	if p.TenantID == "" {
+		return fmt.Errorf("tenant_id is required")
+	}
+	if p.Name == "" {
+		return fmt.Errorf("name is required")
+	}
+	return nil
+}
+
+// ModelAPIToken represents a created user API token.
+// RefreshToken and InitialAccessToken are secrets that CloudAPI returns only
+// once, at creation time.
+type ModelAPIToken struct {
+	// ID is the URN of the token in the format urn:vcloud:token:<UUID>
+	ID string `documentation:"URN of the token in the format urn:vcloud:token:<UUID>"`
+
+	// Name of the token
+	Name string `documentation:"Name of the token"`
+
+	// RefreshToken is the long-lived API token seed, returned only at creation.
+	RefreshToken string `documentation:"Long-lived API token seed, returned only at creation"`
+
+	// InitialAccessToken is the one-time access token issued at creation.
+	InitialAccessToken string `documentation:"One-time access token issued at creation"`
+}
+
 // ParamsEntityReference represents an entity reference (ID + Name) used in global role params.
 type ParamsEntityReference struct {
 	ID   string
@@ -158,6 +193,9 @@ type ModelRight struct {
 
 	// ServiceNamespace of the right
 	ServiceNamespace string `documentation:"Service namespace of the right"`
+
+	// ImpliedRights is the set of implied rights associated with this right.
+	ImpliedRights []*ModelRight `documentation:"The set of implied rights"`
 }
 
 // ModelTenant represents a tenant associated with a global role.
@@ -397,4 +435,148 @@ func (p ParamsUnpublishAllGlobalRoleTenants) Validate() error {
 		return fmt.Errorf("id is required")
 	}
 	return nil
+}
+
+// ModelRole represents an org-scoped role.
+type ModelRole struct {
+	// ID of the role
+	ID string `documentation:"ID of the role"`
+
+	// Name of the role
+	Name string `documentation:"Name of the role"`
+
+	// Description of the role
+	Description string `documentation:"Description of the role"`
+
+	// BundleKey is the read-only rights bundle key.
+	BundleKey string `documentation:"Rights bundle key of the role"`
+
+	// ReadOnly indicates whether this role is read-only.
+	ReadOnly bool `documentation:"Whether the role is read-only"`
+}
+
+// ParamsListOrgRoles defines parameters for listing org roles.
+type ParamsListOrgRoles struct {
+	// Filter is a FIQL filter applied server-side (allowed keys: name, description, readOnly).
+	Filter string
+}
+
+// ParamsGetOrgRole defines parameters for getting an org role.
+type ParamsGetOrgRole struct {
+	ID string
+}
+
+// Validate checks ParamsGetOrgRole structural constraints.
+func (p ParamsGetOrgRole) Validate() error {
+	if p.ID == "" {
+		return fmt.Errorf("id is required")
+	}
+	return nil
+}
+
+// ParamsCreateOrgRole defines parameters for creating an org role.
+type ParamsCreateOrgRole struct {
+	Name        string
+	Description string
+}
+
+// Validate checks ParamsCreateOrgRole structural constraints.
+func (p ParamsCreateOrgRole) Validate() error {
+	if p.Name == "" {
+		return fmt.Errorf("name is required")
+	}
+	return nil
+}
+
+// ParamsUpdateOrgRole defines parameters for updating an org role.
+type ParamsUpdateOrgRole struct {
+	ID          string
+	Name        string
+	Description string
+}
+
+// Validate checks ParamsUpdateOrgRole structural constraints.
+func (p ParamsUpdateOrgRole) Validate() error {
+	if p.ID == "" {
+		return fmt.Errorf("id is required")
+	}
+	return nil
+}
+
+// ParamsDeleteOrgRole defines parameters for deleting an org role.
+type ParamsDeleteOrgRole struct {
+	ID string
+}
+
+// Validate checks ParamsDeleteOrgRole structural constraints.
+func (p ParamsDeleteOrgRole) Validate() error {
+	if p.ID == "" {
+		return fmt.Errorf("id is required")
+	}
+	return nil
+}
+
+// ParamsListOrgRoleRights defines parameters for listing org role rights.
+type ParamsListOrgRoleRights struct {
+	ID string
+}
+
+// Validate checks ParamsListOrgRoleRights structural constraints.
+func (p ParamsListOrgRoleRights) Validate() error {
+	if p.ID == "" {
+		return fmt.Errorf("id is required")
+	}
+	return nil
+}
+
+// ParamsAddOrgRoleRights defines parameters for adding rights to an org role.
+type ParamsAddOrgRoleRights struct {
+	ID     string
+	Rights []ParamsEntityReference
+}
+
+// Validate checks ParamsAddOrgRoleRights structural constraints.
+func (p ParamsAddOrgRoleRights) Validate() error {
+	if p.ID == "" {
+		return fmt.Errorf("id is required")
+	}
+	if len(p.Rights) == 0 {
+		return fmt.Errorf("rights is required")
+	}
+	return nil
+}
+
+// ParamsReplaceOrgRoleRights defines parameters for replacing org role rights.
+type ParamsReplaceOrgRoleRights struct {
+	ID     string
+	Rights []ParamsEntityReference
+}
+
+// Validate checks ParamsReplaceOrgRoleRights structural constraints.
+func (p ParamsReplaceOrgRoleRights) Validate() error {
+	if p.ID == "" {
+		return fmt.Errorf("id is required")
+	}
+	if len(p.Rights) == 0 {
+		return fmt.Errorf("rights is required")
+	}
+	return nil
+}
+
+// ParamsGetRight defines parameters for getting a right.
+type ParamsGetRight struct {
+	ID string
+}
+
+// Validate checks ParamsGetRight structural constraints.
+func (p ParamsGetRight) Validate() error {
+	if p.ID == "" {
+		return fmt.Errorf("id is required")
+	}
+	return nil
+}
+
+// ParamsListRights defines parameters for listing rights.
+type ParamsListRights struct {
+	Filter string
 }

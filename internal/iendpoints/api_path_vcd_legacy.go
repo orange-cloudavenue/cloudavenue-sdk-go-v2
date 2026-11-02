@@ -26,6 +26,10 @@ const (
 	pathAdminOrg = "/api/admin/org/{orgId}"
 	// pathAdminOrgs lists organizations through the legacy admin XML API.
 	pathAdminOrgs = "/api/admin/orgs"
+	// pathAdminUserByID addresses one user through the legacy admin XML API.
+	// CloudAPI user responses omit the deployed/stored VM quotas, which only
+	// this endpoint returns.
+	pathAdminUserByID = "/api/admin/user/{userId}"
 	// These legacy AdminOrg XML user paths are retained for compatibility only;
 	// IAM user operations use VMware CloudAPI.
 	// pathAdminOrgUsers lists and creates users in the legacy admin XML API.
