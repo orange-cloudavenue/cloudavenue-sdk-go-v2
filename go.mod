@@ -22,7 +22,7 @@ require (
 	github.com/orange-cloudavenue/common-go/validators v1.2.0
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/sync v0.24.0
-	resty.dev/v3 v3.0.0-rc.3
+	resty.dev/v3 v3.0.0-rc.4
 )
 
 require (

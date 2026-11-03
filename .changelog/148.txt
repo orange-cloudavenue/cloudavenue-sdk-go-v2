@@ -1,0 +1,3 @@
+```release-note:dependency
+deps: bumps resty.dev/v3 from  to 3.0.0-rc.4
+```
