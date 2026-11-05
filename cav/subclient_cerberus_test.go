@@ -10,6 +10,7 @@
 package cav
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -18,8 +19,34 @@ import (
 	"github.com/stretchr/testify/require"
 	"resty.dev/v3"
 
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
+
+func TestCerberusNewHTTPClientUsesAuthorizationHeader(t *testing.T) {
+	var gotAuthorization string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotAuthorization = r.Header.Get("Authorization")
+		w.WriteHeader(http.StatusOK)
+		_, _ = io.WriteString(w, `{}`)
+	}))
+	t.Cleanup(srv.Close)
+
+	v := &cerberus{subclient: subclient{authProvider: &cerberusAuthProvider{
+		accessToken: "cerberus-access-token",
+		tokenType:   cerberusTokenTypeBearer,
+	}}}
+	v.setConsole(consoles.ConsoleName(mockOrg))
+	v.console.OverrideEndpoint(consoles.Services{APICerberus: consoles.Service{Enabled: true, Endpoint: srv.URL}})
+
+	hc, err := v.newHTTPClient(t.Context())
+	require.NoError(t, err)
+
+	resp, err := hc.R().SetContext(t.Context()).Get("/test")
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, resp.StatusCode())
+	assert.Equal(t, "Bearer cerberus-access-token", gotAuthorization)
+}
 
 // doCerberusRequest serves given response and returns resty response,
 // configured like Cerberus-routed customer API client (JSON result error).
