@@ -10,6 +10,7 @@
 package cav
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 	"sync"
@@ -89,4 +90,22 @@ func (c *cloudavenueCredential) IsInitialized() bool {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return c.bearer != ""
+}
+
+// CurrentAuthorization returns the VMware-compatible Authorization header
+// payload currently derived from this credential.
+func (c *cloudavenueCredential) CurrentAuthorization(ctx context.Context) (string, error) {
+	if !c.IsInitialized() {
+		if err := c.Refresh(ctx); err != nil {
+			return "", err
+		}
+	}
+
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	if c.bearer == "" {
+		return "", errors.New("authorization not initialized")
+	}
+
+	return c.bearer, nil
 }

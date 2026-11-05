@@ -50,12 +50,12 @@ func (c *Client) CreateAPIToken(ctx context.Context, params types.ParamsCreateAP
 		return nil, fmt.Errorf("%s: register oauth client: %w", opCreateAPIToken, err)
 	}
 
-	supplier, ok := c.c.(cav.BearerSupplier)
+	supplier, ok := c.c.(cav.AuthorizationSupplier)
 	if !ok {
-		return nil, fmt.Errorf("%s: client does not expose bearer tokens", opCreateAPIToken)
+		return nil, fmt.Errorf("%s: client does not expose backend authorization", opCreateAPIToken)
 	}
 
-	assertion, err := supplier.CurrentBearer(ctx)
+	assertion, err := supplier.CurrentAuthorization(ctx, cav.BackendInfrapi)
 	if err != nil {
 		return nil, fmt.Errorf("%s: bearer assertion: %w", opCreateAPIToken, err)
 	}

@@ -46,13 +46,13 @@ func WithCloudAvenueCredential(username, password string) ClientOption {
 	return func(s *settings) error {
 		logger := xlogger.WithGroup("client").WithGroup("options").WithGroup("WithCloudAvenueCredential")
 
-		cred, err := newCloudavenueCredential(s.Console, s.Organization, username, password)
-		if err != nil {
-			logger.Error("Failed to create Cloudavenue credential", "error", err)
-			return err
-		}
-
 		for _, client := range []subClientName{ClientCerberus, ClientVmware, ClientIHM} {
+			cred, err := newCloudavenueCredential(s.Console, s.Organization, username, password)
+			if err != nil {
+				logger.Error("Failed to create Cloudavenue credential", "error", err)
+				return err
+			}
+
 			if _, ok := s.SubClients[client]; !ok {
 				s.SubClients[client] = subClients[client]
 			}

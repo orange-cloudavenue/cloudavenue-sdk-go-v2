@@ -15,6 +15,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"resty.dev/v3"
 )
 
@@ -28,6 +29,27 @@ func Test_NewClient_InvalidOrganization(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expected error for invalid organization, got nil")
 	}
+}
+
+func TestCurrentAuthorizationUsesBackendCredential(t *testing.T) {
+	cl, err := NewClient(mockOrg, WithCloudAvenueCredential("mockuser", "mockpassword"))
+	require.NoError(t, err)
+
+	c := cl.(*client)
+	cerberusCredential := c.clientsInitialized[ClientCerberus].getCredential().(*cloudavenueCredential)
+	vmwareCredential := c.clientsInitialized[ClientVmware].getCredential().(*cloudavenueCredential)
+	require.NotSame(t, cerberusCredential, vmwareCredential)
+
+	cerberusCredential.bearer = "cerberus-token"
+	vmwareCredential.bearer = "vmware-token"
+
+	got, err := c.CurrentAuthorization(t.Context(), BackendInfrapi)
+	require.NoError(t, err)
+	assert.Equal(t, "cerberus-token", got)
+
+	got, err = c.CurrentAuthorization(t.Context(), BackendVMware)
+	require.NoError(t, err)
+	assert.Equal(t, "vmware-token", got)
 }
 
 func TestConflictRetryStopsAfterBusyEntityLimit(t *testing.T) {
