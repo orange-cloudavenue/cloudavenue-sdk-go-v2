@@ -14,7 +14,7 @@ import (
 )
 
 // auth defines credential lifecycle required by subclients.
-type auth interface {
+type authProvider interface {
 	// Headers returns headers required for authenticated requests.
 	Headers() map[string]string
 

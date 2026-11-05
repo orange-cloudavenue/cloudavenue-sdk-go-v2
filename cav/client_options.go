@@ -47,7 +47,18 @@ func WithCloudAvenueCredential(username, password string) ClientOption {
 		logger := xlogger.WithGroup("client").WithGroup("options").WithGroup("WithCloudAvenueCredential")
 
 		for _, client := range []subClientName{ClientCerberus, ClientVmware, ClientIHM} {
-			cred, err := newCloudavenueCredential(s.Console, s.Organization, username, password)
+			var (
+				provider authProvider
+				err      error
+			)
+
+			switch client {
+			case ClientCerberus:
+				provider, err = newCerberusAuthProvider(s.Console, s.Organization, username, password)
+			default:
+				provider, err = newVMwareAuthProvider(s.Console, s.Organization, username, password)
+			}
+
 			if err != nil {
 				logger.Error("Failed to create Cloudavenue credential", "error", err)
 				return err
@@ -58,7 +69,7 @@ func WithCloudAvenueCredential(username, password string) ClientOption {
 			}
 
 			s.SubClients[client].setConsole(s.Console)
-			s.SubClients[client].setCredential(cred)
+			s.SubClients[client].setAuthProvider(provider)
 		}
 
 		return nil

@@ -30,12 +30,12 @@ func (i *ihm) newHTTPClient(ctx context.Context) (*resty.Client, error) {
 	hC := httpclient.NewHTTPClient().SetBaseURL(i.console.GetIHMEndpoint()).
 		SetHeader("Accept", "application/json").SetHeader("Content-Type", "application/json").
 		SetResultError(errors.CustomerAPIErrorBody{})
-	if !i.credential.IsInitialized() {
-		if err := i.credential.Refresh(ctx); err != nil {
+	if !i.authProvider.IsInitialized() {
+		if err := i.authProvider.Refresh(ctx); err != nil {
 			return nil, err
 		}
 	}
-	hC.SetHeaders(i.credential.Headers())
+	hC.SetHeaders(i.authProvider.Headers())
 	return hC, nil
 }
 

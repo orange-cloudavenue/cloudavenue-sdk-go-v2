@@ -34,7 +34,7 @@ func init() {
 // NewSessionVmwareMockHandler returns mock VMware session handler.
 func NewSessionVmwareMockHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, _ *http.Request) {
-		w.Header().Add(cloudavenueCredentialXVmwareAccessToken, "mock-access-token")
+		w.Header().Add(vmwareAuthProviderXVmwareAccessToken, "mock-access-token")
 
 		resp := apiResponseSessionVmware{}
 

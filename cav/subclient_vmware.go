@@ -39,14 +39,14 @@ func (v *vmware) newHTTPClient(ctx context.Context) (*resty.Client, error) {
 		SetHeader("Accept", "application/json;version="+vmwareVCDVersion).
 		SetResultError(vmwareError{})
 
-	if !v.credential.IsInitialized() {
-		if err := v.credential.Refresh(ctx); err != nil {
+	if !v.authProvider.IsInitialized() {
+		if err := v.authProvider.Refresh(ctx); err != nil {
 			return nil, err
 		}
 	}
 
 	hC.
-		SetHeaders(v.credential.Headers())
+		SetHeaders(v.authProvider.Headers())
 
 	return hC, nil
 }
@@ -115,11 +115,11 @@ func (v *vmware) idempotentRetryCondition() resty.RetryConditionFunc {
 }
 
 func (v *vmware) ContextData(_ context.Context) ContextData {
-	if v == nil || v.getCredential() == nil {
+	if v == nil || v.getAuthProvider() == nil {
 		return ContextData{}
 	}
 
-	extra := v.getCredential().getExtraData()
+	extra := v.getAuthProvider().getExtraData()
 	return ContextData{
 		OrganizationID: extra["organizationID"],
 		SiteID:         extra["siteID"],

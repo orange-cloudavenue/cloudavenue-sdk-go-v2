@@ -102,7 +102,7 @@ func TestVmwareParseAPIErrorMetadata(t *testing.T) {
 }
 
 func TestVmwareContextData(t *testing.T) {
-	v := &vmware{subclient: subclient{credential: &cloudavenueCredential{
+	v := &vmware{subclient: subclient{authProvider: &vmwareAuthProvider{
 		organizationID: "org-1",
 		siteID:         "site-1",
 	}}}

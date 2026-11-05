@@ -90,7 +90,7 @@ func (c *client) CurrentAuthorization(ctx context.Context, backend BackendTarget
 		return "", fmt.Errorf("current authorization: %w", err)
 	}
 
-	credential := subClient.getCredential()
+	credential := subClient.getAuthProvider()
 	if credential == nil {
 		return "", fmt.Errorf("current authorization: no credential configured for backend %d", backend)
 	}
