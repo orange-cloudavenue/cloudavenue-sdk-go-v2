@@ -38,13 +38,13 @@ func TestCurrentAuthorizationUsesBackendCredential(t *testing.T) {
 
 	c := cl.(*client)
 	cerberusAuthProvider := c.clientsInitialized[ClientCerberus].getAuthProvider().(*cerberusAuthProvider)
-	vmwareCredential := c.clientsInitialized[ClientVmware].getAuthProvider().(*vmwareAuthProvider)
-	require.NotSame(t, cerberusAuthProvider, vmwareCredential)
+	vmwareAuthProvider := c.clientsInitialized[ClientVmware].getAuthProvider().(*vmwareAuthProvider)
+	require.NotSame(t, cerberusAuthProvider, vmwareAuthProvider)
 
 	cerberusAuthProvider.accessToken = "cerberus-token"
 	cerberusAuthProvider.tokenType = cerberusTokenTypeBearer
 	cerberusAuthProvider.expiresAt = time.Now().Add(time.Hour)
-	vmwareCredential.bearer = "vmware-token"
+	vmwareAuthProvider.bearer = "vmware-token"
 
 	got, err := c.CurrentAuthorization(t.Context(), BackendInfrapi)
 	require.NoError(t, err)
