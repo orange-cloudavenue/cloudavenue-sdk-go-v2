@@ -48,7 +48,7 @@ func TestCurrentAuthorizationUsesBackendCredential(t *testing.T) {
 
 	got, err := c.CurrentAuthorization(t.Context(), BackendInfrapi)
 	require.NoError(t, err)
-	assert.Equal(t, "cerberus-token", got)
+	assert.Equal(t, "Bearer cerberus-token", got)
 
 	got, err = c.CurrentAuthorization(t.Context(), BackendVMware)
 	require.NoError(t, err)
