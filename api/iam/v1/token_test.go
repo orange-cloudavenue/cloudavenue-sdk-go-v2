@@ -144,7 +144,7 @@ func TestCreateAPIToken(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, "client-123", form.Get("client_id"))
 		assert.Equal(t, "urn:ietf:params:oauth:grant-type:jwt-bearer", form.Get("grant_type"))
-		assert.Equal(t, "mock-access-token", form.Get("assertion"))
+		assert.Equal(t, "Bearer mock-access-token", form.Get("assertion"))
 		w.Header().Set("Content-Type", "application/json")
 		require.NoError(t, json.NewEncoder(w).Encode(itypes.APIResponseOAuthToken{ //nolint: gosec
 			AccessToken: "initial-access", TokenType: "Bearer", ExpiresIn: 3600, RefreshToken: "refresh-token",
