@@ -33,6 +33,7 @@ func TestCerberusCredentialRefresh(t *testing.T) {
 		assert.Equal(t, "mockpassword", r.Form.Get("client_secret"))
 		assert.Equal(t, "tenant:"+mockOrg, r.Form.Get("scope"))
 		w.Header().Set("Content-Type", "application/json")
+		//nolint:gosec // deterministic fake token for transport/auth unit test
 		require.NoError(t, json.NewEncoder(w).Encode(cerberusAuthResponse{
 			AccessToken: "cerberus-access-token",
 			TokenType:   cerberusTokenTypeBearer,

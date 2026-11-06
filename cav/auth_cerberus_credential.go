@@ -30,6 +30,7 @@ const (
 	cerberusTokenTypeBearer = "Bearer"
 	cerberusAuthPath        = "/auth/v1/user/token"
 	cerberusExpiryBuffer    = 30 * time.Second
+	formGrantTypeKey        = "grant_type"
 )
 
 type cerberusAuthProvider struct {
@@ -137,10 +138,10 @@ func (c *cerberusAuthProvider) Refresh(ctx context.Context) error {
 		SetHeader("Content-Type", "application/x-www-form-urlencoded").
 		SetHeader("Accept", "application/json").
 		SetFormData(map[string]string{
-			"grant_type":    "client_credentials",
-			"client_id":     c.username,
-			"client_secret": c.password,
-			"scope":         "tenant:" + c.organization,
+			formGrantTypeKey: "client_credentials",
+			"client_id":      c.username,
+			"client_secret":  c.password,
+			"scope":          "tenant:" + c.organization,
 		}).
 		SetResult(&cerberusAuthResponse{}).
 		SetResultError(&cerberusErrorResponse{}).
