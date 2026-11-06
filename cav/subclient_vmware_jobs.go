@@ -12,7 +12,6 @@ package cav
 import (
 	"strings"
 
-	"github.com/orange-cloudavenue/common-go/urn"
 	"github.com/orange-cloudavenue/common-go/validators"
 	"resty.dev/v3"
 
@@ -43,9 +42,6 @@ func init() {
 	}.Register()
 }
 
-// Ensure vmware implements jobsInterface.
-var _ jobsInterface = &vmware{}
-
 // vmwareJobAPIResponse describes VMware task response.
 type vmwareJobAPIResponse struct {
 	HREF             string       `json:"href,omitempty" fake:"{href_uuid}"` // The URI of the entity.
@@ -66,45 +62,8 @@ type vmwareJobAPIResponse struct {
 	Details          string       `json:"details,omitempty"`                 // Detailed message about the task. Also contained by the Owner entity when task status is preRunning.
 }
 
-// JobRefresh refreshes VMware job status.
-func (v *vmware) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts []EndpointRequestOption) (job *Job, err error) {
-	job, err = v.JobParser(resp)
-	if err != nil {
-		return job, err
-	}
-
-	ep, err := GetEndpoint(getJobVMwareEndpointName)
-	if err != nil {
-		return nil, errors.New("failed to get endpoint for GetJobVmware: " + err.Error())
-	}
-
-	reqOpts = append(
-		reqOpts,
-		SetCustomRestyOption(func(r *resty.Request) { r.SetResultError(&vmwareError{}) }),
-		WithPathParam(ep.PathParams[0], urn.ExtractUUID(job.ID)),
-		OverrideSetResult(vmwareJobAPIResponse{}),
-	)
-
-	r := httpC.R().
-		SetContext(resp.Request.Context()).
-		SetHeader("Accept", "application/*+json;version="+vmwareVCDVersion)
-
-	for _, opt := range reqOpts {
-		if err := opt(ep, r); err != nil {
-			return nil, err
-		}
-	}
-
-	respR, err := r.Get(ep.PathTemplate)
-	if err != nil {
-		return nil, errors.New("failed to refresh job status: " + err.Error())
-	}
-
-	return v.JobParser(respR)
-}
-
-// JobParser parses VMware job data from response.
-func (v *vmware) JobParser(resp *resty.Response) (job *Job, err error) {
+// parseVMwareJob parses VMware job data from response.
+func parseVMwareJob(resp *resty.Response) (job *Job, err error) {
 	if resp == nil {
 		return job, errors.New("no response to parse")
 	}
@@ -138,7 +97,7 @@ func (v *vmware) JobParser(resp *resty.Response) (job *Job, err error) {
 			HREF:        apiR.HREF,
 		}
 
-		status, err := v.JobStatusParser(apiR.Status)
+		status, err := parseVMwareJobStatus(apiR.Status)
 		if err != nil {
 			return nil, errors.New("failed to parse vmware job status: " + err.Error())
 		}
@@ -160,15 +119,15 @@ func (v *vmware) JobParser(resp *resty.Response) (job *Job, err error) {
 		return job, nil
 	}
 
-	if err := v.parseAPIError("JobParser", resp); err != nil {
+	if err := (&vmware{}).parseAPIError("JobParser", resp); err != nil {
 		return nil, err
 	}
 
 	return nil, errors.New("failed to parse vmware job response: unexpected type or empty response")
 }
 
-// JobStatusParser maps VMware status strings to JobStatus.
-func (v *vmware) JobStatusParser(status string) (s JobStatus, err error) {
+// parseVMwareJobStatus maps VMware status strings to JobStatus.
+func parseVMwareJobStatus(status string) (s JobStatus, err error) {
 	switch status {
 	case "queued":
 		s = JobQueued

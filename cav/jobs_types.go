@@ -29,6 +29,17 @@ type (
 
 		// Status is current job state.
 		Status JobStatus `json:"status,omitempty"`
+
+		// Actions lists per-step details when the backend reports them
+		// (Cerberus only).
+		Actions []JobAction `json:"actions,omitempty"`
+	}
+
+	// JobAction describes one step of a backend job.
+	JobAction struct {
+		Name    string `json:"name,omitempty"`
+		Status  string `json:"status,omitempty"`
+		Details string `json:"details,omitempty"`
 	}
 
 	// JobStatus represents backend job state.

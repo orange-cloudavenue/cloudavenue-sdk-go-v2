@@ -12,12 +12,9 @@ package edgegateway
 import (
 	"context"
 	"fmt"
-	"sort"
-	"time"
-
 	"github.com/orange-cloudavenue/common-go/extractor"
 	"github.com/orange-cloudavenue/common-go/validators"
-	"resty.dev/v3"
+	"sort"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
@@ -76,27 +73,15 @@ func (c *Client) CreatePublicIP(ctx context.Context, params types.ParamsEdgeGate
 
 	// Poll customer job completion and extract created public IP from job
 	// response.
-	publicipCreated, err := cav.AwaitJob(ctx, c.c, jobID, cav.JobPollOptions{
-		Timeout:         30 * time.Second,
-		PollingInterval: 1 * time.Second,
-	}, func(resp *resty.Response) (string, error) {
-		// Job status response may be customer-job format routed through Cerberus
-		// or VMware task format, depending on which endpoint succeeded.
-		if r, ok := resp.Result().(*cav.CerberusJobAPIResponse); ok {
-			if len(*r) == 0 {
-				return "", errors.New("no job information returned")
-			}
-
-			job := (*r)[0]
-			for _, j := range job.Actions {
-				if err := validators.New().Var(j.Details, "ip4_addr"); err == nil {
-					return j.Details, nil
-				}
-			}
-		}
-
-		return "", errors.New("public IP not found in job response")
+	job, err := cav.WaitJob(ctx, c.c, cav.JobWaitRequest{
+		Backend: cav.BackendInfrapi,
+		JobID:   jobID,
 	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create public IP: %w", err)
+	}
+
+	publicipCreated, err := extractCreatedPublicIP(job)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create public IP: %w", err)
 	}
@@ -256,4 +241,17 @@ func (c *Client) retrievePublicIPServiceID(ctx context.Context, ip string) (stri
 	}
 
 	return serviceID, nil
+}
+
+// extractCreatedPublicIP returns the public IP reported by a terminal job.
+func extractCreatedPublicIP(job *cav.Job) (string, error) {
+	if job != nil {
+		for _, action := range job.Actions {
+			if err := validators.New().Var(action.Details, "ip4_addr"); err == nil {
+				return action.Details, nil
+			}
+		}
+	}
+
+	return "", errors.New("public IP not found in job response")
 }
