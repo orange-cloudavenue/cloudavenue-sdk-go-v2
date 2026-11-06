@@ -16,7 +16,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
@@ -104,6 +106,8 @@ func TestUpdateOrganization(t *testing.T) {
 				Email:               "user@email.com",
 				InternetBillingMode: internetBillingModePAYG,
 			},
+			mockUpdateOrgResponse: &cav.Job{ID: "87ab1934-0146-4fb0-80bc-815fea03214d", Status: cav.JobSuccess},
+			mockUpdateOrgStatus:   http.StatusCreated,
 		},
 		{
 			name: "Success Update Organization - Empty params",
@@ -113,7 +117,9 @@ func TestUpdateOrganization(t *testing.T) {
 				Email:               "",
 				InternetBillingMode: "",
 			},
-			expectErr: false,
+			mockUpdateOrgResponse: &cav.Job{ID: "87ab1934-0146-4fb0-80bc-815fea03214d", Status: cav.JobSuccess},
+			mockUpdateOrgStatus:   http.StatusCreated,
+			expectErr:             false,
 		},
 		{
 			name: "Fail - parameters too long for FullName",
@@ -165,14 +171,6 @@ func TestUpdateOrganization(t *testing.T) {
 			mockUpdateOrgStatus: 404,
 			expectErr:           true,
 		},
-		{
-			name: "Fail Get Organization Error after Update",
-			params: &types.ParamsUpdateOrganization{
-				FullName: "New Org Name",
-			},
-			mockGetOrgsStatus: 404,
-			expectErr:         true,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -201,9 +199,9 @@ func TestUpdateOrganization(t *testing.T) {
 				assert.NotNil(t, err, "expected an error but got nil")
 				return
 			}
-			assert.Nil(t, err, "expected no error but got: %v", err)
-			assert.NotNil(t, resp, "expected a response but got nil")
-			assert.NotEmpty(t, resp, "expected a non-empty response but got empty")
+			require.NoError(t, err, "expected no error but got: %v", err)
+			require.NotNil(t, resp, "expected a response but got nil")
+			assert.NotEmpty(t, resp.ID, "expected a non-empty job id but got empty")
 		})
 	}
 }
@@ -212,7 +210,7 @@ func TestOrganizationEnableDisableUseInfrapiIsEnabled(t *testing.T) {
 	tests := []struct {
 		name    string
 		enabled bool
-		call    func(*Client, context.Context) (*types.ModelGetOrganization, error)
+		call    func(*Client, context.Context) (*cav.Job, error)
 	}{
 		{
 			name:    "enable",
@@ -243,12 +241,15 @@ func TestOrganizationEnableDisableUseInfrapiIsEnabled(t *testing.T) {
 				var body itypes.APIRequestUpdateOrg
 				assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
 				assert.Equal(t, tt.enabled, body.IsEnabled)
-				w.WriteHeader(http.StatusAccepted)
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				_, _ = w.Write([]byte(`{"id":"87ab1934-0146-4fb0-80bc-815fea03214d","status":"success"}`))
 			})
 
 			result, err := tt.call(client, t.Context())
-			assert.NoError(t, err)
-			assert.NotNil(t, result)
+			require.NoError(t, err)
+			require.NotNil(t, result)
+			assert.NotEmpty(t, result.ID)
 		})
 	}
 }

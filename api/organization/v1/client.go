@@ -37,3 +37,8 @@ func New(c cav.Client) (*Client, error) {
 		logger: orgLogger,
 	}, nil
 }
+
+// GetClient returns the underlying SDK runtime client.
+func (c *Client) GetClient() cav.Client {
+	return c.c
+}
