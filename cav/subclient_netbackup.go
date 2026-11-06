@@ -183,9 +183,9 @@ func (n *netbackup) getToken(ctx context.Context) error {
 		SetContext(ctx).
 		SetHeader("Content-Type", "application/x-www-form-urlencoded").
 		SetFormData(map[string]string{
-			"grant_type": "password",
-			"username":   username,
-			"password":   password,
+			formGrantTypeKey: "password",
+			"username":       username,
+			"password":       password,
 		}).
 		SetResult(&netbackupTokenResponse{}).
 		SetResultError(&netbackupError{}).
@@ -224,8 +224,8 @@ func (n *netbackup) refreshToken(ctx context.Context) error {
 		SetContext(ctx).
 		SetHeader("Content-Type", "application/x-www-form-urlencoded").
 		SetFormData(map[string]string{
-			"grant_type":    "refresh_token",
-			"refresh_token": refreshToken,
+			formGrantTypeKey: "refresh_token",
+			"refresh_token":  refreshToken,
 		}).
 		SetResult(&netbackupTokenResponse{}).
 		SetResultError(&netbackupError{}).

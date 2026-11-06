@@ -21,10 +21,10 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )
 
-func Test_newCloudavenueCredential(t *testing.T) {
+func Test_newVMwareAuthProvider(t *testing.T) {
 	console, _ := consoles.FindByOrganizationName(mockOrg)
 
-	// Test cases for newCloudavenueCredential
+	// Test cases for newVMwareAuthProvider
 	tests := []struct {
 		name         string
 		console      consoles.ConsoleName
@@ -77,9 +77,9 @@ func Test_newCloudavenueCredential(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			auth, err := newCloudavenueCredential(tt.console, tt.organization, tt.username, tt.password)
+			auth, err := newVMwareAuthProvider(tt.console, tt.organization, tt.username, tt.password)
 			if (err != nil) != tt.expectError {
-				t.Errorf("newCloudavenueCredential() error = %v, expectError %v", err, tt.expectError)
+				t.Errorf("newVMwareAuthProvider() error = %v, expectError %v", err, tt.expectError)
 				return
 			}
 			if !tt.expectError && auth == nil {
@@ -92,7 +92,7 @@ func Test_newCloudavenueCredential(t *testing.T) {
 func Test_CloudavenueCredential_Refresh_with_Bearer(t *testing.T) {
 	console, _ := consoles.FindByOrganizationName(mockOrg)
 
-	auth := &cloudavenueCredential{
+	auth := &vmwareAuthProvider{
 		logger:       xlog.GetGlobalLogger(),
 		httpC:        httpclient.NewHTTPClient().SetBaseURL(console.GetAPIVCDEndpoint()),
 		console:      console,
@@ -108,7 +108,7 @@ func Test_CloudavenueCredential_Refresh_with_Bearer(t *testing.T) {
 }
 
 func TestCloudavenueCredentialStoreRefreshSessionRejectsUnexpectedResult(t *testing.T) {
-	auth := &cloudavenueCredential{}
+	auth := &vmwareAuthProvider{}
 
 	err := auth.storeRefreshSession(&resty.Response{
 		RawResponse: &http.Response{Header: http.Header{}},

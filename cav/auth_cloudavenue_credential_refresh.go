@@ -26,7 +26,7 @@ const (
 )
 
 // Refresh refreshes authentication token and session metadata.
-func (c *cloudavenueCredential) Refresh(ctx context.Context) error {
+func (c *vmwareAuthProvider) Refresh(ctx context.Context) error {
 	logger := c.logger.WithGroup("refresh")
 	ep, err := GetEndpoint(sessionVmwareEndpoint)
 	if err != nil {
@@ -84,7 +84,7 @@ func (c *cloudavenueCredential) Refresh(ctx context.Context) error {
 }
 
 // executeRefreshRequest sends VMware session refresh request.
-func (c *cloudavenueCredential) executeRefreshRequest(ctx context.Context, ep *Endpoint) (*resty.Response, error) {
+func (c *vmwareAuthProvider) executeRefreshRequest(ctx context.Context, ep *Endpoint) (*resty.Response, error) {
 	request := c.httpC.R().
 		SetContext(ctx).
 		SetHeader("Accept", "application/json;version="+vmwareVCDVersion).
@@ -98,7 +98,7 @@ func (c *cloudavenueCredential) executeRefreshRequest(ctx context.Context, ep *E
 }
 
 // applyRefreshAuth applies bearer or basic authentication to request.
-func (c *cloudavenueCredential) applyRefreshAuth(request *resty.Request) {
+func (c *vmwareAuthProvider) applyRefreshAuth(request *resty.Request) {
 	bearer := c.currentBearer()
 	if bearer != "" {
 		request.SetAuthToken(bearer)
@@ -109,21 +109,21 @@ func (c *cloudavenueCredential) applyRefreshAuth(request *resty.Request) {
 }
 
 // currentBearer returns current bearer token.
-func (c *cloudavenueCredential) currentBearer() string {
+func (c *vmwareAuthProvider) currentBearer() string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return c.bearer
 }
 
 // clearBearer removes cached bearer token.
-func (c *cloudavenueCredential) clearBearer() {
+func (c *vmwareAuthProvider) clearBearer() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.bearer = ""
 }
 
 // storeRefreshSession updates cached session data from refresh response.
-func (c *cloudavenueCredential) storeRefreshSession(resp *resty.Response) error {
+func (c *vmwareAuthProvider) storeRefreshSession(resp *resty.Response) error {
 	session, ok := resp.Result().(*apiResponseSessionVmware)
 	if !ok || session == nil {
 		return fmt.Errorf("unexpected session refresh response type %T", resp.Result())
@@ -131,7 +131,7 @@ func (c *cloudavenueCredential) storeRefreshSession(resp *resty.Response) error 
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	c.bearer = resp.Header().Get(cloudavenueCredentialXVmwareAccessToken)
+	c.bearer = resp.Header().Get(vmwareAuthProviderXVmwareAccessToken)
 	c.organizationID = session.Org.ID
 	c.siteID = session.Site.ID
 

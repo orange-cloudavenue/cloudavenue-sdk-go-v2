@@ -84,6 +84,18 @@ func defaultMockHandler(ep *Endpoint) http.HandlerFunc {
 			return
 		}
 
+		if ep.PathTemplate == cerberusAuthPath {
+			w.Header().Set("Content-Type", "application/json")
+			resp := map[string]any{
+				"access_token": "mock-access-token",
+				"token_type":   cerberusTokenTypeBearer,
+				"expires_in":   3600,
+			}
+			respJ, _ := json.Marshal(resp)
+			_, _ = w.Write(respJ)
+			return
+		}
+
 		// VMware job endpoints return 202 with Location header
 		if ep.Name == "GetJobVmware" {
 			w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")

@@ -14,9 +14,13 @@ import (
 )
 
 // auth defines credential lifecycle required by subclients.
-type auth interface {
+type authProvider interface {
 	// Headers returns headers required for authenticated requests.
 	Headers() map[string]string
+
+	// CurrentAuthorization returns the current authorization value for explicit
+	// cross-flow use after ensuring the credential is initialized.
+	CurrentAuthorization(context.Context) (string, error)
 
 	// Refresh refreshes credential state.
 	Refresh(context.Context) error

@@ -10,6 +10,7 @@
 package cav
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 	"sync"
@@ -21,10 +22,10 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )
 
-var _ auth = (*cloudavenueCredential)(nil)
+var _ authProvider = (*vmwareAuthProvider)(nil)
 
-// cloudavenueCredential implements auth for username/password login.
-type cloudavenueCredential struct {
+// vmwareAuthProvider implements backend-scoped VMware/VCD authentication.
+type vmwareAuthProvider struct {
 	logger         *slog.Logger
 	httpC          *resty.Client
 	username       string `validate:"required"`
@@ -37,11 +38,11 @@ type cloudavenueCredential struct {
 	mu             sync.RWMutex
 }
 
-// cloudavenueCredentialXVmwareAccessToken carries VMware access token.
-const cloudavenueCredentialXVmwareAccessToken = "X-VMWARE-VCLOUD-ACCESS-TOKEN" // #nosec G101
+// vmwareAuthProviderXVmwareAccessToken carries VMware access token.
+const vmwareAuthProviderXVmwareAccessToken = "X-VMWARE-VCLOUD-ACCESS-TOKEN" // #nosec G101
 
-func newCloudavenueCredential(c consoles.ConsoleName, organization, username, password string) (auth, error) {
-	cc := &cloudavenueCredential{
+func newVMwareAuthProvider(c consoles.ConsoleName, organization, username, password string) (authProvider, error) {
+	cc := &vmwareAuthProvider{
 		logger:       xlogger.WithGroup("auth"),
 		console:      c,
 		organization: organization,
@@ -76,7 +77,7 @@ func newCloudavenueCredential(c consoles.ConsoleName, organization, username, pa
 }
 
 // Headers returns authorization headers for authenticated requests.
-func (c *cloudavenueCredential) Headers() map[string]string {
+func (c *vmwareAuthProvider) Headers() map[string]string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	headers := make(map[string]string)
@@ -85,8 +86,26 @@ func (c *cloudavenueCredential) Headers() map[string]string {
 }
 
 // IsInitialized reports whether bearer token is available.
-func (c *cloudavenueCredential) IsInitialized() bool {
+func (c *vmwareAuthProvider) IsInitialized() bool {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return c.bearer != ""
+}
+
+// CurrentAuthorization returns the VMware-compatible Authorization header
+// payload currently derived from this credential.
+func (c *vmwareAuthProvider) CurrentAuthorization(ctx context.Context) (string, error) {
+	if !c.IsInitialized() {
+		if err := c.Refresh(ctx); err != nil {
+			return "", err
+		}
+	}
+
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	if c.bearer == "" {
+		return "", errors.New("authorization not initialized")
+	}
+
+	return c.bearer, nil
 }

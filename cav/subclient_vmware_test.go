@@ -86,7 +86,12 @@ func TestVmwareParseAPIErrorMetadata(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resp := doVmwareRequest(t, http.StatusBadRequest, "application/json", tt.body)
+			contentType := "application/json"
+			if tt.name == "fallback error" {
+				contentType = "text/plain"
+			}
+
+			resp := doVmwareRequest(t, http.StatusBadRequest, contentType, tt.body)
 			apiErr := (&vmware{}).parseAPIError("op", resp)
 			require.NotNil(t, apiErr)
 			require.Equal(t, resp.Duration(), apiErr.Duration)
@@ -97,7 +102,7 @@ func TestVmwareParseAPIErrorMetadata(t *testing.T) {
 }
 
 func TestVmwareContextData(t *testing.T) {
-	v := &vmware{subclient: subclient{credential: &cloudavenueCredential{
+	v := &vmware{subclient: subclient{authProvider: &vmwareAuthProvider{
 		organizationID: "org-1",
 		siteID:         "site-1",
 	}}}
