@@ -92,9 +92,9 @@ func (c *Client) GetOrganization(ctx context.Context) (*types.ModelGetOrganizati
 }
 
 // UpdateOrganization updates organization configuration through the Infrapi
-// /infrapicustomerproxy/v2.0/configurations endpoint. Organization state
-// changes belong here rather than in the read-only, XML-backed AdminOrg view.
-func (c *Client) UpdateOrganization(ctx context.Context, p types.ParamsUpdateOrganization) (*types.ModelGetOrganization, error) {
+// /infrapicustomerproxy/v2.0/configurations endpoint and returns the backend
+// job accepted for the update.
+func (c *Client) UpdateOrganization(ctx context.Context, p types.ParamsUpdateOrganization) (*cav.Job, error) {
 	if err := validateUpdateOrganizationParams(p); err != nil {
 		return nil, fmt.Errorf("%s: validate: %w", opUpdateOrganization, err)
 	}
@@ -134,25 +134,31 @@ func (c *Client) UpdateOrganization(ctx context.Context, p types.ParamsUpdateOrg
 		reqBody.IsEnabled = *p.Enabled
 	}
 
-	if _, err = c.c.Do(ctx, endpoints.UpdateOrganization(), cav.SetBody(reqBody)); err != nil {
+	resp, err := c.c.Do(ctx, endpoints.UpdateOrganization(), cav.SetBody(reqBody))
+	if err != nil {
 		return nil, fmt.Errorf("%s: update: %w", opUpdateOrganization, err)
 	}
 
 	logger.DebugContext(ctx, "Successfully initiated organization update")
 
-	return c.GetOrganization(ctx)
+	job, err := cav.ParseCerberusJob(resp)
+	if err != nil {
+		return nil, fmt.Errorf("%s: parse job: %w", opUpdateOrganization, err)
+	}
+
+	return job, nil
 }
 
 // EnableOrganization enables this organization through the Infrapi
 // configuration endpoint.
-func (c *Client) EnableOrganization(ctx context.Context) (*types.ModelGetOrganization, error) {
+func (c *Client) EnableOrganization(ctx context.Context) (*cav.Job, error) {
 	enabled := true
 	return c.UpdateOrganization(ctx, types.ParamsUpdateOrganization{Enabled: &enabled})
 }
 
 // DisableOrganization disables this organization through the Infrapi
 // configuration endpoint.
-func (c *Client) DisableOrganization(ctx context.Context) (*types.ModelGetOrganization, error) {
+func (c *Client) DisableOrganization(ctx context.Context) (*cav.Job, error) {
 	enabled := false
 	return c.UpdateOrganization(ctx, types.ParamsUpdateOrganization{Enabled: &enabled})
 }

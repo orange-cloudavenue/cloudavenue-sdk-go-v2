@@ -25,3 +25,13 @@ type (
 		idempotentRetryCondition() resty.RetryConditionFunc
 	}
 )
+
+// ParseCerberusJob parses a Cerberus job from the given response.
+func ParseCerberusJob(resp *resty.Response) (*Job, error) {
+	return (&cerberus{}).JobParser(resp)
+}
+
+// ParseVMwareJob parses a VMware job from the given response.
+func ParseVMwareJob(resp *resty.Response) (*Job, error) {
+	return (&vmware{}).JobParser(resp)
+}
