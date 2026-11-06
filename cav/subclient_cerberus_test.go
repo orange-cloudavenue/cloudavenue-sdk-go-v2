@@ -25,8 +25,12 @@ import (
 
 func TestCerberusNewHTTPClientUsesAuthorizationHeader(t *testing.T) {
 	var gotAuthorization string
+	var gotAccept string
+	var gotUserAgent string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotAuthorization = r.Header.Get("Authorization")
+		gotAccept = r.Header.Get("Accept")
+		gotUserAgent = r.Header.Get("User-Agent")
 		w.WriteHeader(http.StatusOK)
 		_, _ = io.WriteString(w, `{}`)
 	}))
@@ -46,6 +50,8 @@ func TestCerberusNewHTTPClientUsesAuthorizationHeader(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, resp.StatusCode())
 	assert.Equal(t, "Bearer cerberus-access-token", gotAuthorization)
+	assert.Equal(t, "application/json", gotAccept)
+	assert.Equal(t, "Cloudavenue-SDK-v2", gotUserAgent)
 }
 
 // doCerberusRequest serves given response and returns resty response,
@@ -126,6 +132,15 @@ func TestCerberusParseAPIError(t *testing.T) {
 			body:         `{"code":"LEGACY","message":"old shape"}`,
 			wantCode:     "LEGACY",
 			wantMessage:  "LEGACY: old shape",
+			wantSentinel: errors.ErrBadRequest,
+		},
+		{
+			name:         "numeric legacy code field still honoured",
+			status:       http.StatusBadRequest,
+			contentType:  "application/json",
+			body:         `{"code":400,"message":"old numeric shape"}`,
+			wantCode:     "400",
+			wantMessage:  "400: old numeric shape",
 			wantSentinel: errors.ErrBadRequest,
 		},
 		{

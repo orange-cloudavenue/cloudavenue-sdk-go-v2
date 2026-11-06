@@ -40,7 +40,8 @@ func (v *cerberus) getID() string {
 func (v *cerberus) newHTTPClient(ctx context.Context) (*resty.Client, error) {
 	hC := httpclient.NewHTTPClient().
 		SetBaseURL(v.console.GetAPICerberusEndpoint()).
-		SetHeader("Accept", "application/json;version="+cerberusVCDVersion).
+		SetHeader("Accept", "application/json").
+		SetHeader("User-Agent", "Cloudavenue-SDK-v2").
 		SetResultError(errors.CustomerAPIErrorBody{})
 
 	if !v.authProvider.IsInitialized() {
