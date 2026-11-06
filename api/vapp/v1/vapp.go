@@ -12,17 +12,13 @@ package vapp
 import (
 	"context"
 	"fmt"
-	"net/url"
-	"path"
-	"strings"
-	"time"
-
-	"resty.dev/v3"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
+	"net/url"
+	"path"
+	"strings"
 )
 
 const (
@@ -588,11 +584,9 @@ func IsVAppNetwork(networkHREF string) bool {
 }
 
 func awaitVAppJob(ctx context.Context, c cav.Client, opName, jobID string) error {
-	_, err := cav.AwaitJobOnBackend(ctx, c, cav.BackendVMware, jobID, cav.JobPollOptions{
-		Timeout:         30 * time.Second,
-		PollingInterval: 1 * time.Second,
-	}, func(_ *resty.Response) (struct{}, error) {
-		return struct{}{}, nil
+	_, err := cav.WaitJob(ctx, c, cav.JobWaitRequest{
+		Backend: cav.BackendVMware,
+		JobID:   jobID,
 	})
 	if err != nil {
 		return fmt.Errorf("%s: await job: %w", opName, err)
