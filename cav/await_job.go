@@ -26,19 +26,55 @@ type JobPollOptions struct {
 	Jitter          time.Duration
 }
 
-// AwaitJob polls until job completes or cancellation/timeout stops polling.
-// The extract callback receives the raw response to allow extraction of
-// resource data from the raw response (e.g. created resource names).
-func AwaitJob[R any](ctx context.Context, c Client, jobID string, opts JobPollOptions, extract func(resp *resty.Response) (R, error)) (R, error) {
-	return awaitJob(ctx, c, 0, jobID, opts, extract)
+// JobAwaitRequest describes how to wait for a backend job and optionally
+// extract a typed result from the terminal job response.
+type JobAwaitRequest[R any] struct {
+	Backend     BackendTarget
+	JobID       string
+	PollOptions JobPollOptions
+	Extract     func(resp *resty.Response) (R, error)
 }
 
-// AwaitJobOnBackend polls a job on a known backend and avoids probing unrelated backends.
+// JobWaitRequest describes how to wait for a backend job when no response
+// extraction is needed by the caller.
+type JobWaitRequest struct {
+	Backend     BackendTarget
+	JobID       string
+	PollOptions JobPollOptions
+}
+
 func AwaitJobOnBackend[R any](ctx context.Context, c Client, backend BackendTarget, jobID string, opts JobPollOptions, extract func(resp *resty.Response) (R, error)) (R, error) {
-	return awaitJob(ctx, c, backend, jobID, opts, extract)
+	return awaitJob(ctx, c, JobAwaitRequest[R]{
+		Backend:     backend,
+		JobID:       jobID,
+		PollOptions: opts,
+		Extract:     extract,
+	})
 }
 
-func awaitJob[R any](ctx context.Context, c Client, backend BackendTarget, jobID string, opts JobPollOptions, extract func(resp *resty.Response) (R, error)) (R, error) {
+// AwaitJob polls a known backend job until completion and optionally extracts
+// a typed result from the terminal response.
+func AwaitJob[R any](ctx context.Context, c Client, jobID string, opts JobPollOptions, extract func(resp *resty.Response) (R, error)) (R, error) {
+	return awaitJob(ctx, c, JobAwaitRequest[R]{
+		Backend:     0,
+		JobID:       jobID,
+		PollOptions: opts,
+		Extract:     extract,
+	})
+}
+
+// WaitJob polls a known backend job until completion and ignores the terminal
+// response payload.
+func WaitJob(ctx context.Context, c Client, req JobWaitRequest) error {
+	_, err := awaitJob(ctx, c, JobAwaitRequest[struct{}]{
+		Backend:     req.Backend,
+		JobID:       req.JobID,
+		PollOptions: req.PollOptions,
+	})
+	return err
+}
+
+func awaitJob[R any](ctx context.Context, c Client, req JobAwaitRequest[R]) (R, error) {
 	var zero R
 
 	if err := context.Cause(ctx); err != nil {
@@ -46,25 +82,25 @@ func awaitJob[R any](ctx context.Context, c Client, backend BackendTarget, jobID
 	}
 
 	if c == nil {
-		return zero, fmt.Errorf("await job %s: client is nil", jobID)
+		return zero, fmt.Errorf("await job %s: client is nil", req.JobID)
 	}
-	if jobID == "" {
+	if req.JobID == "" {
 		return zero, fmt.Errorf("await job: job id is required")
 	}
-	if extract == nil {
-		return zero, fmt.Errorf("await job %s: extract is required", jobID)
+	if req.Backend == 0 {
+		return zero, fmt.Errorf("await job %s: backend is required", req.JobID)
 	}
-	if opts.Timeout <= 0 {
-		return zero, fmt.Errorf("await job %s: timeout must be greater than 0", jobID)
+	if req.PollOptions.Timeout <= 0 {
+		return zero, fmt.Errorf("await job %s: timeout must be greater than 0", req.JobID)
 	}
-	if opts.PollingInterval <= 0 {
-		return zero, fmt.Errorf("await job %s: polling interval must be greater than 0", jobID)
+	if req.PollOptions.PollingInterval <= 0 {
+		return zero, fmt.Errorf("await job %s: polling interval must be greater than 0", req.JobID)
 	}
 
 	pollCtx, cancel := context.WithCancelCause(ctx)
 	defer cancel(nil)
 
-	timer := time.AfterFunc(opts.Timeout, func() { cancel(pkgerrors.ErrJobTimeout) })
+	timer := time.AfterFunc(req.PollOptions.Timeout, func() { cancel(pkgerrors.ErrJobTimeout) })
 	defer timer.Stop()
 	startedAt := time.Now()
 	firstPoll := true
@@ -74,32 +110,35 @@ func awaitJob[R any](ctx context.Context, c Client, backend BackendTarget, jobID
 			select {
 			case <-pollCtx.Done():
 				return zero, context.Cause(pollCtx)
-			case <-time.After(withJitter(opts.PollingInterval, opts.Jitter)):
+			case <-time.After(withJitter(req.PollOptions.PollingInterval, req.PollOptions.Jitter)):
 			}
 		}
 		firstPoll = false
 
-		resp, resolvedBackend, err := getJobStatus(pollCtx, c, jobID, backend)
+		resp, resolvedBackend, err := getJobStatus(pollCtx, c, req.JobID, req.Backend)
 		if err != nil {
-			return zero, fmt.Errorf("await job %s: %w", jobID, err)
+			return zero, fmt.Errorf("await job %s: %w", req.JobID, err)
 		}
 
 		job, err := parseJobResponse(&Response{Raw: resp}, resolvedBackend)
 		if err != nil {
-			return zero, fmt.Errorf("await job %s: parse job status: %w", jobID, err)
+			return zero, fmt.Errorf("await job %s: parse job status: %w", req.JobID, err)
 		}
 
-		c.Logger().Debug("job poll", "job_id", jobID, "status", job.Status, "elapsed", time.Since(startedAt))
+		c.Logger().Debug("job poll", "job_id", req.JobID, "status", job.Status, "elapsed", time.Since(startedAt))
 
 		switch job.Status {
 		case JobSuccess:
-			result, extractErr := extract(resp)
+			if req.Extract == nil {
+				return zero, nil
+			}
+			result, extractErr := req.Extract(resp)
 			if extractErr != nil {
 				return zero, extractErr
 			}
 			return result, nil
 		case JobError, JobAborted:
-			return zero, fmt.Errorf("job %s: %w", jobID, pkgerrors.ErrJobFailed)
+			return zero, fmt.Errorf("job %s: %w", req.JobID, pkgerrors.ErrJobFailed)
 		}
 	}
 }
