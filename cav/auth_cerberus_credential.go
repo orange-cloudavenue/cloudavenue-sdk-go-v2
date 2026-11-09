@@ -150,7 +150,7 @@ func (c *cerberusAuthProvider) Refresh(ctx context.Context) error {
 		return fmt.Errorf("authentication request failed: %w", err)
 	}
 
-	if resp.StatusCode() < http.StatusOK || resp.StatusCode() >= http.StatusBadRequest {
+	if resp.StatusCode() < http.StatusOK || resp.StatusCode() >= http.StatusMultipleChoices {
 		c.clearLocked()
 		return fmt.Errorf("authentication failed: %w", toCerberusError(resp))
 	}
@@ -198,17 +198,24 @@ func (c *cerberusAuthProvider) restoreSession(data map[string]string) error {
 		return errors.New("invalid session data")
 	}
 
+	var parsedExpiresAt time.Time
+	setExpiresAt := false
+	if rawExpiresAt := data["expiresAt"]; rawExpiresAt != "" {
+		parsed, err := time.Parse(time.RFC3339Nano, rawExpiresAt)
+		if err != nil {
+			return fmt.Errorf("restore session: parse expiresAt: %w", err)
+		}
+		parsedExpiresAt = parsed
+		setExpiresAt = true
+	}
+
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.organization = data["organization"]
 	c.accessToken = data["accessToken"]
 	c.tokenType = data["tokenType"]
-	if expiresAt := data["expiresAt"]; expiresAt != "" {
-		parsed, err := time.Parse(time.RFC3339Nano, expiresAt)
-		if err != nil {
-			return fmt.Errorf("restore session: parse expiresAt: %w", err)
-		}
-		c.expiresAt = parsed
+	if setExpiresAt {
+		c.expiresAt = parsedExpiresAt
 	}
 
 	return nil

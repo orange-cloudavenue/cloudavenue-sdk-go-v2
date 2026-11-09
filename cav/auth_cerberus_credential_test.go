@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -55,6 +56,49 @@ func TestCerberusCredentialRefresh(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "Bearer cerberus-access-token", authorization)
 	assert.True(t, c.IsInitialized())
+}
+
+func TestCerberusCredentialRefreshRejectsRedirect(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusMultipleChoices)
+	}))
+	t.Cleanup(srv.Close)
+
+	cred, err := newCerberusAuthProvider(consoles.ConsoleName(mockOrg), mockOrg, "mockuser", "mockpassword")
+	require.NoError(t, err)
+	c := cred.(*cerberusAuthProvider)
+	c.httpC.SetBaseURL(srv.URL)
+	c.accessToken = "expired-token"
+	c.tokenType = cerberusTokenTypeBearer
+	c.expiresAt = time.Now().Add(-time.Minute)
+
+	err = c.Refresh(t.Context())
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "300")
+	assert.False(t, c.IsInitialized())
+}
+
+func TestCerberusCredentialRestoreSessionIsAtomicOnInvalidExpiry(t *testing.T) {
+	c := &cerberusAuthProvider{
+		organization: "original-organization",
+		accessToken:  "original-token",
+		tokenType:    cerberusTokenTypeBearer,
+		expiresAt:    time.Date(2026, time.January, 1, 0, 0, 0, 0, time.UTC),
+	}
+
+	err := c.restoreSession(map[string]string{
+		"organization": "replacement-organization",
+		"accessToken":  "replacement-token",
+		"tokenType":    "Replacement",
+		"expiresAt":    "not-a-timestamp",
+	})
+
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "restore session: parse expiresAt")
+	assert.Equal(t, "original-organization", c.organization)
+	assert.Equal(t, "original-token", c.accessToken)
+	assert.Equal(t, cerberusTokenTypeBearer, c.tokenType)
+	assert.Equal(t, time.Date(2026, time.January, 1, 0, 0, 0, 0, time.UTC), c.expiresAt)
 }
 
 func TestWithCloudAvenueCredentialUsesCerberusCredentialForInfrapi(t *testing.T) {
