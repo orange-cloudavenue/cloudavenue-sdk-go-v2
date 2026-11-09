@@ -24,7 +24,6 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
 
-<<<<<<< HEAD
 func TestCerberusNewHTTPClientUsesAuthorizationHeader(t *testing.T) {
 	var gotAuthorization string
 	var gotAccept string
@@ -63,6 +62,7 @@ func TestCerberusNewHTTPClientUsesAuthorizationHeader(t *testing.T) {
 	assert.Equal(t, "application/json", gotAccept)
 	assert.Equal(t, "Cloudavenue-SDK-v2", gotUserAgent)
 }
+
 // doCerberusRequest serves given response and returns resty response,
 // configured like Cerberus-routed customer API client (JSON result error).
 func doCerberusRequest(t *testing.T, status int, contentType, body string) *resty.Response {
