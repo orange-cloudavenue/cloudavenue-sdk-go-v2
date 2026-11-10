@@ -18,7 +18,6 @@ import (
 )
 
 func TestCerberusJobStatusParser(t *testing.T) {
-	v := &cerberus{}
 	tests := []struct {
 		input    string
 		expected JobStatus
@@ -32,7 +31,7 @@ func TestCerberusJobStatusParser(t *testing.T) {
 		{"unknown", JobStatus(""), true},
 	}
 	for _, tt := range tests {
-		got, err := v.JobStatusParser(tt.input)
+		got, err := parseCerberusJobStatus(tt.input)
 		if tt.wantErr {
 			assert.Error(t, err, tt.input)
 		} else {
@@ -43,7 +42,6 @@ func TestCerberusJobStatusParser(t *testing.T) {
 }
 
 func TestCerberusJobParser_NormalResponse(t *testing.T) {
-	v := &cerberus{}
 	resp := &resty.Response{
 		RawResponse: &http.Response{
 			StatusCode: http.StatusOK,
@@ -60,7 +58,7 @@ func TestCerberusJobParser_NormalResponse(t *testing.T) {
 			},
 		},
 	}
-	job, err := v.JobParser(resp)
+	job, err := parseCerberusJob(resp)
 
 	assert.NoError(t, err)
 	assert.Equal(t, "id-123", job.ID)
@@ -71,7 +69,6 @@ func TestCerberusJobParser_NormalResponse(t *testing.T) {
 }
 
 func TestCerberusJobParser_FailedStatus(t *testing.T) {
-	v := &cerberus{}
 	resp := &resty.Response{
 		RawResponse: &http.Response{
 			StatusCode: http.StatusOK,
@@ -88,14 +85,13 @@ func TestCerberusJobParser_FailedStatus(t *testing.T) {
 			},
 		},
 	}
-	job, err := v.JobParser(resp)
+	job, err := parseCerberusJob(resp)
 
 	assert.Error(t, err)
 	assert.NotNil(t, job)
 }
 
 func TestCerberusJobParser_EmptyResponse(t *testing.T) {
-	v := &cerberus{}
 	resp := &resty.Response{
 		RawResponse: &http.Response{
 			StatusCode: http.StatusOK,
@@ -106,20 +102,18 @@ func TestCerberusJobParser_EmptyResponse(t *testing.T) {
 			Result:     &CerberusJobAPIResponse{},
 		},
 	}
-	job, err := v.JobParser(resp)
+	job, err := parseCerberusJob(resp)
 	assert.Error(t, err)
 	assert.Nil(t, job)
 }
 
 func TestCerberusJobParser_NilResponse(t *testing.T) {
-	v := &cerberus{}
-	job, err := v.JobParser(nil)
+	job, err := parseCerberusJob(nil)
 	assert.Error(t, err)
 	assert.Nil(t, job)
 }
 
 func TestCerberusJobParser_UnknownJobStatus(t *testing.T) {
-	v := &cerberus{}
 	resp := &resty.Response{
 		RawResponse: &http.Response{
 			StatusCode: http.StatusOK,
@@ -136,13 +130,12 @@ func TestCerberusJobParser_UnknownJobStatus(t *testing.T) {
 			},
 		},
 	}
-	job, err := v.JobParser(resp)
+	job, err := parseCerberusJob(resp)
 	assert.Error(t, err)
 	assert.Nil(t, job)
 }
 
 func TestCerberusJobParser_RoutedAPIErrorResponse(t *testing.T) {
-	v := &cerberus{}
 	resp := &resty.Response{
 		RawResponse: &http.Response{
 			StatusCode: http.StatusInternalServerError,
@@ -152,13 +145,12 @@ func TestCerberusJobParser_RoutedAPIErrorResponse(t *testing.T) {
 			URL:        "http://example.com/job",
 		},
 	}
-	job, err := v.JobParser(resp)
+	job, err := parseCerberusJob(resp)
 	assert.Error(t, err)
 	assert.Nil(t, job)
 }
 
 func TestCerberusJobParser_InvalidResponseType(t *testing.T) {
-	v := &cerberus{}
 	resp := &resty.Response{
 		RawResponse: &http.Response{
 			StatusCode: http.StatusOK,
@@ -169,7 +161,7 @@ func TestCerberusJobParser_InvalidResponseType(t *testing.T) {
 			Result:     "invalid response type",
 		},
 	}
-	job, err := v.JobParser(resp)
+	job, err := parseCerberusJob(resp)
 	assert.Error(t, err)
 	assert.Nil(t, job)
 }
