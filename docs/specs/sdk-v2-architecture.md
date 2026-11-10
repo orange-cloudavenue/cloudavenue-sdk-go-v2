@@ -57,60 +57,60 @@ compile-time-typed value:
 
 ```go
 type Operation[P any, R any] struct {
-	// Name is a stable, generator-populated identifier used for
-	// observability (logging, tracing, metrics) and error context.
-	// Format: "<Group>.<Verb><Resource>", e.g. "EdgeGateway.Get".
-	Name string
+ // Name is a stable, generator-populated identifier used for
+ // observability (logging, tracing, metrics) and error context.
+ // Format: "<Group>.<Verb><Resource>", e.g. "EdgeGateway.Get".
+ Name string
 
-	// Backend declares which backend this leaf operation targets.
-	// This is a required, structured field — not inferred, not left
-	// to convention — because backend migration (infrapi replacing
-	// vmware verb-by-verb) is an explicit, ongoing project reality.
-	Backend BackendTarget
+ // Backend declares which backend this leaf operation targets.
+ // This is a required, structured field — not inferred, not left
+ // to convention — because backend migration (infrapi replacing
+ // vmware verb-by-verb) is an explicit, ongoing project reality.
+ Backend BackendTarget
 
-	Endpoint *cav.Endpoint
+ Endpoint *cav.Endpoint
 
-	// Validate performs pure, structural validation only (see §5).
-	// It must never perform I/O.
-	Validate func(P) error
+ // Validate performs pure, structural validation only (see §5).
+ // It must never perform I/O.
+ Validate func(P) error
 
-	// Transform maps typed params to the wire request body/path/query
-	// values consumed by Endpoint.
-	Transform func(P) (any, error)
+ // Transform maps typed params to the wire request body/path/query
+ // values consumed by Endpoint.
+ Transform func(P) (any, error)
 
-	// Extract maps the raw response back to a typed result.
-	Extract func(*cav.Response, P) (R, error)
+ // Extract maps the raw response back to a typed result.
+ Extract func(*cav.Response, P) (R, error)
 }
 
 type BackendTarget int
 
 const (
-	BackendInfrapi BackendTarget = iota
-	BackendVMware
-	BackendOSE      // Object Storage Extension (S3), see §8.4
-	BackendNetBackup
+ BackendInfrapi BackendTarget = iota + 1
+ BackendVMware
+ BackendOSE      // Object Storage Extension (S3), see §8.4
+ BackendNetBackup
 )
 
 func Execute[P, R any](ctx context.Context, c *Client, op Operation[P, R], params P) (R, error) {
-	var zero R
-	if op.Validate != nil {
-		if err := op.Validate(params); err != nil {
-			return zero, fmt.Errorf("%s: validate: %w", op.Name, err)
-		}
-	}
-	body, err := op.Transform(params)
-	if err != nil {
-		return zero, fmt.Errorf("%s: transform: %w", op.Name, err)
-	}
-	resp, err := c.do(ctx, op.Endpoint, body)
-	if err != nil {
-		return zero, fmt.Errorf("%s: %w", op.Name, err)
-	}
-	result, err := op.Extract(resp, params)
-	if err != nil {
-		return zero, fmt.Errorf("%s: extract: %w", op.Name, err)
-	}
-	return result, nil
+ var zero R
+ if op.Validate != nil {
+  if err := op.Validate(params); err != nil {
+   return zero, fmt.Errorf("%s: validate: %w", op.Name, err)
+  }
+ }
+ body, err := op.Transform(params)
+ if err != nil {
+  return zero, fmt.Errorf("%s: transform: %w", op.Name, err)
+ }
+ resp, err := c.do(ctx, op.Endpoint, body)
+ if err != nil {
+  return zero, fmt.Errorf("%s: %w", op.Name, err)
+ }
+ result, err := op.Extract(resp, params)
+ if err != nil {
+  return zero, fmt.Errorf("%s: extract: %w", op.Name, err)
+ }
+ return result, nil
 }
 ```
 
@@ -226,9 +226,9 @@ ordinary hand-written methods on `*Client` (or the relevant per-group
 const opCreateEdgeGateway = "EdgeGateway.Create"
 
 func (c *Client) CreateEdgeGateway(ctx context.Context, params types.ParamsCreateEdgeGateway) (*types.ModelEdgeGateway, error) {
-	// ... fan-out lookups, bandwidth validation, job submission via
-	// Execute(ctx, c, createEdgeGatewayOp, ...), AwaitJob, conditional
-	// follow-up PATCH ...
+ // ... fan-out lookups, bandwidth validation, job submission via
+ // Execute(ctx, c, createEdgeGatewayOp, ...), WaitJob, conditional
+ // follow-up PATCH ...
 }
 ```
 
@@ -278,8 +278,8 @@ fails) must return a non-nil result **and** a wrapped error satisfying
 // via errors.AsType and persist Result even though err != nil, to avoid
 // orphaning a resource that exists server-side but is absent from state.
 type ErrPartialSuccess[R any] struct {
-	Result R
-	Err    error
+ Result R
+ Err    error
 }
 
 func (e *ErrPartialSuccess[R]) Error() string { return e.Err.Error() }
@@ -316,91 +316,95 @@ added if someone remembers.
 
 ---
 
-## 6. Async Jobs: `AwaitJob[R]`
+## 6. Async Jobs: `WaitJob`
 
 CloudAvenue's Cerberus/infrapi subsystem is fully async (submit → poll job
 status → success/fail), while VCD/cloudapi is synchronous. The current
 implementation detects this implicitly via reflection on
 `BodyResponseType == cav.Job{}`. The new design makes this explicit: any
 `Operation[P,R]` whose `Extract` needs to await a job does so by calling
-`AwaitJob` directly inside its `Extract` function or inside the enclosing
+`WaitJob` directly inside its `Extract` function or inside the enclosing
 orchestration method — there is no implicit type-sniffing.
 
 ```go
-type JobPollOptions struct {
-	Timeout         time.Duration
-	PollingInterval time.Duration
-	// Jitter adds randomized variance to PollingInterval to avoid
-	// thundering-herd polling against Cerberus at scale (multiple API
-	// groups, N concurrent operations, fixed-interval polling was
-	// identified as a real production risk against Orange's own infra).
-	Jitter time.Duration
+type JobWaitRequest struct {
+ // Backend is required and must identify the backend hosting the job.
+ Backend BackendTarget
+
+ // JobID is the backend job identifier.
+ JobID string
+
+ Timeout         time.Duration
+ PollingInterval time.Duration
+ // Jitter adds randomized variance to PollingInterval to avoid
+ // thundering-herd polling against Cerberus at scale (multiple API
+ // groups, N concurrent operations, fixed-interval polling was
+ // identified as a real production risk against Orange's own infra).
+ Jitter time.Duration
 }
 
-// AwaitJob polls until the job referenced by jobID completes, is canceled,
-// or opts.Timeout elapses — whichever comes first.
+// WaitJob polls until the job referenced by req.JobID completes, is canceled,
+// or req.Timeout elapses — whichever comes first.
 //
 // Timeout vs. ctx deadline precedence: whichever fires first wins, and the
 // resulting error is distinguishable via context.Cause:
-//   - if opts.Timeout elapses first, ctx is canceled internally with cause
+//   - if req.Timeout elapses first, ctx is canceled internally with cause
 //     ErrJobTimeout (slow backend — alerting-relevant, paging-worthy).
 //   - if the caller's own ctx is canceled/deadline-exceeded first, its
 //     original cause is preserved and returned as-is (client-side
 //     cancellation — a different, non-backend alerting category).
 //
-// Cancellation semantics: if ctx is canceled (either cause), AwaitJob stops
-// polling and returns immediately. It does NOT currently attempt to signal
-// Cerberus to cancel the job server-side — the job may continue running
-// server-side, orphaned from the caller's perspective. This is a known,
-// accepted limitation for this rewrite (Cerberus does not universally
-// expose a job-cancel endpoint); it must be documented prominently on
-// AwaitJob's doc comment, not silently assumed away.
+// Cancellation semantics: if ctx is canceled (either cause), WaitJob stops
+// polling and returns immediately.
 //
 // Observability: each poll attempt emits a debug-level slog record
 // (job ID, elapsed, status) via the logger on ctx/Client, so a stuck
 // poll is diagnosable without needing to reproduce with custom
 // instrumentation.
-func AwaitJob[R any](ctx context.Context, c *Client, jobID string, opts JobPollOptions, extract func(Job) (R, error)) (R, error) {
-	ctx, cancel := context.WithCancelCause(ctx)
-	defer cancel(nil)
-	timer := time.AfterFunc(opts.Timeout, func() { cancel(ErrJobTimeout) })
-	defer timer.Stop()
+func WaitJob(ctx context.Context, c Client, req JobWaitRequest) (*Job, error) {
+ pollCtx, cancel := context.WithCancelCause(ctx)
+ defer cancel(nil)
+ timer := time.AfterFunc(req.Timeout, func() { cancel(ErrJobTimeout) })
+ defer timer.Stop()
 
-	interval := opts.PollingInterval
-	for {
-		select {
-		case <-ctx.Done():
-			var zero R
-			return zero, context.Cause(ctx)
-		case <-time.After(withJitter(interval, opts.Jitter)):
-		}
-		job, err := c.getJobStatus(ctx, jobID)
-		if err != nil {
-			var zero R
-			return zero, fmt.Errorf("await job %s: %w", jobID, err)
-		}
-		c.logger.Debug("job poll", "job_id", jobID, "status", job.Status)
-		switch job.Status {
-		case JobStatusSuccess:
-			return extract(job)
-		case JobStatusFailed:
-			var zero R
-			return zero, fmt.Errorf("job %s: %w", jobID, ErrJobFailed)
-		}
-		// still running, continue polling
-	}
+ for first := true; ; first = false {
+  if !first {
+   select {
+   case <-pollCtx.Done():
+    return nil, context.Cause(pollCtx)
+   case <-time.After(withJitter(req.PollingInterval, req.Jitter)):
+   }
+  }
+
+  job, err := fetchJob(pollCtx, c, req.Backend, req.JobID)
+  if err != nil {
+   return job, fmt.Errorf("await job %s: %w", req.JobID, err)
+  }
+
+  c.Logger().Debug("job poll", "job_id", req.JobID, "status", job.Status)
+
+  switch job.Status {
+  case JobSuccess:
+   return job, nil
+  case JobError, JobAborted:
+   return job, fmt.Errorf("job %s: %w", req.JobID, ErrJobFailed)
+  }
+ }
 }
 ```
 
 ### 6.1 Design notes
 
-- **`AwaitJob` standardizes only the poll loop** (timeout/interval/jitter/
-  cancellation/status-check/logging). Resource-specific extraction — e.g.
+ - **`WaitJob` requires the backend as explicit input.** `req.Backend == 0`
+   is invalid; the zero value means "unset", not "infrapi".
+ - **`WaitJob` standardizes only the poll loop** (timeout/interval/jitter/
+   cancellation/status-check/logging) and returns the terminal `Job`
+  (including `Actions[]`). Resource-specific extraction — e.g.
   regex-parsing a newly created resource's name out of `Actions[].Details`
-  — remains hand-written per call site via the `extract` callback. This is
+  — remains hand-written per call site on the returned `Job`. This is
   correct and intentional, not an oversight: extraction logic is
   fundamentally per-resource and does not generalize.
-- Recommended testing approach: wrap `AwaitJob` tests in Go 1.26's GA
+- Recommended testing approach: wrap `WaitJob` tests in Go 1.26's GA
   `testing/synctest.Test(t, func(t *testing.T) { ... })` to get a virtualized
   clock, making cancellation-mid-poll and timeout-fires scenarios fast and
   deterministic to test without real sleeps.
@@ -468,11 +472,11 @@ of it.
 
 ```go
 type SubClient interface {
-	// ContextData returns backend-specific values (e.g. OrganizationID,
-	// SiteID for vmware) needed by request construction. Replaces the
-	// current concrete type-switch (`switch sc := sc.(type) { case *vmware: ... }`)
-	// living in shared request-dispatch code — a direct polymorphism fix.
-	ContextData(ctx context.Context) ContextData
+ // ContextData returns backend-specific values (e.g. OrganizationID,
+ // SiteID for vmware) needed by request construction. Replaces the
+ // current concrete type-switch (`switch sc := sc.(type) { case *vmware: ... }`)
+ // living in shared request-dispatch code — a direct polymorphism fix.
+ ContextData(ctx context.Context) ContextData
 }
 ```
 
@@ -615,6 +619,7 @@ work, sequenced after this SDK spec is implemented (§10), not a constraint
 on this spec's own shape.
 
 ### 9.5 Domain-specific requirements carried forward from prior migration
+
 planning
 
 The following concrete, previously-identified technical requirements are
