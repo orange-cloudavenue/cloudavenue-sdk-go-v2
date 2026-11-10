@@ -243,7 +243,7 @@ func TestOrganizationEnableDisableUseInfrapiIsEnabled(t *testing.T) {
 				assert.Equal(t, tt.enabled, body.IsEnabled)
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusCreated)
-				_, _ = w.Write([]byte(`{"jobId":"87ab1934-0146-4fb0-80bc-815fea03214d","status":"success"}`))
+				_, _ = w.Write([]byte(`{"jobId":"87ab1934-0146-4fb0-80bc-815fea03214d","message":"Job created successfully"}`))
 			})
 
 			result, err := tt.call(client, t.Context())
