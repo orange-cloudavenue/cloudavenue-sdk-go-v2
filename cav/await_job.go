@@ -70,6 +70,9 @@ func WaitJob(ctx context.Context, c Client, req JobWaitRequest) error {
 		Backend:     req.Backend,
 		JobID:       req.JobID,
 		PollOptions: req.PollOptions,
+		Extract: func(_ *resty.Response) (struct{}, error) {
+			return struct{}{}, nil
+		},
 	})
 	return err
 }
@@ -86,9 +89,6 @@ func awaitJob[R any](ctx context.Context, c Client, req JobAwaitRequest[R]) (R, 
 	}
 	if req.JobID == "" {
 		return zero, fmt.Errorf("await job: job id is required")
-	}
-	if req.Backend == 0 {
-		return zero, fmt.Errorf("await job %s: backend is required", req.JobID)
 	}
 	if req.PollOptions.Timeout <= 0 {
 		return zero, fmt.Errorf("await job %s: timeout must be greater than 0", req.JobID)
@@ -130,7 +130,7 @@ func awaitJob[R any](ctx context.Context, c Client, req JobAwaitRequest[R]) (R, 
 		switch job.Status {
 		case JobSuccess:
 			if req.Extract == nil {
-				return zero, nil
+				return zero, fmt.Errorf("await job %s: extract is required", req.JobID)
 			}
 			result, extractErr := req.Extract(resp)
 			if extractErr != nil {
