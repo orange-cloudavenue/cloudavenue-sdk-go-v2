@@ -126,16 +126,10 @@ func TestWaitJobPollsWithoutExtract(t *testing.T) {
 	require.EqualValues(t, 1, client.polls.Load())
 }
 
-func TestWaitJobPollsWithoutExtract(t *testing.T) {
-	client := &awaitJobTestClient{}
 
-	err := WaitJob(t.Context(), client, JobWaitRequest{
-		Backend: BackendVMware,
-		JobID:   "job-id",
-		PollOptions: JobPollOptions{
-			Timeout:         time.Second,
-			PollingInterval: 200 * time.Millisecond,
-		},
+	err := WaitJob(t.Context(), client, BackendVMware, "job-id", JobPollOptions{
+		Timeout:         time.Second,
+		PollingInterval: 200 * time.Millisecond,
 	})
 	require.NoError(t, err)
 	require.EqualValues(t, 1, client.polls.Load())
