@@ -7,15 +7,6 @@
  * or see the "LICENSE" file for more details.
  */
 
-/*
- * SPDX-FileCopyrightText: Copyright (c) 2025 Orange
- * SPDX-License-Identifier: Mozilla Public License 2.0
- *
- * This software is distributed under the MPL-2.0 license.
- * the text of which is available at https://www.mozilla.org/en-US/MPL-2.0/
- * or see the "LICENSE" file for more details.
- */
-
 package cav
 
 import (
@@ -124,13 +115,9 @@ func TestAwaitJobPollsImmediately(t *testing.T) {
 func TestWaitJobPollsWithoutExtract(t *testing.T) {
 	client := &awaitJobTestClient{}
 
-	err := WaitJob(t.Context(), client, JobWaitRequest{
-		Backend: BackendVMware,
-		JobID:   "job-id",
-		PollOptions: JobPollOptions{
-			Timeout:         time.Second,
-			PollingInterval: 200 * time.Millisecond,
-		},
+	err := WaitJob(t.Context(), client, BackendVMware, "job-id", JobPollOptions{
+		Timeout:         time.Second,
+		PollingInterval: 200 * time.Millisecond,
 	})
 	require.NoError(t, err)
 	require.EqualValues(t, 1, client.polls.Load())
