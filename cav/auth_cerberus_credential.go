@@ -46,6 +46,13 @@ type cerberusAuthProvider struct {
 	expiresAt   time.Time
 }
 
+type cerberusSession struct {
+	organization string
+	accessToken  string
+	tokenType    string
+	expiresAt    time.Time
+}
+
 type cerberusAuthResponse struct {
 	AccessToken string `json:"access_token"`
 	TokenType   string `json:"token_type"`
@@ -117,21 +124,16 @@ func (c *cerberusAuthProvider) CurrentAuthorization(ctx context.Context) (string
 		return "", errors.New("authorization not initialized")
 	}
 
-	tokenType := c.tokenType
-	if tokenType == "" {
-		tokenType = cerberusTokenTypeBearer
-	}
-
-	return tokenType + " " + c.accessToken, nil
+	return c.accessToken, nil
 }
 
 func (c *cerberusAuthProvider) Refresh(ctx context.Context) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
+	c.mu.RLock()
 	if c.isInitializedLocked() && !c.isExpiredLocked() {
+		c.mu.RUnlock()
 		return nil
 	}
+	c.mu.RUnlock()
 
 	resp, err := c.httpC.R().
 		SetContext(ctx).
@@ -151,26 +153,44 @@ func (c *cerberusAuthProvider) Refresh(ctx context.Context) error {
 	}
 
 	if resp.StatusCode() < http.StatusOK || resp.StatusCode() >= http.StatusMultipleChoices {
-		c.clearLocked()
+		c.mu.Lock()
+		defer c.mu.Unlock()
+		c.clearSessionLocked()
 		return fmt.Errorf("authentication failed: %w", toCerberusError(resp))
 	}
 
 	authResp, ok := resp.Result().(*cerberusAuthResponse)
 	if !ok || authResp == nil {
-		c.clearLocked()
+		c.mu.Lock()
+		defer c.mu.Unlock()
+		c.clearSessionLocked()
 		return errors.New("authentication failed: invalid response format")
 	}
 	if authResp.AccessToken == "" {
-		c.clearLocked()
+		c.mu.Lock()
+		defer c.mu.Unlock()
+		c.clearSessionLocked()
 		return errors.New("authentication failed: empty access token received")
 	}
 
-	c.accessToken = authResp.AccessToken
-	c.tokenType = authResp.TokenType
-	if c.tokenType == "" {
-		c.tokenType = cerberusTokenTypeBearer
+	tokenType := authResp.TokenType
+	if tokenType == "" {
+		tokenType = cerberusTokenTypeBearer
 	}
-	c.expiresAt = time.Now().Add(time.Duration(authResp.ExpiresIn) * time.Second)
+
+	nextSession := cerberusSession{
+		organization: c.organization,
+		accessToken:  authResp.AccessToken,
+		tokenType:    tokenType,
+		expiresAt:    time.Now().Add(time.Duration(authResp.ExpiresIn) * time.Second),
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if c.isInitializedLocked() && !c.isExpiredLocked() {
+		return nil
+	}
+	c.applySessionLocked(nextSession)
 
 	return nil
 }
@@ -178,7 +198,7 @@ func (c *cerberusAuthProvider) Refresh(ctx context.Context) error {
 func (c *cerberusAuthProvider) IsInitialized() bool {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	return c.isInitializedLocked()
+	return c.isInitializedLocked() && !c.isExpiredLocked()
 }
 
 func (c *cerberusAuthProvider) getSession() map[string]string {
@@ -209,14 +229,19 @@ func (c *cerberusAuthProvider) restoreSession(data map[string]string) error {
 		setExpiresAt = true
 	}
 
+	nextSession := cerberusSession{
+		organization: data["organization"],
+		accessToken:  data["accessToken"],
+		tokenType:    data["tokenType"],
+		expiresAt:    time.Time{},
+	}
+	if setExpiresAt {
+		nextSession.expiresAt = parsedExpiresAt
+	}
+
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	c.organization = data["organization"]
-	c.accessToken = data["accessToken"]
-	c.tokenType = data["tokenType"]
-	if setExpiresAt {
-		c.expiresAt = parsedExpiresAt
-	}
+	c.applySessionLocked(nextSession)
 
 	return nil
 }
@@ -236,7 +261,14 @@ func (c *cerberusAuthProvider) isExpiredLocked() bool {
 	return c.expiresAt.Add(-cerberusExpiryBuffer).Before(time.Now())
 }
 
-func (c *cerberusAuthProvider) clearLocked() {
+func (c *cerberusAuthProvider) applySessionLocked(session cerberusSession) {
+	c.organization = session.organization
+	c.accessToken = session.accessToken
+	c.tokenType = session.tokenType
+	c.expiresAt = session.expiresAt
+}
+
+func (c *cerberusAuthProvider) clearSessionLocked() {
 	c.accessToken = ""
 	c.tokenType = ""
 	c.expiresAt = time.Time{}

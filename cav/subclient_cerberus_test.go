@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -36,11 +37,19 @@ func TestCerberusNewHTTPClientUsesAuthorizationHeader(t *testing.T) {
 	}))
 	t.Cleanup(srv.Close)
 
+	console, ok := consoles.FindByOrganizationName(mockOrg)
+	require.True(t, ok)
+	originalServices := console.Services()
+	t.Cleanup(func() {
+		console.OverrideEndpoint(originalServices)
+	})
+
 	v := &cerberus{subclient: subclient{authProvider: &cerberusAuthProvider{
 		accessToken: "cerberus-access-token",
 		tokenType:   cerberusTokenTypeBearer,
+		expiresAt:   time.Now().Add(time.Hour),
 	}}}
-	v.setConsole(consoles.ConsoleName(mockOrg))
+	v.setConsole(console)
 	v.console.OverrideEndpoint(consoles.Services{APICerberus: consoles.Service{Enabled: true, Endpoint: srv.URL}})
 
 	hc, err := v.newHTTPClient(t.Context())

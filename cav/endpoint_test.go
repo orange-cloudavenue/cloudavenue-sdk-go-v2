@@ -11,16 +11,28 @@ package cav
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_Endpoint_Register(t *testing.T) {
+	endpointName := "FakeTestEndpointRegister"
+	endpoints.mu.Lock()
+	delete(endpoints.Map, endpointName)
+	endpoints.mu.Unlock()
+	t.Cleanup(func() {
+		endpoints.mu.Lock()
+		delete(endpoints.Map, endpointName)
+		endpoints.mu.Unlock()
+	})
+
 	tests := []struct {
 		Endpoint
 		expectedError bool
 	}{
 		{
 			Endpoint: Endpoint{
-				Name:             "Fake",
+				Name:             endpointName,
 				Method:           MethodPOST,
 				Backend:          BackendVMware,
 				PathTemplate:     "/1.2.3/sessions",
@@ -42,14 +54,22 @@ func Test_Endpoint_Register(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.Name, func(t *testing.T) {
 			if tt.expectedError {
+				panicked := false
 				defer func() {
 					if r := recover(); r != nil {
-						// We successfully recovered from panic
-						t.Log("Test passed, panic was caught!")
+						panicked = true
 					}
+					require.True(t, panicked, "expected Register to panic")
 				}()
 			}
 			tt.Endpoint.Register()
+			if tt.expectedError {
+				return
+			}
+
+			registered, err := GetEndpoint(tt.Name)
+			require.NoError(t, err)
+			require.NotNil(t, registered)
 		})
 	}
 }

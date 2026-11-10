@@ -13,6 +13,7 @@ import (
 	"errors"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -42,11 +43,12 @@ func TestCurrentAuthorizationUsesBackendCredential(t *testing.T) {
 
 	cerberusAuthProvider.accessToken = "cerberus-token"
 	cerberusAuthProvider.tokenType = cerberusTokenTypeBearer
+	cerberusAuthProvider.expiresAt = time.Now().Add(time.Hour)
 	vmwareCredential.bearer = "vmware-token"
 
 	got, err := c.CurrentAuthorization(t.Context(), BackendInfrapi)
 	require.NoError(t, err)
-	assert.Equal(t, "Bearer cerberus-token", got)
+	assert.Equal(t, "cerberus-token", got)
 
 	got, err = c.CurrentAuthorization(t.Context(), BackendVMware)
 	require.NoError(t, err)

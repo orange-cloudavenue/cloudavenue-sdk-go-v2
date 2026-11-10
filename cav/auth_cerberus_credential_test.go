@@ -54,7 +54,7 @@ func TestCerberusCredentialRefresh(t *testing.T) {
 
 	authorization, err := c.CurrentAuthorization(t.Context())
 	require.NoError(t, err)
-	assert.Equal(t, "Bearer cerberus-access-token", authorization)
+	assert.Equal(t, "cerberus-access-token", authorization)
 	assert.True(t, c.IsInitialized())
 }
 

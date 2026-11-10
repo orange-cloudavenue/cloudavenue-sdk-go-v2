@@ -12,6 +12,7 @@ package iam
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
@@ -59,6 +60,7 @@ func (c *Client) CreateAPIToken(ctx context.Context, params types.ParamsCreateAP
 	if err != nil {
 		return nil, fmt.Errorf("%s: bearer assertion: %w", opCreateAPIToken, err)
 	}
+	assertion = strings.TrimPrefix(assertion, "Bearer ")
 
 	oauthToken, err := c.CreateOAuthToken(ctx, types.ParamsCreateOAuthToken{
 		TenantID:  params.TenantID,
