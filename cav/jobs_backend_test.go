@@ -33,7 +33,7 @@ func TestWithJitter(t *testing.T) {
 }
 
 func TestParseJobResponseUnsupportedClient(t *testing.T) {
-	_, err := parseJobResponse(&Response{Raw: &resty.Response{}}, BackendNetBackup)
+	_, err := parseJobResponse(&resty.Response{}, BackendNetBackup)
 	require.EqualError(t, err, "backend 4 does not support jobs")
 }
 

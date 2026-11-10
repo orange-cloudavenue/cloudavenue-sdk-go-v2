@@ -13,11 +13,9 @@ import (
 	"context"
 	"fmt"
 	"slices"
-	"time"
 
 	"github.com/orange-cloudavenue/common-go/validators"
 	"golang.org/x/sync/errgroup"
-	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
@@ -218,10 +216,15 @@ func (c *Client) CreateEdgeGateway(ctx context.Context, params types.ParamsCreat
 		return nil, fmt.Errorf("%s: create: %w", opCreateEdgeGateway, err)
 	}
 
-	edgeGatewayCreated, err := cav.AwaitJob(ctx, c.c, jobID, cav.JobPollOptions{
-		Timeout:         30 * time.Second,
-		PollingInterval: 1 * time.Second,
-	}, extractCreatedEdgeGatewayName)
+	job, err := cav.WaitJob(ctx, c.c, cav.JobWaitRequest{
+		Backend: cav.BackendInfrapi,
+		JobID:   jobID,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("%s: await job: %w", opCreateEdgeGateway, err)
+	}
+
+	edgeGatewayCreated, err := extractCreatedEdgeGatewayName(job)
 	if err != nil {
 		return nil, fmt.Errorf("%s: await job: %w", opCreateEdgeGateway, err)
 	}
@@ -314,21 +317,13 @@ func (c *Client) resolveCreateEdgeGatewayDependencies(ctx context.Context, owner
 	return dependencies, nil
 }
 
-func extractCreatedEdgeGatewayName(job *resty.Response) (string, error) {
+func extractCreatedEdgeGatewayName(job *cav.Job) (string, error) {
 	if job == nil {
 		return "", errors.New("created edge gateway name not found in job response")
 	}
 
-	r, ok := job.Result().(*cav.CerberusJobAPIResponse)
-	if !ok {
-		return "", errors.New("created edge gateway name not found in job response")
-	}
-	if len(*r) == 0 {
-		return "", errors.New("no job information returned")
-	}
-
 	var fallback string
-	for _, action := range (*r)[0].Actions {
+	for _, action := range job.Actions {
 		if fallback == "" && action.Details != "" {
 			fallback = action.Details
 		}

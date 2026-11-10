@@ -14,7 +14,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/orange-cloudavenue/common-go/urn"
 	"github.com/orange-cloudavenue/common-go/validators"
 	"resty.dev/v3"
 
@@ -54,9 +53,6 @@ func init() {
 	}.Register()
 }
 
-// Ensure cerberus implements jobsInterface.
-var _ jobsInterface = &cerberus{}
-
 // cerberusJobCreatedAPIResponse is returned when customer API accepts
 // asynchronous work through Cerberus.
 type cerberusJobCreatedAPIResponse struct {
@@ -82,49 +78,8 @@ type CerberusJobAPIResponseAction struct {
 	Details string `json:"details" fake:"{sentence}"`
 }
 
-// JobRefresh refreshes customer job status through Cerberus job endpoint.
-func (v *cerberus) JobRefresh(httpC *resty.Client, resp *resty.Response, reqOpts []EndpointRequestOption) (job *Job, err error) {
-	job, err = v.JobParser(resp)
-	if err != nil {
-		return job, err
-	}
-
-	ep, err := GetEndpoint(getJobCerberusEndpointName)
-	if err != nil {
-		return nil, errors.New("failed to get endpoint for JobCerberus: " + err.Error())
-	}
-
-	reqOpts = append(
-		reqOpts,
-		SetCustomRestyOption(
-			func(r *resty.Request) {
-				r.SetResultError(&errors.CustomerAPIErrorBody{})
-				r.SetResult(&CerberusJobAPIResponse{})
-			},
-		),
-		WithPathParam(ep.PathParams[0], urn.ExtractUUID(job.ID)),
-	)
-
-	r := httpC.R().
-		SetContext(resp.Request.Context()).
-		SetHeader("Accept", "application/json;version="+cerberusVCDVersion)
-
-	for _, opt := range reqOpts {
-		if err := opt(ep, r); err != nil {
-			return nil, err
-		}
-	}
-
-	respR, err := r.Get(ep.PathTemplate)
-	if err != nil {
-		return nil, errors.New("failed to refresh job status: " + err.Error())
-	}
-
-	return v.JobParser(respR)
-}
-
-// JobParser parses customer job data from response returned through Cerberus.
-func (v *cerberus) JobParser(resp *resty.Response) (job *Job, err error) {
+// parseCerberusJob parses customer job data from a response returned through Cerberus.
+func parseCerberusJob(resp *resty.Response) (job *Job, err error) {
 	if resp == nil {
 		return job, errors.New("no response to parse")
 	}
@@ -162,7 +117,11 @@ func (v *cerberus) JobParser(resp *resty.Response) (job *Job, err error) {
 			HREF:        resp.Request.URL,
 		}
 
-		status, err := v.JobStatusParser((*apiR)[0].Status)
+		for _, action := range (*apiR)[0].Actions {
+			job.Actions = append(job.Actions, JobAction(action))
+		}
+
+		status, err := parseCerberusJobStatus((*apiR)[0].Status)
 		if err != nil {
 			return nil, errors.New("failed to parse job status: " + err.Error())
 		}
@@ -184,16 +143,16 @@ func (v *cerberus) JobParser(resp *resty.Response) (job *Job, err error) {
 		return job, nil
 	}
 
-	if err := v.parseAPIError("JobParser", resp); err != nil {
+	if err := (&cerberus{}).parseAPIError("JobParser", resp); err != nil {
 		return nil, err
 	}
 
 	return nil, errors.New("failed to parse customer job response from Cerberus endpoint: unexpected type or empty response")
 }
 
-// JobStatusParser maps customer job status strings returned through Cerberus to
-// JobStatus.
-func (v *cerberus) JobStatusParser(status string) (s JobStatus, err error) {
+// parseCerberusJobStatus maps customer job status strings returned through
+// Cerberus to JobStatus.
+func parseCerberusJobStatus(status string) (s JobStatus, err error) {
 	// CREATED, PENDING, IN_PROGRESS, FAILED, DONE
 	switch strings.ToLower(status) {
 	case "created":

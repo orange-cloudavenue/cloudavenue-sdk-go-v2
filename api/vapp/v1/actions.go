@@ -16,8 +16,6 @@ import (
 	"net/http"
 	"strings"
 
-	"resty.dev/v3"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
@@ -166,13 +164,12 @@ func (c *Client) executeVAppAction(ctx context.Context, id string, op cav.Operat
 }
 
 func (c *Client) awaitJob(ctx context.Context, opName, jobID string) error {
-	_, err := cav.AwaitJobOnBackend(ctx, c.c, cav.BackendVMware, jobID, cav.JobPollOptions{
+	if _, err := cav.WaitJob(ctx, c.c, cav.JobWaitRequest{
+		Backend:         cav.BackendVMware,
+		JobID:           jobID,
 		Timeout:         c.jobTimeout,
 		PollingInterval: c.jobPollInterval,
-	}, func(_ *resty.Response) (struct{}, error) {
-		return struct{}{}, nil
-	})
-	if err != nil {
+	}); err != nil {
 		return fmt.Errorf("%s: await job: %w", opName, err)
 	}
 	return nil
