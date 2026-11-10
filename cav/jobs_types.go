@@ -15,7 +15,8 @@ type (
 		// ID is job identifier.
 		ID string `json:"jobId,omitempty"`
 
-		// Message is job name.
+		// Message carries backend-provided free-form details, mainly from
+		// Cerberus job creation responses.
 		Message string `json:"message,omitempty"`
 
 		// Name is job name.
