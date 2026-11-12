@@ -72,15 +72,7 @@ func newMockClient() (Client, error) {
 func defaultMockHandler(ep *Endpoint) http.HandlerFunc {
 	return func(w http.ResponseWriter, _ *http.Request) {
 		if ep.Name == "SessionVmware" {
-			w.Header().Add("X-VMWARE-VCLOUD-ACCESS-TOKEN", "mock-access-token")
-			w.Header().Set("Content-Type", "application/json")
-			resp := map[string]any{
-				"org":   map[string]string{"id": "{urn:org}", "name": mockOrg},
-				"site":  map[string]string{"id": "{urn:site}", "name": mockOrg},
-				"roles": []string{"Organization Administrator"},
-			}
-			respJ, _ := json.Marshal(resp)
-			_, _ = w.Write(respJ)
+			NewSessionVmwareMockHandler().ServeHTTP(w, nil)
 			return
 		}
 

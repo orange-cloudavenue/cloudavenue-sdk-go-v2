@@ -29,9 +29,9 @@ func Test_NewRequest_WithoutAuth(t *testing.T) {
 }
 
 func Test_NewRequest(t *testing.T) {
-	client, err := NewClient(mockOrg, WithCloudAvenueCredential("mockuser", "mockpassword"))
+	client, err := newMockClient()
 	if err != nil {
-		t.Fatalf("Error creating client with mock: %v", err)
+		t.Fatalf("Error creating mock client: %v", err)
 	}
 	defer func() {
 		if err := client.Close(); err != nil {
@@ -46,9 +46,9 @@ func Test_NewRequest(t *testing.T) {
 }
 
 func TestNewRequestAppliesEndpointHeaders(t *testing.T) {
-	client, err := NewClient(mockOrg, WithCloudAvenueCredential("mockuser", "mockpassword"))
+	client, err := newMockClient()
 	if err != nil {
-		t.Fatalf("Error creating client with mock: %v", err)
+		t.Fatalf("Error creating mock client: %v", err)
 	}
 	defer func() {
 		if err := client.Close(); err != nil {
@@ -72,9 +72,9 @@ func TestNewRequestAppliesEndpointHeaders(t *testing.T) {
 }
 
 func TestNewRawRequest(t *testing.T) {
-	c, err := NewClient(mockOrg, WithCloudAvenueCredential("mockuser", "mockpassword"))
+	c, err := newMockClient()
 	if err != nil {
-		t.Fatalf("Error creating client with mock: %v", err)
+		t.Fatalf("Error creating mock client: %v", err)
 	}
 	defer func() {
 		if err := c.Close(); err != nil {
