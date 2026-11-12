@@ -76,6 +76,20 @@ func GetVApp() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetVApp")
 }
 
+// GetVAppNetworkConfigSection - Get the runtime network configuration section of a VApp
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-NetworkConfigSection-vApp.html
+func GetVAppNetworkConfigSection() *cav.Endpoint {
+	return cav.MustGetEndpoint("GetVAppNetworkConfigSection")
+}
+
+// UpdateVAppNetworkConfigSection - Replace the runtime network configuration section of a VApp
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-NetworkConfigSection-vApp.html
+func UpdateVAppNetworkConfigSection() *cav.Endpoint {
+	return cav.MustGetEndpoint("UpdateVAppNetworkConfigSection")
+}
+
 // ComposeVApp - Compose a new VApp
 //
 // DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-ComposeVApp.html
@@ -116,6 +130,20 @@ func RemoveAllNetworks() *cav.Endpoint {
 // DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-UndeployVApp.html
 func UndeployVApp() *cav.Endpoint {
 	return cav.MustGetEndpoint("UndeployVApp")
+}
+
+// GetVAppProductSections - Get the ProductSection guest properties of a VApp
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-ProductSections-vApp.html
+func GetVAppProductSections() *cav.Endpoint {
+	return cav.MustGetEndpoint("GetVAppProductSections")
+}
+
+// UpdateVAppProductSections - Replace the ProductSection guest properties of a VApp
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-ProductSections-vApp.html
+func UpdateVAppProductSections() *cav.Endpoint {
+	return cav.MustGetEndpoint("UpdateVAppProductSections")
 }
 
 // GetVAppLeaseSettings - Get org/VDC-level lease settings

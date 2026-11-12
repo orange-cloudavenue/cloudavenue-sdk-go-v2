@@ -145,6 +145,33 @@ func init() {
 		ResponseType: itypes.APIResponseGetVApp{},
 	}.Register()
 
+	// GetVAppNetworkConfigSection
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-NetworkConfigSection-vApp.html",
+		Name:             "GetVAppNetworkConfigSection",
+		Description:      "Get the runtime network configuration section of a VApp",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		Headers:          map[string]string{headerAccept: headerXML},
+		PathTemplate:     pathVAppNetworkConfigSection,
+		PathParams:       vAppActionPathParams(),
+		ResponseType:     itypes.APIResponseVAppNetworkConfigSection{},
+	}.Register()
+
+	// UpdateVAppNetworkConfigSection
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-NetworkConfigSection-vApp.html",
+		Name:             "UpdateVAppNetworkConfigSection",
+		Description:      "Replace the runtime network configuration section of a VApp",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendVMware,
+		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
+		PathTemplate:     pathVAppNetworkConfigSection,
+		PathParams:       vAppActionPathParams(),
+		BodyRequestType:  itypes.APIResponseVAppNetworkConfigSection{},
+		ResponseType:     cav.Job{},
+	}.Register()
+
 	// ComposeVApp
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-ComposeVApp.html",
@@ -190,6 +217,8 @@ func init() {
 	}.Register()
 
 	// UpdateVApp
+	// PUT /vApp/{id} is the vApp modify operation in the pinned 39.1 inventory,
+	// but Broadcom does not publish a distinct PUT-VApp.html page there.
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-Vm.html",
 		Name:             "UpdateVApp",
@@ -267,8 +296,36 @@ func init() {
 				TransformFunc: extractor.ExtractUUID,
 			},
 		},
+		Headers:         map[string]string{headerAccept: headerXML, headerContentType: headerXML},
 		BodyRequestType: itypes.APIRequestUndeployVApp{},
 		ResponseType:    cav.Job{},
+	}.Register()
+
+	// GetVAppProductSections
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-ProductSections-vApp.html",
+		Name:             "GetVAppProductSections",
+		Description:      "Get the ProductSection guest properties of a VApp",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		Headers:          map[string]string{headerAccept: headerJSON},
+		PathTemplate:     pathVAppProductSections,
+		PathParams:       vAppActionPathParams(),
+		ResponseType:     itypes.APIResponseGuestProperties{},
+	}.Register()
+
+	// UpdateVAppProductSections
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-ProductSections-vApp.html",
+		Name:             "UpdateVAppProductSections",
+		Description:      "Replace the ProductSection guest properties of a VApp",
+		Method:           cav.MethodPUT,
+		Backend:          cav.BackendVMware,
+		Headers:          map[string]string{headerAccept: headerJSON, headerContentType: headerJSON},
+		PathTemplate:     pathVAppProductSections,
+		PathParams:       vAppActionPathParams(),
+		BodyRequestType:  itypes.APIResponseGuestProperties{},
+		ResponseType:     cav.Job{},
 	}.Register()
 
 	// GetVAppLeaseSettings

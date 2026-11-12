@@ -41,10 +41,14 @@ const (
 	// pathAdminOrgUserChangePassword changes one user password in the legacy admin XML API.
 	// pathVAppByID addresses one vApp in the legacy XML API.
 	pathVAppByID = "/api/vapp/{vapp-id}"
+	// pathVAppNetworkConfigSection gets or replaces the runtime network configuration of one vApp.
+	pathVAppNetworkConfigSection = "/api/vapp/{vapp-id}/networkConfigSection/"
 	// pathVAppRemoveAllNetworks removes all networks from one vApp.
 	pathVAppRemoveAllNetworks = "/api/vapp/{vapp-id}/action/removeAllNetworks"
 	// pathVAppUndeploy undeploys one vApp.
 	pathVAppUndeploy = "/api/vapp/{vapp-id}/action/undeploy"
+	// pathVAppProductSections gets or updates one vApp ProductSection set.
+	pathVAppProductSections = "/api/vapp/{vapp-id}/productSections"
 	// pathVAppDeploy deploys one vApp.
 	pathVAppDeploy = "/api/vapp/{vapp-id}/action/deploy"
 	// vApp power action paths operate on one vApp or VM.
