@@ -13,19 +13,23 @@ type (
 	// Job describes an asynchronous backend job.
 	Job struct {
 		// ID is job identifier.
-		ID string
+		ID string `json:"jobId,omitempty"`
+
+		// Message carries backend-provided free-form details, mainly from
+		// Cerberus job creation responses.
+		Message string `json:"message,omitempty"`
 
 		// Name is job name.
-		Name string
+		Name string `json:"name,omitempty"`
 
 		// Description summarizes job purpose or outcome.
-		Description string
+		Description string `json:"description,omitempty"`
 
 		// HREF is job resource URL when backend exposes one.
-		HREF string
+		HREF string `json:"href,omitempty"`
 
 		// Status is current job state.
-		Status JobStatus
+		Status JobStatus `json:"status,omitempty"`
 	}
 
 	// JobStatus represents backend job state.

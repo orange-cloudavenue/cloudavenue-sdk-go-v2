@@ -26,16 +26,25 @@ type JobPollOptions struct {
 	Jitter          time.Duration
 }
 
-// AwaitJob polls until job completes or cancellation/timeout stops polling.
-// The extract callback receives the raw response to allow extraction of
-// resource data from the raw response (e.g. created resource names).
+// AwaitJobOnBackend polls a backend-specific job until completion and extracts
+// a typed result from the terminal response.
+func AwaitJobOnBackend[R any](ctx context.Context, c Client, backend BackendTarget, jobID string, opts JobPollOptions, extract func(resp *resty.Response) (R, error)) (R, error) {
+	return awaitJob(ctx, c, backend, jobID, opts, extract)
+}
+
+// AwaitJob polls a job until completion, probing the backend automatically on
+// the first request, then extracts a typed result from the terminal response.
 func AwaitJob[R any](ctx context.Context, c Client, jobID string, opts JobPollOptions, extract func(resp *resty.Response) (R, error)) (R, error) {
 	return awaitJob(ctx, c, 0, jobID, opts, extract)
 }
 
-// AwaitJobOnBackend polls a job on a known backend and avoids probing unrelated backends.
-func AwaitJobOnBackend[R any](ctx context.Context, c Client, backend BackendTarget, jobID string, opts JobPollOptions, extract func(resp *resty.Response) (R, error)) (R, error) {
-	return awaitJob(ctx, c, backend, jobID, opts, extract)
+// WaitJob polls a backend-specific job until completion and ignores the
+// terminal response payload.
+func WaitJob(ctx context.Context, c Client, backend BackendTarget, jobID string, opts JobPollOptions) error {
+	_, err := awaitJob(ctx, c, backend, jobID, opts, func(_ *resty.Response) (struct{}, error) {
+		return struct{}{}, nil
+	})
+	return err
 }
 
 func awaitJob[R any](ctx context.Context, c Client, backend BackendTarget, jobID string, opts JobPollOptions, extract func(resp *resty.Response) (R, error)) (R, error) {
@@ -50,9 +59,6 @@ func awaitJob[R any](ctx context.Context, c Client, backend BackendTarget, jobID
 	}
 	if jobID == "" {
 		return zero, fmt.Errorf("await job: job id is required")
-	}
-	if extract == nil {
-		return zero, fmt.Errorf("await job %s: extract is required", jobID)
 	}
 	if opts.Timeout <= 0 {
 		return zero, fmt.Errorf("await job %s: timeout must be greater than 0", jobID)
@@ -93,6 +99,9 @@ func awaitJob[R any](ctx context.Context, c Client, backend BackendTarget, jobID
 
 		switch job.Status {
 		case JobSuccess:
+			if extract == nil {
+				return zero, fmt.Errorf("await job %s: extract is required", jobID)
+			}
 			result, extractErr := extract(resp)
 			if extractErr != nil {
 				return zero, extractErr

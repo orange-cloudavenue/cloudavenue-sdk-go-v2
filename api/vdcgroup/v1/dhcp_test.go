@@ -34,7 +34,7 @@ func configureDhcpTask(t *testing.T, ms interface {
 	jobEndpoint := cav.MustGetEndpoint("GetJobVmware")
 	ms.SetResponseFunc(jobEndpoint, func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"id":"` + dhcpTaskIdentifier + `","status":"success"}`))
+		_, _ = w.Write([]byte(`{"href":"https://example.invalid/api/task/` + dhcpTaskIdentifier + `","id":"` + dhcpTaskIdentifier + `","name":"task","status":"success","operation":"updateDhcpConfig","operationName":"updateDhcpConfig","serviceNamespace":"com.orange.cloudavenue","description":"Task completed successfully"}`))
 	})
 	t.Cleanup(func() { ms.CleanResponse(jobEndpoint) })
 }

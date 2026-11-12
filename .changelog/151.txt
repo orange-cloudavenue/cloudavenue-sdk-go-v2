@@ -1,0 +1,4 @@
+```release-note:breaking
+provider: align organization update job handling with the backend async contract in SDK v2
+provider: update UpdateOrganization, EnableOrganization, and DisableOrganization to return the accepted asynchronous job instead of waiting for completion and returning organization state
+```
