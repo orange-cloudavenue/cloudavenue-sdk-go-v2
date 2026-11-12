@@ -34,12 +34,70 @@ type (
 		DeploymentLeaseInSeconds *int `documentation:"Deployment lease in seconds"`
 		StorageLeaseInSeconds    *int `documentation:"Storage lease in seconds"`
 
-		Properties ModelVAppProperties `documentation:"Properties of the VApp"`
+		Properties      ModelVAppProperties      `documentation:"Properties of the VApp"`
+		GuestProperties ModelVAppGuestProperties `documentation:"Guest properties of the VApp"`
 	}
 
 	// ModelVAppProperties contains VApp properties.
 	ModelVAppProperties struct {
 		BillingModel string `documentation:"Billing model of the VApp"`
+	}
+
+	// ModelVAppGuestProperties contains vApp ProductSection guest properties.
+	ModelVAppGuestProperties struct {
+		Sections []ModelVAppGuestPropertySection
+	}
+
+	// ModelVAppGuestPropertySection contains one ProductSection and its properties.
+	ModelVAppGuestPropertySection struct {
+		Class      string
+		Instance   string
+		Properties map[string]string
+	}
+
+	// ModelVAppRuntimeNetworkConfigSection contains the runtime networkConfigSection returned by VCD.
+	ModelVAppRuntimeNetworkConfigSection struct {
+		Info          string
+		NetworkConfig []ModelVAppRuntimeNetworkConfig
+	}
+
+	// ModelVAppRuntimeNetworkConfig contains one runtime network definition of a vApp.
+	ModelVAppRuntimeNetworkConfig struct {
+		ID            string
+		HREF          string
+		Description   string
+		Type          string
+		NetworkName   string
+		Configuration ModelVAppRuntimeNetworkConfiguration
+	}
+
+	// ModelVAppRuntimeNetworkConfiguration contains the runtime settings of one vApp network.
+	ModelVAppRuntimeNetworkConfiguration struct {
+		ParentNetwork                  *VAppReference
+		FenceMode                      string
+		RetainNetInfoAcrossDeployments *bool
+		IsDeployed                     *bool
+		IsShared                       *bool
+		IsConnected                    bool
+		IPScopes                       []ModelVAppRuntimeIPScope
+	}
+
+	// ModelVAppRuntimeIPScope contains one IP scope of a runtime vApp network.
+	ModelVAppRuntimeIPScope struct {
+		IsInherited  bool
+		Gateway      string
+		Netmask      string
+		DNS1         string
+		DNS2         string
+		DNSSuffix    string
+		PrefixLength *int
+		IPRanges     []ModelVAppRuntimeIPRange
+	}
+
+	// ModelVAppRuntimeIPRange contains one IP range of a runtime vApp network.
+	ModelVAppRuntimeIPRange struct {
+		StartAddress string
+		EndAddress   string
 	}
 )
 
@@ -159,6 +217,64 @@ type (
 		Name string
 	}
 
+	// VAppUndeployMode defines the VMware undeploy action payload mode.
+	VAppUndeployMode string
+
+	// ParamsGetVAppGuestProperties identifies the vApp guest properties to read.
+	ParamsGetVAppGuestProperties struct {
+		ID   string
+		Name string
+	}
+
+	// ParamsUpdateVAppGuestProperties identifies the vApp guest properties to replace.
+	ParamsUpdateVAppGuestProperties struct {
+		ID              string
+		Name            string
+		GuestProperties ModelVAppGuestProperties
+	}
+
+	// ParamsUndeployVApp defines the parameters for undeploying a vApp.
+	ParamsUndeployVApp struct {
+		ID   string
+		Name string
+		Mode VAppUndeployMode
+	}
+
+	// ParamsGetVAppNetworkConfig identifies the vApp runtime network section to read.
+	ParamsGetVAppNetworkConfig struct {
+		ID   string
+		Name string
+	}
+
+	// ParamsCreateVAppNetwork defines a new isolated runtime vApp network.
+	ParamsCreateVAppNetwork struct {
+		VAppID   string
+		VAppName string
+		Network  ModelVAppRuntimeNetworkConfig
+	}
+
+	// ParamsAddOrgNetworkToVApp defines a new direct/routed runtime vApp network backed by an org network.
+	ParamsAddOrgNetworkToVApp struct {
+		VAppID   string
+		VAppName string
+		Network  ModelVAppRuntimeNetworkConfig
+	}
+
+	// ParamsUpdateVAppNetwork updates an existing runtime vApp network by name.
+	ParamsUpdateVAppNetwork struct {
+		VAppID      string
+		VAppName    string
+		NetworkName string
+		Network     ModelVAppRuntimeNetworkConfig
+	}
+
+	// ParamsRemoveVAppNetwork removes one runtime vApp network by name.
+	ParamsRemoveVAppNetwork struct {
+		VAppID      string
+		VAppName    string
+		NetworkName string
+	}
+
 	// ModelVAppLeaseSettings contains org/VDC-level lease settings.
 	ModelVAppLeaseSettings struct {
 		DeploymentLeaseInSeconds int `documentation:"Deployment lease in seconds"`
@@ -187,6 +303,15 @@ type (
 		// LeaseSettings are the lease settings to apply.
 		LeaseSettings ModelVAppLeaseSettings
 	}
+)
+
+const (
+	// VAppUndeployModePowerOff powers off the vApp before undeploy.
+	VAppUndeployModePowerOff VAppUndeployMode = "powerOff"
+	// VAppUndeployModeSuspend suspends the vApp before undeploy.
+	VAppUndeployModeSuspend VAppUndeployMode = "suspend"
+	// VAppUndeployModeForce requests VMware force undeploy behavior.
+	VAppUndeployModeForce VAppUndeployMode = "force"
 )
 
 // Validate checks ParamsGetVApp structural constraints.
@@ -227,6 +352,164 @@ func (p ParamsUpdateVApp) Validate() error {
 // Validate checks ParamsDeleteVApp structural constraints.
 func (p ParamsDeleteVApp) Validate() error {
 	if p.ID == "" && p.Name == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	return nil
+}
+
+// Validate checks ParamsGetVAppGuestProperties structural constraints.
+func (p ParamsGetVAppGuestProperties) Validate() error {
+	if p.ID == "" && p.Name == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	return nil
+}
+
+// Validate checks ParamsUpdateVAppGuestProperties structural constraints.
+func (p ParamsUpdateVAppGuestProperties) Validate() error {
+	if p.ID == "" && p.Name == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	return p.GuestProperties.Validate()
+}
+
+// Validate checks ParamsUndeployVApp structural constraints.
+func (p ParamsUndeployVApp) Validate() error {
+	if p.ID == "" && p.Name == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	return p.Mode.Validate()
+}
+
+// Validate checks ParamsGetVAppNetworkConfig structural constraints.
+func (p ParamsGetVAppNetworkConfig) Validate() error {
+	if p.ID == "" && p.Name == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	return nil
+}
+
+// Validate checks ParamsCreateVAppNetwork structural constraints.
+func (p ParamsCreateVAppNetwork) Validate() error {
+	if p.VAppID == "" && p.VAppName == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	if p.Network.Configuration.ParentNetwork != nil {
+		return fmt.Errorf("parent network is not allowed for create")
+	}
+	if p.Network.Configuration.FenceMode != "isolated" {
+		return fmt.Errorf("create requires isolated fence mode")
+	}
+	return p.Network.Validate()
+}
+
+// Validate checks ParamsAddOrgNetworkToVApp structural constraints.
+func (p ParamsAddOrgNetworkToVApp) Validate() error {
+	if p.VAppID == "" && p.VAppName == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	if err := p.Network.Validate(); err != nil {
+		return err
+	}
+	if p.Network.Configuration.ParentNetwork == nil {
+		return fmt.Errorf("missing required parameters")
+	}
+	return nil
+}
+
+// Validate checks ParamsUpdateVAppNetwork structural constraints.
+func (p ParamsUpdateVAppNetwork) Validate() error {
+	if p.VAppID == "" && p.VAppName == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	if p.NetworkName == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	if p.Network.NetworkName != "" && p.Network.NetworkName != p.NetworkName {
+		return fmt.Errorf("network name mismatch")
+	}
+	return p.Network.Validate()
+}
+
+// Validate checks ParamsRemoveVAppNetwork structural constraints.
+func (p ParamsRemoveVAppNetwork) Validate() error {
+	if p.VAppID == "" && p.VAppName == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	if p.NetworkName == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	return nil
+}
+
+// Validate checks runtime vApp network structural constraints.
+func (m ModelVAppRuntimeNetworkConfig) Validate() error {
+	if m.NetworkName == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	return m.Configuration.Validate()
+}
+
+// Validate checks guest properties structural constraints.
+func (m ModelVAppGuestProperties) Validate() error {
+	for _, section := range m.Sections {
+		if err := section.Validate(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Validate checks guest property section structural constraints.
+func (m ModelVAppGuestPropertySection) Validate() error {
+	if m.Properties == nil {
+		return fmt.Errorf("missing required parameters")
+	}
+	return nil
+}
+
+// Validate checks undeploy mode structural constraints.
+func (m VAppUndeployMode) Validate() error {
+	switch m {
+	case "", VAppUndeployModePowerOff, VAppUndeployModeSuspend, VAppUndeployModeForce:
+		return nil
+	default:
+		return fmt.Errorf("unsupported undeploy mode %q", m)
+	}
+}
+
+// Validate checks runtime vApp network configuration structural constraints.
+func (m ModelVAppRuntimeNetworkConfiguration) Validate() error {
+	if m.FenceMode == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	if len(m.IPScopes) == 0 && m.ParentNetwork == nil {
+		return fmt.Errorf("missing required parameters")
+	}
+	for _, scope := range m.IPScopes {
+		if err := scope.Validate(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Validate checks runtime IP scope structural constraints.
+func (m ModelVAppRuntimeIPScope) Validate() error {
+	if m.Gateway == "" || m.Netmask == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	for _, r := range m.IPRanges {
+		if err := r.Validate(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Validate checks runtime IP range structural constraints.
+func (m ModelVAppRuntimeIPRange) Validate() error {
+	if m.StartAddress == "" || m.EndAddress == "" {
 		return fmt.Errorf("missing required parameters")
 	}
 	return nil
