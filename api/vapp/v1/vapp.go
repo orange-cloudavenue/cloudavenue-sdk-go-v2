@@ -11,9 +11,12 @@ package vapp
 
 import (
 	"context"
+	stderrors "errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"path"
+	"sort"
 	"strings"
 	"time"
 
@@ -22,23 +25,35 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+	pkgerrors "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
 const (
-	opListVApp                = "VApp.List"
-	opGetVApp                 = "VApp.Get"
-	opComposeVApp             = "VApp.Compose"
-	opInstantiateVAppTemplate = "VApp.InstantiateTemplate"
-	opUpdateVApp              = "VApp.Update"
-	opDeleteVApp              = "VApp.Delete"
-	opDeployVApp              = "VApp.Deploy"
-	opPowerOffVApp            = "VApp.PowerOff"
-	opPowerOnVApp             = "VApp.PowerOn"
-	opRebootVApp              = "VApp.Reboot"
-	opResetVApp               = "VApp.Reset"
-	opShutdownVApp            = "VApp.Shutdown"
-	opSuspendVApp             = "VApp.Suspend"
+	ovfEnvelopeXMLNS            = "http://schemas.dmtf.org/ovf/envelope/1"
+	opListVApp                  = "VApp.List"
+	opGetVApp                   = "VApp.Get"
+	opGetVAppNetworkConfig      = "VApp.NetworkConfig.Get"
+	opGetVAppGuestProperties    = "VApp.GuestProperties.Get"
+	opUpdateVAppGuestProperties = "VApp.GuestProperties.Update"
+	opCreateVAppNetwork         = "VApp.NetworkConfig.Create"
+	opAddOrgNetworkToVApp       = "VApp.NetworkConfig.AddOrgNetwork"
+	opUpdateVAppNetwork         = "VApp.NetworkConfig.Update"
+	opRemoveVAppNetwork         = "VApp.NetworkConfig.Remove"
+	opComposeVApp               = "VApp.Compose"
+	opInstantiateVAppTemplate   = "VApp.InstantiateTemplate"
+	opUpdateVApp                = "VApp.Update"
+	opDeleteVApp                = "VApp.Delete"
+	opUndeployVApp              = "VApp.Undeploy"
+	opDeployVApp                = "VApp.Deploy"
+	opPowerOffVApp              = "VApp.PowerOff"
+	opPowerOnVApp               = "VApp.PowerOn"
+	opRebootVApp                = "VApp.Reboot"
+	opResetVApp                 = "VApp.Reset"
+	opShutdownVApp              = "VApp.Shutdown"
+	opSuspendVApp               = "VApp.Suspend"
+	vcloudXMLNS                 = "http://www.vmware.com/vcloud/v1.5"
+	xmlSchemaInstanceNS         = "http://www.w3.org/2001/XMLSchema-instance"
 )
 
 type getVAppByIDParams struct {
@@ -62,6 +77,21 @@ type updateVAppByIDParams struct {
 
 type deleteVAppByIDParams struct {
 	ID string
+}
+
+type updateVAppNetworkConfigSectionParams struct {
+	ID   string
+	Body itypes.APIResponseVAppNetworkConfigSection
+}
+
+type updateVAppGuestPropertiesParams struct {
+	ID   string
+	Body itypes.APIResponseGuestProperties
+}
+
+type undeployVAppParams struct {
+	ID   string
+	Body itypes.APIRequestUndeployVApp
 }
 
 type listVAppParams struct {
@@ -95,6 +125,92 @@ var (
 			}
 
 			return list, nil
+		},
+	}
+	getVAppNetworkConfigSectionOp = cav.Operation[getVAppByIDParams, *itypes.APIResponseVAppNetworkConfigSection]{
+		Name:     opGetVAppNetworkConfig,
+		Backend:  cav.BackendVMware,
+		Endpoint: endpoints.GetVAppNetworkConfigSection(),
+		Validate: func(p getVAppByIDParams) error {
+			if p.ID == "" {
+				return fmt.Errorf("id is required")
+			}
+			return nil
+		},
+		RequestOptions: func(p getVAppByIDParams) ([]cav.EndpointRequestOption, error) {
+			ep := endpoints.GetVAppNetworkConfigSection()
+			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
+		},
+		Extract: func(resp *cav.Response, _ getVAppByIDParams) (*itypes.APIResponseVAppNetworkConfigSection, error) {
+			section, ok := resp.Result().(*itypes.APIResponseVAppNetworkConfigSection)
+			if !ok || section == nil {
+				return nil, fmt.Errorf("unexpected get response type %T", resp.Result())
+			}
+			return section, nil
+		},
+	}
+	getVAppProductSectionsOp = cav.Operation[getVAppByIDParams, *itypes.APIResponseGuestProperties]{
+		Name:     opGetVAppGuestProperties,
+		Backend:  cav.BackendVMware,
+		Endpoint: endpoints.GetVAppProductSections(),
+		Validate: func(p getVAppByIDParams) error {
+			if p.ID == "" {
+				return fmt.Errorf("id is required")
+			}
+			return nil
+		},
+		RequestOptions: func(p getVAppByIDParams) ([]cav.EndpointRequestOption, error) {
+			ep := endpoints.GetVAppProductSections()
+			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
+		},
+		Extract: func(resp *cav.Response, _ getVAppByIDParams) (*itypes.APIResponseGuestProperties, error) {
+			section, ok := resp.Result().(*itypes.APIResponseGuestProperties)
+			if !ok || section == nil {
+				return nil, fmt.Errorf("unexpected get response type %T", resp.Result())
+			}
+			return section, nil
+		},
+	}
+	updateVAppNetworkConfigSectionOp = cav.Operation[updateVAppNetworkConfigSectionParams, cav.Job]{
+		Name:     "VApp.NetworkConfig.Replace",
+		Backend:  cav.BackendVMware,
+		Endpoint: endpoints.UpdateVAppNetworkConfigSection(),
+		Validate: func(p updateVAppNetworkConfigSectionParams) error {
+			if p.ID == "" {
+				return fmt.Errorf("id is required")
+			}
+			return nil
+		},
+		RequestOptions: func(p updateVAppNetworkConfigSectionParams) ([]cav.EndpointRequestOption, error) {
+			ep := endpoints.UpdateVAppNetworkConfigSection()
+			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
+		},
+		Transform: func(p updateVAppNetworkConfigSectionParams) (any, error) {
+			return p.Body, nil
+		},
+		Extract: func(resp *cav.Response, _ updateVAppNetworkConfigSectionParams) (cav.Job, error) {
+			return extractVMwareJob(resp, "replace network config section")
+		},
+	}
+	updateVAppGuestPropertiesOp = cav.Operation[updateVAppGuestPropertiesParams, cav.Job]{
+		Name:     opUpdateVAppGuestProperties,
+		Backend:  cav.BackendVMware,
+		Endpoint: endpoints.UpdateVAppProductSections(),
+		Validate: func(p updateVAppGuestPropertiesParams) error {
+			if p.ID == "" {
+				return fmt.Errorf("id is required")
+			}
+			return nil
+		},
+		RequestOptions: func(p updateVAppGuestPropertiesParams) ([]cav.EndpointRequestOption, error) {
+			ep := endpoints.UpdateVAppProductSections()
+			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
+		},
+		Transform: func(p updateVAppGuestPropertiesParams) (any, error) {
+			return p.Body, nil
+		},
+		Extract: func(resp *cav.Response, _ updateVAppGuestPropertiesParams) (cav.Job, error) {
+			return extractVMwareJob(resp, "replace guest properties")
 		},
 	}
 	getVAppByIDOp = cav.Operation[getVAppByIDParams, *itypes.APIResponseGetVApp]{
@@ -224,25 +340,30 @@ var (
 			return extractVMwareJob(resp, "remove networks")
 		},
 	}
-	undeployVAppOp = cav.Operation[getVAppByIDParams, cav.Job]{
-		Name:     "VApp.Undeploy",
+	undeployVAppOp = cav.Operation[undeployVAppParams, cav.Job]{
+		Name:     opUndeployVApp,
 		Backend:  cav.BackendVMware,
 		Endpoint: endpoints.UndeployVApp(),
-		Validate: func(p getVAppByIDParams) error {
+		Validate: func(p undeployVAppParams) error {
 			if p.ID == "" {
 				return fmt.Errorf("id is required")
 			}
 
 			return nil
 		},
-		RequestOptions: func(p getVAppByIDParams) ([]cav.EndpointRequestOption, error) {
+		RequestOptions: func(p undeployVAppParams) ([]cav.EndpointRequestOption, error) {
 			ep := endpoints.UndeployVApp()
-			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
+			return []cav.EndpointRequestOption{
+				cav.WithPathParam(ep.PathParams[0], p.ID),
+				cav.SetCustomRestyOption(func(req *resty.Request) {
+					req.SetHeader("Content-Type", "application/xml")
+				}),
+			}, nil
 		},
-		Transform: func(p getVAppByIDParams) (any, error) {
-			return itypes.APIRequestUndeployVApp{UndeployPowerOff: true}, nil
+		Transform: func(p undeployVAppParams) (any, error) {
+			return p.Body, nil
 		},
-		Extract: func(resp *cav.Response, _ getVAppByIDParams) (cav.Job, error) {
+		Extract: func(resp *cav.Response, _ undeployVAppParams) (cav.Job, error) {
 			return extractVMwareJob(resp, "undeploy")
 		},
 	}
@@ -340,6 +461,131 @@ func (c *Client) GetVApp(ctx context.Context, params types.ParamsGetVApp) (*type
 	return &m, nil
 }
 
+// GetVAppNetworkConfig returns the runtime network configuration section for a VApp.
+func (c *Client) GetVAppNetworkConfig(ctx context.Context, params types.ParamsGetVAppNetworkConfig) (*types.ModelVAppRuntimeNetworkConfigSection, error) {
+	if err := params.Validate(); err != nil {
+		return nil, fmt.Errorf("%s: validate: %w", opGetVAppNetworkConfig, err)
+	}
+
+	vappID, err := c.resolveVAppID(ctx, params.ID, params.Name)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", opGetVAppNetworkConfig, err)
+	}
+
+	resp, err := cav.Execute(ctx, c.c, getVAppNetworkConfigSectionOp, getVAppByIDParams{ID: vappID})
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", opGetVAppNetworkConfig, err)
+	}
+
+	return resp.ToModel(), nil
+}
+
+// GetVAppGuestProperties returns the ProductSection guest properties for a VApp.
+func (c *Client) GetVAppGuestProperties(ctx context.Context, params types.ParamsGetVAppGuestProperties) (*types.ModelVAppGuestProperties, error) {
+	if err := params.Validate(); err != nil {
+		return nil, fmt.Errorf("%s: validate: %w", opGetVAppGuestProperties, err)
+	}
+
+	vappID, err := c.resolveVAppID(ctx, params.ID, params.Name)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", opGetVAppGuestProperties, err)
+	}
+
+	resp, err := cav.Execute(ctx, c.c, getVAppProductSectionsOp, getVAppByIDParams{ID: vappID})
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", opGetVAppGuestProperties, err)
+	}
+
+	model := resp.ToModel()
+	return &model, nil
+}
+
+// UpdateVAppGuestProperties replaces the ProductSection guest properties for a VApp.
+func (c *Client) UpdateVAppGuestProperties(ctx context.Context, params types.ParamsUpdateVAppGuestProperties) (*types.ModelVAppGuestProperties, error) {
+	if err := params.Validate(); err != nil {
+		return nil, fmt.Errorf("%s: validate: %w", opUpdateVAppGuestProperties, err)
+	}
+
+	vappID, err := c.resolveVAppID(ctx, params.ID, params.Name)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", opUpdateVAppGuestProperties, err)
+	}
+
+	body := toAPIResponseGuestProperties(params.GuestProperties)
+	job, err := cav.Execute(ctx, c.c, updateVAppGuestPropertiesOp, updateVAppGuestPropertiesParams{ID: vappID, Body: body})
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", opUpdateVAppGuestProperties, err)
+	}
+	if err := awaitVAppJob(ctx, c.c, opUpdateVAppGuestProperties, job.ID); err != nil {
+		return nil, err
+	}
+	return c.GetVAppGuestProperties(ctx, types.ParamsGetVAppGuestProperties{ID: vappID})
+}
+
+// CreateVAppNetwork creates a new isolated runtime vApp network and re-reads the section.
+func (c *Client) CreateVAppNetwork(ctx context.Context, params types.ParamsCreateVAppNetwork) (*types.ModelVAppRuntimeNetworkConfigSection, error) {
+	if err := params.Validate(); err != nil {
+		return nil, fmt.Errorf("%s: validate: %w", opCreateVAppNetwork, err)
+	}
+
+	return c.mutateVAppNetworkConfig(ctx, opCreateVAppNetwork, params.VAppID, params.VAppName, func(section *itypes.APIResponseVAppNetworkConfigSection) error {
+		if findRawVAppRuntimeNetwork(section, params.Network.NetworkName) != nil {
+			return fmt.Errorf("network %q already exists", params.Network.NetworkName)
+		}
+		section.NetworkConfig = append(section.NetworkConfig, toRawVAppRuntimeNetwork(params.Network))
+		return nil
+	})
+}
+
+// AddOrgNetworkToVApp adds an org-backed runtime vApp network and re-reads the section.
+func (c *Client) AddOrgNetworkToVApp(ctx context.Context, params types.ParamsAddOrgNetworkToVApp) (*types.ModelVAppRuntimeNetworkConfigSection, error) {
+	if err := params.Validate(); err != nil {
+		return nil, fmt.Errorf("%s: validate: %w", opAddOrgNetworkToVApp, err)
+	}
+
+	return c.mutateVAppNetworkConfig(ctx, opAddOrgNetworkToVApp, params.VAppID, params.VAppName, func(section *itypes.APIResponseVAppNetworkConfigSection) error {
+		if findRawVAppRuntimeNetwork(section, params.Network.NetworkName) != nil {
+			return fmt.Errorf("network %q already exists", params.Network.NetworkName)
+		}
+		section.NetworkConfig = append(section.NetworkConfig, toRawVAppRuntimeNetwork(params.Network))
+		return nil
+	})
+}
+
+// UpdateVAppNetwork updates an existing runtime vApp network and re-reads the section.
+func (c *Client) UpdateVAppNetwork(ctx context.Context, params types.ParamsUpdateVAppNetwork) (*types.ModelVAppRuntimeNetworkConfigSection, error) {
+	if err := params.Validate(); err != nil {
+		return nil, fmt.Errorf("%s: validate: %w", opUpdateVAppNetwork, err)
+	}
+
+	return c.mutateVAppNetworkConfig(ctx, opUpdateVAppNetwork, params.VAppID, params.VAppName, func(section *itypes.APIResponseVAppNetworkConfigSection) error {
+		network := findRawVAppRuntimeNetwork(section, params.NetworkName)
+		if network == nil {
+			return fmt.Errorf("network %q does not exist", params.NetworkName)
+		}
+		updated := params.Network
+		updated.NetworkName = params.NetworkName
+		patchRawVAppRuntimeNetwork(network, updated)
+		return nil
+	})
+}
+
+// RemoveVAppNetwork removes an existing runtime vApp network and re-reads the section.
+func (c *Client) RemoveVAppNetwork(ctx context.Context, params types.ParamsRemoveVAppNetwork) (*types.ModelVAppRuntimeNetworkConfigSection, error) {
+	if err := params.Validate(); err != nil {
+		return nil, fmt.Errorf("%s: validate: %w", opRemoveVAppNetwork, err)
+	}
+
+	return c.mutateVAppNetworkConfig(ctx, opRemoveVAppNetwork, params.VAppID, params.VAppName, func(section *itypes.APIResponseVAppNetworkConfigSection) error {
+		index := findRawVAppRuntimeNetworkIndex(section, params.NetworkName)
+		if index < 0 {
+			return fmt.Errorf("network %q does not exist", params.NetworkName)
+		}
+		section.NetworkConfig = append(section.NetworkConfig[:index], section.NetworkConfig[index+1:]...)
+		return nil
+	})
+}
+
 // ComposeVApp composes a VApp from one or more source resources and returns it.
 func (c *Client) ComposeVApp(ctx context.Context, params types.ParamsComposeVApp) (*types.ModelVApp, error) {
 	if err := params.Validate(); err != nil {
@@ -347,9 +593,9 @@ func (c *Client) ComposeVApp(ctx context.Context, params types.ParamsComposeVApp
 	}
 
 	body := itypes.APIRequestComposeVApp{
-		OVF:              "http://schemas.dmtf.org/ovf/envelope/1",
-		XSI:              "http://www.w3.org/2001/XMLSchema-instance",
-		XMLNS:            "http://www.vmware.com/vcloud/v1.5",
+		OVF:              ovfEnvelopeXMLNS,
+		XSI:              xmlSchemaInstanceNS,
+		XMLNS:            vcloudXMLNS,
 		Name:             params.Name,
 		Description:      params.Description,
 		Deploy:           params.Deploy,
@@ -395,9 +641,9 @@ func (c *Client) InstantiateVAppTemplate(ctx context.Context, params types.Param
 	}
 
 	body := itypes.APIRequestInstantiateVAppTemplate{
-		OVF:                 "http://schemas.dmtf.org/ovf/envelope/1",
-		XSI:                 "http://www.w3.org/2001/XMLSchema-instance",
-		XMLNS:               "http://www.vmware.com/vcloud/v1.5",
+		OVF:                 ovfEnvelopeXMLNS,
+		XSI:                 xmlSchemaInstanceNS,
+		XMLNS:               vcloudXMLNS,
 		Name:                params.Name,
 		Description:         params.Description,
 		Deploy:              params.Deploy,
@@ -507,12 +753,18 @@ func (c *Client) DeleteVApp(ctx context.Context, params types.ParamsDeleteVApp) 
 		return fmt.Errorf("%s: remove all networks: %w", opDeleteVApp, err)
 	}
 
-	// Step 2: Try undeploy (ignore if already undeployed)
-	job, err = cav.Execute(ctx, c.c, undeployVAppOp, getVAppByIDParams{ID: params.ID})
+	// Step 2: Try undeploy (ignore only the explicit already-undeployed case)
+	job, err = cav.Execute(ctx, c.c, undeployVAppOp, undeployVAppParams{ID: params.ID, Body: itypes.ToAPIRequestUndeployVApp(types.VAppUndeployModePowerOff)})
 	if err != nil {
-		c.logger.Debug("Undeploy failed, continuing with delete", "error", err)
+		if !isIgnorableUndeployError(err) {
+			return fmt.Errorf("%s: undeploy: %w", opDeleteVApp, err)
+		}
+		c.logger.Debug("Undeploy skipped during delete because VApp is already undeployed", "error", err)
 	} else if err := awaitVAppJob(ctx, c.c, opDeleteVApp, job.ID); err != nil {
-		c.logger.Debug("Await undeploy failed, continuing with delete", "error", err)
+		if !isIgnorableUndeployError(err) {
+			return fmt.Errorf("%s: undeploy: %w", opDeleteVApp, err)
+		}
+		c.logger.Debug("Undeploy completion skipped during delete because VApp is already undeployed", "error", err)
 	}
 
 	// Step 3: Delete
@@ -530,6 +782,27 @@ func (c *Client) DeleteVApp(ctx context.Context, params types.ParamsDeleteVApp) 
 // DeployVApp deploys a VApp by ID.
 func (c *Client) DeployVApp(ctx context.Context, id string) error {
 	return c.executeVAppAction(ctx, id, deployVAppOp, opDeployVApp)
+}
+
+// UndeployVApp undeploys a VApp using the requested VMware undeploy mode.
+func (c *Client) UndeployVApp(ctx context.Context, params types.ParamsUndeployVApp) error {
+	if err := params.Validate(); err != nil {
+		return fmt.Errorf("%s: validate: %w", opUndeployVApp, err)
+	}
+
+	vappID, err := c.resolveVAppID(ctx, params.ID, params.Name)
+	if err != nil {
+		return fmt.Errorf("%s: %w", opUndeployVApp, err)
+	}
+
+	job, err := cav.Execute(ctx, c.c, undeployVAppOp, undeployVAppParams{ID: vappID, Body: itypes.ToAPIRequestUndeployVApp(params.Mode)})
+	if err != nil {
+		return fmt.Errorf("%s: %w", opUndeployVApp, err)
+	}
+	if err := awaitVAppJob(ctx, c.c, opUndeployVApp, job.ID); err != nil {
+		return err
+	}
+	return nil
 }
 
 // PowerOffVApp powers off a VApp by ID.
@@ -573,20 +846,6 @@ func (c *Client) executeVAppAction(ctx context.Context, id string, op cav.Operat
 	return nil
 }
 
-// IsVAppOrgNetwork checks if a network is an org network.
-// This is a helper preserved from v1 SDK.
-func IsVAppOrgNetwork(networkHREF string) bool {
-	path := networkHrefPath(networkHREF)
-	return strings.Contains(path, "/api/network/") || strings.Contains(path, "/network/")
-}
-
-// IsVAppNetwork checks if a network is a vApp network.
-// This is a helper preserved from v1 SDK.
-func IsVAppNetwork(networkHREF string) bool {
-	path := strings.ToLower(networkHrefPath(networkHREF))
-	return strings.Contains(path, "vappnetwork")
-}
-
 func awaitVAppJob(ctx context.Context, c cav.Client, opName, jobID string) error {
 	_, err := cav.AwaitJobOnBackend(ctx, c, cav.BackendVMware, jobID, cav.JobPollOptions{
 		Timeout:         30 * time.Second,
@@ -600,16 +859,59 @@ func awaitVAppJob(ctx context.Context, c cav.Client, opName, jobID string) error
 	return nil
 }
 
-func networkHrefPath(networkHREF string) string {
-	parsed, err := url.Parse(networkHREF)
-	if err != nil || parsed.Path == "" {
-		return networkHREF
-	}
-	return parsed.Path
-}
-
 func toVAppReference(ref types.VAppReference) itypes.APIRequestVAppReference {
 	return itypes.APIRequestVAppReference{HREF: ref.HREF, ID: ref.ID, Type: ref.Type, Name: ref.Name}
+}
+
+func toAPIResponseGuestProperties(model types.ModelVAppGuestProperties) itypes.APIResponseGuestProperties {
+	result := itypes.APIResponseGuestProperties{
+		XMLNS:                        vcloudXMLNS,
+		XMLNSXsi:                     xmlSchemaInstanceNS,
+		XsiNoNamespaceSchemaLocation: "http://www.vmware.com/vcloud/v1.5/vmguest.xsd",
+		ProductSectionList:           make([]itypes.APIResponseProductSection, 0, len(model.Sections)),
+	}
+	sections := append([]types.ModelVAppGuestPropertySection(nil), model.Sections...)
+	sort.SliceStable(sections, func(i, j int) bool {
+		if sections[i].Class != sections[j].Class {
+			return sections[i].Class < sections[j].Class
+		}
+		return sections[i].Instance < sections[j].Instance
+	})
+
+	for _, section := range sections {
+		keys := make([]string, 0, len(section.Properties))
+		for key := range section.Properties {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+
+		properties := make([]itypes.APIResponseProductProperty, 0, len(section.Properties))
+		for _, key := range keys {
+			properties = append(properties, itypes.APIResponseProductProperty{Key: key, Value: section.Properties[key]})
+		}
+		result.ProductSectionList = append(result.ProductSectionList, itypes.APIResponseProductSection{
+			Class:    section.Class,
+			Instance: section.Instance,
+			Property: properties,
+		})
+	}
+	return result
+}
+
+func isIgnorableUndeployError(err error) bool {
+	var apiErr *pkgerrors.APIError
+	if !stderrors.As(err, &apiErr) || apiErr == nil {
+		return false
+	}
+
+	if apiErr.StatusCode != http.StatusBadRequest {
+		return false
+	}
+
+	message := strings.ToLower(strings.TrimSpace(apiErr.Message))
+	return strings.Contains(message, "requested operation could not be executed") &&
+		strings.Contains(message, "vapp") &&
+		strings.Contains(message, "not running")
 }
 
 func toInstantiationParams(params *types.VAppInstantiationParams) *itypes.APIRequestVAppInstantiationParams {
@@ -662,4 +964,130 @@ func extractVMwareJob(resp *cav.Response, action string) (cav.Job, error) {
 	}
 
 	return cav.Job{ID: jobID}, nil
+}
+
+func (c *Client) resolveVAppID(ctx context.Context, id, name string) (string, error) {
+	if id != "" {
+		return id, nil
+	}
+	vapp, err := c.GetVApp(ctx, types.ParamsGetVApp{Name: name})
+	if err != nil {
+		return "", fmt.Errorf("get current: %w", err)
+	}
+	return vapp.ID, nil
+}
+
+func (c *Client) mutateVAppNetworkConfig(ctx context.Context, opName, vappID, vappName string, mutate func(section *itypes.APIResponseVAppNetworkConfigSection) error) (*types.ModelVAppRuntimeNetworkConfigSection, error) {
+	resolvedVAppID, err := c.resolveVAppID(ctx, vappID, vappName)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", opName, err)
+	}
+
+	section, err := cav.Execute(ctx, c.c, getVAppNetworkConfigSectionOp, getVAppByIDParams{ID: resolvedVAppID})
+	if err != nil {
+		return nil, fmt.Errorf("%s: get current: %w", opName, err)
+	}
+	if section == nil {
+		section = &itypes.APIResponseVAppNetworkConfigSection{}
+	}
+	if section.Info == "" {
+		section.Info = "Runtime network config"
+	}
+	if section.XMLNS == "" {
+		section.XMLNS = vcloudXMLNS
+	}
+	if section.OVF == "" {
+		section.OVF = "http://schemas.dmtf.org/ovf/envelope/1"
+	}
+	if err := mutate(section); err != nil {
+		return nil, fmt.Errorf("%s: %w", opName, err)
+	}
+	job, err := cav.Execute(ctx, c.c, updateVAppNetworkConfigSectionOp, updateVAppNetworkConfigSectionParams{ID: resolvedVAppID, Body: *section})
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", opName, err)
+	}
+	if err := awaitVAppJob(ctx, c.c, opName, job.ID); err != nil {
+		return nil, err
+	}
+	updated, err := c.GetVAppNetworkConfig(ctx, types.ParamsGetVAppNetworkConfig{ID: resolvedVAppID})
+	if err != nil {
+		return nil, fmt.Errorf("%s: get updated: %w", opName, err)
+	}
+	return updated, nil
+}
+
+func findRawVAppRuntimeNetwork(section *itypes.APIResponseVAppNetworkConfigSection, name string) *itypes.APIResponseVAppNetworkConfig {
+	index := findRawVAppRuntimeNetworkIndex(section, name)
+	if index < 0 {
+		return nil
+	}
+	return &section.NetworkConfig[index]
+}
+
+func findRawVAppRuntimeNetworkIndex(section *itypes.APIResponseVAppNetworkConfigSection, name string) int {
+	for i := range section.NetworkConfig {
+		if section.NetworkConfig[i].NetworkName == name {
+			return i
+		}
+	}
+	return -1
+}
+
+func patchRawVAppRuntimeNetwork(dst *itypes.APIResponseVAppNetworkConfig, src types.ModelVAppRuntimeNetworkConfig) {
+	dst.NetworkName = src.NetworkName
+	dst.Description = src.Description
+	patchRawVAppRuntimeConfiguration(&dst.Configuration, src.Configuration)
+}
+
+func patchRawVAppRuntimeConfiguration(dst *itypes.APIResponseVAppRuntimeConfiguration, src types.ModelVAppRuntimeNetworkConfiguration) {
+	dst.FenceMode = src.FenceMode
+	dst.RetainNetInfoAcrossDeployments = src.RetainNetInfoAcrossDeployments
+	dst.IsDeployed = src.IsDeployed
+	dst.IsShared = src.IsShared
+	dst.IsConnected = &src.IsConnected
+	if src.ParentNetwork == nil {
+		dst.ParentNetwork = nil
+	} else {
+		ref := toVAppReference(*src.ParentNetwork)
+		dst.ParentNetwork = &ref
+	}
+	dst.IPScopes = toRawVAppRuntimeIPScopes(src.IPScopes)
+}
+
+func toRawVAppRuntimeIPScopes(scopes []types.ModelVAppRuntimeIPScope) *itypes.APIResponseVAppRuntimeIPScopes {
+	if len(scopes) == 0 {
+		return nil
+	}
+	result := &itypes.APIResponseVAppRuntimeIPScopes{IPScope: make([]itypes.APIResponseVAppRuntimeIPScope, 0, len(scopes))}
+	for _, scope := range scopes {
+		isInherited := scope.IsInherited
+		result.IPScope = append(result.IPScope, itypes.APIResponseVAppRuntimeIPScope{
+			IsInherited:  &isInherited,
+			Gateway:      scope.Gateway,
+			Netmask:      scope.Netmask,
+			DNS1:         scope.DNS1,
+			DNS2:         scope.DNS2,
+			DNSSuffix:    scope.DNSSuffix,
+			PrefixLength: scope.PrefixLength,
+			IPRanges:     toRawVAppRuntimeIPRanges(scope.IPRanges),
+		})
+	}
+	return result
+}
+
+func toRawVAppRuntimeIPRanges(ranges []types.ModelVAppRuntimeIPRange) itypes.APIResponseVAppRuntimeIPRanges {
+	result := itypes.APIResponseVAppRuntimeIPRanges{IPRange: make([]itypes.APIResponseVAppRuntimeIPRange, 0, len(ranges))}
+	for _, ipRange := range ranges {
+		result.IPRange = append(result.IPRange, itypes.APIResponseVAppRuntimeIPRange{StartAddress: ipRange.StartAddress, EndAddress: ipRange.EndAddress})
+	}
+	return result
+}
+
+func toRawVAppRuntimeNetwork(model types.ModelVAppRuntimeNetworkConfig) itypes.APIResponseVAppNetworkConfig {
+	result := itypes.APIResponseVAppNetworkConfig{
+		Description: model.Description,
+		NetworkName: model.NetworkName,
+	}
+	patchRawVAppRuntimeConfiguration(&result.Configuration, model.Configuration)
+	return result
 }
