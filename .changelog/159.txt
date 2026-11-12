@@ -1,0 +1,11 @@
+```release-note:feature
+feat(vapp): add VMware vApp runtime network and guest properties surfaces for provider migration. Adds runtime networkConfigSection read/create/add-org/update/remove operations, ProductSection guest-properties read/update APIs, public undeploy parameters, the matching public types, VMware endpoint definitions, generated wrappers, and focused tests.
+```
+
+```release-note:fix
+fix(vapp): harden VMware vApp delete and runtime network updates. DeleteVApp now ignores only the explicit benign undeploy case instead of swallowing all undeploy failures, undeploy requests use the correct VMware XML transport, and runtime network writes mutate the raw section fetched from VMware so untouched identity, features, router info, and sibling network state are preserved.
+```
+
+```release-note:fix
+fix(vapp): make guest-property and runtime-network payload handling deterministic and safer. Guest-property payloads now serialize in stable order, create-vs-add network validation is explicit, empty guest-property sections can round-trip, and XML wire fidelity is preserved for fields such as IsInherited and IsConnected.
+```
