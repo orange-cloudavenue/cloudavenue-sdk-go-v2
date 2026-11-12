@@ -14,7 +14,7 @@ import "errors"
 const sessionKeyOrganizationID = "organizationID"
 
 // getSession returns session data for cache persistence.
-func (c *cloudavenueCredential) getSession() map[string]string {
+func (c *vmwareAuthProvider) getSession() map[string]string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -27,7 +27,7 @@ func (c *cloudavenueCredential) getSession() map[string]string {
 }
 
 // restoreSession loads cached session data.
-func (c *cloudavenueCredential) restoreSession(data map[string]string) error {
+func (c *vmwareAuthProvider) restoreSession(data map[string]string) error {
 	if data == nil {
 		return errors.New("invalid session data")
 	}
@@ -45,7 +45,7 @@ func (c *cloudavenueCredential) restoreSession(data map[string]string) error {
 }
 
 // getExtraData returns backend metadata derived from session state.
-func (c *cloudavenueCredential) getExtraData() map[string]string {
+func (c *vmwareAuthProvider) getExtraData() map[string]string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 

@@ -10,16 +10,58 @@
 package cav
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"resty.dev/v3"
 
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 )
+
+func TestCerberusNewHTTPClientUsesAuthorizationHeader(t *testing.T) {
+	var gotAuthorization string
+	var gotAccept string
+	var gotUserAgent string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotAuthorization = r.Header.Get("Authorization")
+		gotAccept = r.Header.Get("Accept")
+		gotUserAgent = r.Header.Get("User-Agent")
+		w.WriteHeader(http.StatusOK)
+		_, _ = io.WriteString(w, `{}`)
+	}))
+	t.Cleanup(srv.Close)
+
+	console, ok := consoles.FindByOrganizationName(mockOrg)
+	require.True(t, ok)
+	originalServices := console.Services()
+	t.Cleanup(func() {
+		console.OverrideEndpoint(originalServices)
+	})
+
+	v := &cerberus{subclient: subclient{authProvider: &cerberusAuthProvider{
+		accessToken: "cerberus-access-token",
+		tokenType:   cerberusTokenTypeBearer,
+		expiresAt:   time.Now().Add(time.Hour),
+	}}}
+	v.setConsole(console)
+	v.console.OverrideEndpoint(consoles.Services{APICerberus: consoles.Service{Enabled: true, Endpoint: srv.URL}})
+
+	hc, err := v.newHTTPClient(t.Context())
+	require.NoError(t, err)
+
+	resp, err := hc.R().SetContext(t.Context()).Get("/test")
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, resp.StatusCode())
+	assert.Equal(t, "Bearer cerberus-access-token", gotAuthorization)
+	assert.Equal(t, "application/json", gotAccept)
+	assert.Equal(t, "Cloudavenue-SDK-v2", gotUserAgent)
+}
 
 // doCerberusRequest serves given response and returns resty response,
 // configured like Cerberus-routed customer API client (JSON result error).
@@ -99,6 +141,15 @@ func TestCerberusParseAPIError(t *testing.T) {
 			body:         `{"code":"LEGACY","message":"old shape"}`,
 			wantCode:     "LEGACY",
 			wantMessage:  "LEGACY: old shape",
+			wantSentinel: errors.ErrBadRequest,
+		},
+		{
+			name:         "numeric legacy code field still honoured",
+			status:       http.StatusBadRequest,
+			contentType:  "application/json",
+			body:         `{"code":400,"message":"old numeric shape"}`,
+			wantCode:     "400",
+			wantMessage:  "400: old numeric shape",
 			wantSentinel: errors.ErrBadRequest,
 		},
 		{

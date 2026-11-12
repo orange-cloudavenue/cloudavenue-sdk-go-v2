@@ -43,14 +43,14 @@ func (o *ose) newHTTPClient(ctx context.Context) (*resty.Client, error) {
 		SetHeader("Accept", "application/json").
 		SetResultError(oseError{})
 
-	if !o.credential.IsInitialized() {
-		if err := o.credential.Refresh(ctx); err != nil {
+	if !o.authProvider.IsInitialized() {
+		if err := o.authProvider.Refresh(ctx); err != nil {
 			return nil, err
 		}
 	}
 
 	hC.
-		SetHeaders(o.credential.Headers())
+		SetHeaders(o.authProvider.Headers())
 
 	return hC, nil
 }
@@ -90,11 +90,11 @@ func (o *ose) idempotentRetryCondition() resty.RetryConditionFunc {
 }
 
 func (o *ose) ContextData(_ context.Context) ContextData {
-	if o == nil || o.getCredential() == nil {
+	if o == nil || o.getAuthProvider() == nil {
 		return ContextData{}
 	}
 
-	extra := o.getCredential().getExtraData()
+	extra := o.getAuthProvider().getExtraData()
 	return ContextData{
 		OrganizationID: extra[oseSessionKeyOrganizationID],
 		SiteID:         extra["siteID"],

@@ -10,8 +10,10 @@
 package errors
 
 import (
+	"encoding/json"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -28,6 +30,50 @@ type CustomerAPIErrorBody struct {
 	Code           string `json:"code" fake:"{regex:err-[0-9]{4}}"`
 	Reason         string `json:"reason" fake:"{regex:mock-[0-9]{4}}"`
 	Message        string `json:"message" fake:"{sentence:3,10}"`
+}
+
+// UnmarshalJSON accepts both string and numeric legacy values for `code`.
+func (e *CustomerAPIErrorBody) UnmarshalJSON(data []byte) error {
+	type alias struct {
+		MinorErrorCode string          `json:"minorErrorCode"`
+		Code           json.RawMessage `json:"code"`
+		Reason         string          `json:"reason"`
+		Message        string          `json:"message"`
+	}
+
+	var payload alias
+	if err := json.Unmarshal(data, &payload); err != nil {
+		return err
+	}
+
+	e.MinorErrorCode = payload.MinorErrorCode
+	e.Reason = payload.Reason
+	e.Message = payload.Message
+	e.Code = ""
+
+	if len(payload.Code) == 0 || string(payload.Code) == "null" {
+		return nil
+	}
+
+	var asString string
+	if err := json.Unmarshal(payload.Code, &asString); err == nil {
+		e.Code = asString
+		return nil
+	}
+
+	var asNumber json.Number
+	if err := json.Unmarshal(payload.Code, &asNumber); err == nil {
+		e.Code = asNumber.String()
+		return nil
+	}
+
+	var asInt int64
+	if err := json.Unmarshal(payload.Code, &asInt); err == nil {
+		e.Code = strconv.FormatInt(asInt, 10)
+		return nil
+	}
+
+	return nil
 }
 
 const customerAPIWAFRejectedCode = "REQUEST_REJECTED"

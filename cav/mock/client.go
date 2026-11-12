@@ -12,6 +12,7 @@ package mock
 import (
 	"log"
 	"log/slog"
+	"net/http"
 	"net/http/httptest"
 
 	"github.com/go-chi/chi/v5"
@@ -70,6 +71,10 @@ func NewClient(opts ...OptionFunc) (cav.Client, *Server, error) {
 			mux.MethodFunc(ep.Method.String(), ep.PathTemplate, ms.handlerForGroup(group))
 		}
 	}
+	mux.MethodFunc(http.MethodPost, "/auth/v1/user/token", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"access_token":"mock-access-token","token_type":"Bearer","expires_in":3600}`))
+	})
 
 	// Pre-register the SessionVmware mock handler.
 	if ep, err := cav.GetEndpoint("SessionVmware"); err == nil {

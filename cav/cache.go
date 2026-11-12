@@ -24,7 +24,7 @@ func (c *client) storeSessionsToCache(passphrase, path string) error {
 	}
 
 	for _, value := range c.clientsInitialized {
-		cs.Sessions[value.getID()] = value.getCredential().getSession()
+		cs.Sessions[value.getID()] = value.getAuthProvider().getSession()
 	}
 
 	csJSON, err := json.Marshal(cs)
@@ -70,7 +70,7 @@ func (c *client) restoreSessionsFromCache(passphrase, path string) error {
 	for id, session := range cs.Sessions {
 		for _, value := range c.clientsInitialized {
 			if value.getID() == id {
-				if err := value.getCredential().restoreSession(session); err != nil {
+				if err := value.getAuthProvider().restoreSession(session); err != nil {
 					return err
 				}
 			}

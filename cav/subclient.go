@@ -29,13 +29,13 @@ const (
 )
 
 type subclient struct {
-	credential auth
-	console    consoles.ConsoleName
+	authProvider authProvider
+	console      consoles.ConsoleName
 }
 
 type subClientInterface interface {
-	setCredential(auth)
-	getCredential() auth
+	setAuthProvider(authProvider)
+	getAuthProvider() authProvider
 	setConsole(consoles.ConsoleName)
 	newHTTPClient(context.Context) (*resty.Client, error)
 
@@ -58,12 +58,12 @@ var subClients = map[subClientName]subClientInterface{
 	ClientIHM:       newIHMClient(),
 }
 
-func (s *subclient) getCredential() auth {
-	return s.credential
+func (s *subclient) getAuthProvider() authProvider {
+	return s.authProvider
 }
 
-func (s *subclient) setCredential(a auth) {
-	s.credential = a
+func (s *subclient) setAuthProvider(a authProvider) {
+	s.authProvider = a
 }
 
 func (s *subclient) setConsole(console consoles.ConsoleName) {
