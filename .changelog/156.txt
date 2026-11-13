@@ -1,0 +1,3 @@
+```release-note:dependency
+deps: bumps github.com/aws/aws-sdk-go-v2, github.com/aws/aws-sdk-go-v2/service/s3, golang.org/x/sync from 1.47.4 to 1.47.8
+```
