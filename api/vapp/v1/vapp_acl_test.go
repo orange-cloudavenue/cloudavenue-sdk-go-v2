@@ -30,8 +30,8 @@ const (
 )
 
 func TestVAppACLEndpoints(t *testing.T) {
-	assert.Equal(t, "/api/vapp/{vapp-id}/controlAccess", endpoints.GetVAppACL().PathTemplate)
-	assert.Equal(t, "/api/vapp/{vapp-id}/action/controlAccess", endpoints.SetVAppACL().PathTemplate)
+	assert.Equal(t, "/api/vApp/{vapp-id}/controlAccess", endpoints.GetVAppACL().PathTemplate)
+	assert.Equal(t, "/api/vApp/{vapp-id}/action/controlAccess", endpoints.SetVAppACL().PathTemplate)
 }
 
 func TestGetVAppACL(t *testing.T) {

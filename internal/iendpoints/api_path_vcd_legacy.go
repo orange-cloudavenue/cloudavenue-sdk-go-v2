@@ -40,30 +40,30 @@ const (
 	// pathAdminOrgUserUnlock unlocks one user in the legacy admin XML API.
 	// pathAdminOrgUserChangePassword changes one user password in the legacy admin XML API.
 	// pathVAppByID addresses one vApp in the legacy XML API.
-	pathVAppByID = "/api/vapp/{vapp-id}"
+	pathVAppByID = "/api/vApp/{vapp-id}"
 	// pathVAppControlAccess gets vApp access control through the legacy XML API.
-	pathVAppControlAccess = "/api/vapp/{vapp-id}/controlAccess"
+	pathVAppControlAccess = "/api/vApp/{vapp-id}/controlAccess"
 	// pathVAppControlAccessAction sets vApp access control through the legacy XML API.
-	pathVAppControlAccessAction = "/api/vapp/{vapp-id}/action/controlAccess"
+	pathVAppControlAccessAction = "/api/vApp/{vapp-id}/action/controlAccess"
 	// pathVAppNetworkConfigSection gets or replaces the runtime network configuration of one vApp.
-	pathVAppNetworkConfigSection = "/api/vapp/{vapp-id}/networkConfigSection/"
+	pathVAppNetworkConfigSection = "/api/vApp/{vapp-id}/networkConfigSection/"
 	// pathVAppRemoveAllNetworks removes all networks from one vApp.
-	pathVAppRemoveAllNetworks = "/api/vapp/{vapp-id}/action/removeAllNetworks"
+	pathVAppRemoveAllNetworks = "/api/vApp/{vapp-id}/action/removeAllNetworks"
 	// pathVAppUndeploy undeploys one vApp.
-	pathVAppUndeploy = "/api/vapp/{vapp-id}/action/undeploy"
+	pathVAppUndeploy = "/api/vApp/{vapp-id}/action/undeploy"
 	// pathVAppProductSections gets or updates one vApp ProductSection set.
-	pathVAppProductSections = "/api/vapp/{vapp-id}/productSections"
+	pathVAppProductSections = "/api/vApp/{vapp-id}/productSections"
 	// pathVAppDeploy deploys one vApp.
-	pathVAppDeploy = "/api/vapp/{vapp-id}/action/deploy"
+	pathVAppDeploy = "/api/vApp/{vapp-id}/action/deploy"
 	// vApp power action paths operate on one vApp or VM.
-	pathVAppPowerOff = "/api/vapp/{vapp-id}/power/action/powerOff"
-	pathVAppPowerOn  = "/api/vapp/{vapp-id}/power/action/powerOn"
-	pathVAppReboot   = "/api/vapp/{vapp-id}/power/action/reboot"
-	pathVAppReset    = "/api/vapp/{vapp-id}/power/action/reset"
-	pathVAppShutdown = "/api/vapp/{vapp-id}/power/action/shutdown"
-	pathVAppSuspend  = "/api/vapp/{vapp-id}/power/action/suspend"
+	pathVAppPowerOff = "/api/vApp/{vapp-id}/power/action/powerOff"
+	pathVAppPowerOn  = "/api/vApp/{vapp-id}/power/action/powerOn"
+	pathVAppReboot   = "/api/vApp/{vapp-id}/power/action/reboot"
+	pathVAppReset    = "/api/vApp/{vapp-id}/power/action/reset"
+	pathVAppShutdown = "/api/vApp/{vapp-id}/power/action/shutdown"
+	pathVAppSuspend  = "/api/vApp/{vapp-id}/power/action/suspend"
 	// pathVAppDiscardSuspendedState discards the suspended state of one vApp.
-	pathVAppDiscardSuspendedState = "/api/vapp/{vapp-id}/action/discardSuspendedState"
+	pathVAppDiscardSuspendedState = "/api/vApp/{vapp-id}/action/discardSuspendedState"
 	// pathVAppCompose composes a vApp under a VDC in the legacy XML API.
 	pathVAppCompose = "/api/vdc/{vdc-id}/action/composeVApp"
 	// pathVAppInstantiateTemplate instantiates a vApp template under a VDC.

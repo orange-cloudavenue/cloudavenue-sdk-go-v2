@@ -172,10 +172,10 @@ func TestVAppCreationEndpoints(t *testing.T) {
 	assert.Equal(t, "/api/vdc/{vdc-id}/action/instantiateVAppTemplate", endpoints.InstantiateVAppTemplate().PathTemplate)
 	assert.Equal(t, "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-InstantiateVAppTemplate.html", endpoints.InstantiateVAppTemplate().DocumentationURL)
 	assert.Equal(t, "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-NetworkConfigSection-vApp.html", endpoints.RemoveAllNetworks().DocumentationURL)
-	assert.Equal(t, "/api/vapp/{vapp-id}/networkConfigSection/", endpoints.GetVAppNetworkConfigSection().PathTemplate)
+	assert.Equal(t, "/api/vApp/{vapp-id}/networkConfigSection/", endpoints.GetVAppNetworkConfigSection().PathTemplate)
 	assert.Equal(t, "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-NetworkConfigSection-vApp.html", endpoints.GetVAppNetworkConfigSection().DocumentationURL)
 	assert.Equal(t, "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-NetworkConfigSection-vApp.html", endpoints.UpdateVAppNetworkConfigSection().DocumentationURL)
-	assert.Equal(t, "/api/vapp/{vapp-id}/productSections", endpoints.GetVAppProductSections().PathTemplate)
+	assert.Equal(t, "/api/vApp/{vapp-id}/productSections", endpoints.GetVAppProductSections().PathTemplate)
 	assert.Equal(t, "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-ProductSections-vApp.html", endpoints.GetVAppProductSections().DocumentationURL)
 	assert.Equal(t, "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-ProductSections-vApp.html", endpoints.UpdateVAppProductSections().DocumentationURL)
 }
@@ -652,13 +652,13 @@ func TestVAppLifecycleEndpoints(t *testing.T) {
 		doc  string
 		get  func() *cav.Endpoint
 	}{
-		{"deploy", "/api/vapp/{vapp-id}/action/deploy", "POST-DeployVApp.html", endpoints.DeployVApp},
-		{"power off", "/api/vapp/{vapp-id}/power/action/powerOff", "POST-PowerOffVApp.html", endpoints.PowerOffVApp},
-		{"power on", "/api/vapp/{vapp-id}/power/action/powerOn", "POST-PowerOnVApp.html", endpoints.PowerOnVApp},
-		{"reboot", "/api/vapp/{vapp-id}/power/action/reboot", "POST-RebootVApp.html", endpoints.RebootVApp},
-		{"reset", "/api/vapp/{vapp-id}/power/action/reset", "POST-ResetVApp.html", endpoints.ResetVApp},
-		{"shutdown", "/api/vapp/{vapp-id}/power/action/shutdown", "POST-ShutdownVApp.html", endpoints.ShutdownVApp},
-		{"suspend", "/api/vapp/{vapp-id}/power/action/suspend", "POST-SuspendVApp.html", endpoints.SuspendVApp},
+		{"deploy", "/api/vApp/{vapp-id}/action/deploy", "POST-DeployVApp.html", endpoints.DeployVApp},
+		{"power off", "/api/vApp/{vapp-id}/power/action/powerOff", "POST-PowerOffVApp.html", endpoints.PowerOffVApp},
+		{"power on", "/api/vApp/{vapp-id}/power/action/powerOn", "POST-PowerOnVApp.html", endpoints.PowerOnVApp},
+		{"reboot", "/api/vApp/{vapp-id}/power/action/reboot", "POST-RebootVApp.html", endpoints.RebootVApp},
+		{"reset", "/api/vApp/{vapp-id}/power/action/reset", "POST-ResetVApp.html", endpoints.ResetVApp},
+		{"shutdown", "/api/vApp/{vapp-id}/power/action/shutdown", "POST-ShutdownVApp.html", endpoints.ShutdownVApp},
+		{"suspend", "/api/vApp/{vapp-id}/power/action/suspend", "POST-SuspendVApp.html", endpoints.SuspendVApp},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -672,14 +672,14 @@ func TestVAppLifecycleEndpoints(t *testing.T) {
 
 func TestDiscardSuspendedStateVAppEndpoint(t *testing.T) {
 	ep := endpoints.DiscardSuspendedStateVApp()
-	assert.Equal(t, "/api/vapp/{vapp-id}/action/discardSuspendedState", ep.PathTemplate)
+	assert.Equal(t, "/api/vApp/{vapp-id}/action/discardSuspendedState", ep.PathTemplate)
 	assert.Equal(t, "POST", string(ep.Method))
 	assert.Equal(t, "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-DiscardVAppState.html", ep.DocumentationURL)
 }
 
 func TestUpdateVAppEndpointDocumentation(t *testing.T) {
 	ep := endpoints.UpdateVApp()
-	assert.Equal(t, "/api/vapp/{vapp-id}", ep.PathTemplate)
+	assert.Equal(t, "/api/vApp/{vapp-id}", ep.PathTemplate)
 	assert.Equal(t, "PUT", string(ep.Method))
 	assert.Equal(t, "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-Vm.html", ep.DocumentationURL)
 }
