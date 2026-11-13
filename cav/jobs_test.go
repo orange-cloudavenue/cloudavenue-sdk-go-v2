@@ -23,58 +23,63 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/consoles"
 )
 
-func TestAwaitJobValidation(t *testing.T) {
+func TestWaitJobValidation(t *testing.T) {
 	client, err := newMockClient()
 	require.NoError(t, err)
 	defer func() { require.NoError(t, client.Close()) }()
 
-	_, err = AwaitJob[string](t.Context(), client, "", JobPollOptions{
+	_, err = WaitJob(t.Context(), client, JobWaitRequest{
+		Backend:         BackendVMware,
 		Timeout:         time.Millisecond,
 		PollingInterval: time.Millisecond,
-	}, func(_ *resty.Response) (string, error) { return "", nil })
+	})
 	require.EqualError(t, err, "await job: job id is required")
 }
 
-func TestAwaitJobContextCancellation(t *testing.T) {
+func TestWaitJobContextCancellation(t *testing.T) {
 	ctx, cancel := context.WithCancelCause(t.Context())
 	cancel(fmt.Errorf("caller canceled"))
 
-	_, err := AwaitJob[string](ctx, nil, "id", JobPollOptions{
+	_, err := WaitJob(ctx, nil, JobWaitRequest{
+		Backend:         BackendVMware,
+		JobID:           "id",
 		Timeout:         time.Second,
 		PollingInterval: time.Millisecond,
-	}, func(_ *resty.Response) (string, error) { return "", nil })
+	})
 	require.EqualError(t, err, "caller canceled")
 }
 
-func TestAwaitJobNilClient(t *testing.T) {
-	_, err := AwaitJob[string](t.Context(), nil, "id", JobPollOptions{
+func TestWaitJobNilClient(t *testing.T) {
+	_, err := WaitJob(t.Context(), nil, JobWaitRequest{
+		Backend:         BackendVMware,
+		JobID:           "id",
 		Timeout:         time.Second,
 		PollingInterval: time.Millisecond,
-	}, func(_ *resty.Response) (string, error) { return "", nil })
+	})
 	require.EqualError(t, err, "await job id: client is nil")
 }
 
-type awaitJobTestClient struct {
+type waitJobTestClient struct {
 	polls atomic.Int32
 }
 
-func (c *awaitJobTestClient) NewRequest(_ context.Context, _ *Endpoint, _ ...RequestOption) (*resty.Request, error) {
+func (c *waitJobTestClient) NewRequest(_ context.Context, _ *Endpoint, _ ...RequestOption) (*resty.Request, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
-func (c *awaitJobTestClient) NewRequestWithBackend(_ context.Context, _ BackendTarget, _ *Endpoint, _ ...RequestOption) (*resty.Request, error) {
+func (c *waitJobTestClient) NewRequestWithBackend(_ context.Context, _ BackendTarget, _ *Endpoint, _ ...RequestOption) (*resty.Request, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
-func (c *awaitJobTestClient) Logger() *slog.Logger {
+func (c *waitJobTestClient) Logger() *slog.Logger {
 	return slog.Default()
 }
 
-func (c *awaitJobTestClient) Do(_ context.Context, _ *Endpoint, _ ...EndpointRequestOption) (*resty.Response, error) {
+func (c *waitJobTestClient) Do(_ context.Context, _ *Endpoint, _ ...EndpointRequestOption) (*resty.Response, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
-func (c *awaitJobTestClient) DoWithBackend(_ context.Context, backend BackendTarget, endpoint *Endpoint, _ ...EndpointRequestOption) (*resty.Response, error) {
+func (c *waitJobTestClient) DoWithBackend(_ context.Context, backend BackendTarget, endpoint *Endpoint, _ ...EndpointRequestOption) (*resty.Response, error) {
 	c.polls.Add(1)
 
 	req := &resty.Request{}
@@ -90,35 +95,35 @@ func (c *awaitJobTestClient) DoWithBackend(_ context.Context, backend BackendTar
 	return resp, nil
 }
 
-func (c *awaitJobTestClient) GetConsole() consoles.ConsoleName {
+func (c *waitJobTestClient) GetConsole() consoles.ConsoleName {
 	return consoles.ConsoleName("test")
 }
 
-func (c *awaitJobTestClient) Close() error {
+func (c *waitJobTestClient) Close() error {
 	return nil
 }
 
-func TestAwaitJobPollsImmediately(t *testing.T) {
-	client := &awaitJobTestClient{}
+func TestWaitJobPollsImmediately(t *testing.T) {
+	client := &waitJobTestClient{}
 	start := time.Now()
 
-	result, err := AwaitJobOnBackend[string](t.Context(), client, BackendVMware, "job-id", JobPollOptions{
-		Timeout:         time.Second,
-		PollingInterval: 200 * time.Millisecond,
-	}, func(_ *resty.Response) (string, error) { return "ok", nil })
-	require.NoError(t, err)
-	require.Equal(t, "ok", result)
-	require.EqualValues(t, 1, client.polls.Load())
-	require.Less(t, time.Since(start), 150*time.Millisecond)
-}
-
-func TestWaitJobPollsWithoutExtract(t *testing.T) {
-	client := &awaitJobTestClient{}
-
-	err := WaitJob(t.Context(), client, BackendVMware, "job-id", JobPollOptions{
+	job, err := WaitJob(t.Context(), client, JobWaitRequest{
+		Backend:         BackendVMware,
+		JobID:           "job-id",
 		Timeout:         time.Second,
 		PollingInterval: 200 * time.Millisecond,
 	})
 	require.NoError(t, err)
+	require.Equal(t, JobSuccess, job.Status)
 	require.EqualValues(t, 1, client.polls.Load())
+	require.Less(t, time.Since(start), 150*time.Millisecond)
+}
+
+func TestWaitJobBackendRequired(t *testing.T) {
+	_, err := WaitJob(t.Context(), &waitJobTestClient{}, JobWaitRequest{
+		JobID:           "job-id",
+		Timeout:         time.Second,
+		PollingInterval: time.Millisecond,
+	})
+	require.EqualError(t, err, "await job job-id: backend is required")
 }

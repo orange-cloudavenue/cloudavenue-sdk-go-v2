@@ -27,8 +27,6 @@ type cerberus struct {
 	subclient
 }
 
-const cerberusVCDVersion = vmwareVCDVersion
-
 func newCerberusClient() subClientInterface {
 	return &cerberus{}
 }
