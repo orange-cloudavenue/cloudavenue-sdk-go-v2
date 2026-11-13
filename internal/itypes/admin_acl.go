@@ -15,6 +15,15 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
+const (
+	localSubjectTypeOrgUser      = "urn:vcloud:orguser"
+	localSubjectTypeOrgGroup     = "urn:vcloud:orggroup"
+	vappACLSubjectKindUser       = "user"
+	vappACLSubjectKindGroup      = "group"
+	vappACLSubjectSourceLocal    = "local"
+	vappACLSubjectSourceExternal = "external"
+)
+
 // ControlAccessParams represents the VMware vCD ControlAccessParams XML element.
 type ControlAccessParams struct {
 	XMLName             xml.Name           `xml:"ControlAccessParams"`
@@ -87,4 +96,92 @@ func (r *ControlAccessParams) ToModel() *types.ModelAdminCatalogACL {
 	}
 
 	return model
+}
+
+// ToVAppACLModel converts the VMware vCD ControlAccessParams XML to the vApp public model.
+func (r *ControlAccessParams) ToVAppACLModel() *types.ModelVAppACL {
+	model := &types.ModelVAppACL{
+		IsSharedToEveryone:  r.IsSharedToEveryone,
+		EveryoneAccessLevel: r.EveryoneAccessLevel,
+	}
+
+	if r.AccessSettings == nil {
+		return model
+	}
+
+	for _, as := range r.AccessSettings.AccessSetting {
+		if as == nil {
+			continue
+		}
+
+		subject := types.ModelVAppACLSubject{
+			AccessLevel: as.AccessLevel,
+		}
+
+		if as.Subject != nil {
+			subject.SubjectName = as.Subject.Name
+			subject.SubjectKind = localSubjectKind(as.Subject.Type)
+			subject.SubjectID = localSubjectID(as.Subject.HREF)
+			subject.SubjectSource = vappACLSubjectSourceLocal
+		}
+
+		if as.ExternalSubject != nil {
+			if as.ExternalSubject.IsUser {
+				subject.SubjectKind = vappACLSubjectKindUser
+			} else {
+				subject.SubjectKind = vappACLSubjectKindGroup
+			}
+			subject.SubjectID = as.ExternalSubject.SubjectID
+			subject.SubjectSource = vappACLSubjectSourceExternal
+		}
+
+		model.SharedWith = append(model.SharedWith, subject)
+	}
+
+	return model
+}
+
+func localSubjectKind(subjectType string) string {
+	switch subjectType {
+	case localSubjectTypeOrgUser:
+		return vappACLSubjectKindUser
+	case localSubjectTypeOrgGroup:
+		return vappACLSubjectKindGroup
+	default:
+		return ""
+	}
+}
+
+func localSubjectID(href string) string {
+	if href == "" {
+		return ""
+	}
+	if id, ok := localSubjectURNFromHREF(href, "/api/admin/user/", "urn:vcloud:orguser:"); ok {
+		return id
+	}
+	if id, ok := localSubjectURNFromHREF(href, "/api/admin/group/", "urn:vcloud:orggroup:"); ok {
+		return id
+	}
+	return href
+}
+
+func localSubjectURNFromHREF(href, pathPrefix, urnPrefix string) (string, bool) {
+	idx := len(href) - len(pathPrefix)
+	if idx < 0 {
+		return "", false
+	}
+	pos := -1
+	for i := 0; i <= len(href)-len(pathPrefix); i++ {
+		if href[i:i+len(pathPrefix)] == pathPrefix {
+			pos = i
+		}
+	}
+	if pos < 0 {
+		return "", false
+	}
+	identifier := href[pos+len(pathPrefix):]
+	if identifier == "" {
+		return "", false
+	}
+	return urnPrefix + identifier, true
 }

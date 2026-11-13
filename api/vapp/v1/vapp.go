@@ -12,12 +12,6 @@ package vapp
 import (
 	"context"
 	"fmt"
-	"net/url"
-	"path"
-	"strings"
-	"time"
-
-	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
@@ -32,41 +26,7 @@ const (
 	opInstantiateVAppTemplate = "VApp.InstantiateTemplate"
 	opUpdateVApp              = "VApp.Update"
 	opDeleteVApp              = "VApp.Delete"
-	opDeployVApp              = "VApp.Deploy"
-	opPowerOffVApp            = "VApp.PowerOff"
-	opPowerOnVApp             = "VApp.PowerOn"
-	opRebootVApp              = "VApp.Reboot"
-	opResetVApp               = "VApp.Reset"
-	opShutdownVApp            = "VApp.Shutdown"
-	opSuspendVApp             = "VApp.Suspend"
 )
-
-type getVAppByIDParams struct {
-	ID string
-}
-
-type composeVAppParams struct {
-	VDCID string
-	Body  itypes.APIRequestComposeVApp
-}
-
-type instantiateVAppTemplateParams struct {
-	VDCID string
-	Body  itypes.APIRequestInstantiateVAppTemplate
-}
-
-type updateVAppByIDParams struct {
-	ID   string
-	Body itypes.APIRequestUpdateVApp
-}
-
-type deleteVAppByIDParams struct {
-	ID string
-}
-
-type listVAppParams struct {
-	VDCID string
-}
 
 var (
 	listVAppOp = cav.Operation[listVAppParams, *itypes.APIResponseListVApp]{
@@ -224,57 +184,7 @@ var (
 			return extractVMwareJob(resp, "remove networks")
 		},
 	}
-	undeployVAppOp = cav.Operation[getVAppByIDParams, cav.Job]{
-		Name:     "VApp.Undeploy",
-		Backend:  cav.BackendVMware,
-		Endpoint: endpoints.UndeployVApp(),
-		Validate: func(p getVAppByIDParams) error {
-			if p.ID == "" {
-				return fmt.Errorf("id is required")
-			}
-
-			return nil
-		},
-		RequestOptions: func(p getVAppByIDParams) ([]cav.EndpointRequestOption, error) {
-			ep := endpoints.UndeployVApp()
-			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
-		},
-		Transform: func(p getVAppByIDParams) (any, error) {
-			return itypes.APIRequestUndeployVApp{UndeployPowerOff: true}, nil
-		},
-		Extract: func(resp *cav.Response, _ getVAppByIDParams) (cav.Job, error) {
-			return extractVMwareJob(resp, "undeploy")
-		},
-	}
-	deployVAppOp   = newVAppActionOperation(opDeployVApp, endpoints.DeployVApp, "deploy")
-	powerOffVAppOp = newVAppActionOperation(opPowerOffVApp, endpoints.PowerOffVApp, "power off")
-	powerOnVAppOp  = newVAppActionOperation(opPowerOnVApp, endpoints.PowerOnVApp, "power on")
-	rebootVAppOp   = newVAppActionOperation(opRebootVApp, endpoints.RebootVApp, "reboot")
-	resetVAppOp    = newVAppActionOperation(opResetVApp, endpoints.ResetVApp, "reset")
-	shutdownVAppOp = newVAppActionOperation(opShutdownVApp, endpoints.ShutdownVApp, "shutdown")
-	suspendVAppOp  = newVAppActionOperation(opSuspendVApp, endpoints.SuspendVApp, "suspend")
 )
-
-func newVAppActionOperation(name string, endpoint func() *cav.Endpoint, action string) cav.Operation[getVAppByIDParams, cav.Job] {
-	return cav.Operation[getVAppByIDParams, cav.Job]{
-		Name:     name,
-		Backend:  cav.BackendVMware,
-		Endpoint: endpoint(),
-		Validate: func(p getVAppByIDParams) error {
-			if p.ID == "" {
-				return fmt.Errorf("id is required")
-			}
-			return nil
-		},
-		RequestOptions: func(p getVAppByIDParams) ([]cav.EndpointRequestOption, error) {
-			ep := endpoint()
-			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
-		},
-		Extract: func(resp *cav.Response, _ getVAppByIDParams) (cav.Job, error) {
-			return extractVMwareJob(resp, action)
-		},
-	}
-}
 
 // ListVApp lists VApps in a VDC.
 func (c *Client) ListVApp(ctx context.Context, vdcID string) ([]*types.ModelVApp, error) {
@@ -347,9 +257,9 @@ func (c *Client) ComposeVApp(ctx context.Context, params types.ParamsComposeVApp
 	}
 
 	body := itypes.APIRequestComposeVApp{
-		OVF:              "http://schemas.dmtf.org/ovf/envelope/1",
-		XSI:              "http://www.w3.org/2001/XMLSchema-instance",
-		XMLNS:            "http://www.vmware.com/vcloud/v1.5",
+		OVF:              ovfEnvelopeXMLNS,
+		XSI:              xmlSchemaInstanceNS,
+		XMLNS:            vcloudXMLNS,
 		Name:             params.Name,
 		Description:      params.Description,
 		Deploy:           params.Deploy,
@@ -361,12 +271,12 @@ func (c *Client) ComposeVApp(ctx context.Context, params types.ParamsComposeVApp
 		return nil, fmt.Errorf("%s: sourced item is required", opComposeVApp)
 	}
 	body.SourcedItem = &itypes.APIRequestVAppSourcedItem{
-		Source:            toVAppReference(params.SourcedItem.Source),
+		Source:            itypes.APIRequestVAppReference(params.SourcedItem.Source),
 		SourceDelete:      params.SourcedItem.SourceDelete,
 		VAppScopedLocalID: params.SourcedItem.VAppScopedLocalID,
 	}
 	if params.SourcedItem.StorageProfile != nil {
-		ref := toVAppReference(*params.SourcedItem.StorageProfile)
+		ref := itypes.APIRequestVAppReference(*params.SourcedItem.StorageProfile)
 		body.SourcedItem.StorageProfile = &ref
 	}
 	body.InstantiationParams = toInstantiationParams(params.InstantiationParams)
@@ -395,9 +305,9 @@ func (c *Client) InstantiateVAppTemplate(ctx context.Context, params types.Param
 	}
 
 	body := itypes.APIRequestInstantiateVAppTemplate{
-		OVF:                 "http://schemas.dmtf.org/ovf/envelope/1",
-		XSI:                 "http://www.w3.org/2001/XMLSchema-instance",
-		XMLNS:               "http://www.vmware.com/vcloud/v1.5",
+		OVF:                 ovfEnvelopeXMLNS,
+		XSI:                 xmlSchemaInstanceNS,
+		XMLNS:               vcloudXMLNS,
 		Name:                params.Name,
 		Description:         params.Description,
 		Deploy:              params.Deploy,
@@ -498,7 +408,6 @@ func (c *Client) DeleteVApp(ctx context.Context, params types.ParamsDeleteVApp) 
 		params.ID = vapp.ID
 	}
 
-	// Step 1: Remove all networks
 	job, err := cav.Execute(ctx, c.c, removeAllNetworksOp, getVAppByIDParams{ID: params.ID})
 	if err != nil {
 		return fmt.Errorf("%s: remove all networks: %w", opDeleteVApp, err)
@@ -507,15 +416,19 @@ func (c *Client) DeleteVApp(ctx context.Context, params types.ParamsDeleteVApp) 
 		return fmt.Errorf("%s: remove all networks: %w", opDeleteVApp, err)
 	}
 
-	// Step 2: Try undeploy (ignore if already undeployed)
-	job, err = cav.Execute(ctx, c.c, undeployVAppOp, getVAppByIDParams{ID: params.ID})
+	job, err = cav.Execute(ctx, c.c, undeployVAppOp, undeployVAppParams{ID: params.ID, Body: itypes.ToAPIRequestUndeployVApp(types.VAppUndeployModePowerOff)})
 	if err != nil {
-		c.logger.Debug("Undeploy failed, continuing with delete", "error", err)
+		if !isIgnorableUndeployError(err) {
+			return fmt.Errorf("%s: undeploy: %w", opDeleteVApp, err)
+		}
+		c.logger.Debug("Undeploy skipped during delete because VApp is already undeployed", "error", err)
 	} else if err := awaitVAppJob(ctx, c.c, opDeleteVApp, job.ID); err != nil {
-		c.logger.Debug("Await undeploy failed, continuing with delete", "error", err)
+		if !isIgnorableUndeployError(err) {
+			return fmt.Errorf("%s: undeploy: %w", opDeleteVApp, err)
+		}
+		c.logger.Debug("Undeploy completion skipped during delete because VApp is already undeployed", "error", err)
 	}
 
-	// Step 3: Delete
 	job, err = cav.Execute(ctx, c.c, deleteVAppByIDOp, deleteVAppByIDParams{ID: params.ID})
 	if err != nil {
 		return fmt.Errorf("%s: delete: %w", opDeleteVApp, err)
@@ -527,89 +440,15 @@ func (c *Client) DeleteVApp(ctx context.Context, params types.ParamsDeleteVApp) 
 	return nil
 }
 
-// DeployVApp deploys a VApp by ID.
-func (c *Client) DeployVApp(ctx context.Context, id string) error {
-	return c.executeVAppAction(ctx, id, deployVAppOp, opDeployVApp)
-}
-
-// PowerOffVApp powers off a VApp by ID.
-func (c *Client) PowerOffVApp(ctx context.Context, id string) error {
-	return c.executeVAppAction(ctx, id, powerOffVAppOp, opPowerOffVApp)
-}
-
-// PowerOnVApp powers on a VApp by ID.
-func (c *Client) PowerOnVApp(ctx context.Context, id string) error {
-	return c.executeVAppAction(ctx, id, powerOnVAppOp, opPowerOnVApp)
-}
-
-// RebootVApp reboots a VApp by ID.
-func (c *Client) RebootVApp(ctx context.Context, id string) error {
-	return c.executeVAppAction(ctx, id, rebootVAppOp, opRebootVApp)
-}
-
-// ResetVApp resets a VApp by ID.
-func (c *Client) ResetVApp(ctx context.Context, id string) error {
-	return c.executeVAppAction(ctx, id, resetVAppOp, opResetVApp)
-}
-
-// ShutdownVApp shuts down a VApp by ID.
-func (c *Client) ShutdownVApp(ctx context.Context, id string) error {
-	return c.executeVAppAction(ctx, id, shutdownVAppOp, opShutdownVApp)
-}
-
-// SuspendVApp suspends a VApp by ID.
-func (c *Client) SuspendVApp(ctx context.Context, id string) error {
-	return c.executeVAppAction(ctx, id, suspendVAppOp, opSuspendVApp)
-}
-
-func (c *Client) executeVAppAction(ctx context.Context, id string, op cav.Operation[getVAppByIDParams, cav.Job], name string) error {
-	job, err := cav.Execute(ctx, c.c, op, getVAppByIDParams{ID: id})
+func (c *Client) resolveVAppID(ctx context.Context, id, name string) (string, error) {
+	if id != "" {
+		return id, nil
+	}
+	vapp, err := c.GetVApp(ctx, types.ParamsGetVApp{Name: name})
 	if err != nil {
-		return fmt.Errorf("%s: %w", name, err)
+		return "", fmt.Errorf("get current: %w", err)
 	}
-	if err := awaitVAppJob(ctx, c.c, name, job.ID); err != nil {
-		return err
-	}
-	return nil
-}
-
-// IsVAppOrgNetwork checks if a network is an org network.
-// This is a helper preserved from v1 SDK.
-func IsVAppOrgNetwork(networkHREF string) bool {
-	path := networkHrefPath(networkHREF)
-	return strings.Contains(path, "/api/network/") || strings.Contains(path, "/network/")
-}
-
-// IsVAppNetwork checks if a network is a vApp network.
-// This is a helper preserved from v1 SDK.
-func IsVAppNetwork(networkHREF string) bool {
-	path := strings.ToLower(networkHrefPath(networkHREF))
-	return strings.Contains(path, "vappnetwork")
-}
-
-func awaitVAppJob(ctx context.Context, c cav.Client, opName, jobID string) error {
-	_, err := cav.AwaitJobOnBackend(ctx, c, cav.BackendVMware, jobID, cav.JobPollOptions{
-		Timeout:         30 * time.Second,
-		PollingInterval: 1 * time.Second,
-	}, func(_ *resty.Response) (struct{}, error) {
-		return struct{}{}, nil
-	})
-	if err != nil {
-		return fmt.Errorf("%s: await job: %w", opName, err)
-	}
-	return nil
-}
-
-func networkHrefPath(networkHREF string) string {
-	parsed, err := url.Parse(networkHREF)
-	if err != nil || parsed.Path == "" {
-		return networkHREF
-	}
-	return parsed.Path
-}
-
-func toVAppReference(ref types.VAppReference) itypes.APIRequestVAppReference {
-	return itypes.APIRequestVAppReference{HREF: ref.HREF, ID: ref.ID, Type: ref.Type, Name: ref.Name}
+	return vapp.ID, nil
 }
 
 func toInstantiationParams(params *types.VAppInstantiationParams) *itypes.APIRequestVAppInstantiationParams {
@@ -635,31 +474,4 @@ func toInstantiationParams(params *types.VAppInstantiationParams) *itypes.APIReq
 		}
 	}
 	return result
-}
-
-func extractVMwareJob(resp *cav.Response, action string) (cav.Job, error) {
-	if job, ok := resp.Result().(*cav.Job); ok && job != nil && job.ID != "" {
-		return *job, nil
-	}
-
-	if resp == nil || resp.Raw == nil {
-		return cav.Job{}, fmt.Errorf("unexpected %s response: missing raw response", action)
-	}
-
-	location := resp.Raw.Header().Get("Location")
-	if location == "" {
-		return cav.Job{}, fmt.Errorf("unexpected %s response: missing job location", action)
-	}
-
-	parsed, err := url.Parse(location)
-	if err != nil {
-		return cav.Job{}, fmt.Errorf("unexpected %s response: parse location: %w", action, err)
-	}
-
-	jobID := path.Base(parsed.Path)
-	if jobID == "" || jobID == "." || jobID == "/" {
-		return cav.Job{}, fmt.Errorf("unexpected %s response: missing job id in location %q", action, location)
-	}
-
-	return cav.Job{ID: jobID}, nil
 }

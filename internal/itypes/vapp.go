@@ -67,15 +67,16 @@ type APIResponseGuestProperties struct {
 
 // APIResponseProductSection contains product section info for guest properties.
 type APIResponseProductSection struct {
-	Info    string               `json:"Info" fake:"Product section"` //nolint:tagliatelle
-	Product []APIResponseProduct `json:"Product" fakesize:"1"`        //nolint:tagliatelle
+	Info     string                       `json:"Info" fake:"Product section"` //nolint:tagliatelle
+	Class    string                       `json:"Class" fake:"{word}"`         //nolint:tagliatelle
+	Instance string                       `json:"Instance" fake:"{word}"`      //nolint:tagliatelle
+	Property []APIResponseProductProperty `json:"Property" fakesize:"1"`       //nolint:tagliatelle
 }
 
-// APIResponseProduct contains product info.
-type APIResponseProduct struct {
-	Info     string `json:"Info" fake:"Product info"` //nolint:tagliatelle
-	Class    string `json:"Class" fake:"{word}"`      //nolint:tagliatelle
-	Instance string `json:"Instance" fake:"{word}"`   //nolint:tagliatelle
+// APIResponseProductProperty contains one guest property from a ProductSection.
+type APIResponseProductProperty struct {
+	Key   string `json:"key" fake:"{word}"`
+	Value string `json:"value" fake:"{word}"`
 }
 
 // APIResponseNetworkConfigSection contains network configuration.
@@ -116,6 +117,79 @@ type APIResponseIPScope struct {
 type APIResponseIPRange struct {
 	StartAddress string `json:"startAddress" fake:"{ipv4}"`
 	EndAddress   string `json:"endAddress" fake:"{ipv4}"`
+}
+
+// APIResponseVAppNetworkConfigSection contains the runtime XML networkConfigSection of a vApp.
+type APIResponseVAppNetworkConfigSection struct {
+	XMLName       xml.Name                       `xml:"NetworkConfigSection"`
+	XMLNS         string                         `xml:"xmlns,attr,omitempty"`
+	OVF           string                         `xml:"xmlns:ovf,attr,omitempty"`
+	Info          string                         `xml:"ovf:Info,omitempty"`
+	NetworkConfig []APIResponseVAppNetworkConfig `xml:"NetworkConfig,omitempty"`
+}
+
+type APIResponseVAppNetworkConfig struct {
+	NetworkID     string                              `xml:"id,attr,omitempty"`
+	NetworkHREF   string                              `xml:"href,attr,omitempty"`
+	Description   string                              `xml:"Description,omitempty"`
+	NetworkType   string                              `xml:"type,attr,omitempty"`
+	NetworkName   string                              `xml:"networkName,attr,omitempty"`
+	Configuration APIResponseVAppRuntimeConfiguration `xml:"Configuration"`
+}
+
+type APIResponseVAppRuntimeConfiguration struct {
+	ParentNetwork                  *APIRequestVAppReference          `xml:"ParentNetwork,omitempty"`
+	FenceMode                      string                            `xml:"FenceMode,omitempty"`
+	RetainNetInfoAcrossDeployments *bool                             `xml:"RetainNetInfoAcrossDeployments,omitempty"`
+	Features                       *APIResponseVAppRuntimeFeatures   `xml:"Features,omitempty"`
+	RouterInfo                     *APIResponseVAppRuntimeRouterInfo `xml:"RouterInfo,omitempty"`
+	IPScopes                       *APIResponseVAppRuntimeIPScopes   `xml:"IpScopes,omitempty"`
+	IsDeployed                     *bool                             `xml:"IsDeployed,omitempty"`
+	IsShared                       *bool                             `xml:"IsShared,omitempty"`
+	IsConnected                    *bool                             `xml:"IsConnected,omitempty"`
+}
+
+type APIResponseVAppRuntimeFeatures struct {
+	FirewallService      *APIResponseVAppRuntimeInnerXML `xml:"FirewallService,omitempty"`
+	NATService           *APIResponseVAppRuntimeInnerXML `xml:"NatService,omitempty"`
+	DhcpService          *APIResponseVAppRuntimeInnerXML `xml:"DhcpService,omitempty"`
+	StaticRoutingService *APIResponseVAppRuntimeInnerXML `xml:"StaticRoutingService,omitempty"`
+}
+
+type APIResponseVAppRuntimeInnerXML struct {
+	InnerXML string `xml:",innerxml"`
+}
+
+type APIResponseVAppRuntimeRouterInfo struct {
+	ExternalIP               string `xml:"ExternalIp,omitempty"`
+	ExternalIPAllocationMode string `xml:"ExternalIpAllocationMode,omitempty"`
+	ConnectionType           string `xml:"ConnectionType,omitempty"`
+	ParentNetwork            string `xml:"ParentNetwork,omitempty"`
+	ParentNetworkName        string `xml:"ParentNetworkName,omitempty"`
+}
+
+type APIResponseVAppRuntimeIPScopes struct {
+	IPScope []APIResponseVAppRuntimeIPScope `xml:"IpScope,omitempty"`
+}
+
+type APIResponseVAppRuntimeIPScope struct {
+	IsInherited  *bool                          `xml:"IsInherited,omitempty"`
+	Gateway      string                         `xml:"Gateway,omitempty"`
+	Netmask      string                         `xml:"Netmask,omitempty"`
+	DNS1         string                         `xml:"Dns1,omitempty"`
+	DNS2         string                         `xml:"Dns2,omitempty"`
+	DNSSuffix    string                         `xml:"DnsSuffix,omitempty"`
+	IPRanges     APIResponseVAppRuntimeIPRanges `xml:"IpRanges,omitempty"`
+	PrefixLength *int                           `xml:"PrefixLength,omitempty"`
+}
+
+type APIResponseVAppRuntimeIPRanges struct {
+	IPRange []APIResponseVAppRuntimeIPRange `xml:"IpRange,omitempty"`
+}
+
+type APIResponseVAppRuntimeIPRange struct {
+	StartAddress string `xml:"StartAddress,omitempty"`
+	EndAddress   string `xml:"EndAddress,omitempty"`
 }
 
 // APIResponseMetadata contains metadata entries.
@@ -226,8 +300,10 @@ type APIRequestOrgLeaseSettings struct {
 
 // APIRequestUndeployVApp contains the request payload for undeploying a VApp.
 type APIRequestUndeployVApp struct {
-	XMLNS            string `json:"xmlns" fake:"http://www.vmware.com/vcloud/v1.5"`
-	UndeployPowerOff bool   `json:"undeployPowerOff" fake:"{bool}"`
+	XMLName          xml.Name `xml:"UndeployVAppParams"`
+	XMLNS            string   `xml:"xmlns,attr,omitempty" fake:"http://www.vmware.com/vcloud/v1.5"`
+	UndeployPowerOff *bool    `xml:"UndeployPowerOff,omitempty"`
+	UndeployAction   string   `xml:"UndeployPowerAction,omitempty"`
 }
 
 // ToModel converts APIResponseListVAppRecord to types.ModelVApp.
@@ -269,8 +345,31 @@ func (r *APIResponseGetVApp) ToModel() types.ModelVApp {
 			m.Properties.BillingModel = meta.Value
 		}
 	}
+	m.GuestProperties = r.GuestProperties.ToModel()
 
 	return m
+}
+
+// ToModel converts APIResponseGuestProperties to the public guest property model.
+func (r *APIResponseGuestProperties) ToModel() types.ModelVAppGuestProperties {
+	model := types.ModelVAppGuestProperties{Sections: make([]types.ModelVAppGuestPropertySection, 0, len(r.ProductSectionList))}
+	for _, section := range r.ProductSectionList {
+		model.Sections = append(model.Sections, section.ToModel())
+	}
+	return model
+}
+
+// ToModel converts APIResponseProductSection to the public guest property section model.
+func (r *APIResponseProductSection) ToModel() types.ModelVAppGuestPropertySection {
+	model := types.ModelVAppGuestPropertySection{
+		Class:      r.Class,
+		Instance:   r.Instance,
+		Properties: make(map[string]string, len(r.Property)),
+	}
+	for _, property := range r.Property {
+		model.Properties[property.Key] = property.Value
+	}
+	return model
 }
 
 // ToModel converts APIResponseListVApp to types.ModelListVApp.
@@ -284,4 +383,152 @@ func (r *APIResponseListVApp) ToModel() *types.ModelListVApp {
 	}
 
 	return model
+}
+
+// ToModel converts APIResponseVAppNetworkConfigSection to the public runtime model.
+func (r *APIResponseVAppNetworkConfigSection) ToModel() *types.ModelVAppRuntimeNetworkConfigSection {
+	if r == nil {
+		return nil
+	}
+	model := &types.ModelVAppRuntimeNetworkConfigSection{Info: r.Info, NetworkConfig: make([]types.ModelVAppRuntimeNetworkConfig, 0, len(r.NetworkConfig))}
+	for _, network := range r.NetworkConfig {
+		model.NetworkConfig = append(model.NetworkConfig, network.ToModel())
+	}
+	return model
+}
+
+// ToModel converts APIResponseVAppNetworkConfig to the public runtime model.
+func (r *APIResponseVAppNetworkConfig) ToModel() types.ModelVAppRuntimeNetworkConfig {
+	return types.ModelVAppRuntimeNetworkConfig{
+		Description:   r.Description,
+		ID:            r.NetworkID,
+		HREF:          r.NetworkHREF,
+		Type:          r.NetworkType,
+		NetworkName:   r.NetworkName,
+		Configuration: r.Configuration.ToModel(),
+	}
+}
+
+// ToModel converts APIResponseVAppRuntimeConfiguration to the public runtime model.
+func (r *APIResponseVAppRuntimeConfiguration) ToModel() types.ModelVAppRuntimeNetworkConfiguration {
+	model := types.ModelVAppRuntimeNetworkConfiguration{
+		FenceMode:                      r.FenceMode,
+		RetainNetInfoAcrossDeployments: r.RetainNetInfoAcrossDeployments,
+		IsDeployed:                     r.IsDeployed,
+		IsShared:                       r.IsShared,
+		IPScopes:                       make([]types.ModelVAppRuntimeIPScope, 0),
+	}
+	if r.IsConnected != nil {
+		model.IsConnected = *r.IsConnected
+	}
+	if r.ParentNetwork != nil {
+		ref := types.VAppReference{HREF: r.ParentNetwork.HREF, ID: r.ParentNetwork.ID, Type: r.ParentNetwork.Type, Name: r.ParentNetwork.Name}
+		model.ParentNetwork = &ref
+	}
+	if r.IPScopes != nil {
+		model.IPScopes = make([]types.ModelVAppRuntimeIPScope, 0, len(r.IPScopes.IPScope))
+		for _, scope := range r.IPScopes.IPScope {
+			model.IPScopes = append(model.IPScopes, scope.ToModel())
+		}
+	}
+	return model
+}
+
+func (r *APIResponseVAppRuntimeIPScope) ToModel() types.ModelVAppRuntimeIPScope {
+	model := types.ModelVAppRuntimeIPScope{
+		IsInherited:  r.IsInherited != nil && *r.IsInherited,
+		Gateway:      r.Gateway,
+		Netmask:      r.Netmask,
+		DNS1:         r.DNS1,
+		DNS2:         r.DNS2,
+		DNSSuffix:    r.DNSSuffix,
+		PrefixLength: r.PrefixLength,
+		IPRanges:     make([]types.ModelVAppRuntimeIPRange, 0, len(r.IPRanges.IPRange)),
+	}
+	for _, ipRange := range r.IPRanges.IPRange {
+		model.IPRanges = append(model.IPRanges, ipRange.ToModel())
+	}
+	return model
+}
+
+func (r *APIResponseVAppRuntimeIPRange) ToModel() types.ModelVAppRuntimeIPRange {
+	return types.ModelVAppRuntimeIPRange{StartAddress: r.StartAddress, EndAddress: r.EndAddress}
+}
+
+// ToAPIResponseVAppNetworkConfigSection converts the public runtime model to the runtime XML payload.
+func ToAPIResponseVAppNetworkConfigSection(model *types.ModelVAppRuntimeNetworkConfigSection) *APIResponseVAppNetworkConfigSection {
+	if model == nil {
+		return nil
+	}
+	section := &APIResponseVAppNetworkConfigSection{
+		XMLNS:         "http://www.vmware.com/vcloud/v1.5",
+		OVF:           "http://schemas.dmtf.org/ovf/envelope/1",
+		Info:          model.Info,
+		NetworkConfig: make([]APIResponseVAppNetworkConfig, 0, len(model.NetworkConfig)),
+	}
+	for _, network := range model.NetworkConfig {
+		section.NetworkConfig = append(section.NetworkConfig, toAPIResponseVAppNetworkConfig(network))
+	}
+	return section
+}
+
+func toAPIResponseVAppNetworkConfig(model types.ModelVAppRuntimeNetworkConfig) APIResponseVAppNetworkConfig {
+	return APIResponseVAppNetworkConfig{NetworkID: model.ID, NetworkHREF: model.HREF, Description: model.Description, NetworkType: model.Type, NetworkName: model.NetworkName, Configuration: toAPIResponseVAppRuntimeConfiguration(model.Configuration)}
+}
+
+// ToAPIRequestUndeployVApp converts the public undeploy mode to the VMware XML payload.
+func ToAPIRequestUndeployVApp(mode types.VAppUndeployMode) APIRequestUndeployVApp {
+	result := APIRequestUndeployVApp{XMLNS: "http://www.vmware.com/vcloud/v1.5"}
+	switch mode {
+	case types.VAppUndeployModeSuspend:
+		result.UndeployAction = "suspend"
+	case types.VAppUndeployModeForce:
+		result.UndeployAction = "force"
+		powerOff := true
+		result.UndeployPowerOff = &powerOff
+	default:
+		powerOff := true
+		result.UndeployPowerOff = &powerOff
+	}
+	return result
+}
+
+func toAPIResponseVAppRuntimeConfiguration(model types.ModelVAppRuntimeNetworkConfiguration) APIResponseVAppRuntimeConfiguration {
+	result := APIResponseVAppRuntimeConfiguration{
+		FenceMode:                      model.FenceMode,
+		RetainNetInfoAcrossDeployments: model.RetainNetInfoAcrossDeployments,
+		IsDeployed:                     model.IsDeployed,
+		IsShared:                       model.IsShared,
+		IPScopes:                       nil,
+	}
+	result.IsConnected = &model.IsConnected
+	if model.ParentNetwork != nil {
+		ref := APIRequestVAppReference{HREF: model.ParentNetwork.HREF, ID: model.ParentNetwork.ID, Type: model.ParentNetwork.Type, Name: model.ParentNetwork.Name}
+		result.ParentNetwork = &ref
+	}
+	if len(model.IPScopes) > 0 {
+		result.IPScopes = &APIResponseVAppRuntimeIPScopes{IPScope: make([]APIResponseVAppRuntimeIPScope, 0, len(model.IPScopes))}
+		for _, scope := range model.IPScopes {
+			result.IPScopes.IPScope = append(result.IPScopes.IPScope, toAPIResponseVAppRuntimeIPScope(scope))
+		}
+	}
+	return result
+}
+
+func toAPIResponseVAppRuntimeIPScope(model types.ModelVAppRuntimeIPScope) APIResponseVAppRuntimeIPScope {
+	isInherited := model.IsInherited
+	result := APIResponseVAppRuntimeIPScope{
+		IsInherited:  &isInherited,
+		Gateway:      model.Gateway,
+		Netmask:      model.Netmask,
+		DNS1:         model.DNS1,
+		DNS2:         model.DNS2,
+		DNSSuffix:    model.DNSSuffix,
+		PrefixLength: model.PrefixLength,
+		IPRanges:     APIResponseVAppRuntimeIPRanges{IPRange: make([]APIResponseVAppRuntimeIPRange, 0, len(model.IPRanges))},
+	}
+	for _, ipRange := range model.IPRanges {
+		result.IPRanges.IPRange = append(result.IPRanges.IPRange, APIResponseVAppRuntimeIPRange{StartAddress: ipRange.StartAddress, EndAddress: ipRange.EndAddress})
+	}
+	return result
 }

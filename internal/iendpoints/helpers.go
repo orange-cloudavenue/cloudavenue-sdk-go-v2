@@ -26,7 +26,8 @@ const (
 	// VMware VCD negotiates both JSON and XML responses by API version. Keep
 	// endpoint-specific media types versioned rather than relying on a
 	// subclient default that may be overridden by an endpoint.
-	headerXML = "application/xml;version=39.1"
+	headerXML  = "application/xml;version=39.1"
+	headerJSON = "application/json;version=39.1"
 	// headerXMLAdminUser is the admin user media type: the admin user record
 	// rejects the generic XML accept with HTTP 406.
 	headerXMLAdminUser = "application/vnd.vmware.admin.user+xml;version=39.1"
