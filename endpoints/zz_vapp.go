@@ -69,6 +69,13 @@ func SuspendVApp() *cav.Endpoint {
 	return cav.MustGetEndpoint("SuspendVApp")
 }
 
+// DiscardSuspendedStateVApp - Discard suspended state of a VApp
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-DiscardVAppState.html
+func DiscardSuspendedStateVApp() *cav.Endpoint {
+	return cav.MustGetEndpoint("DiscardSuspendedStateVApp")
+}
+
 // GetVApp - Get VApp
 //
 // DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-VApp.html

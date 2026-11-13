@@ -670,6 +670,13 @@ func TestVAppLifecycleEndpoints(t *testing.T) {
 	}
 }
 
+func TestDiscardSuspendedStateVAppEndpoint(t *testing.T) {
+	ep := endpoints.DiscardSuspendedStateVApp()
+	assert.Equal(t, "/api/vapp/{vapp-id}/action/discardSuspendedState", ep.PathTemplate)
+	assert.Equal(t, "POST", string(ep.Method))
+	assert.Equal(t, "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-DiscardVAppState.html", ep.DocumentationURL)
+}
+
 func TestUpdateVAppEndpointDocumentation(t *testing.T) {
 	ep := endpoints.UpdateVApp()
 	assert.Equal(t, "/api/vapp/{vapp-id}", ep.PathTemplate)
@@ -690,6 +697,7 @@ func TestVAppLifecycleActionsRequireID(t *testing.T) {
 		{"reset", func() error { return client.ResetVApp(t.Context(), "") }},
 		{"shutdown", func() error { return client.ShutdownVApp(t.Context(), "") }},
 		{"suspend", func() error { return client.SuspendVApp(t.Context(), "") }},
+		{"discard suspended state", func() error { return client.DiscardSuspendedStateVApp(t.Context(), "") }},
 	}
 	for _, action := range actions {
 		t.Run(action.name, func(t *testing.T) {

@@ -125,6 +125,18 @@ func init() {
 		ResponseType:     cav.Job{},
 	}.Register()
 
+	// DiscardSuspendedStateVApp
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-DiscardVAppState.html",
+		Name:             "DiscardSuspendedStateVApp",
+		Description:      "Discard suspended state of a VApp",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		PathTemplate:     pathVAppDiscardSuspendedState,
+		PathParams:       vAppActionPathParams(),
+		ResponseType:     cav.Job{},
+	}.Register()
+
 	// GetVApp
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-VApp.html",

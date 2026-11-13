@@ -62,6 +62,8 @@ const (
 	pathVAppReset    = "/api/vapp/{vapp-id}/power/action/reset"
 	pathVAppShutdown = "/api/vapp/{vapp-id}/power/action/shutdown"
 	pathVAppSuspend  = "/api/vapp/{vapp-id}/power/action/suspend"
+	// pathVAppDiscardSuspendedState discards the suspended state of one vApp.
+	pathVAppDiscardSuspendedState = "/api/vapp/{vapp-id}/action/discardSuspendedState"
 	// pathVAppCompose composes a vApp under a VDC in the legacy XML API.
 	pathVAppCompose = "/api/vdc/{vdc-id}/action/composeVApp"
 	// pathVAppInstantiateTemplate instantiates a vApp template under a VDC.

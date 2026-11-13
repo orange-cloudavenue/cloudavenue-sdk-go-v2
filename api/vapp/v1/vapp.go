@@ -55,6 +55,7 @@ const (
 	opResetVApp                  = "VApp.Reset"
 	opShutdownVApp               = "VApp.Shutdown"
 	opSuspendVApp                = "VApp.Suspend"
+	opDiscardSuspendedStateVApp  = "VApp.DiscardSuspendedState"
 	vcloudXMLNS                  = "http://www.vmware.com/vcloud/v1.5"
 	xmlSchemaInstanceNS          = "http://www.w3.org/2001/XMLSchema-instance"
 	pathAdminUserByID            = "/api/admin/user/%s"
@@ -432,13 +433,14 @@ var (
 			return extractVMwareJob(resp, "undeploy")
 		},
 	}
-	deployVAppOp   = newVAppActionOperation(opDeployVApp, endpoints.DeployVApp, "deploy")
-	powerOffVAppOp = newVAppActionOperation(opPowerOffVApp, endpoints.PowerOffVApp, "power off")
-	powerOnVAppOp  = newVAppActionOperation(opPowerOnVApp, endpoints.PowerOnVApp, "power on")
-	rebootVAppOp   = newVAppActionOperation(opRebootVApp, endpoints.RebootVApp, "reboot")
-	resetVAppOp    = newVAppActionOperation(opResetVApp, endpoints.ResetVApp, "reset")
-	shutdownVAppOp = newVAppActionOperation(opShutdownVApp, endpoints.ShutdownVApp, "shutdown")
-	suspendVAppOp  = newVAppActionOperation(opSuspendVApp, endpoints.SuspendVApp, "suspend")
+	deployVAppOp                = newVAppActionOperation(opDeployVApp, endpoints.DeployVApp, "deploy")
+	powerOffVAppOp              = newVAppActionOperation(opPowerOffVApp, endpoints.PowerOffVApp, "power off")
+	powerOnVAppOp               = newVAppActionOperation(opPowerOnVApp, endpoints.PowerOnVApp, "power on")
+	rebootVAppOp                = newVAppActionOperation(opRebootVApp, endpoints.RebootVApp, "reboot")
+	resetVAppOp                 = newVAppActionOperation(opResetVApp, endpoints.ResetVApp, "reset")
+	shutdownVAppOp              = newVAppActionOperation(opShutdownVApp, endpoints.ShutdownVApp, "shutdown")
+	suspendVAppOp               = newVAppActionOperation(opSuspendVApp, endpoints.SuspendVApp, "suspend")
+	discardSuspendedStateVAppOp = newVAppActionOperation(opDiscardSuspendedStateVApp, endpoints.DiscardSuspendedStateVApp, "discard suspended state")
 )
 
 func newVAppActionOperation(name string, endpoint func() *cav.Endpoint, action string) cav.Operation[getVAppByIDParams, cav.Job] {
@@ -947,6 +949,11 @@ func (c *Client) ShutdownVApp(ctx context.Context, id string) error {
 // SuspendVApp suspends a VApp by ID.
 func (c *Client) SuspendVApp(ctx context.Context, id string) error {
 	return c.executeVAppAction(ctx, id, suspendVAppOp, opSuspendVApp)
+}
+
+// DiscardSuspendedStateVApp discards the suspended state of a VApp by ID.
+func (c *Client) DiscardSuspendedStateVApp(ctx context.Context, id string) error {
+	return c.executeVAppAction(ctx, id, discardSuspendedStateVAppOp, opDiscardSuspendedStateVApp)
 }
 
 func (c *Client) executeVAppAction(ctx context.Context, id string, op cav.Operation[getVAppByIDParams, cav.Job], name string) error {
