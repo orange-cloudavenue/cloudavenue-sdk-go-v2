@@ -33,20 +33,19 @@ type APIResponseListVAppRecord struct {
 
 // APIResponseGetVApp contains a VApp returned by get operations.
 type APIResponseGetVApp struct {
-	HREF                 string                          `json:"href" fake:"{href_uuid}"`
-	ID                   string                          `json:"id" fake:"{urn:vapp}"`
-	Name                 string                          `json:"name" fake:"mockvapp-{word}"`
-	Description          string                          `json:"description" fake:"{sentence}"`
-	Status               string                          `json:"status" fake:"{vapp_status}"`
-	Deployed             bool                            `json:"deployed" fake:"{bool}"`
-	LeaseSettings        APIResponseLeaseSettings        `json:"leaseSettings"`
-	GuestProperties      APIResponseGuestProperties      `json:"guestProperties"`
-	NetworkConfigSection APIResponseNetworkConfigSection `json:"networkConfigSection"`
-	VAppParent           string                          `json:"vAppParent" fake:"{urn:vapp}"`
-	VDC                  string                          `json:"vdc" fake:"{urn:vdc}"`
-	Org                  string                          `json:"org" fake:"{urn:org}"`
-	Owner                string                          `json:"owner" fake:"{urn:user}"`
-	Metadata             []APIResponseMetadata           `json:"metadataEntry" fakesize:"1"`
+	HREF            string                     `json:"href" fake:"{href_uuid}"`
+	ID              string                     `json:"id" fake:"{urn:vapp}"`
+	Name            string                     `json:"name" fake:"mockvapp-{word}"`
+	Description     string                     `json:"description" fake:"{sentence}"`
+	Status          string                     `json:"status" fake:"{vapp_status}"`
+	Deployed        bool                       `json:"deployed" fake:"{bool}"`
+	LeaseSettings   APIResponseLeaseSettings   `json:"leaseSettings"`
+	GuestProperties APIResponseGuestProperties `json:"guestProperties"`
+	VAppParent      string                     `json:"vAppParent" fake:"{urn:vapp}"`
+	VDC             string                     `json:"vdc" fake:"{urn:vdc}"`
+	Org             string                     `json:"org" fake:"{urn:org}"`
+	Owner           string                     `json:"owner" fake:"{urn:user}"`
+	Metadata        []APIResponseMetadata      `json:"metadataEntry" fakesize:"1"`
 }
 
 // APIResponseLeaseSettings contains VApp lease settings.
@@ -75,48 +74,11 @@ type APIResponseProductSection struct {
 
 // APIResponseProductProperty contains one guest property from a ProductSection.
 type APIResponseProductProperty struct {
-	Key   string `json:"key" fake:"{word}"`
-	Value string `json:"value" fake:"{word}"`
-}
-
-// APIResponseNetworkConfigSection contains network configuration.
-type APIResponseNetworkConfigSection struct {
-	XMLNS                        string                     `json:"xmlns" fake:"http://www.vmware.com/vcloud/v1.5"`
-	XMLNSXsi                     string                     `json:"xmlns:xsi" fake:"http://www.w3.org/2001/XMLSchema-instance"`
-	XsiNoNamespaceSchemaLocation string                     `json:"xsi:noNamespaceSchemaLocation" fake:"http://www.vmware.com/vcloud/v1.5/vAppNetworkConfig.xsd"`
-	NetworkConfig                []APIResponseNetworkConfig `json:"networkConfig" fakesize:"1"`
-}
-
-// APIResponseNetworkConfig contains network configuration.
-type APIResponseNetworkConfig struct {
-	NetworkName   string                          `json:"networkName" fake:"{word}-net"`
-	NetworkHREF   string                          `json:"network" fake:"{href_uuid}"`
-	Configuration APIResponseNetworkConfiguration `json:"configuration"`
-}
-
-// APIResponseNetworkConfiguration contains network configuration details.
-type APIResponseNetworkConfiguration struct {
-	IPScope     APIResponseIPScope `json:"ipScope"`
-	FenceMode   string             `json:"fenceMode" fake:"{vapp_fence_mode}"`
-	IsConnected bool               `json:"isConnected" fake:"{bool}"`
-}
-
-// APIResponseIPScope contains IP scope configuration.
-type APIResponseIPScope struct {
-	IsInherited  bool                 `json:"isInherited" fake:"{bool}"`
-	Gateway      string               `json:"gateway" fake:"{ipv4}"`
-	Netmask      string               `json:"netmask" fake:"255.255.255.0"`
-	PrefixLength int                  `json:"prefixLength" fake:"24"`
-	DNSServer1   string               `json:"dns1" fake:"{ipv4}"`
-	DNSServer2   string               `json:"dns2" fake:"{ipv4}"`
-	DNSSuffix    string               `json:"dnsSuffix" fake:"example.com"`
-	IPRanges     []APIResponseIPRange `json:"ipRanges" fakesize:"1"`
-}
-
-// APIResponseIPRange contains IP range configuration.
-type APIResponseIPRange struct {
-	StartAddress string `json:"startAddress" fake:"{ipv4}"`
-	EndAddress   string `json:"endAddress" fake:"{ipv4}"`
+	Key              string `json:"key" fake:"{word}"`
+	Label            string `json:"label" fake:"{word}"`
+	Type             string `json:"type" fake:"{word}"`
+	Value            string `json:"value" fake:"{word}"`
+	UserConfigurable bool   `json:"userConfigurable" fake:"{bool}"`
 }
 
 // APIResponseVAppNetworkConfigSection contains the runtime XML networkConfigSection of a vApp.
@@ -216,17 +178,26 @@ type APIRequestVAppInstantiationParams struct {
 }
 
 type APIRequestVAppNetworkConfigSection struct {
-	Info          string                        `xml:"Info,omitempty"`
+	Info          string                        `xml:"ovf:Info,omitempty"`
 	NetworkConfig []APIRequestVAppNetworkConfig `xml:"NetworkConfig,omitempty"`
 }
 
+// APIRequestVAppNetworkConfig mirrors the XSD NetworkConfig: only the
+// networkName attribute plus a mandatory Configuration block (ParentNetwork
+// and FenceMode) are wire-valid; a bare network attribute is rejected.
 type APIRequestVAppNetworkConfig struct {
-	NetworkName string `xml:"networkName,attr,omitempty"`
-	Network     string `xml:"network,attr,omitempty"`
+	NetworkName   string                             `xml:"networkName,attr,omitempty"`
+	Description   string                             `xml:"Description,omitempty"`
+	Configuration APIRequestVAppNetworkConfiguration `xml:"Configuration"`
+}
+
+type APIRequestVAppNetworkConfiguration struct {
+	ParentNetwork *APIRequestVAppReference `xml:"ParentNetwork,omitempty"`
+	FenceMode     string                   `xml:"FenceMode"`
 }
 
 type APIRequestVAppNetworkConnectionSection struct {
-	Info                          string `xml:"Info,omitempty"`
+	Info                          string `xml:"ovf:Info,omitempty"`
 	PrimaryNetworkConnectionIndex int    `xml:"PrimaryNetworkConnectionIndex,omitempty"`
 }
 
@@ -257,15 +228,19 @@ type APIRequestComposeVApp struct {
 // APIRequestInstantiateVAppTemplate is the documented
 // InstantiateVAppTemplate XML request.
 type APIRequestInstantiateVAppTemplate struct {
-	XMLName             xml.Name                           `xml:"InstantiateVAppTemplateParams"`
-	OVF                 string                             `xml:"xmlns:ovf,attr"`
-	XSI                 string                             `xml:"xmlns:xsi,attr,omitempty"`
-	XMLNS               string                             `xml:"xmlns,attr"`
-	Name                string                             `xml:"name,attr"`
-	Deploy              bool                               `xml:"deploy,attr"`
-	PowerOn             bool                               `xml:"powerOn,attr"`
-	LinkedClone         bool                               `xml:"linkedClone,attr,omitempty"`
-	Description         string                             `xml:"Description,omitempty"`
+	XMLName     xml.Name `xml:"InstantiateVAppTemplateParams"`
+	OVF         string   `xml:"xmlns:ovf,attr"`
+	XSI         string   `xml:"xmlns:xsi,attr,omitempty"`
+	XMLNS       string   `xml:"xmlns,attr"`
+	Name        string   `xml:"name,attr"`
+	Deploy      bool     `xml:"deploy,attr"`
+	PowerOn     bool     `xml:"powerOn,attr"`
+	LinkedClone bool     `xml:"linkedClone,attr,omitempty"`
+	Description string   `xml:"Description,omitempty"`
+	// Field order is wire-significant: the schema sequence is
+	// Description, InstantiationParams, Source (per the official
+	// instantiateVAppTemplate example); InstantiationParams after Source
+	// fails XSD validation.
 	InstantiationParams *APIRequestVAppInstantiationParams `xml:"InstantiationParams,omitempty"`
 	Source              APIRequestVAppReference            `xml:"Source"`
 	IsSourceDelete      bool                               `xml:"IsSourceDelete,omitempty"`
@@ -364,10 +339,16 @@ func (r *APIResponseProductSection) ToModel() types.ModelVAppGuestPropertySectio
 	model := types.ModelVAppGuestPropertySection{
 		Class:      r.Class,
 		Instance:   r.Instance,
-		Properties: make(map[string]string, len(r.Property)),
+		Properties: make(map[string]types.ModelVAppGuestProperty, len(r.Property)),
 	}
 	for _, property := range r.Property {
-		model.Properties[property.Key] = property.Value
+		model.Properties[property.Key] = types.ModelVAppGuestProperty{
+			Key:              property.Key,
+			Label:            property.Label,
+			Type:             property.Type,
+			Value:            property.Value,
+			UserConfigurable: property.UserConfigurable,
+		}
 	}
 	return model
 }

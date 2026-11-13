@@ -137,7 +137,14 @@ func toAPIResponseGuestProperties(model types.ModelVAppGuestProperties) itypes.A
 
 		properties := make([]itypes.APIResponseProductProperty, 0, len(section.Properties))
 		for _, key := range keys {
-			properties = append(properties, itypes.APIResponseProductProperty{Key: key, Value: section.Properties[key]})
+			property := section.Properties[key]
+			properties = append(properties, itypes.APIResponseProductProperty{
+				Key:              key,
+				Label:            property.Label,
+				Type:             property.Type,
+				Value:            property.Value,
+				UserConfigurable: property.UserConfigurable,
+			})
 		}
 		result.ProductSectionList = append(result.ProductSectionList, itypes.APIResponseProductSection{
 			Class:    section.Class,

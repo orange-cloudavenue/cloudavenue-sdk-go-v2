@@ -31,7 +31,19 @@ const (
 	// headerXMLAdminUser is the admin user media type: the admin user record
 	// rejects the generic XML accept with HTTP 406.
 	headerXMLAdminUser = "application/vnd.vmware.admin.user+xml;version=39.1"
-	descUserURN        = "User URN"
+	// headerQueryRecordsJSON is the query API media type: the query endpoint
+	// rejects the generic JSON accept with HTTP 406.
+	headerQueryRecordsJSON = "application/vnd.vmware.vcloud.query.records+json;version=39.1"
+	// headerXMLAny is a permissive XML accept for operations whose response
+	// media type varies (e.g. instantiate returns a task or a vApp reference).
+	headerXMLAny = "application/*+xml;version=39.1"
+	// headerInstantiateParamsXML is the mandatory request media type of the
+	// instantiateVAppTemplate action; the generic XML content type yields 415.
+	headerInstantiateParamsXML = "application/vnd.vmware.vcloud.instantiateVAppTemplateParams+xml;version=39.1"
+	// headerProductSectionsJSON is the productSections media type: the generic
+	// JSON accept/content type yields 406 (GET) / 415 (PUT).
+	headerProductSectionsJSON = "application/vnd.vmware.vcloud.productSections+json;version=39.1"
+	descUserURN               = "User URN"
 
 	queryParamFilter   = "filter"
 	queryParamQ        = "q"

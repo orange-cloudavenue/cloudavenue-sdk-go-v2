@@ -82,6 +82,23 @@ func TestListVApp(t *testing.T) {
 	}
 }
 
+func TestListVAppSendsQueryRecordsAccept(t *testing.T) {
+	client, ms := newClient(t)
+	var gotAccept string
+
+	ms.CleanResponse(endpoints.ListVApp())
+	ms.SetResponseFunc(endpoints.ListVApp(), func(w http.ResponseWriter, r *http.Request) {
+		gotAccept = r.Header.Get("Accept")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		assert.NoError(t, json.NewEncoder(w).Encode(map[string]any{"message": "stop after header capture", "majorErrorCode": http.StatusBadRequest, "minorErrorCode": "BAD_REQUEST"}))
+	})
+
+	_, err := client.ListVApp(t.Context(), "urn:vcloud:vdc:12345678-1234-4b8d-89ab-123456789012")
+	assert.Error(t, err)
+	assert.Equal(t, "application/vnd.vmware.vcloud.query.records+json;version=39.1", gotAccept)
+}
+
 func TestGetVApp(t *testing.T) {
 	tests := []struct {
 		name               string
@@ -448,10 +465,11 @@ func TestVAppGuestProperties(t *testing.T) {
 	vappID := testVAppID
 	getCalls := 0
 
-	guestProperties := &itypes.APIResponseGuestProperties{ProductSectionList: []itypes.APIResponseProductSection{{Class: "vami", Instance: "default", Property: []itypes.APIResponseProductProperty{{Key: "hostname", Value: "vm-01"}, {Key: "role", Value: "app"}}}}}
+	guestProperties := &itypes.APIResponseGuestProperties{ProductSectionList: []itypes.APIResponseProductSection{{Class: "vami", Instance: "default", Property: []itypes.APIResponseProductProperty{{Key: "hostname", Label: "Hostname", Type: "string", Value: "vm-01", UserConfigurable: true}, {Key: "role", Type: "string", Value: "app"}}}}}
 
 	ms.CleanResponse(endpoints.GetVAppProductSections())
 	ms.SetResponseFunc(endpoints.GetVAppProductSections(), func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "application/vnd.vmware.vcloud.productSections+json;version=39.1", r.Header.Get("Accept"))
 		w.Header().Set("Content-Type", "application/json")
 		assert.NoError(t, json.NewEncoder(w).Encode(guestProperties))
 		getCalls++
@@ -462,47 +480,49 @@ func TestVAppGuestProperties(t *testing.T) {
 	if assert.NotNil(t, resp) && assert.Len(t, resp.Sections, 1) {
 		assert.Equal(t, "vami", resp.Sections[0].Class)
 		assert.Equal(t, "default", resp.Sections[0].Instance)
-		assert.Equal(t, "vm-01", resp.Sections[0].Properties["hostname"])
+		assert.Equal(t, types.ModelVAppGuestProperty{Key: "hostname", Label: "Hostname", Type: "string", Value: "vm-01", UserConfigurable: true}, resp.Sections[0].Properties["hostname"])
 	}
 
 	ms.CleanResponse(endpoints.UpdateVAppProductSections())
 	ms.SetResponseFunc(endpoints.UpdateVAppProductSections(), func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "application/vnd.vmware.vcloud.productSections+json;version=39.1", r.Header.Get("Accept"))
+		assert.Equal(t, "application/vnd.vmware.vcloud.productSections+json;version=39.1", r.Header.Get("Content-Type"))
 		var body itypes.APIResponseGuestProperties
 		assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
 		if assert.Len(t, body.ProductSectionList, 1) {
 			assert.Equal(t, "vami", body.ProductSectionList[0].Class)
 			assert.Len(t, body.ProductSectionList[0].Property, 2)
-			assert.Equal(t, []itypes.APIResponseProductProperty{{Key: "hostname", Value: "vm-02"}, {Key: "role", Value: "db"}}, body.ProductSectionList[0].Property)
+			assert.Equal(t, []itypes.APIResponseProductProperty{{Key: "hostname", Label: "Hostname", Type: "string", Value: "vm-02", UserConfigurable: true}, {Key: "role", Type: "string", Value: "db"}}, body.ProductSectionList[0].Property)
 		}
 		guestProperties = &body
 		w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
 		w.WriteHeader(http.StatusAccepted)
 	})
 
-	updated, err := client.UpdateVAppGuestProperties(t.Context(), types.ParamsUpdateVAppGuestProperties{ID: vappID, GuestProperties: types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Class: "vami", Instance: "default", Properties: map[string]string{"hostname": "vm-02", "role": "db"}}}}})
+	updated, err := client.UpdateVAppGuestProperties(t.Context(), types.ParamsUpdateVAppGuestProperties{ID: vappID, GuestProperties: types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Class: "vami", Instance: "default", Properties: map[string]types.ModelVAppGuestProperty{"hostname": {Label: "Hostname", Type: "string", Value: "vm-02", UserConfigurable: true}, "role": {Type: "string", Value: "db"}}}}}})
 	assert.NoError(t, err)
 	if assert.NotNil(t, updated) && assert.Len(t, updated.Sections, 1) {
-		assert.Equal(t, "vm-02", updated.Sections[0].Properties["hostname"])
-		assert.Equal(t, "db", updated.Sections[0].Properties["role"])
+		assert.Equal(t, types.ModelVAppGuestProperty{Key: "hostname", Label: "Hostname", Type: "string", Value: "vm-02", UserConfigurable: true}, updated.Sections[0].Properties["hostname"])
+		assert.Equal(t, types.ModelVAppGuestProperty{Key: "role", Type: "string", Value: "db"}, updated.Sections[0].Properties["role"])
 	}
 	assert.Equal(t, 2, getCalls)
 }
 
 func TestVAppGuestPropertiesPayloadDeterministicOrder(t *testing.T) {
-	first := toAPIResponseGuestProperties(types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Class: "class", Instance: "b", Properties: map[string]string{"gamma": "3", "beta": "4"}}, {Class: "class", Instance: "a", Properties: map[string]string{"zeta": "1", "alpha": "2"}}}})
-	second := toAPIResponseGuestProperties(types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Class: "class", Instance: "a", Properties: map[string]string{"alpha": "2", "zeta": "1"}}, {Class: "class", Instance: "b", Properties: map[string]string{"beta": "4", "gamma": "3"}}}})
+	first := toAPIResponseGuestProperties(types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Class: "class", Instance: "b", Properties: map[string]types.ModelVAppGuestProperty{"gamma": {Type: "string", Value: "3"}, "beta": {Type: "string", Value: "4"}}}, {Class: "class", Instance: "a", Properties: map[string]types.ModelVAppGuestProperty{"zeta": {Type: "string", Value: "1"}, "alpha": {Type: "string", Value: "2"}}}}})
+	second := toAPIResponseGuestProperties(types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Class: "class", Instance: "a", Properties: map[string]types.ModelVAppGuestProperty{"alpha": {Type: "string", Value: "2"}, "zeta": {Type: "string", Value: "1"}}}, {Class: "class", Instance: "b", Properties: map[string]types.ModelVAppGuestProperty{"beta": {Type: "string", Value: "4"}, "gamma": {Type: "string", Value: "3"}}}}})
 
 	assert.Equal(t, second, first)
 	if assert.Len(t, first.ProductSectionList, 2) {
 		assert.Equal(t, "a", first.ProductSectionList[0].Instance)
-		assert.Equal(t, []itypes.APIResponseProductProperty{{Key: "alpha", Value: "2"}, {Key: "zeta", Value: "1"}}, first.ProductSectionList[0].Property)
+		assert.Equal(t, []itypes.APIResponseProductProperty{{Key: "alpha", Type: "string", Value: "2"}, {Key: "zeta", Type: "string", Value: "1"}}, first.ProductSectionList[0].Property)
 		assert.Equal(t, "b", first.ProductSectionList[1].Instance)
-		assert.Equal(t, []itypes.APIResponseProductProperty{{Key: "beta", Value: "4"}, {Key: "gamma", Value: "3"}}, first.ProductSectionList[1].Property)
+		assert.Equal(t, []itypes.APIResponseProductProperty{{Key: "beta", Type: "string", Value: "4"}, {Key: "gamma", Type: "string", Value: "3"}}, first.ProductSectionList[1].Property)
 	}
 }
 
 func TestVAppGuestPropertiesAllowEmptySection(t *testing.T) {
-	err := (types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Class: "vami", Instance: "default", Properties: map[string]string{}}}}).Validate()
+	err := (types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Class: "vami", Instance: "default", Properties: map[string]types.ModelVAppGuestProperty{}}}}).Validate()
 	assert.NoError(t, err)
 
 	err = (types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Class: "vami", Instance: "default"}}}).Validate()
@@ -532,7 +552,7 @@ func TestUndeployVAppModes(t *testing.T) {
 			ms.CleanResponse(endpoints.UndeployVApp())
 			ms.SetResponseFunc(endpoints.UndeployVApp(), func(w http.ResponseWriter, r *http.Request) {
 				var body itypes.APIRequestUndeployVApp
-				assert.Equal(t, "application/xml", r.Header.Get("Content-Type"))
+				assert.Equal(t, "application/xml;version=39.1", r.Header.Get("Content-Type"))
 				assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
 				assert.Equal(t, "http://www.vmware.com/vcloud/v1.5", body.XMLNS)
 				assert.Equal(t, tt.expectAction, body.UndeployAction)
@@ -722,6 +742,29 @@ func TestInstantiateVAppTemplateRequiresTemplate(t *testing.T) {
 		VDCID: "urn:vcloud:vdc:12345678-1234-4b8d-89ab-123456789012",
 	})
 	assert.Error(t, err)
+}
+
+func TestInstantiateVAppTemplateSendsParamsMediaType(t *testing.T) {
+	client, ms := newClient(t)
+	var gotAccept, gotContentType string
+
+	ms.CleanResponse(endpoints.InstantiateVAppTemplate())
+	ms.SetResponseFunc(endpoints.InstantiateVAppTemplate(), func(w http.ResponseWriter, r *http.Request) {
+		gotAccept = r.Header.Get("Accept")
+		gotContentType = r.Header.Get("Content-Type")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		assert.NoError(t, json.NewEncoder(w).Encode(map[string]any{"message": "stop after header capture", "majorErrorCode": http.StatusBadRequest, "minorErrorCode": "BAD_REQUEST"}))
+	})
+
+	_, err := client.InstantiateVAppTemplate(t.Context(), types.ParamsInstantiateVAppTemplate{
+		Name:       "test-vapp",
+		VDCID:      "urn:vcloud:vdc:12345678-1234-4b8d-89ab-123456789012",
+		TemplateID: "urn:vcloud:vappTemplate:12345678-1234-4b8d-89ab-123456789012",
+	})
+	assert.Error(t, err)
+	assert.Equal(t, "application/vnd.vmware.vcloud.instantiateVAppTemplateParams+xml;version=39.1", gotContentType)
+	assert.Equal(t, "application/*+xml;version=39.1", gotAccept)
 }
 
 func TestUpdateVAppPreservesExistingDescription(t *testing.T) {

@@ -54,9 +54,6 @@ var (
 			ep := endpoints.UndeployVApp()
 			return []cav.EndpointRequestOption{
 				cav.WithPathParam(ep.PathParams[0], p.ID),
-				cav.SetCustomRestyOption(func(req *resty.Request) {
-					req.SetHeader("Content-Type", "application/xml")
-				}),
 			}, nil
 		},
 		Transform: func(p undeployVAppParams) (any, error) {

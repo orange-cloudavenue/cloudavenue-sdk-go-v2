@@ -52,11 +52,20 @@ type (
 		Sections []ModelVAppGuestPropertySection
 	}
 
+	// ModelVAppGuestProperty contains one guest property of a ProductSection.
+	ModelVAppGuestProperty struct {
+		Key              string
+		Label            string
+		Type             string
+		Value            string
+		UserConfigurable bool
+	}
+
 	// ModelVAppGuestPropertySection contains one ProductSection and its properties.
 	ModelVAppGuestPropertySection struct {
 		Class      string
 		Instance   string
-		Properties map[string]string
+		Properties map[string]ModelVAppGuestProperty
 	}
 
 	// ModelVAppRuntimeNetworkConfigSection contains the runtime networkConfigSection returned by VCD.
@@ -166,8 +175,9 @@ type (
 	}
 
 	VAppNetworkConfig struct {
-		NetworkName string
-		Network     string
+		NetworkName   string
+		ParentNetwork *VAppReference
+		FenceMode     string
 	}
 
 	VAppNetworkConnectionSection struct {
@@ -373,6 +383,42 @@ const (
 	vappACLAccessLevelFullControl = "FullControl"
 )
 
+// Validate checks VAppInstantiationParams wire constraints.
+func (p *VAppInstantiationParams) Validate() error {
+	if p == nil || p.NetworkConfigSection == nil {
+		return nil
+	}
+	return p.NetworkConfigSection.Validate()
+}
+
+// Validate checks the instantiate/compose NetworkConfigSection wire constraints
+// enforced by the VCD XSD (ovf:Info and Configuration are mandatory).
+func (s *VAppNetworkConfigSection) Validate() error {
+	if s.Info == "" {
+		return fmt.Errorf("network config section info is required")
+	}
+	for i, network := range s.NetworkConfig {
+		if err := network.Validate(); err != nil {
+			return fmt.Errorf("networkConfig[%d]: %w", i, err)
+		}
+	}
+	return nil
+}
+
+// Validate checks one instantiate/compose NetworkConfig wire constraints.
+func (n VAppNetworkConfig) Validate() error {
+	if n.NetworkName == "" {
+		return fmt.Errorf("network name is required")
+	}
+	if n.FenceMode == "" {
+		return fmt.Errorf("fence mode is required")
+	}
+	if n.ParentNetwork == nil || (n.ParentNetwork.HREF == "" && n.ParentNetwork.Name == "") {
+		return fmt.Errorf("parent network href or name is required")
+	}
+	return nil
+}
+
 // Validate checks ParamsGetVApp structural constraints.
 func (p ParamsGetVApp) Validate() error {
 	if p.ID == "" && p.Name == "" {
@@ -386,7 +432,7 @@ func (p ParamsComposeVApp) Validate() error {
 	if p.Name == "" || p.VDCID == "" {
 		return fmt.Errorf("missing required parameters")
 	}
-	return nil
+	return p.InstantiationParams.Validate()
 }
 
 // Validate checks ParamsInstantiateVAppTemplate structural constraints.
@@ -394,7 +440,7 @@ func (p ParamsInstantiateVAppTemplate) Validate() error {
 	if p.Name == "" || p.VDCID == "" || p.TemplateID == "" {
 		return fmt.Errorf("missing required parameters")
 	}
-	return nil
+	return p.InstantiationParams.Validate()
 }
 
 // Validate checks ParamsUpdateVApp structural constraints.

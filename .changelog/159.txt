@@ -10,10 +10,6 @@ feat(vapp): add vApp ACL operations and models. Adds GetVAppACL, SetVAppACL and 
 feat(vapp): add discard suspended state action. Adds DiscardSuspendedStateVApp and its VMware endpoint definition to the vApp lifecycle operations.
 ```
 
-```release-note:bug
-fix(vapp): harden VMware vApp delete and runtime network updates. DeleteVApp now ignores only the explicit benign undeploy case instead of swallowing all undeploy failures, undeploy requests use the correct VMware XML transport, and runtime network writes mutate the raw section fetched from VMware so untouched identity, features, router info, and sibling network state are preserved.
-```
-
-```release-note:bug
-fix(vapp): make guest-property and runtime-network payload handling deterministic and safer. Guest-property payloads now serialize in stable order, create-vs-add network validation is explicit, empty guest-property sections can round-trip, and XML wire fidelity is preserved for fields such as IsInherited and IsConnected.
+```release-note:feature
+feat(vapp): deliver the vApp lifecycle and payload behavior verified against the live VCD 39.1 contract. Undeploy requests use the versioned VMware XML content type; DeleteVApp ignores only the explicit benign not-running undeploy case and tolerates the 404 answered by removeAllNetworks for vApps without networks; runtime network writes mutate the raw section fetched from VMware so untouched identity, features, router info and sibling network state are preserved. Guest properties round-trip with full fidelity (Key, Label, Type, Value, UserConfigurable) in stable order, with empty sections accepted and nil sections rejected. vApp job polling is configurable through the new WithJobTimeout and WithJobPollInterval client options (5-minute default timeout). Endpoints send the media types required by the API (query records JSON, instantiateVAppTemplateParams XML, productSections JSON) and instantiate/compose network payloads emit the ovf:Info and Configuration (ParentNetwork, FenceMode) blocks mandated by the VCD schema.
 ```

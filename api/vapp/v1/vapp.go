@@ -460,10 +460,19 @@ func toInstantiationParams(params *types.VAppInstantiationParams) *itypes.APIReq
 	if params.NetworkConfigSection != nil {
 		section := &itypes.APIRequestVAppNetworkConfigSection{Info: params.NetworkConfigSection.Info}
 		for _, network := range params.NetworkConfigSection.NetworkConfig {
-			section.NetworkConfig = append(section.NetworkConfig, itypes.APIRequestVAppNetworkConfig{
-				NetworkName: network.NetworkName,
-				Network:     network.Network,
-			})
+			wire := itypes.APIRequestVAppNetworkConfig{
+				NetworkName:   network.NetworkName,
+				Configuration: itypes.APIRequestVAppNetworkConfiguration{FenceMode: network.FenceMode},
+			}
+			if network.ParentNetwork != nil {
+				wire.Configuration.ParentNetwork = &itypes.APIRequestVAppReference{
+					HREF: network.ParentNetwork.HREF,
+					ID:   network.ParentNetwork.ID,
+					Type: network.ParentNetwork.Type,
+					Name: network.ParentNetwork.Name,
+				}
+			}
+			section.NetworkConfig = append(section.NetworkConfig, wire)
 		}
 		result.NetworkConfigSection = section
 	}

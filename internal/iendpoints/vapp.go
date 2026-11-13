@@ -26,6 +26,7 @@ func init() {
 		Description:      "List VApps",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
+		Headers:          map[string]string{headerAccept: headerQueryRecordsJSON},
 		PathTemplate:     pathQueryAPI,
 		QueryParams: []cav.QueryParam{
 			{
@@ -240,7 +241,7 @@ func init() {
 		Description:      "Instantiate a VApp from a template",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
+		Headers:          map[string]string{headerAccept: headerXMLAny, headerContentType: headerInstantiateParamsXML},
 		PathTemplate:     pathVAppInstantiateTemplate,
 		PathParams: []cav.PathParam{
 			{
@@ -347,7 +348,7 @@ func init() {
 		Description:      "Get the ProductSection guest properties of a VApp",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{headerAccept: headerJSON},
+		Headers:          map[string]string{headerAccept: headerProductSectionsJSON},
 		PathTemplate:     pathVAppProductSections,
 		PathParams:       vAppActionPathParams(),
 		ResponseType:     itypes.APIResponseGuestProperties{},
@@ -360,7 +361,7 @@ func init() {
 		Description:      "Replace the ProductSection guest properties of a VApp",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{headerAccept: headerJSON, headerContentType: headerJSON},
+		Headers:          map[string]string{headerAccept: headerProductSectionsJSON, headerContentType: headerProductSectionsJSON},
 		PathTemplate:     pathVAppProductSections,
 		PathParams:       vAppActionPathParams(),
 		BodyRequestType:  itypes.APIResponseGuestProperties{},
