@@ -11,11 +11,14 @@ package vapp
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+	pkgerrors "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
@@ -286,7 +289,7 @@ func (c *Client) ComposeVApp(ctx context.Context, params types.ParamsComposeVApp
 		return nil, fmt.Errorf("%s: %w", opComposeVApp, err)
 	}
 
-	if err := awaitVAppJob(ctx, c.c, opComposeVApp, job.ID); err != nil {
+	if err := c.awaitJob(ctx, opComposeVApp, job.ID); err != nil {
 		return nil, err
 	}
 
@@ -322,7 +325,7 @@ func (c *Client) InstantiateVAppTemplate(ctx context.Context, params types.Param
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", opInstantiateVAppTemplate, err)
 	}
-	if err := awaitVAppJob(ctx, c.c, opInstantiateVAppTemplate, job.ID); err != nil {
+	if err := c.awaitJob(ctx, opInstantiateVAppTemplate, job.ID); err != nil {
 		return nil, err
 	}
 	return c.GetVApp(ctx, types.ParamsGetVApp{Name: params.Name})
@@ -379,7 +382,7 @@ func (c *Client) UpdateVApp(ctx context.Context, params types.ParamsUpdateVApp) 
 		return nil, fmt.Errorf("%s: %w", opUpdateVApp, err)
 	}
 
-	if err := awaitVAppJob(ctx, c.c, opUpdateVApp, job.ID); err != nil {
+	if err := c.awaitJob(ctx, opUpdateVApp, job.ID); err != nil {
 		return nil, err
 	}
 
@@ -410,9 +413,13 @@ func (c *Client) DeleteVApp(ctx context.Context, params types.ParamsDeleteVApp) 
 
 	job, err := cav.Execute(ctx, c.c, removeAllNetworksOp, getVAppByIDParams{ID: params.ID})
 	if err != nil {
-		return fmt.Errorf("%s: remove all networks: %w", opDeleteVApp, err)
-	}
-	if err := awaitVAppJob(ctx, c.c, opDeleteVApp, job.ID); err != nil {
+		if !isIgnorableRemoveAllNetworksError(err) {
+			return fmt.Errorf("%s: remove all networks: %w", opDeleteVApp, err)
+		}
+		// A vApp without networks answers 404 to removeAllNetworks; there is
+		// nothing to remove, so skip the step instead of aborting the delete.
+		c.logger.Debug("Remove all networks skipped during delete because VApp has no networks", "error", err)
+	} else if err := c.awaitJob(ctx, opDeleteVApp, job.ID); err != nil {
 		return fmt.Errorf("%s: remove all networks: %w", opDeleteVApp, err)
 	}
 
@@ -422,7 +429,7 @@ func (c *Client) DeleteVApp(ctx context.Context, params types.ParamsDeleteVApp) 
 			return fmt.Errorf("%s: undeploy: %w", opDeleteVApp, err)
 		}
 		c.logger.Debug("Undeploy skipped during delete because VApp is already undeployed", "error", err)
-	} else if err := awaitVAppJob(ctx, c.c, opDeleteVApp, job.ID); err != nil {
+	} else if err := c.awaitJob(ctx, opDeleteVApp, job.ID); err != nil {
 		if !isIgnorableUndeployError(err) {
 			return fmt.Errorf("%s: undeploy: %w", opDeleteVApp, err)
 		}
@@ -433,11 +440,22 @@ func (c *Client) DeleteVApp(ctx context.Context, params types.ParamsDeleteVApp) 
 	if err != nil {
 		return fmt.Errorf("%s: delete: %w", opDeleteVApp, err)
 	}
-	if err := awaitVAppJob(ctx, c.c, opDeleteVApp, job.ID); err != nil {
+	if err := c.awaitJob(ctx, opDeleteVApp, job.ID); err != nil {
 		return fmt.Errorf("%s: delete: %w", opDeleteVApp, err)
 	}
 
 	return nil
+}
+
+// isIgnorableRemoveAllNetworksError reports whether err is the 404 that VCD
+// returns when removeAllNetworks is invoked on a vApp that has no networks.
+func isIgnorableRemoveAllNetworksError(err error) bool {
+	var apiErr *pkgerrors.APIError
+	if !errors.As(err, &apiErr) || apiErr == nil {
+		return false
+	}
+
+	return apiErr.StatusCode == http.StatusNotFound
 }
 
 func (c *Client) resolveVAppID(ctx context.Context, id, name string) (string, error) {

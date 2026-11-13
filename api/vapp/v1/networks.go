@@ -166,9 +166,6 @@ func (c *Client) mutateVAppNetworkConfig(ctx context.Context, opName, vappID, va
 	if err != nil {
 		return nil, fmt.Errorf("%s: get current: %w", opName, err)
 	}
-	if section == nil {
-		section = &itypes.APIResponseVAppNetworkConfigSection{}
-	}
 	if section.Info == "" {
 		section.Info = "Runtime network config"
 	}
@@ -185,7 +182,7 @@ func (c *Client) mutateVAppNetworkConfig(ctx context.Context, opName, vappID, va
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", opName, err)
 	}
-	if err := awaitVAppJob(ctx, c.c, opName, job.ID); err != nil {
+	if err := c.awaitJob(ctx, opName, job.ID); err != nil {
 		return nil, err
 	}
 	updated, err := c.GetVAppNetworkConfig(ctx, types.ParamsGetVAppNetworkConfig{ID: resolvedVAppID})

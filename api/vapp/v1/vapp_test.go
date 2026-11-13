@@ -868,6 +868,29 @@ func TestDeleteVApp(t *testing.T) {
 		assert.NoError(t, client.DeleteVApp(t.Context(), types.ParamsDeleteVApp{ID: testVAppID}))
 	})
 
+	t.Run("removeAllNetworks 404 continues and delete happens", func(t *testing.T) {
+		client, ms := newClient(t)
+		deleteCalls := 0
+
+		ms.CleanResponse(endpoints.RemoveAllNetworks())
+		ms.SetResponseFunc(endpoints.RemoveAllNetworks(), func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusNotFound)
+			assert.NoError(t, json.NewEncoder(w).Encode(map[string]any{"message": "vApp has no networks", "majorErrorCode": http.StatusNotFound, "minorErrorCode": "NOT_FOUND"}))
+		})
+
+		ms.CleanResponse(endpoints.DeleteVApp())
+		ms.SetResponseFunc(endpoints.DeleteVApp(), func(w http.ResponseWriter, r *http.Request) {
+			deleteCalls++
+			w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
+			w.WriteHeader(http.StatusAccepted)
+		})
+
+		err := client.DeleteVApp(t.Context(), types.ParamsDeleteVApp{ID: testVAppID})
+		assert.NoError(t, err)
+		assert.Equal(t, 1, deleteCalls)
+	})
+
 	t.Run("undeploy benign error continues and delete happens", func(t *testing.T) {
 		client, ms := newClient(t)
 		deleteCalls := 0

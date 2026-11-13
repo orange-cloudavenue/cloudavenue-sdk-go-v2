@@ -107,7 +107,7 @@ func (c *Client) UpdateVAppGuestProperties(ctx context.Context, params types.Par
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", opUpdateVAppGuestProperties, err)
 	}
-	if err := awaitVAppJob(ctx, c.c, opUpdateVAppGuestProperties, job.ID); err != nil {
+	if err := c.awaitJob(ctx, opUpdateVAppGuestProperties, job.ID); err != nil {
 		return nil, err
 	}
 	return c.GetVAppGuestProperties(ctx, types.ParamsGetVAppGuestProperties{ID: vappID})

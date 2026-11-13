@@ -15,7 +15,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
 	"resty.dev/v3"
 
@@ -114,7 +113,7 @@ func (c *Client) UndeployVApp(ctx context.Context, params types.ParamsUndeployVA
 	if err != nil {
 		return fmt.Errorf("%s: %w", opUndeployVApp, err)
 	}
-	if err := awaitVAppJob(ctx, c.c, opUndeployVApp, job.ID); err != nil {
+	if err := c.awaitJob(ctx, opUndeployVApp, job.ID); err != nil {
 		return err
 	}
 	return nil
@@ -160,16 +159,16 @@ func (c *Client) executeVAppAction(ctx context.Context, id string, op cav.Operat
 	if err != nil {
 		return fmt.Errorf("%s: %w", name, err)
 	}
-	if err := awaitVAppJob(ctx, c.c, name, job.ID); err != nil {
+	if err := c.awaitJob(ctx, name, job.ID); err != nil {
 		return err
 	}
 	return nil
 }
 
-func awaitVAppJob(ctx context.Context, c cav.Client, opName, jobID string) error {
-	_, err := cav.AwaitJobOnBackend(ctx, c, cav.BackendVMware, jobID, cav.JobPollOptions{
-		Timeout:         30 * time.Second,
-		PollingInterval: 1 * time.Second,
+func (c *Client) awaitJob(ctx context.Context, opName, jobID string) error {
+	_, err := cav.AwaitJobOnBackend(ctx, c.c, cav.BackendVMware, jobID, cav.JobPollOptions{
+		Timeout:         c.jobTimeout,
+		PollingInterval: c.jobPollInterval,
 	}, func(_ *resty.Response) (struct{}, error) {
 		return struct{}{}, nil
 	})
