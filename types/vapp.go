@@ -9,7 +9,11 @@
 
 package types
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/orange-cloudavenue/common-go/validators"
+)
 
 type (
 	// ModelListVApp contains a list of VApps.
@@ -59,6 +63,22 @@ type (
 	ModelVAppRuntimeNetworkConfigSection struct {
 		Info          string
 		NetworkConfig []ModelVAppRuntimeNetworkConfig
+	}
+
+	// ModelVAppACL contains the full ACL state of a vApp.
+	ModelVAppACL struct {
+		IsSharedToEveryone  bool                  `documentation:"Indicates if the vApp is shared to everyone"`
+		EveryoneAccessLevel *string               `documentation:"Access level granted to everyone"`
+		SharedWith          []ModelVAppACLSubject `documentation:"List of subjects the vApp is shared with"`
+	}
+
+	// ModelVAppACLSubject contains one vApp ACL subject grant.
+	ModelVAppACLSubject struct {
+		SubjectKind   string `documentation:"Kind of subject granted access to the vApp"`
+		SubjectSource string `documentation:"Source of the subject granted access to the vApp"`
+		SubjectID     string `documentation:"Identifier of the subject granted access to the vApp"`
+		SubjectName   string `documentation:"Name of the subject granted access to the vApp"`
+		AccessLevel   string `documentation:"Access level granted to the subject"`
 	}
 
 	// ModelVAppRuntimeNetworkConfig contains one runtime network definition of a vApp.
@@ -246,6 +266,35 @@ type (
 		Name string
 	}
 
+	// ParamsGetVAppACL identifies the vApp ACL to read.
+	ParamsGetVAppACL struct {
+		ID   string
+		Name string
+	}
+
+	// ParamsSetVAppACLSubject defines one subject grant for full vApp ACL replacement.
+	ParamsSetVAppACLSubject struct {
+		SubjectKind   string
+		SubjectSource string
+		SubjectID     string
+		AccessLevel   string
+	}
+
+	// ParamsSetVAppACL defines the full vApp ACL replacement payload.
+	ParamsSetVAppACL struct {
+		ID                  string
+		Name                string
+		IsSharedToEveryone  bool
+		EveryoneAccessLevel *string
+		SharedWith          []ParamsSetVAppACLSubject
+	}
+
+	// ParamsRemoveVAppACL identifies the vApp ACL to clear.
+	ParamsRemoveVAppACL struct {
+		ID   string
+		Name string
+	}
+
 	// ParamsCreateVAppNetwork defines a new isolated runtime vApp network.
 	ParamsCreateVAppNetwork struct {
 		VAppID   string
@@ -312,6 +361,16 @@ const (
 	VAppUndeployModeSuspend VAppUndeployMode = "suspend"
 	// VAppUndeployModeForce requests VMware force undeploy behavior.
 	VAppUndeployModeForce VAppUndeployMode = "force"
+
+	VAppACLSubjectSourceLocal    = "local"
+	VAppACLSubjectSourceExternal = "external"
+
+	vappACLSubjectKindUser  = "user"
+	vappACLSubjectKindGroup = "group"
+
+	vappACLAccessLevelReadOnly    = "ReadOnly"
+	vappACLAccessLevelChange      = "Change"
+	vappACLAccessLevelFullControl = "FullControl"
 )
 
 // Validate checks ParamsGetVApp structural constraints.
@@ -385,6 +444,143 @@ func (p ParamsUndeployVApp) Validate() error {
 func (p ParamsGetVAppNetworkConfig) Validate() error {
 	if p.ID == "" && p.Name == "" {
 		return fmt.Errorf("missing required parameters")
+	}
+	return nil
+}
+
+// Validate checks ParamsGetVAppACL structural constraints.
+func (p ParamsGetVAppACL) Validate() error {
+	if p.ID == "" && p.Name == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	if p.ID != "" {
+		if err := validators.New().Var(p.ID, "urn=vapp"); err != nil {
+			return fmt.Errorf("id: %w", err)
+		}
+	}
+	return nil
+}
+
+// Validate checks ParamsSetVAppACL structural constraints.
+func (p ParamsSetVAppACL) Validate() error {
+	if p.ID == "" && p.Name == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	if p.ID != "" {
+		if err := validators.New().Var(p.ID, "urn=vapp"); err != nil {
+			return fmt.Errorf("id: %w", err)
+		}
+	}
+	if err := validateVAppACLEveryoneAccess(p.IsSharedToEveryone, p.EveryoneAccessLevel); err != nil {
+		return err
+	}
+	for i, subject := range p.SharedWith {
+		if err := subject.Validate(); err != nil {
+			return fmt.Errorf("sharedWith[%d]: %w", i, err)
+		}
+	}
+	return nil
+}
+
+// Validate checks ParamsSetVAppACLSubject structural constraints.
+func (p ParamsSetVAppACLSubject) Validate() error {
+	if p.SubjectKind == "" || p.SubjectSource == "" || p.SubjectID == "" || p.AccessLevel == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	if !isSupportedVAppACLSubjectKind(p.SubjectKind) {
+		return fmt.Errorf("unsupported subject kind %q", p.SubjectKind)
+	}
+	if !isSupportedVAppACLSubjectSource(p.SubjectSource) {
+		return fmt.Errorf("unsupported subject source %q", p.SubjectSource)
+	}
+	if err := validateVAppACLAccessLevel(p.AccessLevel); err != nil {
+		return err
+	}
+	if err := validateVAppACLSubjectID(p.SubjectSource, p.SubjectKind, p.SubjectID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func validateVAppACLEveryoneAccess(isSharedToEveryone bool, everyoneAccessLevel *string) error {
+	if !isSharedToEveryone {
+		if everyoneAccessLevel != nil {
+			return fmt.Errorf("everyoneAccessLevel must be nil when isSharedToEveryone is false")
+		}
+		return nil
+	}
+	if everyoneAccessLevel == nil {
+		return fmt.Errorf("everyoneAccessLevel is required when isSharedToEveryone is true")
+	}
+	return validateVAppACLAccessLevel(*everyoneAccessLevel)
+}
+
+func validateVAppACLAccessLevel(accessLevel string) error {
+	if !isSupportedVAppACLAccessLevel(accessLevel) {
+		return fmt.Errorf("unsupported access level %q", accessLevel)
+	}
+	return nil
+}
+
+func validateVAppACLSubjectID(subjectSource, subjectKind, subjectID string) error {
+	switch subjectSource {
+	case VAppACLSubjectSourceLocal:
+		return validateVAppACLSubjectURN(subjectKind, subjectID)
+	case VAppACLSubjectSourceExternal:
+		if subjectID == "" {
+			return fmt.Errorf("subjectID is required")
+		}
+		return nil
+	default:
+		return fmt.Errorf("unsupported subject source %q", subjectSource)
+	}
+}
+
+func validateVAppACLSubjectURN(subjectKind, subjectID string) error {
+	var expectedPrefix string
+	switch subjectKind {
+	case vappACLSubjectKindUser:
+		expectedPrefix = "urn:vcloud:orguser:"
+	case vappACLSubjectKindGroup:
+		expectedPrefix = "urn:vcloud:orggroup:"
+	default:
+		return fmt.Errorf("unsupported subject kind %q", subjectKind)
+	}
+	if err := validators.New().Var(subjectID, "required"); err != nil {
+		return fmt.Errorf("subjectID: %w", err)
+	}
+	if len(subjectID) <= len(expectedPrefix) || subjectID[:len(expectedPrefix)] != expectedPrefix {
+		return fmt.Errorf("subjectID must be a %s URN", subjectKind)
+	}
+	return nil
+}
+
+func isSupportedVAppACLSubjectKind(subjectKind string) bool {
+	return subjectKind == vappACLSubjectKindUser || subjectKind == vappACLSubjectKindGroup
+}
+
+func isSupportedVAppACLSubjectSource(subjectSource string) bool {
+	return subjectSource == VAppACLSubjectSourceLocal || subjectSource == VAppACLSubjectSourceExternal
+}
+
+func isSupportedVAppACLAccessLevel(accessLevel string) bool {
+	switch accessLevel {
+	case vappACLAccessLevelReadOnly, vappACLAccessLevelChange, vappACLAccessLevelFullControl:
+		return true
+	default:
+		return false
+	}
+}
+
+// Validate checks ParamsRemoveVAppACL structural constraints.
+func (p ParamsRemoveVAppACL) Validate() error {
+	if p.ID == "" && p.Name == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	if p.ID != "" {
+		if err := validators.New().Var(p.ID, "urn=vapp"); err != nil {
+			return fmt.Errorf("id: %w", err)
+		}
 	}
 	return nil
 }

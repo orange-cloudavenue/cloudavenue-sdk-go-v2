@@ -76,6 +76,20 @@ func GetVApp() *cav.Endpoint {
 	return cav.MustGetEndpoint("GetVApp")
 }
 
+// GetVAppACL - Get vApp ACL
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-ControlAccessParams-vApp.html
+func GetVAppACL() *cav.Endpoint {
+	return cav.MustGetEndpoint("GetVAppACL")
+}
+
+// SetVAppACL - Set vApp ACL
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-ControlAccess.html
+func SetVAppACL() *cav.Endpoint {
+	return cav.MustGetEndpoint("SetVAppACL")
+}
+
 // GetVAppNetworkConfigSection - Get the runtime network configuration section of a VApp
 //
 // DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-NetworkConfigSection-vApp.html

@@ -10,7 +10,9 @@
 package vapp
 
 import (
+	"encoding/xml"
 	"log/slog"
+	"net/http"
 	"os"
 	"testing"
 
@@ -39,4 +41,12 @@ func newClient(t *testing.T) (*Client, *mock.Server) {
 	eC, err := New(mC)
 	assert.Nil(t, err, "Error creating vapp client")
 	return eC, ms
+}
+
+func xmlResponse(w http.ResponseWriter, v any) {
+	w.Header().Set("Content-Type", "application/xml")
+	w.Header().Set("X-Cloud-Avenue-Mock", "true")
+	if err := xml.NewEncoder(w).Encode(v); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }

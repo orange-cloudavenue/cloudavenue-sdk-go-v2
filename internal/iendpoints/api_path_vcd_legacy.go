@@ -41,6 +41,10 @@ const (
 	// pathAdminOrgUserChangePassword changes one user password in the legacy admin XML API.
 	// pathVAppByID addresses one vApp in the legacy XML API.
 	pathVAppByID = "/api/vapp/{vapp-id}"
+	// pathVAppControlAccess gets vApp access control through the legacy XML API.
+	pathVAppControlAccess = "/api/vapp/{vapp-id}/controlAccess"
+	// pathVAppControlAccessAction sets vApp access control through the legacy XML API.
+	pathVAppControlAccessAction = "/api/vapp/{vapp-id}/action/controlAccess"
 	// pathVAppNetworkConfigSection gets or replaces the runtime network configuration of one vApp.
 	pathVAppNetworkConfigSection = "/api/vapp/{vapp-id}/networkConfigSection/"
 	// pathVAppRemoveAllNetworks removes all networks from one vApp.

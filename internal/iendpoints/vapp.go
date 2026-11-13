@@ -145,6 +145,33 @@ func init() {
 		ResponseType: itypes.APIResponseGetVApp{},
 	}.Register()
 
+	// GetVAppACL
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-ControlAccessParams-vApp.html",
+		Name:             "GetVAppACL",
+		Description:      "Get vApp ACL",
+		Method:           cav.MethodGET,
+		Backend:          cav.BackendVMware,
+		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
+		PathTemplate:     pathVAppControlAccess,
+		PathParams:       vAppActionPathParams(),
+		ResponseType:     itypes.ControlAccessParams{},
+	}.Register()
+
+	// SetVAppACL
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-ControlAccess.html",
+		Name:             "SetVAppACL",
+		Description:      "Set vApp ACL",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
+		PathTemplate:     pathVAppControlAccessAction,
+		PathParams:       vAppActionPathParams(),
+		BodyRequestType:  itypes.ControlAccessParams{},
+		ResponseType:     itypes.ControlAccessParams{},
+	}.Register()
+
 	// GetVAppNetworkConfigSection
 	cav.Endpoint{
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-NetworkConfigSection-vApp.html",
