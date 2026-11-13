@@ -10,14 +10,10 @@ feat(vapp): add vApp ACL operations and models. Adds GetVAppACL, SetVAppACL and 
 feat(vapp): add discard suspended state action. Adds DiscardSuspendedStateVApp and its VMware endpoint definition to the vApp lifecycle operations.
 ```
 
-```release-note:fix
+```release-note:bug
 fix(vapp): harden VMware vApp delete and runtime network updates. DeleteVApp now ignores only the explicit benign undeploy case instead of swallowing all undeploy failures, undeploy requests use the correct VMware XML transport, and runtime network writes mutate the raw section fetched from VMware so untouched identity, features, router info, and sibling network state are preserved.
 ```
 
-```release-note:fix
+```release-note:bug
 fix(vapp): make guest-property and runtime-network payload handling deterministic and safer. Guest-property payloads now serialize in stable order, create-vs-add network validation is explicit, empty guest-property sections can round-trip, and XML wire fidelity is preserved for fields such as IsInherited and IsConnected.
-```
-
-```release-note:refactor
-refactor(vapp): split the vApp client into per-domain files. Moves the ACL, lifecycle action, guest-property and runtime-network operations out of vapp.go into dedicated files, keeps only the cross-cutting XML namespaces and the job extractor in shared.go, and colocates each operation constant with its single consumer.
 ```
