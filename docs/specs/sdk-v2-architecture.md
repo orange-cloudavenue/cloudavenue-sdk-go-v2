@@ -334,6 +334,10 @@ type JobWaitRequest struct {
  // JobID is the backend job identifier.
  JobID string
 
+ // Timeout / PollingInterval resolution order: an explicit per-request
+ // value wins; otherwise a client-level value configured with
+ // WithJobTimeout / WithJobPollInterval; otherwise the package defaults
+ // (3m / 2s).
  Timeout         time.Duration
  PollingInterval time.Duration
  // Jitter adds randomized variance to PollingInterval to avoid

@@ -32,12 +32,14 @@ type JobWaitRequest struct {
 	// JobID is the backend job identifier.
 	JobID string
 
-	// Timeout is the maximum total wait time. When zero, a backend-oriented
-	// default is used.
+	// Timeout is the maximum total wait time. An explicit value wins over a
+	// client-level WithJobTimeout and the package default; when zero, the
+	// client-level value applies, falling back to the package default.
 	Timeout time.Duration
 
-	// PollingInterval is the delay between status checks. When zero, a default
-	// interval is used.
+	// PollingInterval is the delay between status checks. Resolution order
+	// mirrors Timeout: explicit per-request value, then client-level
+	// WithJobPollInterval, then the package default.
 	PollingInterval time.Duration
 
 	// Jitter randomizes PollingInterval by +/- Jitter. Optional.
@@ -51,6 +53,7 @@ type JobWaitRequest struct {
 // ends in error or is aborted, the terminal Job is returned together with an
 // error wrapping pkgerrors.ErrJobFailed. If the timeout elapses the error is
 // pkgerrors.ErrJobTimeout; if ctx is canceled its cause is returned.
+
 func WaitJob(ctx context.Context, c Client, req JobWaitRequest) (*Job, error) {
 	if err := context.Cause(ctx); err != nil {
 		return nil, err
@@ -65,18 +68,14 @@ func WaitJob(ctx context.Context, c Client, req JobWaitRequest) (*Job, error) {
 	if req.Backend == 0 {
 		return nil, fmt.Errorf("await job %s: backend is required", req.JobID)
 	}
-	if req.Timeout == 0 {
-		req.Timeout = defaultJobWaitTimeout
-	}
 	if req.Timeout < 0 {
 		return nil, fmt.Errorf("await job %s: timeout must be greater than 0", req.JobID)
-	}
-	if req.PollingInterval == 0 {
-		req.PollingInterval = defaultJobWaitPollingInterval
 	}
 	if req.PollingInterval < 0 {
 		return nil, fmt.Errorf("await job %s: polling interval must be greater than 0", req.JobID)
 	}
+
+	req = applyJobWaitDefaults(c, req)
 
 	pollCtx, cancel := context.WithCancelCause(ctx)
 	defer cancel(nil)
@@ -113,4 +112,28 @@ func WaitJob(ctx context.Context, c Client, req JobWaitRequest) (*Job, error) {
 // ParseCerberusJob parses a Cerberus job from the given response.
 func ParseCerberusJob(resp *resty.Response) (*Job, error) {
 	return parseCerberusJob(resp)
+}
+
+// applyJobWaitDefaults resolves the effective timeout and polling interval for
+// a job wait. Priority: an explicit per-request value wins; otherwise a
+// client-level value configured with WithJobTimeout / WithJobPollInterval;
+// otherwise the package defaults.
+func applyJobWaitDefaults(c Client, req JobWaitRequest) JobWaitRequest {
+	var cfgTimeout, cfgInterval time.Duration
+	if cc, ok := c.(*client); ok {
+		cfgTimeout, cfgInterval = cc.jobTimeout, cc.jobPollInterval
+	}
+	req.Timeout = firstPositive(req.Timeout, cfgTimeout, defaultJobWaitTimeout)
+	req.PollingInterval = firstPositive(req.PollingInterval, cfgInterval, defaultJobWaitPollingInterval)
+	return req
+}
+
+// firstPositive returns the first value greater than zero.
+func firstPositive(values ...time.Duration) time.Duration {
+	for _, v := range values {
+		if v > 0 {
+			return v
+		}
+	}
+	return 0
 }
