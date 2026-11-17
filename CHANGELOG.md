@@ -1,7 +1,11 @@
 ## 1.1.0 (Unreleased)
+### :rotating_light: **Breaking Changes**
+
+* cav: replace the public polling API with `WaitJob(ctx, client, JobWaitRequest)`, requiring an explicit backend and removing the legacy await helpers. (GH-155)
 
 ### :rocket: **New Features**
 
+* cav: add `WithJobTimeout` and `WithJobPollInterval` client options. Consumers can tune job wait budgets once per client; the values apply to every `WaitJob` call that does not set an explicit `JobWaitRequest` value, overriding the package defaults (3-minute timeout, 2-second polling). (GH-155)
 * feat(vapp): add VMware vApp runtime network and guest properties surfaces for provider migration. Adds runtime networkConfigSection read/create/add-org/update/remove operations, ProductSection guest-properties read/update APIs, public undeploy parameters, the matching public types, VMware endpoint definitions, generated wrappers, and focused tests. (GH-159)
 * feat(vapp): add discard suspended state action. Adds DiscardSuspendedStateVApp and its VMware endpoint definition to the vApp lifecycle operations. (GH-159)
 * feat(vapp): add vApp ACL operations and models. Adds GetVAppACL, SetVAppACL and RemoveVAppACL with the matching public models and parameters, subject kind/source and access-level validation, VMware endpoint definitions, internal ACL wire types, and focused tests. (GH-159)
