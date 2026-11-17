@@ -8,3 +8,54 @@
  */
 
 package vapp
+
+import (
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+)
+
+type getVAppByIDParams struct {
+	ID string
+}
+
+type composeVAppParams struct {
+	VDCID string
+	Body  itypes.APIRequestComposeVApp
+}
+
+type instantiateVAppTemplateParams struct {
+	VDCID string
+	Body  itypes.APIRequestInstantiateVAppTemplate
+}
+
+type updateVAppByIDParams struct {
+	ID   string
+	Body itypes.APIRequestUpdateVApp
+}
+
+type deleteVAppByIDParams struct {
+	ID string
+}
+
+type updateVAppNetworkConfigSectionParams struct {
+	ID   string
+	Body itypes.APIResponseVAppNetworkConfigSection
+}
+
+type updateVAppGuestPropertiesParams struct {
+	ID   string
+	Body itypes.APIResponseGuestProperties
+}
+
+type setVAppACLParams struct {
+	ID   string
+	Body itypes.ControlAccessParams
+}
+
+type undeployVAppParams struct {
+	ID   string
+	Body itypes.APIRequestUndeployVApp
+}
+
+type listVAppParams struct {
+	VDCID string
+}
