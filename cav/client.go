@@ -37,6 +37,9 @@ type client struct {
 	clientsInitialized map[subClientName]subClientInterface
 
 	cachePassphrase, cachePath string
+
+	jobTimeout      time.Duration
+	jobPollInterval time.Duration
 }
 
 // NewClient creates client bound to organization.
@@ -59,6 +62,8 @@ func NewClient(organization string, opts ...ClientOption) (Client, error) {
 
 	client.logger = xlogger.WithGroup("client").With("organization", settings.Organization)
 	client.clientsInitialized = settings.SubClients
+	client.jobTimeout = settings.JobTimeout
+	client.jobPollInterval = settings.JobPollInterval
 
 	if settings.CachePassphrase != "" && settings.CachePath != "" {
 		if err := client.restoreSessionsFromCache(settings.CachePassphrase, settings.CachePath); err != nil {

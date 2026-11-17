@@ -1,0 +1,7 @@
+```release-note:breaking-change
+cav: replace the public polling API with `WaitJob(ctx, client, JobWaitRequest)`, requiring an explicit backend and removing the legacy await helpers.
+```
+
+```release-note:feature
+cav: add `WithJobTimeout` and `WithJobPollInterval` client options. Consumers can tune job wait budgets once per client; the values apply to every `WaitJob` call that does not set an explicit `JobWaitRequest` value, overriding the package defaults (3-minute timeout, 2-second polling).
+```

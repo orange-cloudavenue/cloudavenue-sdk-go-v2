@@ -19,7 +19,6 @@ import (
 )
 
 func TestVmwareJobStatusParser(t *testing.T) {
-	v := &vmware{}
 	tests := []struct {
 		input    string
 		expected JobStatus
@@ -34,7 +33,7 @@ func TestVmwareJobStatusParser(t *testing.T) {
 		{"unknown", JobStatus(""), true},
 	}
 	for _, tt := range tests {
-		got, err := v.JobStatusParser(tt.input)
+		got, err := parseVMwareJobStatus(tt.input)
 		if tt.wantErr {
 			assert.Error(t, err, tt.input)
 		} else {
@@ -45,7 +44,6 @@ func TestVmwareJobStatusParser(t *testing.T) {
 }
 
 func TestVmwareJobParser_201Created(t *testing.T) {
-	v := &vmware{}
 	resp := &resty.Response{
 		RawResponse: &http.Response{
 			StatusCode: http.StatusCreated,
@@ -54,14 +52,13 @@ func TestVmwareJobParser_201Created(t *testing.T) {
 			},
 		},
 	}
-	job, err := v.JobParser(resp)
+	job, err := parseVMwareJob(resp)
 
 	assert.NoError(t, err)
 	assert.Equal(t, "d3c42a20-96b9-4452-91dd-f71b71dfe314", job.ID)
 }
 
 func TestVmwareJobParser_201Created_BadLocationHeader(t *testing.T) {
-	v := &vmware{}
 	resp := &resty.Response{
 		RawResponse: &http.Response{
 			StatusCode: http.StatusCreated,
@@ -70,15 +67,13 @@ func TestVmwareJobParser_201Created_BadLocationHeader(t *testing.T) {
 			},
 		},
 	}
-	job, err := v.JobParser(resp)
+	job, err := parseVMwareJob(resp)
 
 	assert.Error(t, err)
 	assert.Nil(t, job)
 }
 
 func TestVmwareJobParser_NormalResponse(t *testing.T) {
-	v := &vmware{}
-
 	data := &vmwareJobAPIResponse{}
 	_ = generator.Struct(data)
 
@@ -92,7 +87,7 @@ func TestVmwareJobParser_NormalResponse(t *testing.T) {
 			Result:     data,
 		},
 	}
-	job, err := v.JobParser(resp)
+	job, err := parseVMwareJob(resp)
 
 	assert.NoError(t, err)
 	assert.Equal(t, data.ID, job.ID)
@@ -103,7 +98,6 @@ func TestVmwareJobParser_NormalResponse(t *testing.T) {
 }
 
 func TestVmwareJobParser_FailedStatus(t *testing.T) {
-	v := &vmware{}
 	resp := &resty.Response{
 		RawResponse: &http.Response{
 			StatusCode: http.StatusOK,
@@ -121,14 +115,13 @@ func TestVmwareJobParser_FailedStatus(t *testing.T) {
 			},
 		},
 	}
-	job, err := v.JobParser(resp)
+	job, err := parseVMwareJob(resp)
 
 	assert.Error(t, err)
 	assert.NotNil(t, job)
 }
 
 func TestVmwareJobParser_EmptyResponse(t *testing.T) {
-	v := &vmware{}
 	resp := &resty.Response{
 		RawResponse: &http.Response{
 			StatusCode: http.StatusOK,
@@ -139,20 +132,18 @@ func TestVmwareJobParser_EmptyResponse(t *testing.T) {
 			Result:     &vmwareJobAPIResponse{},
 		},
 	}
-	job, err := v.JobParser(resp)
+	job, err := parseVMwareJob(resp)
 	assert.Error(t, err)
 	assert.Nil(t, job)
 }
 
 func TestVmwareJobParser_NilResponse(t *testing.T) {
-	v := &vmware{}
-	job, err := v.JobParser(nil)
+	job, err := parseVMwareJob(nil)
 	assert.Error(t, err)
 	assert.Nil(t, job)
 }
 
 func TestVmwareJobParser_UnknownJobStatus(t *testing.T) {
-	v := &vmware{}
 	resp := &resty.Response{
 		RawResponse: &http.Response{
 			StatusCode: http.StatusOK,
@@ -165,13 +156,12 @@ func TestVmwareJobParser_UnknownJobStatus(t *testing.T) {
 			},
 		},
 	}
-	job, err := v.JobParser(resp)
+	job, err := parseVMwareJob(resp)
 	assert.Error(t, err)
 	assert.Nil(t, job)
 }
 
 func TestVmwareJobParser_VmwareErrorResponse(t *testing.T) {
-	v := &vmware{}
 	resp := &resty.Response{
 		RawResponse: &http.Response{
 			StatusCode: http.StatusInternalServerError,
@@ -181,13 +171,12 @@ func TestVmwareJobParser_VmwareErrorResponse(t *testing.T) {
 			URL:        "http://example.com/job",
 		},
 	}
-	job, err := v.JobParser(resp)
+	job, err := parseVMwareJob(resp)
 	assert.Error(t, err)
 	assert.Nil(t, job)
 }
 
 func TestVmwareJobParser_InvalidResponseType(t *testing.T) {
-	v := &vmware{}
 	resp := &resty.Response{
 		RawResponse: &http.Response{
 			StatusCode: http.StatusOK,
@@ -198,7 +187,7 @@ func TestVmwareJobParser_InvalidResponseType(t *testing.T) {
 			Result:     "invalid response type",
 		},
 	}
-	job, err := v.JobParser(resp)
+	job, err := parseVMwareJob(resp)
 	assert.Error(t, err)
 	assert.Nil(t, job)
 }

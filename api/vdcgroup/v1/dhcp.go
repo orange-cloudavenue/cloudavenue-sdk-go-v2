@@ -14,7 +14,6 @@ import (
 	"fmt"
 	"net/url"
 	"path"
-	"time"
 
 	"resty.dev/v3"
 
@@ -113,11 +112,9 @@ func awaitDhcpTask(ctx context.Context, client cav.Client, resp *resty.Response,
 		return fmt.Errorf("%s: %w", operation, err)
 	}
 
-	if _, err := cav.AwaitJobOnBackend(ctx, client, cav.BackendVMware, jobID, cav.JobPollOptions{
-		Timeout:         30 * time.Second,
-		PollingInterval: 1 * time.Second,
-	}, func(_ *resty.Response) (struct{}, error) {
-		return struct{}{}, nil
+	if _, err := cav.WaitJob(ctx, client, cav.JobWaitRequest{
+		Backend: cav.BackendVMware,
+		JobID:   jobID,
 	}); err != nil {
 		return fmt.Errorf("%s: await task: %w", operation, err)
 	}

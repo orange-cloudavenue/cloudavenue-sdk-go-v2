@@ -26,46 +26,29 @@ const (
 	getJobVMwareEndpointName   = "GetJobVmware"
 )
 
-func getJobStatus(ctx context.Context, c Client, jobID string, backend BackendTarget) (*resty.Response, BackendTarget, error) {
-	if backend != 0 {
-		endpointName, err := getJobEndpointName(backend)
-		if err != nil {
-			return nil, 0, err
-		}
-
-		ep, err := GetEndpoint(endpointName)
-		if err != nil {
-			return nil, 0, err
-		}
-
-		resp, err := c.DoWithBackend(ctx, backend, ep, buildJobRequestOptions(ep.Backend, ep, jobID)...)
-		if err != nil {
-			return nil, 0, err
-		}
-
-		return resp, backend, nil
+// fetchJob reads the current state of a job from its backend and parses it.
+func fetchJob(ctx context.Context, c Client, backend BackendTarget, jobID string) (*Job, error) {
+	endpointName, err := getJobEndpointName(backend)
+	if err != nil {
+		return nil, err
 	}
 
-	endpointNames := []string{getJobCerberusEndpointName, getJobVMwareEndpointName}
-
-	var lastErr error
-	for _, endpointName := range endpointNames {
-		ep, err := GetEndpoint(endpointName)
-		if err != nil {
-			lastErr = err
-			continue
-		}
-
-		resp, err := c.Do(ctx, ep, buildJobRequestOptions(ep.Backend, ep, jobID)...)
-		if err != nil {
-			lastErr = err
-			continue
-		}
-
-		return resp, ep.Backend, nil
+	ep, err := GetEndpoint(endpointName)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, 0, fmt.Errorf("no job endpoint found: %w", lastErr)
+	resp, err := c.DoWithBackend(ctx, backend, ep, buildJobRequestOptions(backend, ep, jobID)...)
+	if err != nil {
+		return nil, err
+	}
+
+	job, err := parseJobResponse(resp, backend)
+	if err != nil {
+		return job, fmt.Errorf("parse job status: %w", err)
+	}
+
+	return job, nil
 }
 
 func getJobEndpointName(backend BackendTarget) (string, error) {
@@ -84,9 +67,6 @@ func buildJobRequestOptions(backend BackendTarget, endpoint *Endpoint, jobID str
 		WithPathParam(endpoint.PathParams[0], jobID),
 		SetCustomRestyOption(func(r *resty.Request) {
 			switch backend {
-			case BackendInfrapi:
-				r.SetResult(&CerberusJobAPIResponse{})
-				r.SetResultError(&errors.CustomerAPIErrorBody{})
 			case BackendVMware:
 				r.SetResult(&vmwareJobAPIResponse{})
 				r.SetResultError(&vmwareError{})
@@ -98,16 +78,16 @@ func buildJobRequestOptions(backend BackendTarget, endpoint *Endpoint, jobID str
 	}
 }
 
-func parseJobResponse(resp *Response, backend BackendTarget) (*Job, error) {
-	if resp == nil || resp.Raw == nil {
+func parseJobResponse(resp *resty.Response, backend BackendTarget) (*Job, error) {
+	if resp == nil {
 		return nil, fmt.Errorf("job response is nil")
 	}
 
 	switch backend {
 	case BackendInfrapi:
-		return (&cerberus{}).JobParser(resp.Raw)
+		return parseCerberusJob(resp)
 	case BackendVMware:
-		return (&vmware{}).JobParser(resp.Raw)
+		return parseVMwareJob(resp)
 	default:
 		return nil, fmt.Errorf("backend %d does not support jobs", backend)
 	}

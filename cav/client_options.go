@@ -12,7 +12,9 @@ package cav
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
+	"time"
 
 	httpclient "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/http-client"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/xlog"
@@ -26,6 +28,12 @@ type settings struct {
 	SubClients      map[subClientName]subClientInterface
 	CachePassphrase string
 	CachePath       string
+
+	// JobTimeout and JobPollInterval configure client-wide defaults for
+	// cav.WaitJob. An explicit per-request JobWaitRequest value still wins;
+	// zero here means "not configured", falling back to package defaults.
+	JobTimeout      time.Duration
+	JobPollInterval time.Duration
 }
 
 // ClientOption applies configuration to settings.
@@ -84,6 +92,34 @@ func WithLogger(customLogger *slog.Logger) ClientOption {
 		if xlogger.Enabled(context.Background(), slog.LevelDebug) {
 			httpclient.DebugMode.Store(true)
 		}
+		return nil
+	}
+}
+
+// WithJobTimeout sets the client-wide job wait timeout used by cav.WaitJob.
+// It applies to every wait that does not set an explicit
+// JobWaitRequest.Timeout, and overrides the package default. Must be greater
+// than zero.
+func WithJobTimeout(timeout time.Duration) ClientOption {
+	return func(s *settings) error {
+		if timeout <= 0 {
+			return fmt.Errorf("job timeout must be greater than 0, got %s", timeout)
+		}
+		s.JobTimeout = timeout
+		return nil
+	}
+}
+
+// WithJobPollInterval sets the client-wide job polling interval used by
+// cav.WaitJob. It applies to every wait that does not set an explicit
+// JobWaitRequest.PollingInterval, and overrides the package default. Must be
+// greater than zero.
+func WithJobPollInterval(interval time.Duration) ClientOption {
+	return func(s *settings) error {
+		if interval <= 0 {
+			return fmt.Errorf("job polling interval must be greater than 0, got %s", interval)
+		}
+		s.JobPollInterval = interval
 		return nil
 	}
 }
