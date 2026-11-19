@@ -13,6 +13,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/orange-cloudavenue/common-go/urn"
+
 	vdcv1 "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/vdc/v1"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
@@ -22,21 +24,21 @@ import (
 
 const opListVDCNetwork = "VApp.VDCNetwork.List"
 
-// ListVDCNetwork lists the Org VDC networks owned by a VDC.
-// The caller provides either VDCID (URN) or VDCName; when VDCName is set and
-// VDCID is empty the name is resolved through the VDC listing endpoint.
+// ListVDCNetwork lists the Org VDC networks owned by a VDC or VDC group.
+// The caller provides either OwnerID (full URN or bare UUID) or OwnerName;
+// when OwnerName is set and OwnerID is empty, the name is resolved through
+// the VDC listing endpoint.
 func (c *Client) ListVDCNetwork(ctx context.Context, params types.ParamsListVDCNetwork) (*types.ModelListVDCNetwork, error) {
 	vdcID := params.OwnerID
 	if vdcID == "" {
 		if params.OwnerName == "" {
-			return nil, fmt.Errorf("%s: validate: vdc id or vdc name is required", opListVDCNetwork)
+			return nil, fmt.Errorf("%s: validate: owner id or owner name is required", opListVDCNetwork)
 		}
 
 		vdcClient, err := vdcv1.New(c.c)
 		if err != nil {
 			return nil, fmt.Errorf("%s: create vdc client: %w", opListVDCNetwork, err)
 		}
-
 		vdcs, err := vdcClient.ListVDC(ctx, types.ParamsListVDC{Name: params.OwnerName})
 		if err != nil {
 			return nil, fmt.Errorf("%s: resolve vdc: %w", opListVDCNetwork, err)
@@ -46,6 +48,9 @@ func (c *Client) ListVDCNetwork(ctx context.Context, params types.ParamsListVDCN
 		}
 		vdcID = vdcs.VDCS[0].ID
 	}
+
+	// Normalize is a no-op for a full VDC/VDCGroup URN and prefixes a bare UUID.
+	vdcID = urn.Normalize(urn.VDC, vdcID).String()
 
 	ep := endpoints.ListVDCNetwork()
 	resp, err := c.c.Do(ctx, ep, cav.WithQueryParam(ep.QueryParams[0], fmt.Sprintf("ownerRef.id==%s", vdcID)))
