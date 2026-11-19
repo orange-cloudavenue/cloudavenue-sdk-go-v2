@@ -17,6 +17,11 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
+const (
+	vcloudXMLNS      = "http://www.vmware.com/vcloud/v1.5"
+	ovfEnvelopeXMLNS = "http://schemas.dmtf.org/ovf/envelope/1"
+)
+
 // APIResponseListVApp contains VApp records returned by list operations.
 type APIResponseListVApp struct {
 	Records []APIResponseListVAppRecord `json:"record" fakesize:"2"`
@@ -535,8 +540,8 @@ func ToAPIResponseVAppNetworkConfigSection(model *types.ModelVAppRuntimeNetworkC
 		return nil
 	}
 	section := &APIResponseVAppNetworkConfigSection{
-		XMLNS:         "http://www.vmware.com/vcloud/v1.5",
-		OVF:           "http://schemas.dmtf.org/ovf/envelope/1",
+		XMLNS:         vcloudXMLNS,
+		OVF:           ovfEnvelopeXMLNS,
 		Info:          model.Info,
 		NetworkConfig: make([]APIResponseVAppNetworkConfig, 0, len(model.NetworkConfig)),
 	}
@@ -554,11 +559,11 @@ func toAPIResponseVAppNetworkConfig(model types.ModelVAppRuntimeNetworkConfig) A
 func ToAPIRequestUndeployVApp(mode types.VAppUndeployMode) APIRequestUndeployVApp {
 	switch mode {
 	case types.VAppUndeployModeSuspend:
-		return APIRequestUndeployVApp{XMLNS: "http://www.vmware.com/vcloud/v1.5", UndeployAction: "suspend"}
+		return APIRequestUndeployVApp{XMLNS: vcloudXMLNS, UndeployAction: "suspend"}
 	case types.VAppUndeployModeForce:
-		return APIRequestUndeployVApp{XMLNS: "http://www.vmware.com/vcloud/v1.5", UndeployAction: "force"}
+		return APIRequestUndeployVApp{XMLNS: vcloudXMLNS, UndeployAction: "force"}
 	default:
-		return APIRequestUndeployVApp{XMLNS: "http://www.vmware.com/vcloud/v1.5", UndeployAction: "powerOff"}
+		return APIRequestUndeployVApp{XMLNS: vcloudXMLNS, UndeployAction: "powerOff"}
 	}
 }
 
