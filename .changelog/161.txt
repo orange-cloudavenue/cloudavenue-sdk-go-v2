@@ -1,3 +1,15 @@
 ```release-note:bug
 fix(vapp): align legacy Cloud Director vApp reads and runtime network writes with the wire contract. Versioned vendor media types are used on legacy `/api/vApp` endpoints, XML bodies are marshaled for the vendor `+xml` content type, and job polling sends a versioned Accept header. VApp path identifiers keep the required `vapp-` prefix, runtime network configuration follows the XSD element sequence and carries `GuestVlanAllowed` through read-modify-write cycles, and status/owner decoding accepts both the legacy numeric/object and string wire encodings with normalization to semantic string tokens.
 ```
+
+```release-note:bug
+fix(vapp): align vApp creation, undeploy and delete with the legacy wire contract, verified against a live Cloud Director. The composeVApp and undeploy actions now send their mandatory vendor media types (generic XML yielded 415), undeployVAppParams uses the UndeployPowerAction element instead of the XSD-rejected legacy boolean, a synchronous 201 creation response is no longer polled as a task, the vApp URN is derived from the entity HREF when query records return a null id, DELETE sends a versioned Accept header (406 otherwise), and XML error bodies no longer decode to an empty error message.
+```
+
+```release-note:feature
+feat(vapp): ComposeVApp now accepts an empty vApp without a sourced item.
+```
+
+```release-note:feature
+feat(vdc): add a type-agnostic Org VDC Network lookup (GetVDCNetwork by ID, or by name with a VDC/VDCGroup owner URN or name), fetch Org VDC Network listings across all pages, and expose the legacy network HREF on the model through VAppParentNetworkReference for use as a vApp ParentNetwork reference.
+```
