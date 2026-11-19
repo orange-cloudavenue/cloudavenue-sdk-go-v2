@@ -48,6 +48,12 @@ const (
 	// headerInstantiateParamsXML is the mandatory request media type of the
 	// instantiateVAppTemplate action; the generic XML content type yields 415.
 	headerInstantiateParamsXML = "application/vnd.vmware.vcloud.instantiateVAppTemplateParams+xml;version=39.1"
+	// headerComposeVAppParamsXML is the mandatory request media type of the
+	// composeVApp action; the generic XML content type yields 415.
+	headerComposeVAppParamsXML = "application/vnd.vmware.vcloud.composeVAppParams+xml;version=39.1"
+	// headerUndeployVAppParamsXML is the mandatory request media type of the
+	// undeploy action; the generic XML content type yields 415.
+	headerUndeployVAppParamsXML = "application/vnd.vmware.vcloud.undeployVAppParams+xml;version=39.1"
 	// headerProductSectionsJSON is the productSections media type: the generic
 	// JSON accept/content type yields 406 (GET) / 415 (PUT).
 	headerProductSectionsJSON = "application/vnd.vmware.vcloud.productSections+json;version=39.1"

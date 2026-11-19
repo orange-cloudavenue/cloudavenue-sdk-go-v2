@@ -224,7 +224,7 @@ func init() {
 		Description:      "Compose a new VApp",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
+		Headers:          map[string]string{headerAccept: headerXMLAny, headerContentType: headerComposeVAppParamsXML},
 		PathTemplate:     pathVAppCompose,
 		PathParams: []cav.PathParam{
 			{
@@ -291,6 +291,7 @@ func init() {
 		Description:      "Delete an existing VApp",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
+		Headers:          map[string]string{headerAccept: headerXMLAny},
 		PathTemplate:     pathVAppByID,
 		PathParams: []cav.PathParam{
 			{
@@ -341,7 +342,7 @@ func init() {
 				TransformFunc: toLegacyVAppID,
 			},
 		},
-		Headers:         map[string]string{headerAccept: headerXML, headerContentType: headerXML},
+		Headers:         map[string]string{headerAccept: headerXMLAny, headerContentType: headerUndeployVAppParamsXML},
 		BodyRequestType: itypes.APIRequestUndeployVApp{},
 		ResponseType:    cav.Job{},
 	}.Register()

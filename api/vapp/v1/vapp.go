@@ -288,8 +288,10 @@ func (c *Client) ComposeVApp(ctx context.Context, params types.ParamsComposeVApp
 		return nil, fmt.Errorf("%s: %w", opComposeVApp, err)
 	}
 
-	if err := c.awaitJob(ctx, opComposeVApp, job.ID); err != nil {
-		return nil, err
+	if job.Status != cav.JobSuccess {
+		if err := c.awaitJob(ctx, opComposeVApp, job.ID); err != nil {
+			return nil, err
+		}
 	}
 
 	m, err := c.GetVApp(ctx, types.ParamsGetVApp{Name: params.Name})
@@ -324,8 +326,10 @@ func (c *Client) InstantiateVAppTemplate(ctx context.Context, params types.Param
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", opInstantiateVAppTemplate, err)
 	}
-	if err := c.awaitJob(ctx, opInstantiateVAppTemplate, job.ID); err != nil {
-		return nil, err
+	if job.Status != cav.JobSuccess {
+		if err := c.awaitJob(ctx, opInstantiateVAppTemplate, job.ID); err != nil {
+			return nil, err
+		}
 	}
 	return c.GetVApp(ctx, types.ParamsGetVApp{Name: params.Name})
 }

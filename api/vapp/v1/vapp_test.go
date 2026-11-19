@@ -521,20 +521,15 @@ func TestVAppGuestPropertiesAllowEmptySection(t *testing.T) {
 
 func TestUndeployVAppModes(t *testing.T) {
 	tests := []struct {
-		name           string
-		mode           types.VAppUndeployMode
-		expectAction   string
-		expectPowerOff *bool
+		name         string
+		mode         types.VAppUndeployMode
+		expectAction string
 	}{
-		{name: "default power off", mode: "", expectAction: "", expectPowerOff: new(bool)},
-		{name: "explicit power off", mode: types.VAppUndeployModePowerOff, expectAction: "", expectPowerOff: new(bool)},
+		{name: "default power off", mode: "", expectAction: "powerOff"},
+		{name: "explicit power off", mode: types.VAppUndeployModePowerOff, expectAction: "powerOff"},
 		{name: "suspend", mode: types.VAppUndeployModeSuspend, expectAction: "suspend"},
-		{name: "force", mode: types.VAppUndeployModeForce, expectAction: "force", expectPowerOff: new(bool)},
+		{name: "force", mode: types.VAppUndeployModeForce, expectAction: "force"},
 	}
-
-	*tests[0].expectPowerOff = true
-	*tests[1].expectPowerOff = true
-	*tests[3].expectPowerOff = true
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -542,11 +537,10 @@ func TestUndeployVAppModes(t *testing.T) {
 			ms.CleanResponse(endpoints.UndeployVApp())
 			ms.SetResponseFunc(endpoints.UndeployVApp(), func(w http.ResponseWriter, r *http.Request) {
 				var body itypes.APIRequestUndeployVApp
-				assert.Equal(t, "application/xml;version=39.1", r.Header.Get("Content-Type"))
+				assert.Equal(t, "application/vnd.vmware.vcloud.undeployVAppParams+xml;version=39.1", r.Header.Get("Content-Type"))
 				assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
 				assert.Equal(t, "http://www.vmware.com/vcloud/v1.5", body.XMLNS)
 				assert.Equal(t, tt.expectAction, body.UndeployAction)
-				assert.Equal(t, tt.expectPowerOff, body.UndeployPowerOff)
 				w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
 				w.WriteHeader(http.StatusAccepted)
 			})

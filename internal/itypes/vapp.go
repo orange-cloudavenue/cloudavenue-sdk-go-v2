@@ -12,6 +12,7 @@ package itypes
 import (
 	"encoding/json"
 	"encoding/xml"
+	"strings"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
@@ -315,7 +316,9 @@ type APIRequestComposeVApp struct {
 	Description         string                             `xml:"Description,omitempty"`
 	InstantiationParams *APIRequestVAppInstantiationParams `xml:"InstantiationParams,omitempty"`
 	SourcedItem         *APIRequestVAppSourcedItem         `xml:"SourcedItem,omitempty"`
-	AllEULAsAccepted    bool                               `xml:"AllEULAsAccepted,omitempty"`
+	// Element required last by the ComposeVAppParams sequence; the same-name
+	// attribute form is XSD-rejected. Omitted for empty vApps.
+	AllEULAsAccepted bool `xml:"AllEULAsAccepted,omitempty"`
 }
 
 // APIRequestInstantiateVAppTemplate is the documented
@@ -368,16 +371,16 @@ type APIRequestOrgLeaseSettings struct {
 
 // APIRequestUndeployVApp contains the request payload for undeploying a VApp.
 type APIRequestUndeployVApp struct {
-	XMLName          xml.Name `xml:"UndeployVAppParams"`
-	XMLNS            string   `xml:"xmlns,attr,omitempty" fake:"http://www.vmware.com/vcloud/v1.5"`
-	UndeployPowerOff *bool    `xml:"UndeployPowerOff,omitempty"`
-	UndeployAction   string   `xml:"UndeployPowerAction,omitempty"`
+	XMLName xml.Name `xml:"UndeployVAppParams"`
+	XMLNS   string   `xml:"xmlns,attr,omitempty" fake:"http://www.vmware.com/vcloud/v1.5"`
+	// The 39.1 schema replaced the legacy UndeployPowerOff boolean with this.
+	UndeployAction string `xml:"UndeployPowerAction,omitempty"`
 }
 
 // ToModel converts APIResponseListVAppRecord to types.ModelVApp.
 func (r *APIResponseListVAppRecord) ToModel() types.ModelVApp {
 	return types.ModelVApp{
-		ID:          r.ID,
+		ID:          vAppRecordID(r.ID, r.HREF),
 		Name:        r.Name,
 		Description: r.Description,
 		Status:      normalizeVAppStatus(string(r.Status)),
@@ -549,19 +552,14 @@ func toAPIResponseVAppNetworkConfig(model types.ModelVAppRuntimeNetworkConfig) A
 
 // ToAPIRequestUndeployVApp converts the public undeploy mode to the VMware XML payload.
 func ToAPIRequestUndeployVApp(mode types.VAppUndeployMode) APIRequestUndeployVApp {
-	result := APIRequestUndeployVApp{XMLNS: "http://www.vmware.com/vcloud/v1.5"}
 	switch mode {
 	case types.VAppUndeployModeSuspend:
-		result.UndeployAction = "suspend"
+		return APIRequestUndeployVApp{XMLNS: "http://www.vmware.com/vcloud/v1.5", UndeployAction: "suspend"}
 	case types.VAppUndeployModeForce:
-		result.UndeployAction = "force"
-		powerOff := true
-		result.UndeployPowerOff = &powerOff
+		return APIRequestUndeployVApp{XMLNS: "http://www.vmware.com/vcloud/v1.5", UndeployAction: "force"}
 	default:
-		powerOff := true
-		result.UndeployPowerOff = &powerOff
+		return APIRequestUndeployVApp{XMLNS: "http://www.vmware.com/vcloud/v1.5", UndeployAction: "powerOff"}
 	}
-	return result
 }
 
 func toAPIResponseVAppRuntimeConfiguration(model types.ModelVAppRuntimeNetworkConfiguration) APIResponseVAppRuntimeConfiguration {
@@ -601,4 +599,24 @@ func toAPIResponseVAppRuntimeIPScope(model types.ModelVAppRuntimeIPScope) APIRes
 		result.IPRanges.IPRange = append(result.IPRanges.IPRange, APIResponseVAppRuntimeIPRange{StartAddress: ipRange.StartAddress, EndAddress: ipRange.EndAddress})
 	}
 	return result
+}
+
+// vAppRecordID returns the vApp URN for a query record. Records can carry a
+// null id, so fall back to deriving the URN from the entity HREF
+// (/api/vApp/vapp-<uuid>).
+func vAppRecordID(id, href string) string {
+	if id != "" {
+		return id
+	}
+	if href == "" {
+		return ""
+	}
+	last := href
+	if i := strings.LastIndex(href, "/"); i >= 0 {
+		last = href[i+1:]
+	}
+	if uuid := strings.TrimPrefix(last, "vapp-"); uuid != last && uuid != "" {
+		return "urn:vcloud:vapp:" + uuid
+	}
+	return ""
 }
