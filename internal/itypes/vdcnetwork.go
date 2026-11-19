@@ -14,7 +14,11 @@ import "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 type (
 	// * List
 	APIResponseListVDCNetwork struct {
-		Values []APIResponseVDCNetwork `json:"values" fakesize:"3"`
+		ResultTotal int                     `json:"resultTotal,omitempty"`
+		PageCount   int                     `json:"pageCount,omitempty"`
+		Page        int                     `json:"page,omitempty"`
+		PageSize    int                     `json:"pageSize,omitempty"`
+		Values      []APIResponseVDCNetwork `json:"values" fakesize:"3"`
 	}
 
 	// * Get / Create / Update / shared model
@@ -22,6 +26,7 @@ type (
 		ID                      string                   `json:"id,omitempty" fake:"{urn:network}"`
 		Name                    string                   `json:"name" fake:"mockvdcnetwork-{word}"`
 		Description             string                   `json:"description,omitempty" fake:"{sentence}"`
+		HREF                    string                   `json:"href,omitempty"`
 		Status                  string                   `json:"status,omitempty"`
 		OwnerRef                *APIObjectReference      `json:"ownerRef,omitempty"`
 		NetworkType             string                   `json:"networkType"`
@@ -90,6 +95,7 @@ func (r *APIResponseVDCNetwork) ToModel() types.ModelGetVDCNetwork {
 		ID:                      r.ID,
 		Name:                    r.Name,
 		Description:             r.Description,
+		HREF:                    r.HREF,
 		Status:                  r.Status,
 		NetworkType:             r.NetworkType,
 		GuestVLANTaggingAllowed: r.GuestVLANTaggingAllowed,

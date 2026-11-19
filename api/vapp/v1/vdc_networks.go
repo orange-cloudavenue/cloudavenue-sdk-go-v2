@@ -13,55 +13,26 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/orange-cloudavenue/common-go/urn"
-
-	vdcv1 "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/vdc/v1"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
-	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+	vdcapi "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/api/vdc/v1"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
 const opListVDCNetwork = "VApp.VDCNetwork.List"
 
-// ListVDCNetwork lists the Org VDC networks owned by a VDC or VDC group.
-// The caller provides either OwnerID (full URN or bare UUID) or OwnerName;
-// when OwnerName is set and OwnerID is empty, the name is resolved through
-// the VDC listing endpoint.
+// ListVDCNetwork lists the Org VDC networks owned by a VDC or VDC group,
+// fetching every page. The caller provides either OwnerID (full URN or bare
+// UUID) or OwnerName; when OwnerName is set and OwnerID is empty, the name is
+// resolved through the VDC listing endpoint.
 func (c *Client) ListVDCNetwork(ctx context.Context, params types.ParamsListVDCNetwork) (*types.ModelListVDCNetwork, error) {
-	vdcID := params.OwnerID
-	if vdcID == "" {
-		if params.OwnerName == "" {
-			return nil, fmt.Errorf("%s: validate: owner id or owner name is required", opListVDCNetwork)
-		}
-
-		vdcClient, err := vdcv1.New(c.c)
-		if err != nil {
-			return nil, fmt.Errorf("%s: create vdc client: %w", opListVDCNetwork, err)
-		}
-		vdcs, err := vdcClient.ListVDC(ctx, types.ParamsListVDC{Name: params.OwnerName})
-		if err != nil {
-			return nil, fmt.Errorf("%s: resolve vdc: %w", opListVDCNetwork, err)
-		}
-		if len(vdcs.VDCS) == 0 {
-			return nil, fmt.Errorf("%s: vdc %q not found", opListVDCNetwork, params.OwnerName)
-		}
-		vdcID = vdcs.VDCS[0].ID
-	}
-
-	// Normalize is a no-op for a full VDC/VDCGroup URN and prefixes a bare UUID.
-	vdcID = urn.Normalize(urn.VDC, vdcID).String()
-
-	ep := endpoints.ListVDCNetwork()
-	resp, err := c.c.Do(ctx, ep, cav.WithQueryParam(ep.QueryParams[0], fmt.Sprintf("ownerRef.id==%s", vdcID)))
+	vdcClient, err := vdcapi.New(c.c)
 	if err != nil {
-		return nil, fmt.Errorf("%s: list: %w", opListVDCNetwork, err)
+		return nil, fmt.Errorf("%s: create vdc client: %w", opListVDCNetwork, err)
 	}
 
-	list, ok := resp.Result().(*itypes.APIResponseListVDCNetwork)
-	if !ok || list == nil {
-		return nil, fmt.Errorf("%s: unexpected list response type %T", opListVDCNetwork, resp.Result())
+	result, err := vdcClient.ListVDCNetwork(ctx, params)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", opListVDCNetwork, err)
 	}
 
-	return list.ToModel(), nil
+	return result, nil
 }

@@ -19,6 +19,7 @@ import (
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/inetworkobjects"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
@@ -124,13 +125,12 @@ func listVDCNetworkModel(ctx context.Context, c cav.Client, vdcGroupID, vdcGroup
 		}
 	}
 
-	ep := endpoints.ListVDCNetwork()
-	resp, err := c.Do(ctx, ep, cav.WithQueryParam(ep.QueryParams[0], fmt.Sprintf("ownerRef.id==%s", vdcGroupID)))
+	networks, err := inetworkobjects.ListVDCNetworkModels(ctx, c, fmt.Sprintf("ownerRef.id==%s", vdcGroupID), c.GetConsole().GetAPIVCDEndpoint())
 	if err != nil {
 		return nil, err
 	}
 
-	return resp.Result().(*itypes.APIResponseListVDCNetwork).ToModel(), nil
+	return &types.ModelListVDCNetwork{VDCNetworks: networks}, nil
 }
 
 func getVDCNetworkModel(ctx context.Context, c cav.Client, id, name, vdcGroupID, vdcGroupName, expectedType string) (*types.ModelGetVDCNetwork, error) {
@@ -154,6 +154,7 @@ func getVDCNetworkModel(ctx context.Context, c cav.Client, id, name, vdcGroupID,
 	}
 
 	model := network.ToModel()
+	inetworkobjects.LegacyVDCNetworkHREF(&model, c.GetConsole().GetAPIVCDEndpoint())
 	return &model, nil
 }
 

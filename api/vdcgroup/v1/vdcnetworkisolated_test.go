@@ -10,6 +10,8 @@
 package vdcgroup
 
 import (
+	"encoding/json"
+	"net/http"
 	"testing"
 
 	"github.com/orange-cloudavenue/common-go/generator"
@@ -117,24 +119,37 @@ func TestListVdcNetwork(t *testing.T) {
 	}, nil)
 
 	ms.CleanResponse(endpoints.ListVDCNetwork())
-	ms.SetResponse(endpoints.ListVDCNetwork(), &itypes.APIResponseListVDCNetwork{
-		Values: []itypes.APIResponseVDCNetwork{{
-			ID:                      generator.MustGenerate("{urn:network}"),
-			Name:                    "isolated-net-1",
-			NetworkType:             types.VDCNetworkTypeIsolated,
-			OwnerRef:                &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
-			GuestVLANTaggingAllowed: &guestVLAN,
-			Shared:                  &shared,
-		}},
-	}, nil)
+	ms.SetResponseFunc(endpoints.ListVDCNetwork(), func(w http.ResponseWriter, r *http.Request) {
+		page := r.URL.Query().Get("page")
+		list := &itypes.APIResponseListVDCNetwork{
+			PageCount: 2,
+			Page:      1,
+			Values: []itypes.APIResponseVDCNetwork{{
+				ID:                      "urn:vcloud:network:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+				Name:                    "isolated-net-1",
+				NetworkType:             types.VDCNetworkTypeIsolated,
+				OwnerRef:                &itypes.APIObjectReference{ID: vdcGroupID, Name: vdcGroupName},
+				GuestVLANTaggingAllowed: &guestVLAN,
+				Shared:                  &shared,
+			}},
+		}
+		if page == "2" {
+			list.Page = 2
+			list.Values[0].ID = "urn:vcloud:network:bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"
+			list.Values[0].Name = "isolated-net-2"
+		}
+		w.Header().Set("Content-Type", "application/json")
+		assert.NoError(t, json.NewEncoder(w).Encode(list))
+	})
 
 	resp, err := client.ListVDCNetwork(t.Context(), types.ParamsListVDCNetwork{VDCGroupName: vdcGroupName})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
-	assert.Len(t, resp.VDCNetworks, 1)
+	assert.Len(t, resp.VDCNetworks, 2)
 	assert.Equal(t, types.VDCNetworkTypeIsolated, resp.VDCNetworks[0].NetworkType)
 	assert.Equal(t, vdcGroupID, resp.VDCNetworks[0].OwnerID)
+	assert.Contains(t, resp.VDCNetworks[0].HREF, "/api/network/")
 
 	ms.CleanResponse(endpoints.ListVDCGroup())
 	ms.CleanResponse(endpoints.ListVDCNetwork())
