@@ -47,10 +47,15 @@ type (
 	// * List
 	ParamsListVDCNetwork struct {
 		// VDCGroupID is the ID of the Vdc Group owning the Org VDC Networks.
+		// TODO: to be merged with OwnerID
 		VDCGroupID string
 
 		// VDCGroupName is the name of the Vdc Group owning the Org VDC Networks.
+		// TODO: to be merged with OwnerName
 		VDCGroupName string
+
+		OwnerName string `documentation:"Name used to filter the Owner (VDC)"`
+		OwnerID   string `documentation:"ID used to filter Org VDC Networks by ownerRef.id"`
 	}
 
 	// * Isolated networks
