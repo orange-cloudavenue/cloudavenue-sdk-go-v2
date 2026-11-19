@@ -1,0 +1,3 @@
+```release-note:feature
+feat(vapp): deliver legacy Cloud Director wire compatibility for vApp reads and runtime network writes. Versioned vendor media types are used on legacy `/api/vApp` endpoints, with XML bodies marshaled for the vendor `+xml` content type and versioned Accept headers on job polling. VApp path identifiers keep the required `vapp-` prefix. Runtime network configuration follows the Cloud Director XSD element sequence and carries `GuestVlanAllowed` through read-modify-write cycles. Status and owner accept both the legacy numeric/object and string wire encodings, normalize to semantic string tokens, and pass unknown values through unchanged.
+```
