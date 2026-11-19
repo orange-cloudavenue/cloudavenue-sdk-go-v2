@@ -185,21 +185,17 @@ type APIResponseVAppRuntimeConfiguration struct {
 	// Field order mirrors the XSD sequence of NetworkConfigurationType as
 	// enforced by Cloud Director (govcd types.NetworkConfiguration is the
 	// production reference): IpScopes first, then ParentNetwork, FenceMode,
-	// RetainNetInfoAcrossDeployments, Features, RouterInfo, and the optional
-	// interface/extension flags. Out-of-order elements are rejected with
-	// HTTP 400 cvc-complex-type.2.4.a.
+	// RetainNetInfoAcrossDeployments, Features, RouterInfo, GuestVlanAllowed
+	// and IsDeployed. Out-of-order elements are rejected with HTTP 400
+	// cvc-complex-type.2.4.a.
 	IPScopes                       *APIResponseVAppRuntimeIPScopes   `xml:"IpScopes,omitempty"`
 	ParentNetwork                  *APIRequestVAppReference          `xml:"ParentNetwork,omitempty"`
 	FenceMode                      string                            `xml:"FenceMode,omitempty"`
 	RetainNetInfoAcrossDeployments *bool                             `xml:"RetainNetInfoAcrossDeployments,omitempty"`
 	Features                       *APIResponseVAppRuntimeFeatures   `xml:"Features,omitempty"`
 	RouterInfo                     *APIResponseVAppRuntimeRouterInfo `xml:"RouterInfo,omitempty"`
-	AdvancedNetworkingEnabled      *bool                             `xml:"AdvancedNetworkingEnabled,omitempty"`
 	GuestVLANAllowed               *bool                             `xml:"GuestVlanAllowed,omitempty"`
-	IsConnected                    *bool                             `xml:"Connected,omitempty"`
-	DualStackNetwork               *bool                             `xml:"DualStackNetwork,omitempty"`
 	IsDeployed                     *bool                             `xml:"IsDeployed,omitempty"`
-	IsShared                       *bool                             `xml:"IsShared,omitempty"`
 }
 
 type APIResponseVAppRuntimeFeatures struct {
@@ -222,9 +218,10 @@ type APIResponseVAppRuntimeRouterInfo struct {
 }
 
 type APIResponseVAppRuntimeIPScopes struct {
-	// The legacy vApp networkConfigSection XML schema sends multiple IpScope
-	// elements directly in Configuration, not wrapped in an IpScopes container.
-	// Cloud Director rejects <IpScopes> in PUT; only <IpScope> is valid.
+	// The vApp networkConfigSection wraps IpScope elements in <IpScopes>,
+	// as govcd types.IPScopes does. The wire constraints are the enclosing
+	// element order (IpScopes first in Configuration) and the IpScope child
+	// order, not removal of the wrapper.
 	IPScope []APIResponseVAppRuntimeIPScope `xml:"IpScope,omitempty"`
 }
 
@@ -492,14 +489,8 @@ func (r *APIResponseVAppRuntimeConfiguration) ToModel() types.ModelVAppRuntimeNe
 		FenceMode:                      r.FenceMode,
 		RetainNetInfoAcrossDeployments: r.RetainNetInfoAcrossDeployments,
 		IsDeployed:                     r.IsDeployed,
-		IsShared:                       r.IsShared,
 		GuestVLANAllowed:               r.GuestVLANAllowed,
-		AdvancedNetworkingEnabled:      r.AdvancedNetworkingEnabled,
-		DualStackNetwork:               r.DualStackNetwork,
 		IPScopes:                       make([]types.ModelVAppRuntimeIPScope, 0),
-	}
-	if r.IsConnected != nil {
-		model.IsConnected = *r.IsConnected
 	}
 	if r.ParentNetwork != nil {
 		ref := types.VAppReference{HREF: r.ParentNetwork.HREF, ID: r.ParentNetwork.ID, Type: r.ParentNetwork.Type, Name: r.ParentNetwork.Name}
@@ -578,13 +569,9 @@ func toAPIResponseVAppRuntimeConfiguration(model types.ModelVAppRuntimeNetworkCo
 		FenceMode:                      model.FenceMode,
 		RetainNetInfoAcrossDeployments: model.RetainNetInfoAcrossDeployments,
 		IsDeployed:                     model.IsDeployed,
-		IsShared:                       model.IsShared,
 		GuestVLANAllowed:               model.GuestVLANAllowed,
-		AdvancedNetworkingEnabled:      model.AdvancedNetworkingEnabled,
-		DualStackNetwork:               model.DualStackNetwork,
 		IPScopes:                       nil,
 	}
-	result.IsConnected = &model.IsConnected
 	if model.ParentNetwork != nil {
 		ref := APIRequestVAppReference{HREF: model.ParentNetwork.HREF, ID: model.ParentNetwork.ID, Type: model.ParentNetwork.Type, Name: model.ParentNetwork.Name}
 		result.ParentNetwork = &ref

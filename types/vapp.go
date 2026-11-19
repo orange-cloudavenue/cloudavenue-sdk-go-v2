@@ -106,11 +106,7 @@ type (
 		FenceMode                      string
 		RetainNetInfoAcrossDeployments *bool
 		IsDeployed                     *bool
-		IsShared                       *bool
 		GuestVLANAllowed               *bool
-		AdvancedNetworkingEnabled      *bool
-		DualStackNetwork               *bool
-		IsConnected                    bool
 		IPScopes                       []ModelVAppRuntimeIPScope
 	}
 

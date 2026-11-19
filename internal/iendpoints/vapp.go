@@ -10,7 +10,11 @@
 package iendpoints
 
 import (
+	"fmt"
 	"strings"
+
+	"github.com/orange-cloudavenue/common-go/extractor"
+	"github.com/orange-cloudavenue/common-go/urn"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
@@ -166,7 +170,7 @@ func init() {
 		Description:      "Get vApp ACL",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
+		Headers:          map[string]string{headerAccept: headerVAppControlAccessXML, headerContentType: headerVAppControlAccessXML},
 		PathTemplate:     pathVAppControlAccess,
 		PathParams:       vAppActionPathParams(),
 		ResponseType:     itypes.ControlAccessParams{},
@@ -179,7 +183,7 @@ func init() {
 		Description:      "Set vApp ACL",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
+		Headers:          map[string]string{headerAccept: headerVAppControlAccessXML, headerContentType: headerVAppControlAccessXML},
 		PathTemplate:     pathVAppControlAccessAction,
 		PathParams:       vAppActionPathParams(),
 		BodyRequestType:  itypes.ControlAccessParams{},
@@ -228,7 +232,7 @@ func init() {
 				Description:   descVDCID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVDC),
-				TransformFunc: toLegacyVAppID,
+				TransformFunc: extractor.ExtractUUID,
 			},
 		},
 		BodyRequestType: itypes.APIRequestComposeVApp{},
@@ -250,7 +254,7 @@ func init() {
 				Description:   descVDCID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVDC),
-				TransformFunc: toLegacyVAppID,
+				TransformFunc: extractor.ExtractUUID,
 			},
 		},
 		BodyRequestType: itypes.APIRequestInstantiateVAppTemplate{},
@@ -425,9 +429,16 @@ func vAppActionPathParams() []cav.PathParam {
 // "/api/vApp/vapp-<uuid>" path identifier. Cloud Director answers the bare
 // UUID form with a misleading 403 "Access is forbidden".
 func toLegacyVAppID(value string) (string, error) {
-	value = strings.TrimPrefix(value, "urn:vcloud:vapp:")
-	if !strings.HasPrefix(value, "vapp-") {
-		value = "vapp-" + value
+	if strings.HasPrefix(value, "vapp-") && urn.IsUUIDV4(strings.TrimPrefix(value, "vapp-")) {
+		return value, nil
 	}
-	return value, nil
+	uuid := value
+	switch {
+	case urn.IsVAPP(value):
+		uuid = urn.ExtractUUID(value)
+	case urn.IsUUIDV4(value):
+	default:
+		return "", fmt.Errorf("expected a vApp URN or bare UUID, got %q", value)
+	}
+	return "vapp-" + uuid, nil
 }

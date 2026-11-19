@@ -203,7 +203,6 @@ func TestGetVAppNetworkConfig(t *testing.T) {
 
 	ms.CleanResponse(endpoints.GetVAppNetworkConfigSection())
 	ms.SetResponseFunc(endpoints.GetVAppNetworkConfigSection(), func(w http.ResponseWriter, r *http.Request) {
-		connected := true
 		w.Header().Set("Content-Type", "application/xml")
 		assert.NoError(t, xml.NewEncoder(w).Encode(&itypes.APIResponseVAppNetworkConfigSection{
 			XMLNS: "http://www.vmware.com/vcloud/v1.5",
@@ -216,8 +215,7 @@ func TestGetVAppNetworkConfig(t *testing.T) {
 				NetworkType: "application/vnd.vmware.vcloud.vAppNetwork+xml",
 				NetworkName: "isolated-net",
 				Configuration: itypes.APIResponseVAppRuntimeConfiguration{
-					FenceMode:   "isolated",
-					IsConnected: &connected,
+					FenceMode: "isolated",
 					IPScopes: &itypes.APIResponseVAppRuntimeIPScopes{IPScope: []itypes.APIResponseVAppRuntimeIPScope{{
 						Gateway:   "192.168.1.1",
 						Netmask:   "255.255.255.0",
@@ -409,7 +407,6 @@ func TestRuntimeVAppNetworkMutations(t *testing.T) {
 }
 
 func TestRuntimeNetworkFalseFidelity(t *testing.T) {
-	connected := false
 	inherited := false
 	section := &itypes.APIResponseVAppNetworkConfigSection{
 		XMLNS: "http://www.vmware.com/vcloud/v1.5",
@@ -418,8 +415,7 @@ func TestRuntimeNetworkFalseFidelity(t *testing.T) {
 		NetworkConfig: []itypes.APIResponseVAppNetworkConfig{{
 			NetworkName: "existing-net",
 			Configuration: itypes.APIResponseVAppRuntimeConfiguration{
-				FenceMode:   "isolated",
-				IsConnected: &connected,
+				FenceMode: "isolated",
 				IPScopes: &itypes.APIResponseVAppRuntimeIPScopes{IPScope: []itypes.APIResponseVAppRuntimeIPScope{{
 					IsInherited: &inherited,
 					Gateway:     "192.168.1.1",
@@ -430,11 +426,7 @@ func TestRuntimeNetworkFalseFidelity(t *testing.T) {
 	}
 
 	model := section.ToModel()
-	assert.False(t, model.NetworkConfig[0].Configuration.IsConnected)
 	roundTrip := itypes.ToAPIResponseVAppNetworkConfigSection(model)
-	if assert.NotNil(t, roundTrip.NetworkConfig[0].Configuration.IsConnected) {
-		assert.False(t, *roundTrip.NetworkConfig[0].Configuration.IsConnected)
-	}
 	if assert.NotNil(t, roundTrip.NetworkConfig[0].Configuration.IPScopes) && assert.Len(t, roundTrip.NetworkConfig[0].Configuration.IPScopes.IPScope, 1) {
 		if assert.NotNil(t, roundTrip.NetworkConfig[0].Configuration.IPScopes.IPScope[0].IsInherited) {
 			assert.False(t, *roundTrip.NetworkConfig[0].Configuration.IPScopes.IPScope[0].IsInherited)
@@ -575,8 +567,7 @@ func isolatedRuntimeNetwork(name string) types.ModelVAppRuntimeNetworkConfig {
 	return types.ModelVAppRuntimeNetworkConfig{
 		NetworkName: name,
 		Configuration: types.ModelVAppRuntimeNetworkConfiguration{
-			FenceMode:   "isolated",
-			IsConnected: true,
+			FenceMode: "isolated",
 			IPScopes: []types.ModelVAppRuntimeIPScope{{
 				Gateway:      "192.168.1.1",
 				Netmask:      "255.255.255.0",
@@ -640,7 +631,6 @@ func toRawRuntimeNetwork(model types.ModelVAppRuntimeNetworkConfig) itypes.APIRe
 }
 
 func richRuntimeNetwork(name, gateway string) itypes.APIResponseVAppNetworkConfig {
-	connected := true
 	return itypes.APIResponseVAppNetworkConfig{
 		NetworkID:   "urn:vcloud:vappNetwork:" + name,
 		NetworkHREF: "https://example.com/api/vAppNetwork/" + name,
@@ -648,8 +638,7 @@ func richRuntimeNetwork(name, gateway string) itypes.APIResponseVAppNetworkConfi
 		NetworkType: "application/vnd.vmware.vcloud.vAppNetwork+xml",
 		NetworkName: name,
 		Configuration: itypes.APIResponseVAppRuntimeConfiguration{
-			FenceMode:   "isolated",
-			IsConnected: &connected,
+			FenceMode: "isolated",
 			Features: &itypes.APIResponseVAppRuntimeFeatures{
 				FirewallService: &itypes.APIResponseVAppRuntimeInnerXML{InnerXML: "<IsEnabled>true</IsEnabled>"},
 			},

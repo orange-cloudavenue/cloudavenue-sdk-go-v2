@@ -33,6 +33,9 @@ const (
 	// HTTP 406 by Cloud Director.
 	headerVAppJSON              = "application/vnd.vmware.vcloud.vApp+json;version=39.1"
 	headerVAppNetworkSectionXML = "application/vnd.vmware.vcloud.networkConfigSection+xml;version=39.1"
+	// headerVAppControlAccessXML is the vApp ACL media type: the generic XML
+	// accept is rejected with HTTP 406 by Cloud Director.
+	headerVAppControlAccessXML = "application/vnd.vmware.vcloud.controlAccess+xml;version=39.1"
 	// headerXMLAdminUser is the admin user media type: the admin user record
 	// rejects the generic XML accept with HTTP 406.
 	headerXMLAdminUser = "application/vnd.vmware.admin.user+xml;version=39.1"
