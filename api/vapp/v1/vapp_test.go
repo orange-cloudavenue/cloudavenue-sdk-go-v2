@@ -218,15 +218,13 @@ func TestGetVAppNetworkConfig(t *testing.T) {
 				Configuration: itypes.APIResponseVAppRuntimeConfiguration{
 					FenceMode:   "isolated",
 					IsConnected: &connected,
-					IPScopes: &itypes.APIResponseVAppRuntimeIPScopes{
-						IPScope: []itypes.APIResponseVAppRuntimeIPScope{{
-							Gateway:   "192.168.1.1",
-							Netmask:   "255.255.255.0",
-							DNS1:      "8.8.8.8",
-							DNSSuffix: "example.org",
-							IPRanges:  itypes.APIResponseVAppRuntimeIPRanges{IPRange: []itypes.APIResponseVAppRuntimeIPRange{{StartAddress: "192.168.1.10", EndAddress: "192.168.1.20"}}},
-						}},
-					},
+					IPScopes: &itypes.APIResponseVAppRuntimeIPScopes{IPScope: []itypes.APIResponseVAppRuntimeIPScope{{
+						Gateway:   "192.168.1.1",
+						Netmask:   "255.255.255.0",
+						DNS1:      "8.8.8.8",
+						DNSSuffix: "example.org",
+						IPRanges:  itypes.APIResponseVAppRuntimeIPRanges{IPRange: []itypes.APIResponseVAppRuntimeIPRange{{StartAddress: "192.168.1.10", EndAddress: "192.168.1.20"}}},
+					}}},
 				},
 			}},
 		}))
@@ -381,7 +379,7 @@ func TestRuntimeVAppNetworkMutations(t *testing.T) {
 			ms.SetResponseFunc(endpoints.UpdateVAppNetworkConfigSection(), func(w http.ResponseWriter, r *http.Request) {
 				putCalled = true
 				var body itypes.APIResponseVAppNetworkConfigSection
-				assert.Equal(t, "application/xml;version=39.1", r.Header.Get("Content-Type"))
+				assert.Equal(t, "application/vnd.vmware.vcloud.networkConfigSection+xml;version=39.1", r.Header.Get("Content-Type"))
 				assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
 				if tt.expectPUT != nil {
 					tt.expectPUT(t, &body)

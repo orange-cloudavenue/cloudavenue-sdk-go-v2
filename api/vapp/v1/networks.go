@@ -220,6 +220,9 @@ func patchRawVAppRuntimeConfiguration(dst *itypes.APIResponseVAppRuntimeConfigur
 	dst.RetainNetInfoAcrossDeployments = src.RetainNetInfoAcrossDeployments
 	dst.IsDeployed = src.IsDeployed
 	dst.IsShared = src.IsShared
+	dst.GuestVLANAllowed = src.GuestVLANAllowed
+	dst.AdvancedNetworkingEnabled = src.AdvancedNetworkingEnabled
+	dst.DualStackNetwork = src.DualStackNetwork
 	dst.IsConnected = &src.IsConnected
 	if src.ParentNetwork == nil {
 		dst.ParentNetwork = nil

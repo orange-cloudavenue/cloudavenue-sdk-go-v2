@@ -25,6 +25,7 @@ func init() {
 		Method:           MethodGET,
 		Backend:          BackendVMware,
 		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/GET-Task.html",
+		Headers:          map[string]string{"Accept": "application/vnd.vmware.vcloud.task+json;version=39.1"},
 		PathTemplate:     "/api/task/{taskId}",
 		PathParams: []PathParam{
 			{

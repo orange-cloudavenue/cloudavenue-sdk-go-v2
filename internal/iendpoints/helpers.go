@@ -28,6 +28,11 @@ const (
 	// subclient default that may be overridden by an endpoint.
 	headerXML  = "application/xml;version=39.1"
 	headerJSON = "application/json;version=39.1"
+	// Vendor media types required by the legacy /api entity endpoints: the
+	// generic application/xml and application/json accepts are rejected with
+	// HTTP 406 by Cloud Director.
+	headerVAppJSON              = "application/vnd.vmware.vcloud.vApp+json;version=39.1"
+	headerVAppNetworkSectionXML = "application/vnd.vmware.vcloud.networkConfigSection+xml;version=39.1"
 	// headerXMLAdminUser is the admin user media type: the admin user record
 	// rejects the generic XML accept with HTTP 406.
 	headerXMLAdminUser = "application/vnd.vmware.admin.user+xml;version=39.1"

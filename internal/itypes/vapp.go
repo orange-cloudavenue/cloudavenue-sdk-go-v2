@@ -10,6 +10,7 @@
 package itypes
 
 import (
+	"encoding/json"
 	"encoding/xml"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
@@ -22,13 +23,94 @@ type APIResponseListVApp struct {
 
 // APIResponseListVAppRecord represents a VApp in list responses.
 type APIResponseListVAppRecord struct {
-	HREF        string `json:"href" fake:"{href_uuid}"`
-	ID          string `json:"id" fake:"{urn:vapp}"`
-	Name        string `json:"name" fake:"mockvapp-{word}"`
-	Description string `json:"description" fake:"{sentence}"`
-	Status      string `json:"status" fake:"{vapp_status}"`
-	Deployed    bool   `json:"deployed" fake:"{bool}"`
-	NumberOfVMs int    `json:"numberOfVMs" fake:"{number:0,10}"`
+	HREF        string         `json:"href" fake:"{href_uuid}"`
+	ID          string         `json:"id" fake:"{urn:vapp}"`
+	Name        string         `json:"name" fake:"mockvapp-{word}"`
+	Description string         `json:"description" fake:"{sentence}"`
+	Status      VAppStatusCode `json:"status" fake:"{vapp_status}"`
+	Deployed    bool           `json:"deployed" fake:"{bool}"`
+	NumberOfVMs int            `json:"numberOfVMs" fake:"{number:0,10}"`
+}
+
+// VAppStatusCode accepts the legacy numeric wire encoding (bare JSON number)
+// as well as a stringified code, and never fails on unknown values.
+type VAppStatusCode string
+
+// UnmarshalJSON accepts both JSON numbers and strings.
+func (c *VAppStatusCode) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 || string(data) == typeNull {
+		return nil
+	}
+	if data[0] == '"' {
+		var value string
+		if err := json.Unmarshal(data, &value); err != nil {
+			return err
+		}
+		*c = VAppStatusCode(value)
+		return nil
+	}
+	*c = VAppStatusCode(data)
+	return nil
+}
+
+// VAppOwnerRef accepts the legacy owner representation: either a plain
+// string reference or the nested owner object returned by the JSON API.
+type VAppOwnerRef string
+
+// UnmarshalJSON normalizes string and owner-object payloads down to a
+// single reference, preferring the owning user identifier.
+func (o *VAppOwnerRef) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 || string(data) == "null" {
+		return nil
+	}
+	if data[0] == '"' {
+		var value string
+		if err := json.Unmarshal(data, &value); err != nil {
+			return err
+		}
+		*o = VAppOwnerRef(value)
+		return nil
+	}
+	var payload struct {
+		HREF string `json:"href"`
+		User struct {
+			HREF string `json:"href"`
+			ID   string `json:"id"`
+		} `json:"user"`
+	}
+	if err := json.Unmarshal(data, &payload); err != nil {
+		return err
+	}
+	switch {
+	case payload.User.ID != "":
+		*o = VAppOwnerRef(payload.User.ID)
+	case payload.User.HREF != "":
+		*o = VAppOwnerRef(payload.User.HREF)
+	default:
+		*o = VAppOwnerRef(payload.HREF)
+	}
+	return nil
+}
+
+// vAppStatusCodes maps the deprecated numeric vApp status codes to their
+// semantic tokens, matching the VMware enumeration (govcd types.VAppStatuses).
+var vAppStatusCodes = map[string]string{
+	"-1": "FAILED_CREATION", "0": "UNRESOLVED", "1": "RESOLVED", "2": "DEPLOYED",
+	"3": "SUSPENDED", "4": "POWERED_ON", "5": "WAITING_FOR_INPUT", "6": "UNKNOWN",
+	"7": "UNRECOGNIZED", "8": "POWERED_OFF", "9": "INCONSISTENT_STATE", "10": "MIXED",
+	"11": "DESCRIPTOR_PENDING", "12": "COPYING_CONTENTS", "13": "DISK_CONTENTS_PENDING",
+	"14": "QUARANTINED", "15": "QUARANTINE_EXPIRED", "16": "REJECTED",
+	"17": "TRANSFER_TIMEOUT", "18": "VAPP_UNDEPLOYED", "19": "VAPP_PARTIALLY_DEPLOYED",
+	"20": "PARTIALLY_POWERED_OFF", "21": "PARTIALLY_SUSPENDED",
+}
+
+// normalizeVAppStatus maps a numeric wire code to its semantic token.
+// Unknown and already-semantic values are returned unchanged.
+func normalizeVAppStatus(raw string) string {
+	if token, ok := vAppStatusCodes[raw]; ok {
+		return token
+	}
+	return raw
 }
 
 // APIResponseGetVApp contains a VApp returned by get operations.
@@ -37,14 +119,14 @@ type APIResponseGetVApp struct {
 	ID              string                     `json:"id" fake:"{urn:vapp}"`
 	Name            string                     `json:"name" fake:"mockvapp-{word}"`
 	Description     string                     `json:"description" fake:"{sentence}"`
-	Status          string                     `json:"status" fake:"{vapp_status}"`
+	Status          VAppStatusCode             `json:"status" fake:"{vapp_status}"`
 	Deployed        bool                       `json:"deployed" fake:"{bool}"`
 	LeaseSettings   APIResponseLeaseSettings   `json:"leaseSettings"`
 	GuestProperties APIResponseGuestProperties `json:"guestProperties"`
 	VAppParent      string                     `json:"vAppParent" fake:"{urn:vapp}"`
 	VDC             string                     `json:"vdc" fake:"{urn:vdc}"`
 	Org             string                     `json:"org" fake:"{urn:org}"`
-	Owner           string                     `json:"owner" fake:"{urn:user}"`
+	Owner           VAppOwnerRef               `json:"owner" fake:"{urn:user}"`
 	Metadata        []APIResponseMetadata      `json:"metadataEntry" fakesize:"1"`
 }
 
@@ -100,15 +182,24 @@ type APIResponseVAppNetworkConfig struct {
 }
 
 type APIResponseVAppRuntimeConfiguration struct {
+	// Field order mirrors the XSD sequence of NetworkConfigurationType as
+	// enforced by Cloud Director (govcd types.NetworkConfiguration is the
+	// production reference): IpScopes first, then ParentNetwork, FenceMode,
+	// RetainNetInfoAcrossDeployments, Features, RouterInfo, and the optional
+	// interface/extension flags. Out-of-order elements are rejected with
+	// HTTP 400 cvc-complex-type.2.4.a.
+	IPScopes                       *APIResponseVAppRuntimeIPScopes   `xml:"IpScopes,omitempty"`
 	ParentNetwork                  *APIRequestVAppReference          `xml:"ParentNetwork,omitempty"`
 	FenceMode                      string                            `xml:"FenceMode,omitempty"`
 	RetainNetInfoAcrossDeployments *bool                             `xml:"RetainNetInfoAcrossDeployments,omitempty"`
 	Features                       *APIResponseVAppRuntimeFeatures   `xml:"Features,omitempty"`
 	RouterInfo                     *APIResponseVAppRuntimeRouterInfo `xml:"RouterInfo,omitempty"`
-	IPScopes                       *APIResponseVAppRuntimeIPScopes   `xml:"IpScopes,omitempty"`
+	AdvancedNetworkingEnabled      *bool                             `xml:"AdvancedNetworkingEnabled,omitempty"`
+	GuestVLANAllowed               *bool                             `xml:"GuestVlanAllowed,omitempty"`
+	IsConnected                    *bool                             `xml:"Connected,omitempty"`
+	DualStackNetwork               *bool                             `xml:"DualStackNetwork,omitempty"`
 	IsDeployed                     *bool                             `xml:"IsDeployed,omitempty"`
 	IsShared                       *bool                             `xml:"IsShared,omitempty"`
-	IsConnected                    *bool                             `xml:"IsConnected,omitempty"`
 }
 
 type APIResponseVAppRuntimeFeatures struct {
@@ -131,18 +222,23 @@ type APIResponseVAppRuntimeRouterInfo struct {
 }
 
 type APIResponseVAppRuntimeIPScopes struct {
+	// The legacy vApp networkConfigSection XML schema sends multiple IpScope
+	// elements directly in Configuration, not wrapped in an IpScopes container.
+	// Cloud Director rejects <IpScopes> in PUT; only <IpScope> is valid.
 	IPScope []APIResponseVAppRuntimeIPScope `xml:"IpScope,omitempty"`
 }
 
 type APIResponseVAppRuntimeIPScope struct {
+	// Field order and element names follow the IpScopeType XSD sequence
+	// (govcd types.IPScope): the legacy wire element is SubnetPrefixLength.
 	IsInherited  *bool                          `xml:"IsInherited,omitempty"`
 	Gateway      string                         `xml:"Gateway,omitempty"`
 	Netmask      string                         `xml:"Netmask,omitempty"`
+	PrefixLength *int                           `xml:"SubnetPrefixLength,omitempty"`
 	DNS1         string                         `xml:"Dns1,omitempty"`
 	DNS2         string                         `xml:"Dns2,omitempty"`
 	DNSSuffix    string                         `xml:"DnsSuffix,omitempty"`
 	IPRanges     APIResponseVAppRuntimeIPRanges `xml:"IpRanges,omitempty"`
-	PrefixLength *int                           `xml:"PrefixLength,omitempty"`
 }
 
 type APIResponseVAppRuntimeIPRanges struct {
@@ -287,7 +383,7 @@ func (r *APIResponseListVAppRecord) ToModel() types.ModelVApp {
 		ID:          r.ID,
 		Name:        r.Name,
 		Description: r.Description,
-		Status:      r.Status,
+		Status:      normalizeVAppStatus(string(r.Status)),
 		Deployed:    r.Deployed,
 		NumberOfVMs: r.NumberOfVMs,
 	}
@@ -299,12 +395,12 @@ func (r *APIResponseGetVApp) ToModel() types.ModelVApp {
 		ID:          r.ID,
 		Name:        r.Name,
 		Description: r.Description,
-		Status:      r.Status,
+		Status:      normalizeVAppStatus(string(r.Status)),
 		Deployed:    r.Deployed,
 		HREF:        r.HREF,
 		VDC:         r.VDC,
 		Org:         r.Org,
-		Owner:       r.Owner,
+		Owner:       string(r.Owner),
 		Parent:      r.VAppParent,
 	}
 
@@ -397,6 +493,9 @@ func (r *APIResponseVAppRuntimeConfiguration) ToModel() types.ModelVAppRuntimeNe
 		RetainNetInfoAcrossDeployments: r.RetainNetInfoAcrossDeployments,
 		IsDeployed:                     r.IsDeployed,
 		IsShared:                       r.IsShared,
+		GuestVLANAllowed:               r.GuestVLANAllowed,
+		AdvancedNetworkingEnabled:      r.AdvancedNetworkingEnabled,
+		DualStackNetwork:               r.DualStackNetwork,
 		IPScopes:                       make([]types.ModelVAppRuntimeIPScope, 0),
 	}
 	if r.IsConnected != nil {
@@ -406,7 +505,7 @@ func (r *APIResponseVAppRuntimeConfiguration) ToModel() types.ModelVAppRuntimeNe
 		ref := types.VAppReference{HREF: r.ParentNetwork.HREF, ID: r.ParentNetwork.ID, Type: r.ParentNetwork.Type, Name: r.ParentNetwork.Name}
 		model.ParentNetwork = &ref
 	}
-	if r.IPScopes != nil {
+	if r.IPScopes != nil && len(r.IPScopes.IPScope) > 0 {
 		model.IPScopes = make([]types.ModelVAppRuntimeIPScope, 0, len(r.IPScopes.IPScope))
 		for _, scope := range r.IPScopes.IPScope {
 			model.IPScopes = append(model.IPScopes, scope.ToModel())
@@ -480,6 +579,9 @@ func toAPIResponseVAppRuntimeConfiguration(model types.ModelVAppRuntimeNetworkCo
 		RetainNetInfoAcrossDeployments: model.RetainNetInfoAcrossDeployments,
 		IsDeployed:                     model.IsDeployed,
 		IsShared:                       model.IsShared,
+		GuestVLANAllowed:               model.GuestVLANAllowed,
+		AdvancedNetworkingEnabled:      model.AdvancedNetworkingEnabled,
+		DualStackNetwork:               model.DualStackNetwork,
 		IPScopes:                       nil,
 	}
 	result.IsConnected = &model.IsConnected

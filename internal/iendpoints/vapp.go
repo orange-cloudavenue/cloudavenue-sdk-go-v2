@@ -10,7 +10,7 @@
 package iendpoints
 
 import (
-	"github.com/orange-cloudavenue/common-go/extractor"
+	"strings"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
@@ -145,6 +145,7 @@ func init() {
 		Description:      "Get VApp",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
+		Headers:          map[string]string{headerAccept: headerVAppJSON},
 		PathTemplate:     pathVAppByID,
 		PathParams: []cav.PathParam{
 			{
@@ -152,7 +153,7 @@ func init() {
 				Description:   descVAppID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVApp),
-				TransformFunc: extractor.ExtractUUID,
+				TransformFunc: toLegacyVAppID,
 			},
 		},
 		ResponseType: itypes.APIResponseGetVApp{},
@@ -192,7 +193,7 @@ func init() {
 		Description:      "Get the runtime network configuration section of a VApp",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{headerAccept: headerXML},
+		Headers:          map[string]string{headerAccept: headerVAppNetworkSectionXML},
 		PathTemplate:     pathVAppNetworkConfigSection,
 		PathParams:       vAppActionPathParams(),
 		ResponseType:     itypes.APIResponseVAppNetworkConfigSection{},
@@ -205,7 +206,7 @@ func init() {
 		Description:      "Replace the runtime network configuration section of a VApp",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
+		Headers:          map[string]string{headerAccept: headerXMLAny, headerContentType: headerVAppNetworkSectionXML},
 		PathTemplate:     pathVAppNetworkConfigSection,
 		PathParams:       vAppActionPathParams(),
 		BodyRequestType:  itypes.APIResponseVAppNetworkConfigSection{},
@@ -227,7 +228,7 @@ func init() {
 				Description:   descVDCID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVDC),
-				TransformFunc: extractor.ExtractUUID,
+				TransformFunc: toLegacyVAppID,
 			},
 		},
 		BodyRequestType: itypes.APIRequestComposeVApp{},
@@ -249,7 +250,7 @@ func init() {
 				Description:   descVDCID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVDC),
-				TransformFunc: extractor.ExtractUUID,
+				TransformFunc: toLegacyVAppID,
 			},
 		},
 		BodyRequestType: itypes.APIRequestInstantiateVAppTemplate{},
@@ -272,7 +273,7 @@ func init() {
 				Description:   descVAppID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVApp),
-				TransformFunc: extractor.ExtractUUID,
+				TransformFunc: toLegacyVAppID,
 			},
 		},
 		BodyRequestType: itypes.APIRequestUpdateVApp{},
@@ -293,7 +294,7 @@ func init() {
 				Description:   descVAppID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVApp),
-				TransformFunc: extractor.ExtractUUID,
+				TransformFunc: toLegacyVAppID,
 			},
 		},
 		ResponseType: cav.Job{},
@@ -313,7 +314,7 @@ func init() {
 				Description:   descVAppID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVApp),
-				TransformFunc: extractor.ExtractUUID,
+				TransformFunc: toLegacyVAppID,
 			},
 		},
 		ResponseType: cav.Job{},
@@ -333,7 +334,7 @@ func init() {
 				Description:   descVAppID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVApp),
-				TransformFunc: extractor.ExtractUUID,
+				TransformFunc: toLegacyVAppID,
 			},
 		},
 		Headers:         map[string]string{headerAccept: headerXML, headerContentType: headerXML},
@@ -415,7 +416,18 @@ func vAppActionPathParams() []cav.PathParam {
 			Description:   descVAppID,
 			Required:      true,
 			ValidatorFunc: validateRule(urnVApp),
-			TransformFunc: extractor.ExtractUUID,
+			TransformFunc: toLegacyVAppID,
 		},
 	}
+}
+
+// toLegacyVAppID converts a VApp URN or bare UUID to the legacy
+// "/api/vApp/vapp-<uuid>" path identifier. Cloud Director answers the bare
+// UUID form with a misleading 403 "Access is forbidden".
+func toLegacyVAppID(value string) (string, error) {
+	value = strings.TrimPrefix(value, "urn:vcloud:vapp:")
+	if !strings.HasPrefix(value, "vapp-") {
+		value = "vapp-" + value
+	}
+	return value, nil
 }
