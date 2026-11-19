@@ -713,13 +713,23 @@ func TestVAppLifecycleActionsRequireID(t *testing.T) {
 	}
 }
 
-func TestComposeVAppRequiresSource(t *testing.T) {
-	client, _ := newClient(t)
-	_, err := client.ComposeVApp(t.Context(), types.ParamsComposeVApp{
+func TestComposeVAppAllowsEmptyVApp(t *testing.T) {
+	client, ms := newClient(t)
+
+	ms.CleanResponse(endpoints.ComposeVApp())
+	status := http.StatusAccepted
+	ms.SetResponse(endpoints.ComposeVApp(), nil, &status)
+	ms.CleanResponse(endpoints.GetVApp())
+	ms.SetResponse(endpoints.GetVApp(), &itypes.APIResponseGetVApp{ID: testVAppID, Name: "test-vapp"}, nil)
+	ms.CleanResponse(endpoints.ListVApp())
+	ms.SetResponse(endpoints.ListVApp(), &itypes.APIResponseListVApp{Records: []itypes.APIResponseListVAppRecord{{ID: testVAppID, Name: "test-vapp"}}}, nil)
+
+	resp, err := client.ComposeVApp(t.Context(), types.ParamsComposeVApp{
 		Name:  "test-vapp",
 		VDCID: "urn:vcloud:vdc:12345678-1234-4b8d-89ab-123456789012",
 	})
-	assert.Error(t, err)
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
 }
 
 func TestInstantiateVAppTemplateRequiresTemplate(t *testing.T) {

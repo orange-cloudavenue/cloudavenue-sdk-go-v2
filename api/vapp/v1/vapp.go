@@ -89,8 +89,8 @@ var (
 		Backend:  cav.BackendVMware,
 		Endpoint: endpoints.ComposeVApp(),
 		Validate: func(p composeVAppParams) error {
-			if p.VDCID == "" || p.Body.Name == "" || p.Body.SourcedItem == nil {
-				return fmt.Errorf("vdc id, name, and sourced item are required")
+			if p.VDCID == "" || p.Body.Name == "" {
+				return fmt.Errorf("vdc id and name are required")
 			}
 
 			return nil
@@ -270,17 +270,16 @@ func (c *Client) ComposeVApp(ctx context.Context, params types.ParamsComposeVApp
 		LinkedClone:      params.LinkedClone,
 		AllEULAsAccepted: params.AllEULAsAccepted,
 	}
-	if params.SourcedItem == nil {
-		return nil, fmt.Errorf("%s: sourced item is required", opComposeVApp)
-	}
-	body.SourcedItem = &itypes.APIRequestVAppSourcedItem{
-		Source:            itypes.APIRequestVAppReference(params.SourcedItem.Source),
-		SourceDelete:      params.SourcedItem.SourceDelete,
-		VAppScopedLocalID: params.SourcedItem.VAppScopedLocalID,
-	}
-	if params.SourcedItem.StorageProfile != nil {
-		ref := itypes.APIRequestVAppReference(*params.SourcedItem.StorageProfile)
-		body.SourcedItem.StorageProfile = &ref
+	if params.SourcedItem != nil {
+		body.SourcedItem = &itypes.APIRequestVAppSourcedItem{
+			Source:            itypes.APIRequestVAppReference(params.SourcedItem.Source),
+			SourceDelete:      params.SourcedItem.SourceDelete,
+			VAppScopedLocalID: params.SourcedItem.VAppScopedLocalID,
+		}
+		if params.SourcedItem.StorageProfile != nil {
+			ref := itypes.APIRequestVAppReference(*params.SourcedItem.StorageProfile)
+			body.SourcedItem.StorageProfile = &ref
+		}
 	}
 	body.InstantiationParams = toInstantiationParams(params.InstantiationParams)
 
