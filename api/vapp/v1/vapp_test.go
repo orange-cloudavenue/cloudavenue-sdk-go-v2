@@ -1213,3 +1213,28 @@ func TestUpdateVAppUnknownCurrentLeaseFailsBeforeAnyCall(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, []string{"lease"}, *calls)
 }
+
+func TestPatchRawVAppRuntimeNetworkIsDeployed(t *testing.T) {
+	deployed := true
+	tests := []struct {
+		name    string
+		current *bool
+		request *bool
+		want    *bool
+	}{
+		{name: "not requested keeps the current value", current: &deployed, request: nil, want: &deployed},
+		{name: "requested overwrites the current value", current: nil, request: &deployed, want: &deployed},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dst := &itypes.APIResponseVAppNetworkConfig{NetworkName: "net", IsDeployed: tt.current}
+			src := types.ModelVAppRuntimeNetworkConfig{NetworkName: "net"}
+			src.Configuration.IsDeployed = tt.request
+
+			patchRawVAppRuntimeNetwork(dst, src)
+
+			assert.Equal(t, tt.want, dst.IsDeployed)
+		})
+	}
+}
