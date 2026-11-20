@@ -476,7 +476,7 @@ func TestVAppGuestProperties(t *testing.T) {
 
 	ms.CleanResponse(endpoints.UpdateVAppProductSections())
 	ms.SetResponseFunc(endpoints.UpdateVAppProductSections(), func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "application/vnd.vmware.vcloud.productSections+json;version=39.1", r.Header.Get("Accept"))
+		assert.Equal(t, "application/*+xml;version=39.1", r.Header.Get("Accept"))
 		assert.Equal(t, "application/vnd.vmware.vcloud.productSections+json;version=39.1", r.Header.Get("Content-Type"))
 		var body itypes.APIResponseGuestProperties
 		assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
