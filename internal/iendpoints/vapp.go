@@ -261,27 +261,34 @@ func init() {
 		ResponseType:    cav.Job{},
 	}.Register()
 
-	// UpdateVApp
-	// PUT /vApp/{id} is the vApp modify operation in the pinned 39.1 inventory,
-	// but Broadcom does not publish a distinct PUT-VApp.html page there.
+	// RecomposeVApp updates the description of a vApp. A PUT on /api/vApp/{id}
+	// answers 415 on the real API: the name and description are changed with the
+	// recomposeVApp action (same contract as go-vcloud-director UpdateNameDescription).
 	cav.Endpoint{
-		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-Vm.html",
-		Name:             "UpdateVApp",
-		Description:      "Update an existing VApp",
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-RecomposeVApp.html",
+		Name:             "RecomposeVApp",
+		Description:      "Update the name and the description of a VApp (recompose action)",
+		Method:           cav.MethodPOST,
+		Backend:          cav.BackendVMware,
+		Headers:          map[string]string{headerAccept: headerXMLAny, headerContentType: headerRecomposeVAppParamsXML},
+		PathTemplate:     pathVAppRecompose,
+		PathParams:       vAppActionPathParams(),
+		BodyRequestType:  itypes.APIRequestRecomposeVApp{},
+		ResponseType:     cav.Job{},
+	}.Register()
+
+	// UpdateVAppLeaseSettingsSection replaces the lease settings of a vApp.
+	cav.Endpoint{
+		DocumentationURL: "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-LeaseSettingsSection.html",
+		Name:             "UpdateVAppLeaseSettingsSection",
+		Description:      "Replace the lease settings section of a VApp",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		PathTemplate:     pathVAppByID,
-		PathParams: []cav.PathParam{
-			{
-				Name:          pathParamVAppID,
-				Description:   descVAppID,
-				Required:      true,
-				ValidatorFunc: validateRule(urnVApp),
-				TransformFunc: toLegacyVAppID,
-			},
-		},
-		BodyRequestType: itypes.APIRequestUpdateVApp{},
-		ResponseType:    cav.Job{},
+		Headers:          map[string]string{headerAccept: headerXMLAny, headerContentType: headerVAppLeaseSettingsSectionXML},
+		PathTemplate:     pathVAppLeaseSettingsSection,
+		PathParams:       vAppActionPathParams(),
+		BodyRequestType:  itypes.APIRequestLeaseSettingsSection{},
+		ResponseType:     cav.Job{},
 	}.Register()
 
 	// DeleteVApp
@@ -354,10 +361,10 @@ func init() {
 		Description:      "Get the ProductSection guest properties of a VApp",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{headerAccept: headerProductSectionsJSON},
+		Headers:          map[string]string{headerAccept: headerProductSectionsXML},
 		PathTemplate:     pathVAppProductSections,
 		PathParams:       vAppActionPathParams(),
-		ResponseType:     itypes.APIResponseGuestProperties{},
+		ResponseType:     itypes.APIProductSectionList{},
 	}.Register()
 
 	// UpdateVAppProductSections
@@ -367,11 +374,12 @@ func init() {
 		Description:      "Replace the ProductSection guest properties of a VApp",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{headerAccept: headerProductSectionsJSON, headerContentType: headerProductSectionsJSON},
-		PathTemplate:     pathVAppProductSections,
-		PathParams:       vAppActionPathParams(),
-		BodyRequestType:  itypes.APIResponseGuestProperties{},
-		ResponseType:     cav.Job{},
+		// The response is a task, not a productSections: the productSections Accept is rejected with HTTP 406.
+		Headers:         map[string]string{headerAccept: headerXMLAny, headerContentType: headerProductSectionsXML},
+		PathTemplate:    pathVAppProductSections,
+		PathParams:      vAppActionPathParams(),
+		BodyRequestType: itypes.APIProductSectionList{},
+		ResponseType:    cav.Job{},
 	}.Register()
 
 	// GetVAppLeaseSettings

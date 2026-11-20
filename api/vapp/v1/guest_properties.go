@@ -12,7 +12,6 @@ package vapp
 import (
 	"context"
 	"fmt"
-	"sort"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
@@ -26,7 +25,7 @@ const (
 )
 
 var (
-	getVAppProductSectionsOp = cav.Operation[getVAppByIDParams, *itypes.APIResponseGuestProperties]{
+	getVAppProductSectionsOp = cav.Operation[getVAppByIDParams, *itypes.APIProductSectionList]{
 		Name:     opGetVAppGuestProperties,
 		Backend:  cav.BackendVMware,
 		Endpoint: endpoints.GetVAppProductSections(),
@@ -40,8 +39,8 @@ var (
 			ep := endpoints.GetVAppProductSections()
 			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
 		},
-		Extract: func(resp *cav.Response, _ getVAppByIDParams) (*itypes.APIResponseGuestProperties, error) {
-			section, ok := resp.Result().(*itypes.APIResponseGuestProperties)
+		Extract: func(resp *cav.Response, _ getVAppByIDParams) (*itypes.APIProductSectionList, error) {
+			section, ok := resp.Result().(*itypes.APIProductSectionList)
 			if !ok || section == nil {
 				return nil, fmt.Errorf("unexpected get response type %T", resp.Result())
 			}
@@ -91,7 +90,8 @@ func (c *Client) GetVAppGuestProperties(ctx context.Context, params types.Params
 	return &model, nil
 }
 
-// UpdateVAppGuestProperties replaces the ProductSection guest properties for a VApp.
+// UpdateVAppGuestProperties replaces the guest properties of a VApp: the properties that are not
+// in the given model are removed, the other elements of the ProductSections are kept.
 func (c *Client) UpdateVAppGuestProperties(ctx context.Context, params types.ParamsUpdateVAppGuestProperties) (*types.ModelVAppGuestProperties, error) {
 	if err := params.Validate(); err != nil {
 		return nil, fmt.Errorf("%s: validate: %w", opUpdateVAppGuestProperties, err)
@@ -102,7 +102,14 @@ func (c *Client) UpdateVAppGuestProperties(ctx context.Context, params types.Par
 		return nil, fmt.Errorf("%s: %w", opUpdateVAppGuestProperties, err)
 	}
 
-	body := toAPIResponseGuestProperties(params.GuestProperties)
+	// Read the current list and change only what the model carries: the elements of the
+	// ProductSection schema that are not modeled (password, qualifiers, categories...) are kept.
+	current, err := cav.Execute(ctx, c.c, getVAppProductSectionsOp, getVAppByIDParams{ID: vappID})
+	if err != nil {
+		return nil, fmt.Errorf("%s: get current: %w", opUpdateVAppGuestProperties, err)
+	}
+
+	body := itypes.MergeProductSectionList(current, params.GuestProperties)
 	job, err := cav.Execute(ctx, c.c, updateVAppGuestPropertiesOp, updateVAppGuestPropertiesParams{ID: vappID, Body: body})
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", opUpdateVAppGuestProperties, err)
@@ -111,46 +118,4 @@ func (c *Client) UpdateVAppGuestProperties(ctx context.Context, params types.Par
 		return nil, err
 	}
 	return c.GetVAppGuestProperties(ctx, types.ParamsGetVAppGuestProperties{ID: vappID})
-}
-
-func toAPIResponseGuestProperties(model types.ModelVAppGuestProperties) itypes.APIResponseGuestProperties {
-	result := itypes.APIResponseGuestProperties{
-		XMLNS:                        vcloudXMLNS,
-		XMLNSXsi:                     xmlSchemaInstanceNS,
-		XsiNoNamespaceSchemaLocation: "http://www.vmware.com/vcloud/v1.5/vmguest.xsd",
-		ProductSectionList:           make([]itypes.APIResponseProductSection, 0, len(model.Sections)),
-	}
-	sections := append([]types.ModelVAppGuestPropertySection(nil), model.Sections...)
-	sort.SliceStable(sections, func(i, j int) bool {
-		if sections[i].Class != sections[j].Class {
-			return sections[i].Class < sections[j].Class
-		}
-		return sections[i].Instance < sections[j].Instance
-	})
-
-	for _, section := range sections {
-		keys := make([]string, 0, len(section.Properties))
-		for key := range section.Properties {
-			keys = append(keys, key)
-		}
-		sort.Strings(keys)
-
-		properties := make([]itypes.APIResponseProductProperty, 0, len(section.Properties))
-		for _, key := range keys {
-			property := section.Properties[key]
-			properties = append(properties, itypes.APIResponseProductProperty{
-				Key:              key,
-				Label:            property.Label,
-				Type:             property.Type,
-				Value:            property.Value,
-				UserConfigurable: property.UserConfigurable,
-			})
-		}
-		result.ProductSectionList = append(result.ProductSectionList, itypes.APIResponseProductSection{
-			Class:    section.Class,
-			Instance: section.Instance,
-			Property: properties,
-		})
-	}
-	return result
 }

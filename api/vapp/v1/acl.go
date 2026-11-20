@@ -21,15 +21,17 @@ import (
 )
 
 const (
-	opGetVAppACL                 = "VApp.ACL.Get"
-	opSetVAppACL                 = "VApp.ACL.Set"
-	opRemoveVAppACL              = "VApp.ACL.Remove"
-	pathAdminUserByID            = "/api/admin/user/%s"
-	pathAdminGroupByID           = "/api/admin/group/%s"
-	urnOrgUserPrefix             = "urn:vcloud:orguser:"
-	urnOrgGroupPrefix            = "urn:vcloud:orggroup:"
-	urnOrgUserType               = "urn:vcloud:orguser"
-	urnOrgGroupType              = "urn:vcloud:orggroup"
+	opGetVAppACL       = "VApp.ACL.Get"
+	opSetVAppACL       = "VApp.ACL.Set"
+	opRemoveVAppACL    = "VApp.ACL.Remove"
+	pathAdminUserByID  = "/api/admin/user/%s"
+	pathAdminGroupByID = "/api/admin/group/%s"
+	urnOrgUserPrefix   = "urn:vcloud:orguser:"
+	urnOrgGroupPrefix  = "urn:vcloud:orggroup:"
+	// Media types of the local subjects: the API rejects any other value of the
+	// Subject type attribute with HTTP 400 (go-vcloud-director sends the same).
+	vappACLUserMediaType         = "application/vnd.vmware.admin.user+xml"
+	vappACLGroupMediaType        = "application/vnd.vmware.admin.group+xml"
 	vappACLSubjectKindUser       = "user"
 	vappACLSubjectKindGroup      = "group"
 	vappACLSubjectSourceLocal    = "local"
@@ -185,9 +187,9 @@ func toVAppACLSubjectHREF(apiEndpoint string, subject types.ParamsSetVAppACLSubj
 func toVAppACLSubjectType(subjectKind string) string {
 	switch subjectKind {
 	case vappACLSubjectKindUser:
-		return urnOrgUserType
+		return vappACLUserMediaType
 	case vappACLSubjectKindGroup:
-		return urnOrgGroupType
+		return vappACLGroupMediaType
 	default:
 		return ""
 	}

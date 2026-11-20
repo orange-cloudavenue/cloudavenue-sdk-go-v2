@@ -213,12 +213,15 @@ func patchRawVAppRuntimeNetwork(dst *itypes.APIResponseVAppNetworkConfig, src ty
 	dst.NetworkName = src.NetworkName
 	dst.Description = src.Description
 	patchRawVAppRuntimeConfiguration(&dst.Configuration, src.Configuration)
+	// IsDeployed is a child of NetworkConfig; only overwritten when requested.
+	if src.Configuration.IsDeployed != nil {
+		dst.IsDeployed = src.Configuration.IsDeployed
+	}
 }
 
 func patchRawVAppRuntimeConfiguration(dst *itypes.APIResponseVAppRuntimeConfiguration, src types.ModelVAppRuntimeNetworkConfiguration) {
 	dst.FenceMode = src.FenceMode
 	dst.RetainNetInfoAcrossDeployments = src.RetainNetInfoAcrossDeployments
-	dst.IsDeployed = src.IsDeployed
 	dst.GuestVLANAllowed = src.GuestVLANAllowed
 	if src.ParentNetwork == nil {
 		dst.ParentNetwork = nil

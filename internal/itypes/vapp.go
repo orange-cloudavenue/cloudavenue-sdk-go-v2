@@ -14,8 +14,13 @@ import (
 	"encoding/xml"
 	"strings"
 
+	"github.com/orange-cloudavenue/common-go/urn"
+
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
+
+// vAppLeaseSettingsSectionType is the _type of the lease section of the legacy vApp JSON.
+const vAppLeaseSettingsSectionType = "LeaseSettingsSectionType"
 
 const (
 	vcloudXMLNS      = "http://www.vmware.com/vcloud/v1.5"
@@ -91,7 +96,13 @@ func (o *VAppOwnerRef) UnmarshalJSON(data []byte) error {
 	case payload.User.ID != "":
 		*o = VAppOwnerRef(payload.User.ID)
 	case payload.User.HREF != "":
-		*o = VAppOwnerRef(payload.User.HREF)
+		// The legacy payload may carry only the user href (/api/admin/user/<uuid>):
+		// return the user URN to stay consistent with the other identifiers.
+		if uuid := urn.ExtractUUID(payload.User.HREF); uuid != "" {
+			*o = VAppOwnerRef(urn.Normalize(urn.User, uuid).String())
+		} else {
+			*o = VAppOwnerRef(payload.User.HREF)
+		}
 	default:
 		*o = VAppOwnerRef(payload.HREF)
 	}
@@ -134,6 +145,27 @@ type APIResponseGetVApp struct {
 	Org             string                     `json:"org" fake:"{urn:org}"`
 	Owner           VAppOwnerRef               `json:"owner" fake:"{urn:user}"`
 	Metadata        []APIResponseMetadata      `json:"metadataEntry" fakesize:"1"`
+
+	// Links and Sections are only decoded from the real legacy payload: it has
+	// no top-level vdc nor leaseSettings, the VDC is the rel="up" link and the
+	// lease lives in the LeaseSettingsSectionType section.
+	Links    []APIResponseVAppLink    `json:"link" fake:"skip"`
+	Sections []APIResponseVAppSection `json:"section" fake:"skip"`
+}
+
+// APIResponseVAppLink is one entry of the `link` array of the legacy vApp JSON.
+type APIResponseVAppLink struct {
+	HREF string `json:"href"`
+	Rel  string `json:"rel"`
+	Type string `json:"type"`
+}
+
+// APIResponseVAppSection is one entry of the `section` array of the legacy vApp JSON.
+// Only the lease section fields are decoded.
+type APIResponseVAppSection struct {
+	Type                     string `json:"_type"`
+	DeploymentLeaseInSeconds *int   `json:"deploymentLeaseInSeconds"`
+	StorageLeaseInSeconds    *int   `json:"storageLeaseInSeconds"`
 }
 
 // APIResponseLeaseSettings contains VApp lease settings.
@@ -179,29 +211,53 @@ type APIResponseVAppNetworkConfigSection struct {
 }
 
 type APIResponseVAppNetworkConfig struct {
-	NetworkID     string                              `xml:"id,attr,omitempty"`
-	NetworkHREF   string                              `xml:"href,attr,omitempty"`
+	NetworkID   string `xml:"id,attr,omitempty"`
+	NetworkHREF string `xml:"href,attr,omitempty"`
+	// Link is the first child element of the network config. The id and href
+	// attributes are not always present on the real payload, the Link href is then
+	// the only place with the network UUID (go-vcloud-director reads it the same way).
+	Link          *APIResponseVAppNetworkLink         `xml:"Link,omitempty"`
 	Description   string                              `xml:"Description,omitempty"`
 	NetworkType   string                              `xml:"type,attr,omitempty"`
 	NetworkName   string                              `xml:"networkName,attr,omitempty"`
 	Configuration APIResponseVAppRuntimeConfiguration `xml:"Configuration"`
+	// IsDeployed is a child of NetworkConfig (after Configuration), not of Configuration.
+	IsDeployed *bool `xml:"IsDeployed,omitempty"`
+}
+
+// APIResponseVAppNetworkLink is the Link child of a vApp NetworkConfig.
+type APIResponseVAppNetworkLink struct {
+	Rel  string `xml:"rel,attr,omitempty"`
+	HREF string `xml:"href,attr,omitempty"`
+	Type string `xml:"type,attr,omitempty"`
 }
 
 type APIResponseVAppRuntimeConfiguration struct {
-	// Field order mirrors the XSD sequence of NetworkConfigurationType as
-	// enforced by Cloud Director (govcd types.NetworkConfiguration is the
-	// production reference): IpScopes first, then ParentNetwork, FenceMode,
-	// RetainNetInfoAcrossDeployments, Features, RouterInfo, GuestVlanAllowed
-	// and IsDeployed. Out-of-order elements are rejected with HTTP 400
-	// cvc-complex-type.2.4.a.
+	// Field order mirrors the XSD sequence of NetworkConfigurationType (VMware
+	// Cloud Director API, NetworkConfigSection): BackwardCompatibilityMode,
+	// IpScopes, ParentNetwork, FenceMode, RetainNetInfoAcrossDeployments,
+	// Features, SyslogServerSettings, RouterInfo, SubInterface,
+	// DistributedInterface, ServiceInterface, GuestVlanAllowed, Connected,
+	// DualStackNetwork. Out-of-order elements are rejected with HTTP 400
+	// cvc-complex-type.2.4.a. IsDeployed is NOT part of it: it is a child of
+	// NetworkConfig.
+	//
+	// The elements that are not exposed by the public model are kept here only so
+	// that the read-modify-write of the whole section does not drop them.
+	BackwardCompatibilityMode      *bool                             `xml:"BackwardCompatibilityMode,omitempty"`
 	IPScopes                       *APIResponseVAppRuntimeIPScopes   `xml:"IpScopes,omitempty"`
 	ParentNetwork                  *APIRequestVAppReference          `xml:"ParentNetwork,omitempty"`
 	FenceMode                      string                            `xml:"FenceMode,omitempty"`
 	RetainNetInfoAcrossDeployments *bool                             `xml:"RetainNetInfoAcrossDeployments,omitempty"`
 	Features                       *APIResponseVAppRuntimeFeatures   `xml:"Features,omitempty"`
+	SyslogServerSettings           *APIResponseVAppRuntimeInnerXML   `xml:"SyslogServerSettings,omitempty"`
 	RouterInfo                     *APIResponseVAppRuntimeRouterInfo `xml:"RouterInfo,omitempty"`
+	SubInterface                   *bool                             `xml:"SubInterface,omitempty"`
+	DistributedInterface           *bool                             `xml:"DistributedInterface,omitempty"`
+	ServiceInterface               *bool                             `xml:"ServiceInterface,omitempty"`
 	GuestVLANAllowed               *bool                             `xml:"GuestVlanAllowed,omitempty"`
-	IsDeployed                     *bool                             `xml:"IsDeployed,omitempty"`
+	Connected                      *bool                             `xml:"Connected,omitempty"`
+	DualStackNetwork               *bool                             `xml:"DualStackNetwork,omitempty"`
 }
 
 type APIResponseVAppRuntimeFeatures struct {
@@ -348,18 +404,27 @@ type APIRequestInstantiateVAppTemplate struct {
 	AllEULAsAccepted    bool                               `xml:"AllEULAsAccepted,omitempty"`
 }
 
-// APIRequestUpdateVApp contains the request payload for updating a VApp.
-type APIRequestUpdateVApp struct {
-	XMLNS         string                   `json:"xmlns" fake:"http://www.vmware.com/vcloud/v1.5"`
-	Name          string                   `json:"name,omitempty" fake:"mockvapp-{word}"`
-	Description   *string                  `json:"description,omitempty" fake:"{sentence}"`
-	LeaseSettings *APIRequestLeaseSettings `json:"leaseSettings,omitempty"`
+// APIRequestRecomposeVApp is the XML body of the recomposeVApp action used to
+// update the name and the description of a vApp.
+type APIRequestRecomposeVApp struct {
+	XMLName     xml.Name `xml:"RecomposeVAppParams"`
+	OVF         string   `xml:"xmlns:ovf,attr"`
+	XSI         string   `xml:"xmlns:xsi,attr"`
+	XMLNS       string   `xml:"xmlns,attr"`
+	Name        string   `xml:"name,attr"`
+	Deploy      bool     `xml:"deploy,attr"`
+	Description string   `xml:"Description"`
 }
 
-// APIRequestLeaseSettings contains lease settings for update requests.
-type APIRequestLeaseSettings struct {
-	DeploymentLeaseInSeconds *int `json:"deploymentLeaseInSeconds,omitempty"`
-	StorageLeaseInSeconds    *int `json:"storageLeaseInSeconds,omitempty"`
+// APIRequestLeaseSettingsSection is the XML body replacing the lease settings
+// section of a vApp.
+type APIRequestLeaseSettingsSection struct {
+	XMLName                  xml.Name `xml:"LeaseSettingsSection"`
+	OVF                      string   `xml:"xmlns:ovf,attr"`
+	XMLNS                    string   `xml:"xmlns,attr"`
+	Info                     string   `xml:"ovf:Info"`
+	DeploymentLeaseInSeconds *int     `xml:"DeploymentLeaseInSeconds,omitempty"`
+	StorageLeaseInSeconds    *int     `xml:"StorageLeaseInSeconds,omitempty"`
 }
 
 // APIResponseOrgLeaseSettings contains org/VDC-level lease settings.
@@ -416,6 +481,27 @@ func (r *APIResponseGetVApp) ToModel() types.ModelVApp {
 		m.StorageLeaseInSeconds = &r.LeaseSettings.StorageLeaseInSeconds
 	}
 
+	// The real payload carries the lease in the LeaseSettingsSectionType section.
+	// A lease of 0 means "never expires" and must not be confused with "absent".
+	for _, section := range r.Sections {
+		if section.Type != vAppLeaseSettingsSectionType {
+			continue
+		}
+		if section.DeploymentLeaseInSeconds != nil {
+			v := *section.DeploymentLeaseInSeconds
+			m.DeploymentLeaseInSeconds = &v
+		}
+		if section.StorageLeaseInSeconds != nil {
+			v := *section.StorageLeaseInSeconds
+			m.StorageLeaseInSeconds = &v
+		}
+		break
+	}
+
+	if m.VDC == "" {
+		m.VDC = vdcURNFromLinks(r.Links)
+	}
+
 	for _, meta := range r.Metadata {
 		if meta.Key == "vappBillingModel" {
 			m.Properties.BillingModel = meta.Value
@@ -424,6 +510,20 @@ func (r *APIResponseGetVApp) ToModel() types.ModelVApp {
 	m.GuestProperties = r.GuestProperties.ToModel()
 
 	return m
+}
+
+// vdcURNFromLinks returns the URN of the parent VDC from the rel="up" link
+// (https://<console>/api/vdc/<uuid>), or an empty string.
+func vdcURNFromLinks(links []APIResponseVAppLink) string {
+	for _, link := range links {
+		if link.Rel != "up" || !strings.Contains(link.HREF, "/api/vdc/") {
+			continue
+		}
+		if uuid := urn.ExtractUUID(link.HREF); uuid != "" {
+			return urn.Normalize(urn.VDC, uuid).String()
+		}
+	}
+	return ""
 }
 
 // ToModel converts APIResponseGuestProperties to the public guest property model.
@@ -481,13 +581,21 @@ func (r *APIResponseVAppNetworkConfigSection) ToModel() *types.ModelVAppRuntimeN
 
 // ToModel converts APIResponseVAppNetworkConfig to the public runtime model.
 func (r *APIResponseVAppNetworkConfig) ToModel() types.ModelVAppRuntimeNetworkConfig {
+	href := r.NetworkHREF
+	if href == "" && r.Link != nil {
+		href = r.Link.HREF
+	}
+	configuration := r.Configuration.ToModel()
+	// IsDeployed is a child of NetworkConfig; the public model keeps it in the configuration.
+	configuration.IsDeployed = r.IsDeployed
+
 	return types.ModelVAppRuntimeNetworkConfig{
 		Description:   r.Description,
 		ID:            r.NetworkID,
-		HREF:          r.NetworkHREF,
+		HREF:          href,
 		Type:          r.NetworkType,
 		NetworkName:   r.NetworkName,
-		Configuration: r.Configuration.ToModel(),
+		Configuration: configuration,
 	}
 }
 
@@ -496,7 +604,6 @@ func (r *APIResponseVAppRuntimeConfiguration) ToModel() types.ModelVAppRuntimeNe
 	model := types.ModelVAppRuntimeNetworkConfiguration{
 		FenceMode:                      r.FenceMode,
 		RetainNetInfoAcrossDeployments: r.RetainNetInfoAcrossDeployments,
-		IsDeployed:                     r.IsDeployed,
 		GuestVLANAllowed:               r.GuestVLANAllowed,
 		IPScopes:                       make([]types.ModelVAppRuntimeIPScope, 0),
 	}
@@ -552,7 +659,7 @@ func ToAPIResponseVAppNetworkConfigSection(model *types.ModelVAppRuntimeNetworkC
 }
 
 func toAPIResponseVAppNetworkConfig(model types.ModelVAppRuntimeNetworkConfig) APIResponseVAppNetworkConfig {
-	return APIResponseVAppNetworkConfig{NetworkID: model.ID, NetworkHREF: model.HREF, Description: model.Description, NetworkType: model.Type, NetworkName: model.NetworkName, Configuration: toAPIResponseVAppRuntimeConfiguration(model.Configuration)}
+	return APIResponseVAppNetworkConfig{NetworkID: model.ID, NetworkHREF: model.HREF, Description: model.Description, NetworkType: model.Type, NetworkName: model.NetworkName, Configuration: toAPIResponseVAppRuntimeConfiguration(model.Configuration), IsDeployed: model.Configuration.IsDeployed}
 }
 
 // ToAPIRequestUndeployVApp converts the public undeploy mode to the VMware XML payload.
@@ -571,7 +678,6 @@ func toAPIResponseVAppRuntimeConfiguration(model types.ModelVAppRuntimeNetworkCo
 	result := APIResponseVAppRuntimeConfiguration{
 		FenceMode:                      model.FenceMode,
 		RetainNetInfoAcrossDeployments: model.RetainNetInfoAcrossDeployments,
-		IsDeployed:                     model.IsDeployed,
 		GuestVLANAllowed:               model.GuestVLANAllowed,
 		IPScopes:                       nil,
 	}
