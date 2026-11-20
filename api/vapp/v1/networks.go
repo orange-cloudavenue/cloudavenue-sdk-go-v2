@@ -219,8 +219,7 @@ func patchRawVAppRuntimeConfiguration(dst *itypes.APIResponseVAppRuntimeConfigur
 	dst.FenceMode = src.FenceMode
 	dst.RetainNetInfoAcrossDeployments = src.RetainNetInfoAcrossDeployments
 	dst.IsDeployed = src.IsDeployed
-	dst.IsShared = src.IsShared
-	dst.IsConnected = &src.IsConnected
+	dst.GuestVLANAllowed = src.GuestVLANAllowed
 	if src.ParentNetwork == nil {
 		dst.ParentNetwork = nil
 	} else {

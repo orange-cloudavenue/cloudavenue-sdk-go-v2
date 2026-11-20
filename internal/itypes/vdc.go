@@ -180,7 +180,7 @@ func (r *APIResponseGetVDC) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &wrapped); err != nil {
 		return err
 	}
-	if len(wrapped.VDC) > 0 && string(wrapped.VDC) != "null" {
+	if len(wrapped.VDC) > 0 && string(wrapped.VDC) != typeNull {
 		type response APIResponseGetVDC
 		var detail response
 		if err := json.Unmarshal(wrapped.VDC, &detail); err != nil {

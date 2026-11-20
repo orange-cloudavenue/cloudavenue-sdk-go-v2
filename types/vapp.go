@@ -106,8 +106,7 @@ type (
 		FenceMode                      string
 		RetainNetInfoAcrossDeployments *bool
 		IsDeployed                     *bool
-		IsShared                       *bool
-		IsConnected                    bool
+		GuestVLANAllowed               *bool
 		IPScopes                       []ModelVAppRuntimeIPScope
 	}
 
@@ -128,6 +127,34 @@ type (
 		StartAddress string
 		EndAddress   string
 	}
+)
+
+// VApp status semantic tokens, normalized by the SDK from the deprecated
+// numeric wire encoding. Values follow the VMware vApp status enumeration.
+const (
+	VAppStatusFailedCreation        = "FAILED_CREATION"
+	VAppStatusUnresolved            = "UNRESOLVED"
+	VAppStatusResolved              = "RESOLVED"
+	VAppStatusDeployed              = "DEPLOYED"
+	VAppStatusSuspended             = "SUSPENDED"
+	VAppStatusPoweredOn             = "POWERED_ON"
+	VAppStatusWaitingForInput       = "WAITING_FOR_INPUT"
+	VAppStatusUnknown               = "UNKNOWN"
+	VAppStatusUnrecognized          = "UNRECOGNIZED"
+	VAppStatusPoweredOff            = "POWERED_OFF"
+	VAppStatusInconsistentState     = "INCONSISTENT_STATE"
+	VAppStatusMixed                 = "MIXED"
+	VAppStatusDescriptorPending     = "DESCRIPTOR_PENDING"
+	VAppStatusCopyingContents       = "COPYING_CONTENTS"
+	VAppStatusDiskContentsPending   = "DISK_CONTENTS_PENDING"
+	VAppStatusQuarantined           = "QUARANTINED"
+	VAppStatusQuarantineExpired     = "QUARANTINE_EXPIRED"
+	VAppStatusRejected              = "REJECTED"
+	VAppStatusTransferTimeout       = "TRANSFER_TIMEOUT"
+	VAppStatusVAppUndeployed        = "VAPP_UNDEPLOYED"
+	VAppStatusVAppPartiallyDeployed = "VAPP_PARTIALLY_DEPLOYED"
+	VAppStatusPartiallyPoweredOff   = "PARTIALLY_POWERED_OFF"
+	VAppStatusPartiallySuspended    = "PARTIALLY_SUSPENDED"
 )
 
 type (

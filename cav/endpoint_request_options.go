@@ -10,7 +10,9 @@
 package cav
 
 import (
+	"encoding/xml"
 	"reflect"
+	"strings"
 
 	"github.com/orange-cloudavenue/common-go/validators"
 	"resty.dev/v3"
@@ -123,6 +125,19 @@ func SetBody(body any) EndpointRequestOption {
 		// Validate the body
 		if err := validators.New().Validate.Struct(body); err != nil {
 			return errors.Newf("body validation failed for endpoint %s %s: %v", endpoint.Name, endpoint.Method, err)
+		}
+
+		// resty only encodes a struct as XML when Content-Type is exactly
+		// "application/xml". Cloud Director rejects that generic media type
+		// and requires the vendor "+xml" type, which resty does not
+		// recognize; marshal here so the body is sent verbatim.
+		if strings.Contains(endpoint.Headers["Content-Type"], "+xml") {
+			payload, err := xml.Marshal(body)
+			if err != nil {
+				return errors.Newf("marshal XML body for endpoint %s %s: %w", endpoint.Name, endpoint.Method, err)
+			}
+			req.SetBody(payload)
+			return nil
 		}
 
 		req.SetBody(body)

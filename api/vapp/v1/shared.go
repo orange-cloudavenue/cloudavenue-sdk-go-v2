@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"net/url"
 	"path"
+	"strings"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 )
@@ -45,6 +46,12 @@ func extractVMwareJob(resp *cav.Response, action string) (cav.Job, error) {
 	jobID := path.Base(parsed.Path)
 	if jobID == "" || jobID == "." || jobID == "/" {
 		return cav.Job{}, fmt.Errorf("unexpected %s response: missing job id in location %q", action, location)
+	}
+
+	// Synchronous creation: the Location points at the vApp entity (vapp-uuid)
+	// rather than a task, so there is nothing to poll.
+	if strings.HasPrefix(jobID, "vapp-") {
+		return cav.Job{Status: cav.JobSuccess, HREF: location}, nil
 	}
 
 	return cav.Job{ID: jobID}, nil

@@ -10,7 +10,11 @@
 package iendpoints
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/orange-cloudavenue/common-go/extractor"
+	"github.com/orange-cloudavenue/common-go/urn"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
@@ -145,6 +149,7 @@ func init() {
 		Description:      "Get VApp",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
+		Headers:          map[string]string{headerAccept: headerVAppJSON},
 		PathTemplate:     pathVAppByID,
 		PathParams: []cav.PathParam{
 			{
@@ -152,7 +157,7 @@ func init() {
 				Description:   descVAppID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVApp),
-				TransformFunc: extractor.ExtractUUID,
+				TransformFunc: toLegacyVAppID,
 			},
 		},
 		ResponseType: itypes.APIResponseGetVApp{},
@@ -165,7 +170,7 @@ func init() {
 		Description:      "Get vApp ACL",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
+		Headers:          map[string]string{headerAccept: headerVAppControlAccessXML, headerContentType: headerVAppControlAccessXML},
 		PathTemplate:     pathVAppControlAccess,
 		PathParams:       vAppActionPathParams(),
 		ResponseType:     itypes.ControlAccessParams{},
@@ -178,7 +183,7 @@ func init() {
 		Description:      "Set vApp ACL",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
+		Headers:          map[string]string{headerAccept: headerVAppControlAccessXML, headerContentType: headerVAppControlAccessXML},
 		PathTemplate:     pathVAppControlAccessAction,
 		PathParams:       vAppActionPathParams(),
 		BodyRequestType:  itypes.ControlAccessParams{},
@@ -192,7 +197,7 @@ func init() {
 		Description:      "Get the runtime network configuration section of a VApp",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{headerAccept: headerXML},
+		Headers:          map[string]string{headerAccept: headerVAppNetworkSectionXML},
 		PathTemplate:     pathVAppNetworkConfigSection,
 		PathParams:       vAppActionPathParams(),
 		ResponseType:     itypes.APIResponseVAppNetworkConfigSection{},
@@ -205,7 +210,7 @@ func init() {
 		Description:      "Replace the runtime network configuration section of a VApp",
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
+		Headers:          map[string]string{headerAccept: headerXMLAny, headerContentType: headerVAppNetworkSectionXML},
 		PathTemplate:     pathVAppNetworkConfigSection,
 		PathParams:       vAppActionPathParams(),
 		BodyRequestType:  itypes.APIResponseVAppNetworkConfigSection{},
@@ -219,7 +224,7 @@ func init() {
 		Description:      "Compose a new VApp",
 		Method:           cav.MethodPOST,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{headerAccept: headerXML, headerContentType: headerXML},
+		Headers:          map[string]string{headerAccept: headerXMLAny, headerContentType: headerComposeVAppParamsXML},
 		PathTemplate:     pathVAppCompose,
 		PathParams: []cav.PathParam{
 			{
@@ -272,7 +277,7 @@ func init() {
 				Description:   descVAppID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVApp),
-				TransformFunc: extractor.ExtractUUID,
+				TransformFunc: toLegacyVAppID,
 			},
 		},
 		BodyRequestType: itypes.APIRequestUpdateVApp{},
@@ -286,6 +291,7 @@ func init() {
 		Description:      "Delete an existing VApp",
 		Method:           cav.MethodDELETE,
 		Backend:          cav.BackendVMware,
+		Headers:          map[string]string{headerAccept: headerXMLAny},
 		PathTemplate:     pathVAppByID,
 		PathParams: []cav.PathParam{
 			{
@@ -293,7 +299,7 @@ func init() {
 				Description:   descVAppID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVApp),
-				TransformFunc: extractor.ExtractUUID,
+				TransformFunc: toLegacyVAppID,
 			},
 		},
 		ResponseType: cav.Job{},
@@ -313,7 +319,7 @@ func init() {
 				Description:   descVAppID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVApp),
-				TransformFunc: extractor.ExtractUUID,
+				TransformFunc: toLegacyVAppID,
 			},
 		},
 		ResponseType: cav.Job{},
@@ -333,10 +339,10 @@ func init() {
 				Description:   descVAppID,
 				Required:      true,
 				ValidatorFunc: validateRule(urnVApp),
-				TransformFunc: extractor.ExtractUUID,
+				TransformFunc: toLegacyVAppID,
 			},
 		},
-		Headers:         map[string]string{headerAccept: headerXML, headerContentType: headerXML},
+		Headers:         map[string]string{headerAccept: headerXMLAny, headerContentType: headerUndeployVAppParamsXML},
 		BodyRequestType: itypes.APIRequestUndeployVApp{},
 		ResponseType:    cav.Job{},
 	}.Register()
@@ -415,7 +421,25 @@ func vAppActionPathParams() []cav.PathParam {
 			Description:   descVAppID,
 			Required:      true,
 			ValidatorFunc: validateRule(urnVApp),
-			TransformFunc: extractor.ExtractUUID,
+			TransformFunc: toLegacyVAppID,
 		},
 	}
+}
+
+// toLegacyVAppID converts a VApp URN or bare UUID to the legacy
+// "/api/vApp/vapp-<uuid>" path identifier. Cloud Director answers the bare
+// UUID form with a misleading 403 "Access is forbidden".
+func toLegacyVAppID(value string) (string, error) {
+	if strings.HasPrefix(value, "vapp-") && urn.IsUUIDV4(strings.TrimPrefix(value, "vapp-")) {
+		return value, nil
+	}
+	uuid := value
+	switch {
+	case urn.IsVAPP(value):
+		uuid = urn.ExtractUUID(value)
+	case urn.IsUUIDV4(value):
+	default:
+		return "", fmt.Errorf("expected a vApp URN or bare UUID, got %q", value)
+	}
+	return "vapp-" + uuid, nil
 }

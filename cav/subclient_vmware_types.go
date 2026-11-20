@@ -22,8 +22,10 @@ type (
 	// This structure is used to parse error responses from the VMware API.
 	vmwareError struct {
 		// DOC API : DocURLVMware
-		Message       string `json:"message"`
-		StatusCode    int    `json:"majorErrorCode"`
-		StatusMessage string `json:"minorErrorCode"`
+		// Legacy /api errors are XML: message and codes are Error attributes.
+		XMLName       struct{} `xml:"Error"`
+		Message       string   `json:"message" xml:"message,attr"`
+		StatusCode    int      `json:"majorErrorCode" xml:"majorErrorCode,attr"`
+		StatusMessage string   `json:"minorErrorCode" xml:"minorErrorCode,attr"`
 	}
 )

@@ -28,6 +28,14 @@ const (
 	// subclient default that may be overridden by an endpoint.
 	headerXML  = "application/xml;version=39.1"
 	headerJSON = "application/json;version=39.1"
+	// Vendor media types required by the legacy /api entity endpoints: the
+	// generic application/xml and application/json accepts are rejected with
+	// HTTP 406 by Cloud Director.
+	headerVAppJSON              = "application/vnd.vmware.vcloud.vApp+json;version=39.1"
+	headerVAppNetworkSectionXML = "application/vnd.vmware.vcloud.networkConfigSection+xml;version=39.1"
+	// headerVAppControlAccessXML is the vApp ACL media type: the generic XML
+	// accept is rejected with HTTP 406 by Cloud Director.
+	headerVAppControlAccessXML = "application/vnd.vmware.vcloud.controlAccess+xml;version=39.1"
 	// headerXMLAdminUser is the admin user media type: the admin user record
 	// rejects the generic XML accept with HTTP 406.
 	headerXMLAdminUser = "application/vnd.vmware.admin.user+xml;version=39.1"
@@ -40,6 +48,12 @@ const (
 	// headerInstantiateParamsXML is the mandatory request media type of the
 	// instantiateVAppTemplate action; the generic XML content type yields 415.
 	headerInstantiateParamsXML = "application/vnd.vmware.vcloud.instantiateVAppTemplateParams+xml;version=39.1"
+	// headerComposeVAppParamsXML is the mandatory request media type of the
+	// composeVApp action; the generic XML content type yields 415.
+	headerComposeVAppParamsXML = "application/vnd.vmware.vcloud.composeVAppParams+xml;version=39.1"
+	// headerUndeployVAppParamsXML is the mandatory request media type of the
+	// undeploy action; the generic XML content type yields 415.
+	headerUndeployVAppParamsXML = "application/vnd.vmware.vcloud.undeployVAppParams+xml;version=39.1"
 	// headerProductSectionsJSON is the productSections media type: the generic
 	// JSON accept/content type yields 406 (GET) / 415 (PUT).
 	headerProductSectionsJSON = "application/vnd.vmware.vcloud.productSections+json;version=39.1"

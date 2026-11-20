@@ -9,6 +9,8 @@
 
 package itypes
 
+const typeNull = "null"
+
 type (
 	APIObjectReference struct {
 		ID   string `json:"id"`   // The ID of the object.

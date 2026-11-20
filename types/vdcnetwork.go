@@ -9,6 +9,8 @@
 
 package types
 
+import "fmt"
+
 const (
 	VDCNetworkTypeRouted   = "NAT_ROUTED"
 	VDCNetworkTypeIsolated = "ISOLATED"
@@ -47,10 +49,30 @@ type (
 	// * List
 	ParamsListVDCNetwork struct {
 		// VDCGroupID is the ID of the Vdc Group owning the Org VDC Networks.
+		// TODO: to be merged with OwnerID
 		VDCGroupID string
 
 		// VDCGroupName is the name of the Vdc Group owning the Org VDC Networks.
+		// TODO: to be merged with OwnerName
 		VDCGroupName string
+
+		OwnerName string `documentation:"Name used to filter the Owner (VDC)"`
+		OwnerID   string `documentation:"ID used to filter Org VDC Networks by ownerRef.id"`
+	}
+
+	// * Type-agnostic lookup (routed or isolated, VDC or VDCGroup owner)
+	ParamsGetVDCNetwork struct {
+		// ID is the unique identifier of the Org VDC Network.
+		ID string
+
+		// Name is the name of the Org VDC Network.
+		Name string
+
+		// OwnerID is the ID of the owner (VDC or VDCGroup) of the Org VDC Network.
+		OwnerID string
+
+		// OwnerName is the name of the owner (VDC) of the Org VDC Network.
+		OwnerName string
 	}
 
 	// * Isolated networks
@@ -206,6 +228,7 @@ type (
 		ID          string `documentation:"ID of the Org VDC Network"`
 		Name        string `documentation:"Name of the Org VDC Network"`
 		Description string `documentation:"Description of the Org VDC Network"`
+		HREF        string `documentation:"Legacy HREF of the Org VDC Network"`
 		Status      string `documentation:"Status of the Org VDC Network"`
 		NetworkType string `documentation:"Type of the Org VDC Network (NAT_ROUTED or ISOLATED)"`
 
@@ -271,3 +294,24 @@ type (
 		EndAddress   string `documentation:"Last IP address in the DHCP pool"`
 	}
 )
+
+// Validate checks ParamsGetVDCNetwork structural constraints.
+func (p ParamsGetVDCNetwork) Validate() error {
+	if p.ID == "" && p.Name == "" {
+		return fmt.Errorf("missing required parameters")
+	}
+	if p.ID == "" && p.OwnerID == "" && p.OwnerName == "" {
+		return fmt.Errorf("owner id or owner name is required when looking up an Org VDC Network by name")
+	}
+	return nil
+}
+
+// VAppParentNetworkReference builds the reference consumed by vApp runtime
+// networks (Configuration.ParentNetwork). Only the attributes the API actually
+// returns are populated: the legacy HREF, the cloudapi URN and the name.
+func (m ModelGetVDCNetwork) VAppParentNetworkReference() *VAppReference {
+	if m.ID == "" && m.HREF == "" && m.Name == "" {
+		return nil
+	}
+	return &VAppReference{HREF: m.HREF, ID: m.ID, Name: m.Name}
+}

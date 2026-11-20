@@ -203,7 +203,6 @@ func TestGetVAppNetworkConfig(t *testing.T) {
 
 	ms.CleanResponse(endpoints.GetVAppNetworkConfigSection())
 	ms.SetResponseFunc(endpoints.GetVAppNetworkConfigSection(), func(w http.ResponseWriter, r *http.Request) {
-		connected := true
 		w.Header().Set("Content-Type", "application/xml")
 		assert.NoError(t, xml.NewEncoder(w).Encode(&itypes.APIResponseVAppNetworkConfigSection{
 			XMLNS: "http://www.vmware.com/vcloud/v1.5",
@@ -216,17 +215,14 @@ func TestGetVAppNetworkConfig(t *testing.T) {
 				NetworkType: "application/vnd.vmware.vcloud.vAppNetwork+xml",
 				NetworkName: "isolated-net",
 				Configuration: itypes.APIResponseVAppRuntimeConfiguration{
-					FenceMode:   "isolated",
-					IsConnected: &connected,
-					IPScopes: &itypes.APIResponseVAppRuntimeIPScopes{
-						IPScope: []itypes.APIResponseVAppRuntimeIPScope{{
-							Gateway:   "192.168.1.1",
-							Netmask:   "255.255.255.0",
-							DNS1:      "8.8.8.8",
-							DNSSuffix: "example.org",
-							IPRanges:  itypes.APIResponseVAppRuntimeIPRanges{IPRange: []itypes.APIResponseVAppRuntimeIPRange{{StartAddress: "192.168.1.10", EndAddress: "192.168.1.20"}}},
-						}},
-					},
+					FenceMode: "isolated",
+					IPScopes: &itypes.APIResponseVAppRuntimeIPScopes{IPScope: []itypes.APIResponseVAppRuntimeIPScope{{
+						Gateway:   "192.168.1.1",
+						Netmask:   "255.255.255.0",
+						DNS1:      "8.8.8.8",
+						DNSSuffix: "example.org",
+						IPRanges:  itypes.APIResponseVAppRuntimeIPRanges{IPRange: []itypes.APIResponseVAppRuntimeIPRange{{StartAddress: "192.168.1.10", EndAddress: "192.168.1.20"}}},
+					}}},
 				},
 			}},
 		}))
@@ -381,7 +377,7 @@ func TestRuntimeVAppNetworkMutations(t *testing.T) {
 			ms.SetResponseFunc(endpoints.UpdateVAppNetworkConfigSection(), func(w http.ResponseWriter, r *http.Request) {
 				putCalled = true
 				var body itypes.APIResponseVAppNetworkConfigSection
-				assert.Equal(t, "application/xml;version=39.1", r.Header.Get("Content-Type"))
+				assert.Equal(t, "application/vnd.vmware.vcloud.networkConfigSection+xml;version=39.1", r.Header.Get("Content-Type"))
 				assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
 				if tt.expectPUT != nil {
 					tt.expectPUT(t, &body)
@@ -411,7 +407,6 @@ func TestRuntimeVAppNetworkMutations(t *testing.T) {
 }
 
 func TestRuntimeNetworkFalseFidelity(t *testing.T) {
-	connected := false
 	inherited := false
 	section := &itypes.APIResponseVAppNetworkConfigSection{
 		XMLNS: "http://www.vmware.com/vcloud/v1.5",
@@ -420,8 +415,7 @@ func TestRuntimeNetworkFalseFidelity(t *testing.T) {
 		NetworkConfig: []itypes.APIResponseVAppNetworkConfig{{
 			NetworkName: "existing-net",
 			Configuration: itypes.APIResponseVAppRuntimeConfiguration{
-				FenceMode:   "isolated",
-				IsConnected: &connected,
+				FenceMode: "isolated",
 				IPScopes: &itypes.APIResponseVAppRuntimeIPScopes{IPScope: []itypes.APIResponseVAppRuntimeIPScope{{
 					IsInherited: &inherited,
 					Gateway:     "192.168.1.1",
@@ -432,11 +426,7 @@ func TestRuntimeNetworkFalseFidelity(t *testing.T) {
 	}
 
 	model := section.ToModel()
-	assert.False(t, model.NetworkConfig[0].Configuration.IsConnected)
 	roundTrip := itypes.ToAPIResponseVAppNetworkConfigSection(model)
-	if assert.NotNil(t, roundTrip.NetworkConfig[0].Configuration.IsConnected) {
-		assert.False(t, *roundTrip.NetworkConfig[0].Configuration.IsConnected)
-	}
 	if assert.NotNil(t, roundTrip.NetworkConfig[0].Configuration.IPScopes) && assert.Len(t, roundTrip.NetworkConfig[0].Configuration.IPScopes.IPScope, 1) {
 		if assert.NotNil(t, roundTrip.NetworkConfig[0].Configuration.IPScopes.IPScope[0].IsInherited) {
 			assert.False(t, *roundTrip.NetworkConfig[0].Configuration.IPScopes.IPScope[0].IsInherited)
@@ -531,20 +521,15 @@ func TestVAppGuestPropertiesAllowEmptySection(t *testing.T) {
 
 func TestUndeployVAppModes(t *testing.T) {
 	tests := []struct {
-		name           string
-		mode           types.VAppUndeployMode
-		expectAction   string
-		expectPowerOff *bool
+		name         string
+		mode         types.VAppUndeployMode
+		expectAction string
 	}{
-		{name: "default power off", mode: "", expectAction: "", expectPowerOff: new(bool)},
-		{name: "explicit power off", mode: types.VAppUndeployModePowerOff, expectAction: "", expectPowerOff: new(bool)},
+		{name: "default power off", mode: "", expectAction: "powerOff"},
+		{name: "explicit power off", mode: types.VAppUndeployModePowerOff, expectAction: "powerOff"},
 		{name: "suspend", mode: types.VAppUndeployModeSuspend, expectAction: "suspend"},
-		{name: "force", mode: types.VAppUndeployModeForce, expectAction: "force", expectPowerOff: new(bool)},
+		{name: "force", mode: types.VAppUndeployModeForce, expectAction: "force"},
 	}
-
-	*tests[0].expectPowerOff = true
-	*tests[1].expectPowerOff = true
-	*tests[3].expectPowerOff = true
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -552,11 +537,10 @@ func TestUndeployVAppModes(t *testing.T) {
 			ms.CleanResponse(endpoints.UndeployVApp())
 			ms.SetResponseFunc(endpoints.UndeployVApp(), func(w http.ResponseWriter, r *http.Request) {
 				var body itypes.APIRequestUndeployVApp
-				assert.Equal(t, "application/xml;version=39.1", r.Header.Get("Content-Type"))
+				assert.Equal(t, "application/vnd.vmware.vcloud.undeployVAppParams+xml;version=39.1", r.Header.Get("Content-Type"))
 				assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
 				assert.Equal(t, "http://www.vmware.com/vcloud/v1.5", body.XMLNS)
 				assert.Equal(t, tt.expectAction, body.UndeployAction)
-				assert.Equal(t, tt.expectPowerOff, body.UndeployPowerOff)
 				w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
 				w.WriteHeader(http.StatusAccepted)
 			})
@@ -577,8 +561,7 @@ func isolatedRuntimeNetwork(name string) types.ModelVAppRuntimeNetworkConfig {
 	return types.ModelVAppRuntimeNetworkConfig{
 		NetworkName: name,
 		Configuration: types.ModelVAppRuntimeNetworkConfiguration{
-			FenceMode:   "isolated",
-			IsConnected: true,
+			FenceMode: "isolated",
 			IPScopes: []types.ModelVAppRuntimeIPScope{{
 				Gateway:      "192.168.1.1",
 				Netmask:      "255.255.255.0",
@@ -642,7 +625,6 @@ func toRawRuntimeNetwork(model types.ModelVAppRuntimeNetworkConfig) itypes.APIRe
 }
 
 func richRuntimeNetwork(name, gateway string) itypes.APIResponseVAppNetworkConfig {
-	connected := true
 	return itypes.APIResponseVAppNetworkConfig{
 		NetworkID:   "urn:vcloud:vappNetwork:" + name,
 		NetworkHREF: "https://example.com/api/vAppNetwork/" + name,
@@ -650,8 +632,7 @@ func richRuntimeNetwork(name, gateway string) itypes.APIResponseVAppNetworkConfi
 		NetworkType: "application/vnd.vmware.vcloud.vAppNetwork+xml",
 		NetworkName: name,
 		Configuration: itypes.APIResponseVAppRuntimeConfiguration{
-			FenceMode:   "isolated",
-			IsConnected: &connected,
+			FenceMode: "isolated",
 			Features: &itypes.APIResponseVAppRuntimeFeatures{
 				FirewallService: &itypes.APIResponseVAppRuntimeInnerXML{InnerXML: "<IsEnabled>true</IsEnabled>"},
 			},
@@ -726,13 +707,23 @@ func TestVAppLifecycleActionsRequireID(t *testing.T) {
 	}
 }
 
-func TestComposeVAppRequiresSource(t *testing.T) {
-	client, _ := newClient(t)
-	_, err := client.ComposeVApp(t.Context(), types.ParamsComposeVApp{
+func TestComposeVAppAllowsEmptyVApp(t *testing.T) {
+	client, ms := newClient(t)
+
+	ms.CleanResponse(endpoints.ComposeVApp())
+	status := http.StatusAccepted
+	ms.SetResponse(endpoints.ComposeVApp(), nil, &status)
+	ms.CleanResponse(endpoints.GetVApp())
+	ms.SetResponse(endpoints.GetVApp(), &itypes.APIResponseGetVApp{ID: testVAppID, Name: "test-vapp"}, nil)
+	ms.CleanResponse(endpoints.ListVApp())
+	ms.SetResponse(endpoints.ListVApp(), &itypes.APIResponseListVApp{Records: []itypes.APIResponseListVAppRecord{{ID: testVAppID, Name: "test-vapp"}}}, nil)
+
+	resp, err := client.ComposeVApp(t.Context(), types.ParamsComposeVApp{
 		Name:  "test-vapp",
 		VDCID: "urn:vcloud:vdc:12345678-1234-4b8d-89ab-123456789012",
 	})
-	assert.Error(t, err)
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
 }
 
 func TestInstantiateVAppTemplateRequiresTemplate(t *testing.T) {
