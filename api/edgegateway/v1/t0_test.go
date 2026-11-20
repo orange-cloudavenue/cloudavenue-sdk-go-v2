@@ -80,6 +80,8 @@ func Test_ListT0(t *testing.T) {
 }
 
 func Test_GetT0(t *testing.T) {
+	edgeGatewayName := generator.MustGenerate("{resource_name:edgegateway}")
+
 	tests := []struct {
 		name   string
 		params types.ParamsGetT0
@@ -96,9 +98,9 @@ func Test_GetT0(t *testing.T) {
 				T0Name: "prvrf01eocb0001234allsp01",
 			},
 			mockResponse: &itypes.APIResponseT0{
-				Type:       "tier-0-vrf",
-				Name:       "prvrf01eocb0001234allsp01",
-				Properties: itypes.APIResponseT0Properties{ClassOfService: "SHARED_STANDARD"},
+				Tier0VRF:      "prvrf01eocb0001234allsp01",
+				Tier0Provider: "pr01e02t0sp01",
+				ClassService:  "VRF_STANDARD",
 			},
 			mockResponseStatus: 200,
 			expectedErr:        false,
@@ -130,7 +132,7 @@ func Test_GetT0(t *testing.T) {
 		{
 			name: "Get by EdgeGateway Name",
 			params: types.ParamsGetT0{
-				EdgegatewayName: generator.MustGenerate("{resource_name:edgegateway}"),
+				EdgegatewayName: edgeGatewayName,
 			},
 			mockResponse: &itypes.APIResponseNetworkServices{
 				{
@@ -138,7 +140,7 @@ func Test_GetT0(t *testing.T) {
 					Name: "prvrf01eocb0001234allsp01",
 					Children: []itypes.APIResponseNetworkServicesChildren{{
 						Type: "edge-gateway",
-						Name: "test-edgegateway-name",
+						Name: edgeGatewayName,
 					}},
 				},
 			},
@@ -223,7 +225,7 @@ func Test_GetT0(t *testing.T) {
 			epServices := endpoints.GetEdgeGatewayServices()
 			if tt.mockResponse != nil || tt.mockResponseStatus != 0 {
 				switch tt.mockResponse.(type) {
-				case *itypes.APIResponseT0, *itypes.APIResponseT0s:
+				case *itypes.APIResponseT0:
 					ms.CleanResponse(epGet)
 					ms.SetResponse(epGet, tt.mockResponse, &tt.mockResponseStatus)
 				case *itypes.APIResponseNetworkServices:
@@ -238,30 +240,8 @@ func Test_GetT0(t *testing.T) {
 
 			if tt.params.EdgegatewayID != "" || tt.params.EdgegatewayName != "" {
 				detail := &itypes.APIResponseT0{
-					Type:       "tier-0-vrf",
-					Name:       "prvrf01eocb0001234allsp01",
-					Properties: itypes.APIResponseT0Properties{ClassOfService: "SHARED_STANDARD"},
-					Children: []itypes.APIResponseT0Children{{
-						Type: "edge-gateway",
-						Name: func() string {
-							if tt.params.EdgegatewayName != "" {
-								return tt.params.EdgegatewayName
-							}
-							return generator.MustGenerate("{resource_name:edgegateway}")
-						}(),
-						Properties: struct {
-							RateLimit int    `json:"rateLimit,omitempty" fake:"5"`
-							EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
-						}{
-							RateLimit: 5,
-							EdgeUUID: func() string {
-								if tt.params.EdgegatewayID != "" {
-									return tt.params.EdgegatewayID
-								}
-								return generator.MustGenerate("{urn:edgegateway}")
-							}(),
-						},
-					}},
+					Tier0VRF:     "prvrf01eocb0001234allsp01",
+					ClassService: "VRF_STANDARD",
 				}
 				status := http.StatusOK
 				ms.CleanResponse(epGet)

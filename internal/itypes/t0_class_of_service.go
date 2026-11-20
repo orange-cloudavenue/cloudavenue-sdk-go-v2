@@ -28,25 +28,25 @@ type (
 
 // Source : https://cloud.orange-business.com/en/offres/infrastructure-iaas/cloud-avenue/wiki-cloud-avenue/services/network/
 var classOfServices = map[string]classOfService{
-	"SHARED_STANDARD": {
+	"VRF_STANDARD": {
 		MaxBandwidth:            300,
 		MaxEdgeGateways:         4,
 		MaxEdgeGatewayBandwidth: []int{5, 25, 50, 75, 100, 150, 200, 250, 300},
 		AllowUnlimited:          false,
 	},
-	"SHARED_PREMIUM": {
+	"VRF_PREMIUM": {
 		MaxBandwidth:            1000,
 		MaxEdgeGateways:         8,
 		MaxEdgeGatewayBandwidth: []int{5, 25, 50, 75, 100, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000},
 		AllowUnlimited:          false,
 	},
-	"DEDICATED_MEDIUM": {
+	"VRF_DEDICATED_MEDIUM": {
 		MaxBandwidth:            3500,
 		MaxEdgeGateways:         6,
 		MaxEdgeGatewayBandwidth: []int{5, 25, 50, 75, 100, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000, 2000},
 		AllowUnlimited:          true, // Unlimited bandwidth is allowed for edge gateway with this class of service.
 	},
-	"DEDICATED_LARGE": {
+	"VRF_DEDICATED_LARGE": {
 		MaxBandwidth:            10000,
 		MaxEdgeGateways:         12,
 		MaxEdgeGatewayBandwidth: []int{5, 25, 50, 75, 100, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000, 2000, 3000, 4000, 5000, 6000},
