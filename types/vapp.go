@@ -720,10 +720,18 @@ func (m ModelVAppRuntimeNetworkConfig) Validate() error {
 }
 
 // Validate checks guest properties structural constraints.
+// A property key must be unique across all sections.
 func (m ModelVAppGuestProperties) Validate() error {
+	keys := make(map[string]struct{})
 	for _, section := range m.Sections {
 		if err := section.Validate(); err != nil {
 			return err
+		}
+		for key := range section.Properties {
+			if _, dup := keys[key]; dup {
+				return fmt.Errorf("guest property %q is defined in several sections", key)
+			}
+			keys[key] = struct{}{}
 		}
 	}
 	return nil

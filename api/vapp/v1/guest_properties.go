@@ -90,7 +90,8 @@ func (c *Client) GetVAppGuestProperties(ctx context.Context, params types.Params
 	return &model, nil
 }
 
-// UpdateVAppGuestProperties replaces the ProductSection guest properties for a VApp.
+// UpdateVAppGuestProperties replaces the guest properties of a VApp: the properties that are not
+// in the given model are removed, the other elements of the ProductSections are kept.
 func (c *Client) UpdateVAppGuestProperties(ctx context.Context, params types.ParamsUpdateVAppGuestProperties) (*types.ModelVAppGuestProperties, error) {
 	if err := params.Validate(); err != nil {
 		return nil, fmt.Errorf("%s: validate: %w", opUpdateVAppGuestProperties, err)
@@ -101,7 +102,17 @@ func (c *Client) UpdateVAppGuestProperties(ctx context.Context, params types.Par
 		return nil, fmt.Errorf("%s: %w", opUpdateVAppGuestProperties, err)
 	}
 
-	body := itypes.ToAPIProductSectionList(params.GuestProperties)
+	// Read the current list and change only what the model carries: the elements of the
+	// ProductSection schema that are not modeled (password, qualifiers, categories...) are kept.
+	// The GET and the PUT are not protected against a concurrent update (the API gives no
+	// ETag to send back): a change made between the two is overwritten. The provider
+	// serializes the updates of a vApp with its own lock.
+	current, err := cav.Execute(ctx, c.c, getVAppProductSectionsOp, getVAppByIDParams{ID: vappID})
+	if err != nil {
+		return nil, fmt.Errorf("%s: get current: %w", opUpdateVAppGuestProperties, err)
+	}
+
+	body := itypes.MergeProductSectionList(current, params.GuestProperties)
 	job, err := cav.Execute(ctx, c.c, updateVAppGuestPropertiesOp, updateVAppGuestPropertiesParams{ID: vappID, Body: body})
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", opUpdateVAppGuestProperties, err)
