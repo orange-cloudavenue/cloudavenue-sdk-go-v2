@@ -66,6 +66,9 @@ func TestAPIResponseGetVApp_RealPayload(t *testing.T) {
 	assert.Equal(t, 0, *model.DeploymentLeaseInSeconds)
 	require.NotNil(t, model.StorageLeaseInSeconds)
 	assert.Equal(t, 3600, *model.StorageLeaseInSeconds)
+
+	// Owner user href converted to a user URN
+	assert.Equal(t, "urn:vcloud:user:e05d2dcb-95f1-4af8-8166-9f8a16b6d8d3", model.Owner)
 }
 
 func TestAPIResponseGetVApp_TopLevelFieldsStillWork(t *testing.T) {
@@ -84,6 +87,12 @@ func TestAPIResponseGetVApp_TopLevelFieldsStillWork(t *testing.T) {
 	require.NotNil(t, model.DeploymentLeaseInSeconds)
 	assert.Equal(t, 100, *model.DeploymentLeaseInSeconds)
 	assert.Equal(t, "urn:vcloud:user:22222222-2222-4222-8222-222222222222", model.Owner)
+}
+
+func TestVAppOwnerRef_UserWithoutIDOrUUID(t *testing.T) {
+	var resp APIResponseGetVApp
+	require.NoError(t, json.Unmarshal([]byte(`{"owner": {"user": {"href": "https://console.example.org/api/admin/user/not-a-uuid"}}}`), &resp))
+	assert.Equal(t, "https://console.example.org/api/admin/user/not-a-uuid", string(resp.Owner))
 }
 
 func TestAPIResponseGetVDCStorageProfiles_ArrayOrObject(t *testing.T) {
