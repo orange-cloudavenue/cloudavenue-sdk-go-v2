@@ -11,13 +11,22 @@ package itypes
 
 import (
 	"encoding/xml"
+	"net/url"
+	"slices"
+	"strings"
+
+	"github.com/orange-cloudavenue/common-go/urn"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
 const (
-	localSubjectTypeOrgUser      = "urn:vcloud:orguser"
-	localSubjectTypeOrgGroup     = "urn:vcloud:orggroup"
+	localSubjectTypeOrgUser  = "urn:vcloud:orguser"
+	localSubjectTypeOrgGroup = "urn:vcloud:orggroup"
+	// Media types of the local subjects: the API rejects any other value of the
+	// Subject type attribute with HTTP 400 (go-vcloud-director sends the same).
+	LocalSubjectMediaTypeUser    = "application/vnd.vmware.admin.user+xml"
+	LocalSubjectMediaTypeGroup   = "application/vnd.vmware.admin.group+xml"
 	vappACLSubjectKindUser       = "user"
 	vappACLSubjectKindGroup      = "group"
 	vappACLSubjectSourceLocal    = "local"
@@ -121,6 +130,10 @@ func (r *ControlAccessParams) ToVAppACLModel() *types.ModelVAppACL {
 		if as.Subject != nil {
 			subject.SubjectName = as.Subject.Name
 			subject.SubjectKind = localSubjectKind(as.Subject.Type)
+			if subject.SubjectKind == "" {
+				// The API may answer with another type attribute: the href tells the kind.
+				subject.SubjectKind = localSubjectKindFromHREF(as.Subject.HREF)
+			}
 			subject.SubjectID = localSubjectID(as.Subject.HREF)
 			subject.SubjectSource = vappACLSubjectSourceLocal
 		}
@@ -143,45 +156,77 @@ func (r *ControlAccessParams) ToVAppACLModel() *types.ModelVAppACL {
 
 func localSubjectKind(subjectType string) string {
 	switch subjectType {
-	case localSubjectTypeOrgUser:
+	case LocalSubjectMediaTypeUser, localSubjectTypeOrgUser:
 		return vappACLSubjectKindUser
-	case localSubjectTypeOrgGroup:
+	case LocalSubjectMediaTypeGroup, localSubjectTypeOrgGroup:
 		return vappACLSubjectKindGroup
 	default:
 		return ""
 	}
 }
 
+// localSubjectPath is a subject href path (a legacy admin one or a cloudapi one, the
+// API answers with the latter) followed by the subject identifier.
+type localSubjectPath struct {
+	segments []string
+	kind     string
+	cloudapi bool
+}
+
+var localSubjectPaths = []localSubjectPath{
+	{segments: []string{"api", "admin", "user"}, kind: vappACLSubjectKindUser},
+	{segments: []string{"api", "admin", "group"}, kind: vappACLSubjectKindGroup},
+	{segments: []string{"cloudapi", "1.0.0", "users"}, kind: vappACLSubjectKindUser, cloudapi: true},
+	{segments: []string{"cloudapi", "1.0.0", "groups"}, kind: vappACLSubjectKindGroup, cloudapi: true},
+}
+
+// parseLocalSubjectHREF returns the kind and the orguser / orggroup URN of a subject href.
+// Both are empty when the path of the href is not a known subject path.
+func parseLocalSubjectHREF(href string) (kind, id string) {
+	u, err := url.Parse(href)
+	if err != nil {
+		return "", ""
+	}
+	path := strings.Split(strings.Trim(u.Path, "/"), "/")
+
+	for i := range path {
+		for _, p := range localSubjectPaths {
+			end := i + len(p.segments)
+			if end >= len(path) || path[end] == "" || !slices.Equal(path[i:end], p.segments) {
+				continue
+			}
+
+			prefix := localSubjectTypeOrgUser + ":"
+			if p.kind == vappACLSubjectKindGroup {
+				prefix = localSubjectTypeOrgGroup + ":"
+			}
+
+			// cloudapi hrefs end with the subject URN (urn:vcloud:user:<uuid>)
+			identifier := path[end]
+			if p.cloudapi {
+				identifier = urn.ExtractUUID(path[end])
+			}
+			if identifier == "" {
+				continue
+			}
+			return p.kind, prefix + identifier
+		}
+	}
+
+	return "", ""
+}
+
+// localSubjectKindFromHREF returns the subject kind from the subject href.
+func localSubjectKindFromHREF(href string) string {
+	kind, _ := parseLocalSubjectHREF(href)
+	return kind
+}
+
+// localSubjectID returns the orguser / orggroup URN of the subject href, or the href itself
+// when it is not a known subject path.
 func localSubjectID(href string) string {
-	if href == "" {
-		return ""
-	}
-	if id, ok := localSubjectURNFromHREF(href, "/api/admin/user/", "urn:vcloud:orguser:"); ok {
-		return id
-	}
-	if id, ok := localSubjectURNFromHREF(href, "/api/admin/group/", "urn:vcloud:orggroup:"); ok {
+	if _, id := parseLocalSubjectHREF(href); id != "" {
 		return id
 	}
 	return href
-}
-
-func localSubjectURNFromHREF(href, pathPrefix, urnPrefix string) (string, bool) {
-	idx := len(href) - len(pathPrefix)
-	if idx < 0 {
-		return "", false
-	}
-	pos := -1
-	for i := 0; i <= len(href)-len(pathPrefix); i++ {
-		if href[i:i+len(pathPrefix)] == pathPrefix {
-			pos = i
-		}
-	}
-	if pos < 0 {
-		return "", false
-	}
-	identifier := href[pos+len(pathPrefix):]
-	if identifier == "" {
-		return "", false
-	}
-	return urnPrefix + identifier, true
 }

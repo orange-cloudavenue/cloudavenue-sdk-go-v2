@@ -89,7 +89,7 @@ func TestGetVAppACLLocalHREFNormalization(t *testing.T) {
 						Subject: &itypes.LocalSubject{
 							HREF: "https://api.cloudavenue.org/api/admin/user/22222222-2222-2222-2222-222222222222",
 							Name: "user1",
-							Type: "urn:vcloud:orguser",
+							Type: "application/vnd.vmware.admin.user+xml",
 						},
 						AccessLevel: testVAppACLAccess,
 					},
@@ -97,7 +97,7 @@ func TestGetVAppACLLocalHREFNormalization(t *testing.T) {
 						Subject: &itypes.LocalSubject{
 							HREF: "https://api.cloudavenue.org/api/admin/group/33333333-3333-3333-3333-333333333333",
 							Name: "group1",
-							Type: "urn:vcloud:orggroup",
+							Type: "application/vnd.vmware.admin.group+xml",
 						},
 						AccessLevel: "ReadOnly",
 					},
@@ -136,10 +136,10 @@ func TestSetVAppACLLocalRoundTrip(t *testing.T) {
 		if assert.NotNil(t, body.AccessSettings) && assert.Len(t, body.AccessSettings.AccessSetting, 2) {
 			assert.Nil(t, body.AccessSettings.AccessSetting[0].ExternalSubject)
 			assert.Equal(t, apiEndpoint+"/api/admin/user/22222222-2222-2222-2222-222222222222", body.AccessSettings.AccessSetting[0].Subject.HREF)
-			assert.Equal(t, urnOrgUserType, body.AccessSettings.AccessSetting[0].Subject.Type)
+			assert.Equal(t, itypes.LocalSubjectMediaTypeUser, body.AccessSettings.AccessSetting[0].Subject.Type)
 			assert.Nil(t, body.AccessSettings.AccessSetting[1].ExternalSubject)
 			assert.Equal(t, apiEndpoint+"/api/admin/group/33333333-3333-3333-3333-333333333333", body.AccessSettings.AccessSetting[1].Subject.HREF)
-			assert.Equal(t, urnOrgGroupType, body.AccessSettings.AccessSetting[1].Subject.Type)
+			assert.Equal(t, itypes.LocalSubjectMediaTypeGroup, body.AccessSettings.AccessSetting[1].Subject.Type)
 		}
 
 		xmlResponse(w, itypes.ControlAccessParams{
@@ -227,7 +227,7 @@ func TestGetVAppACLMixedSubjectPreservation(t *testing.T) {
 					Subject: &itypes.LocalSubject{
 						HREF: "https://api.cloudavenue.org/api/admin/user/22222222-2222-2222-2222-222222222222",
 						Name: "user1",
-						Type: urnOrgUserType,
+						Type: itypes.LocalSubjectMediaTypeUser,
 					},
 					AccessLevel: testVAppACLAccess,
 				},

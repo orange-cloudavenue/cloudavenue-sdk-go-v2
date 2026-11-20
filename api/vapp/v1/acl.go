@@ -28,8 +28,6 @@ const (
 	pathAdminGroupByID           = "/api/admin/group/%s"
 	urnOrgUserPrefix             = "urn:vcloud:orguser:"
 	urnOrgGroupPrefix            = "urn:vcloud:orggroup:"
-	urnOrgUserType               = "urn:vcloud:orguser"
-	urnOrgGroupType              = "urn:vcloud:orggroup"
 	vappACLSubjectKindUser       = "user"
 	vappACLSubjectKindGroup      = "group"
 	vappACLSubjectSourceLocal    = "local"
@@ -185,9 +183,9 @@ func toVAppACLSubjectHREF(apiEndpoint string, subject types.ParamsSetVAppACLSubj
 func toVAppACLSubjectType(subjectKind string) string {
 	switch subjectKind {
 	case vappACLSubjectKindUser:
-		return urnOrgUserType
+		return itypes.LocalSubjectMediaTypeUser
 	case vappACLSubjectKindGroup:
-		return urnOrgGroupType
+		return itypes.LocalSubjectMediaTypeGroup
 	default:
 		return ""
 	}
