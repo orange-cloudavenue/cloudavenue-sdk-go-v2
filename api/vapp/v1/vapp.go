@@ -237,6 +237,10 @@ func (c *Client) GetVApp(ctx context.Context, params types.ParamsGetVApp) (*type
 		for _, vapp := range list.Records {
 			m := vapp.ToModel()
 			if m.Name == params.Name {
+				// The list record has no VDC nor lease: read the full vApp by ID.
+				if m.ID != "" {
+					return c.GetVApp(ctx, types.ParamsGetVApp{ID: m.ID})
+				}
 				return &m, nil
 			}
 		}
