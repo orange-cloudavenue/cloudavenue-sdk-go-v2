@@ -11,6 +11,8 @@ package itypes
 
 import (
 	"encoding/json"
+	"encoding/xml"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -117,4 +119,90 @@ func TestAPIResponseGetVDCStorageProfiles_ArrayOrObject(t *testing.T) {
 		require.NoError(t, json.Unmarshal([]byte(`null`), &r))
 		assert.Empty(t, r.StorageProfiles)
 	})
+}
+
+func TestAPIResponseVAppNetworkConfig_LinkChildGivesTheHREF(t *testing.T) {
+	const uuid = "44444444-4444-4444-8444-444444444444"
+
+	t.Run("no id nor href attribute: the Link href is used", func(t *testing.T) {
+		var section APIResponseVAppNetworkConfigSection
+		require.NoError(t, xml.Unmarshal([]byte(`<NetworkConfigSection xmlns="http://www.vmware.com/vcloud/v1.5">
+			<NetworkConfig networkName="net1">
+				<Link rel="repair" href="https://console.example.org/api/network/`+uuid+`"/>
+				<Configuration><FenceMode>isolated</FenceMode></Configuration>
+			</NetworkConfig>
+		</NetworkConfigSection>`), &section))
+
+		model := section.ToModel()
+		require.Len(t, model.NetworkConfig, 1)
+		assert.Equal(t, "net1", model.NetworkConfig[0].NetworkName)
+		assert.Empty(t, model.NetworkConfig[0].ID)
+		assert.Equal(t, "https://console.example.org/api/network/"+uuid, model.NetworkConfig[0].HREF)
+	})
+
+	t.Run("the href attribute wins over the Link", func(t *testing.T) {
+		var section APIResponseVAppNetworkConfigSection
+		require.NoError(t, xml.Unmarshal([]byte(`<NetworkConfigSection xmlns="http://www.vmware.com/vcloud/v1.5">
+			<NetworkConfig networkName="net1" href="https://console.example.org/api/vAppNetwork/`+uuid+`">
+				<Link rel="repair" href="https://console.example.org/api/other"/>
+			</NetworkConfig>
+		</NetworkConfigSection>`), &section))
+
+		assert.Equal(t, "https://console.example.org/api/vAppNetwork/"+uuid, section.ToModel().NetworkConfig[0].HREF)
+	})
+}
+
+// The section is read, modified and sent back as a whole: every element of the
+// NetworkConfigSection schema must survive the round trip, in the schema order
+// (VMware Cloud Director API, NetworkConfigSection).
+func TestAPIResponseVAppNetworkConfigSection_RoundTripKeepsSchemaElements(t *testing.T) {
+	const in = `<NetworkConfigSection xmlns="http://www.vmware.com/vcloud/v1.5">
+		<NetworkConfig networkName="net1">
+			<Link rel="repair" href="https://console.example.org/api/network/44444444-4444-4444-8444-444444444444"/>
+			<Description>desc</Description>
+			<Configuration>
+				<BackwardCompatibilityMode>false</BackwardCompatibilityMode>
+				<IpScopes><IpScope><IsInherited>false</IsInherited><Gateway>10.0.0.1</Gateway></IpScope></IpScopes>
+				<ParentNetwork href="https://console.example.org/api/network/55555555-5555-4555-8555-555555555555" name="org"/>
+				<FenceMode>bridged</FenceMode>
+				<RetainNetInfoAcrossDeployments>false</RetainNetInfoAcrossDeployments>
+				<SubInterface>false</SubInterface>
+				<DistributedInterface>false</DistributedInterface>
+				<ServiceInterface>false</ServiceInterface>
+				<GuestVlanAllowed>true</GuestVlanAllowed>
+				<Connected>true</Connected>
+				<DualStackNetwork>false</DualStackNetwork>
+			</Configuration>
+			<IsDeployed>true</IsDeployed>
+		</NetworkConfig>
+	</NetworkConfigSection>`
+
+	var section APIResponseVAppNetworkConfigSection
+	require.NoError(t, xml.Unmarshal([]byte(in), &section))
+
+	out, err := xml.Marshal(section)
+	require.NoError(t, err)
+
+	// Every element is present, in the schema order.
+	ordered := []string{
+		"<Link ", "<Description>", "<Configuration>",
+		"<BackwardCompatibilityMode>", "<IpScopes>", "<ParentNetwork ", "<FenceMode>",
+		"<RetainNetInfoAcrossDeployments>", "<SubInterface>", "<DistributedInterface>",
+		"<ServiceInterface>", "<GuestVlanAllowed>", "<Connected>", "<DualStackNetwork>",
+		"</Configuration>", "<IsDeployed>",
+	}
+	last := -1
+	for _, element := range ordered {
+		idx := strings.Index(string(out), element)
+		require.GreaterOrEqual(t, idx, 0, "missing %s in %s", element, out)
+		assert.Greater(t, idx, last, "%s is out of order in %s", element, out)
+		last = idx
+	}
+
+	// IsDeployed is read from NetworkConfig into the public model.
+	model := section.ToModel()
+	require.Len(t, model.NetworkConfig, 1)
+	if assert.NotNil(t, model.NetworkConfig[0].Configuration.IsDeployed) {
+		assert.True(t, *model.NetworkConfig[0].Configuration.IsDeployed)
+	}
 }

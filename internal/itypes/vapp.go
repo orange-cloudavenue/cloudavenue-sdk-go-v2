@@ -331,29 +331,53 @@ type APIResponseVAppNetworkConfigSection struct {
 }
 
 type APIResponseVAppNetworkConfig struct {
-	NetworkID     string                              `xml:"id,attr,omitempty"`
-	NetworkHREF   string                              `xml:"href,attr,omitempty"`
+	NetworkID   string `xml:"id,attr,omitempty"`
+	NetworkHREF string `xml:"href,attr,omitempty"`
+	// Link is the first child element of the network config. The id and href
+	// attributes are not always present on the real payload, the Link href is then
+	// the only place with the network UUID (go-vcloud-director reads it the same way).
+	Link          *APIResponseVAppNetworkLink         `xml:"Link,omitempty"`
 	Description   string                              `xml:"Description,omitempty"`
 	NetworkType   string                              `xml:"type,attr,omitempty"`
 	NetworkName   string                              `xml:"networkName,attr,omitempty"`
 	Configuration APIResponseVAppRuntimeConfiguration `xml:"Configuration"`
+	// IsDeployed is a child of NetworkConfig (after Configuration), not of Configuration.
+	IsDeployed *bool `xml:"IsDeployed,omitempty"`
+}
+
+// APIResponseVAppNetworkLink is the Link child of a vApp NetworkConfig.
+type APIResponseVAppNetworkLink struct {
+	Rel  string `xml:"rel,attr,omitempty"`
+	HREF string `xml:"href,attr,omitempty"`
+	Type string `xml:"type,attr,omitempty"`
 }
 
 type APIResponseVAppRuntimeConfiguration struct {
-	// Field order mirrors the XSD sequence of NetworkConfigurationType as
-	// enforced by Cloud Director (govcd types.NetworkConfiguration is the
-	// production reference): IpScopes first, then ParentNetwork, FenceMode,
-	// RetainNetInfoAcrossDeployments, Features, RouterInfo, GuestVlanAllowed
-	// and IsDeployed. Out-of-order elements are rejected with HTTP 400
-	// cvc-complex-type.2.4.a.
+	// Field order mirrors the XSD sequence of NetworkConfigurationType (VMware
+	// Cloud Director API, NetworkConfigSection): BackwardCompatibilityMode,
+	// IpScopes, ParentNetwork, FenceMode, RetainNetInfoAcrossDeployments,
+	// Features, SyslogServerSettings, RouterInfo, SubInterface,
+	// DistributedInterface, ServiceInterface, GuestVlanAllowed, Connected,
+	// DualStackNetwork. Out-of-order elements are rejected with HTTP 400
+	// cvc-complex-type.2.4.a. IsDeployed is NOT part of it: it is a child of
+	// NetworkConfig.
+	//
+	// The elements that are not exposed by the public model are kept here only so
+	// that the read-modify-write of the whole section does not drop them.
+	BackwardCompatibilityMode      *bool                             `xml:"BackwardCompatibilityMode,omitempty"`
 	IPScopes                       *APIResponseVAppRuntimeIPScopes   `xml:"IpScopes,omitempty"`
 	ParentNetwork                  *APIRequestVAppReference          `xml:"ParentNetwork,omitempty"`
 	FenceMode                      string                            `xml:"FenceMode,omitempty"`
 	RetainNetInfoAcrossDeployments *bool                             `xml:"RetainNetInfoAcrossDeployments,omitempty"`
 	Features                       *APIResponseVAppRuntimeFeatures   `xml:"Features,omitempty"`
+	SyslogServerSettings           *APIResponseVAppRuntimeInnerXML   `xml:"SyslogServerSettings,omitempty"`
 	RouterInfo                     *APIResponseVAppRuntimeRouterInfo `xml:"RouterInfo,omitempty"`
+	SubInterface                   *bool                             `xml:"SubInterface,omitempty"`
+	DistributedInterface           *bool                             `xml:"DistributedInterface,omitempty"`
+	ServiceInterface               *bool                             `xml:"ServiceInterface,omitempty"`
 	GuestVLANAllowed               *bool                             `xml:"GuestVlanAllowed,omitempty"`
-	IsDeployed                     *bool                             `xml:"IsDeployed,omitempty"`
+	Connected                      *bool                             `xml:"Connected,omitempty"`
+	DualStackNetwork               *bool                             `xml:"DualStackNetwork,omitempty"`
 }
 
 type APIResponseVAppRuntimeFeatures struct {
@@ -677,13 +701,21 @@ func (r *APIResponseVAppNetworkConfigSection) ToModel() *types.ModelVAppRuntimeN
 
 // ToModel converts APIResponseVAppNetworkConfig to the public runtime model.
 func (r *APIResponseVAppNetworkConfig) ToModel() types.ModelVAppRuntimeNetworkConfig {
+	href := r.NetworkHREF
+	if href == "" && r.Link != nil {
+		href = r.Link.HREF
+	}
+	configuration := r.Configuration.ToModel()
+	// IsDeployed is a child of NetworkConfig; the public model keeps it in the configuration.
+	configuration.IsDeployed = r.IsDeployed
+
 	return types.ModelVAppRuntimeNetworkConfig{
 		Description:   r.Description,
 		ID:            r.NetworkID,
-		HREF:          r.NetworkHREF,
+		HREF:          href,
 		Type:          r.NetworkType,
 		NetworkName:   r.NetworkName,
-		Configuration: r.Configuration.ToModel(),
+		Configuration: configuration,
 	}
 }
 
@@ -692,7 +724,6 @@ func (r *APIResponseVAppRuntimeConfiguration) ToModel() types.ModelVAppRuntimeNe
 	model := types.ModelVAppRuntimeNetworkConfiguration{
 		FenceMode:                      r.FenceMode,
 		RetainNetInfoAcrossDeployments: r.RetainNetInfoAcrossDeployments,
-		IsDeployed:                     r.IsDeployed,
 		GuestVLANAllowed:               r.GuestVLANAllowed,
 		IPScopes:                       make([]types.ModelVAppRuntimeIPScope, 0),
 	}
@@ -748,7 +779,7 @@ func ToAPIResponseVAppNetworkConfigSection(model *types.ModelVAppRuntimeNetworkC
 }
 
 func toAPIResponseVAppNetworkConfig(model types.ModelVAppRuntimeNetworkConfig) APIResponseVAppNetworkConfig {
-	return APIResponseVAppNetworkConfig{NetworkID: model.ID, NetworkHREF: model.HREF, Description: model.Description, NetworkType: model.Type, NetworkName: model.NetworkName, Configuration: toAPIResponseVAppRuntimeConfiguration(model.Configuration)}
+	return APIResponseVAppNetworkConfig{NetworkID: model.ID, NetworkHREF: model.HREF, Description: model.Description, NetworkType: model.Type, NetworkName: model.NetworkName, Configuration: toAPIResponseVAppRuntimeConfiguration(model.Configuration), IsDeployed: model.Configuration.IsDeployed}
 }
 
 // ToAPIRequestUndeployVApp converts the public undeploy mode to the VMware XML payload.
@@ -767,7 +798,6 @@ func toAPIResponseVAppRuntimeConfiguration(model types.ModelVAppRuntimeNetworkCo
 	result := APIResponseVAppRuntimeConfiguration{
 		FenceMode:                      model.FenceMode,
 		RetainNetInfoAcrossDeployments: model.RetainNetInfoAcrossDeployments,
-		IsDeployed:                     model.IsDeployed,
 		GuestVLANAllowed:               model.GuestVLANAllowed,
 		IPScopes:                       nil,
 	}
