@@ -22,9 +22,6 @@ type (
 		T0Name string `json:"tier0VrfId" fake:"{resource_name:t0}" validate:"required,resource_name=t0"`
 	}
 
-	APIResponseEdgegateways struct {
-		Values []APIResponseEdgegateway `json:"values,omitempty" fakesize:"1"` // List of edge gateways.
-	}
 	APIResponseEdgegateway struct {
 		ID          string `json:"id" fake:"{urn:edgegateway}"`             // The ID of the edge gateway.
 		Name        string `json:"name" fake:"{resource_name:edgegateway}"` // The name of the edge gateway.
@@ -88,35 +85,6 @@ type (
 	}
 )
 
-// UnmarshalJSON accepts Cerberus's array response and the former CloudAPI
-// values envelope.
-func (r *APIResponseEdgegateways) UnmarshalJSON(data []byte) error {
-	var values []APIResponseEdgegateway
-	if err := json.Unmarshal(data, &values); err == nil {
-		r.Values = values
-		return nil
-	}
-	var envelope struct {
-		Values []APIResponseEdgegateway            `json:"values"`
-		Record []APIResponseQueryEdgeGatewayRecord `json:"record"`
-	}
-	if err := json.Unmarshal(data, &envelope); err != nil {
-		return err
-	}
-	r.Values = envelope.Values
-	if len(r.Values) == 0 && len(envelope.Record) > 0 {
-		r.Values = make([]APIResponseEdgegateway, 0, len(envelope.Record))
-		for _, record := range envelope.Record {
-			r.Values = append(r.Values, APIResponseEdgegateway{
-				ID:     record.ID,
-				Name:   record.Name,
-				OrgVDC: &APIObjectReference{ID: record.VDCID, Name: record.VDCName},
-			})
-		}
-	}
-	return nil
-}
-
 // UnmarshalJSON accepts both the former query response (record) and the
 // CloudAPI edge gateway collection (values). QueryEdgeGateway remains a
 // compatibility alias, so older fixtures and integrations continue to decode.
@@ -167,18 +135,14 @@ func queryEdgeGatewayRecord(value APIResponseEdgegateway) APIResponseQueryEdgeGa
 	return record
 }
 
-// ToModel converts the APIResponseEdgegateways to ModelEdgeGateways.
-func (api *APIResponseEdgegateways) ToModel() *types.ModelEdgeGateways {
-	if api == nil {
-		return nil
-	}
-
+// EdgeGatewaysToModel converts a list of APIResponseEdgegateway to ModelEdgeGateways.
+func EdgeGatewaysToModel(list []APIResponseEdgegateway) *types.ModelEdgeGateways {
 	model := &types.ModelEdgeGateways{
-		EdgeGateways: make([]types.ModelEdgeGateway, 0, len(api.Values)),
+		EdgeGateways: make([]types.ModelEdgeGateway, 0, len(list)),
 	}
 
-	for _, v := range api.Values {
-		model.EdgeGateways = append(model.EdgeGateways, *v.ToModel())
+	for i := range list {
+		model.EdgeGateways = append(model.EdgeGateways, *list[i].ToModel())
 	}
 
 	return model
@@ -202,14 +166,21 @@ func (api *APIResponseEdgegateway) ToModel() *types.ModelEdgeGateway {
 		ownerRef = &APIObjectReference{Name: api.OwnerName}
 	}
 	uplinkT0 := func() *types.ModelObjectReference {
+		// The edge gateway details expose the Tier-0 VRF through tier0VrfId, which
+		// is the T0 name (e.g. prvrf01eocb0001234allsp01). Uplink details are only
+		// a fallback as they may be absent.
+		if api.Tier0VRFID != "" {
+			ref := &types.ModelObjectReference{Name: api.Tier0VRFID}
+			if len(api.EdgeGatewayUplinks) > 0 {
+				ref.ID = api.EdgeGatewayUplinks[0].UplinkID
+			}
+			return ref
+		}
 		if len(api.EdgeGatewayUplinks) > 0 {
 			return &types.ModelObjectReference{
 				ID:   api.EdgeGatewayUplinks[0].UplinkID,
 				Name: api.EdgeGatewayUplinks[0].UplinkName,
 			}
-		}
-		if api.Tier0VRFID != "" {
-			return &types.ModelObjectReference{ID: api.Tier0VRFID}
 		}
 		return nil
 	}()

@@ -19,8 +19,12 @@ type (
 
 	// * APIResponse
 	APIResponseNetworkServices []struct {
-		Type     string                               `json:"type" fake:"tier-0-vrf"`
-		Name     string                               `json:"name" fake:"{resource_name:t0}"`
+		Type       string `json:"type" fake:"tier-0-vrf"`
+		Name       string `json:"name" fake:"{resource_name:t0}"`
+		Properties struct {
+			ClassOfService string `json:"classOfService,omitempty"`
+			Asn            string `json:"asn,omitempty"`
+		}
 		Children []APIResponseNetworkServicesChildren `json:"children,omitempty" fakesize:"1"`
 	}
 

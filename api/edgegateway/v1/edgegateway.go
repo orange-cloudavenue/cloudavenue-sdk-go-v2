@@ -46,12 +46,12 @@ var (
 		Backend:  cav.BackendInfrapi,
 		Endpoint: endpoints.ListEdgeGateway(),
 		Extract: func(resp *cav.Response, _ struct{}) (*types.ModelEdgeGateways, error) {
-			list, ok := resp.Result().(*itypes.APIResponseEdgegateways)
+			list, ok := resp.Result().(*[]itypes.APIResponseEdgegateway)
 			if !ok || list == nil {
 				return nil, fmt.Errorf("unexpected list response type %T", resp.Result())
 			}
 
-			return list.ToModel(), nil
+			return itypes.EdgeGatewaysToModel(*list), nil
 		},
 	}
 	getEdgeGatewayByIDOp = cav.Operation[getEdgeGatewayByIDParams, *types.ModelEdgeGateway]{
