@@ -11,6 +11,9 @@ package itypes
 
 import (
 	"encoding/xml"
+	"strings"
+
+	"github.com/orange-cloudavenue/common-go/urn"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
@@ -18,6 +21,8 @@ import (
 const (
 	localSubjectTypeOrgUser      = "urn:vcloud:orguser"
 	localSubjectTypeOrgGroup     = "urn:vcloud:orggroup"
+	localSubjectMediaTypeUser    = "application/vnd.vmware.admin.user+xml"
+	localSubjectMediaTypeGroup   = "application/vnd.vmware.admin.group+xml"
 	vappACLSubjectKindUser       = "user"
 	vappACLSubjectKindGroup      = "group"
 	vappACLSubjectSourceLocal    = "local"
@@ -121,6 +126,10 @@ func (r *ControlAccessParams) ToVAppACLModel() *types.ModelVAppACL {
 		if as.Subject != nil {
 			subject.SubjectName = as.Subject.Name
 			subject.SubjectKind = localSubjectKind(as.Subject.Type)
+			if subject.SubjectKind == "" {
+				// The API may answer with another type attribute: the href tells the kind.
+				subject.SubjectKind = localSubjectKindFromHREF(as.Subject.HREF)
+			}
 			subject.SubjectID = localSubjectID(as.Subject.HREF)
 			subject.SubjectSource = vappACLSubjectSourceLocal
 		}
@@ -143,9 +152,22 @@ func (r *ControlAccessParams) ToVAppACLModel() *types.ModelVAppACL {
 
 func localSubjectKind(subjectType string) string {
 	switch subjectType {
-	case localSubjectTypeOrgUser:
+	case localSubjectMediaTypeUser, localSubjectTypeOrgUser:
 		return vappACLSubjectKindUser
-	case localSubjectTypeOrgGroup:
+	case localSubjectMediaTypeGroup, localSubjectTypeOrgGroup:
+		return vappACLSubjectKindGroup
+	default:
+		return ""
+	}
+}
+
+// localSubjectKindFromHREF returns the subject kind from the subject href, which is
+// either a legacy admin href or a cloudapi one (the API answers with the latter).
+func localSubjectKindFromHREF(href string) string {
+	switch {
+	case strings.Contains(href, "/api/admin/user/"), strings.Contains(href, "/cloudapi/1.0.0/users/"):
+		return vappACLSubjectKindUser
+	case strings.Contains(href, "/api/admin/group/"), strings.Contains(href, "/cloudapi/1.0.0/groups/"):
 		return vappACLSubjectKindGroup
 	default:
 		return ""
@@ -155,6 +177,17 @@ func localSubjectKind(subjectType string) string {
 func localSubjectID(href string) string {
 	if href == "" {
 		return ""
+	}
+	// cloudapi hrefs end with the subject URN (urn:vcloud:user:<uuid>): rebuild the orguser / orggroup URN.
+	if strings.Contains(href, "/cloudapi/1.0.0/users/") {
+		if uuid := urn.ExtractUUID(href); uuid != "" {
+			return "urn:vcloud:orguser:" + uuid
+		}
+	}
+	if strings.Contains(href, "/cloudapi/1.0.0/groups/") {
+		if uuid := urn.ExtractUUID(href); uuid != "" {
+			return "urn:vcloud:orggroup:" + uuid
+		}
 	}
 	if id, ok := localSubjectURNFromHREF(href, "/api/admin/user/", "urn:vcloud:orguser:"); ok {
 		return id
