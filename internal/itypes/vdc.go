@@ -144,6 +144,28 @@ type (
 	}
 )
 
+// UnmarshalJSON accepts the storage profiles either as a plain array (real
+// Cerberus API) or as the wrapped object {"vdcStorageProfile": [...]}.
+func (r *APIResponseGetVDCStorageProfiles) UnmarshalJSON(data []byte) error {
+	trimmed := bytes.TrimSpace(data)
+	if len(trimmed) > 0 && trimmed[0] == '[' {
+		var profiles []APIResponseGetVDCStorageProfile
+		if err := json.Unmarshal(trimmed, &profiles); err != nil {
+			return err
+		}
+		r.StorageProfiles = profiles
+		return nil
+	}
+
+	type wrapped APIResponseGetVDCStorageProfiles
+	var w wrapped
+	if err := json.Unmarshal(trimmed, &w); err != nil {
+		return err
+	}
+	*r = APIResponseGetVDCStorageProfiles(w)
+	return nil
+}
+
 // UnmarshalJSON accepts both the legacy VMware query shape and Cerberus' array
 // response. Keeping one response type preserves callers that resolve VDC IDs
 // through the shared endpoint.
