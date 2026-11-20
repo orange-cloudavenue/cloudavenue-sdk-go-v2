@@ -48,7 +48,7 @@ type updateVAppNetworkConfigSectionParams struct {
 
 type updateVAppGuestPropertiesParams struct {
 	ID   string
-	Body itypes.APIProductSectionList
+	Body *itypes.APIProductSectionList
 }
 
 type setVAppACLParams struct {
