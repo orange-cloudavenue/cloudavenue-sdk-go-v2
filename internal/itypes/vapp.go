@@ -12,6 +12,8 @@ package itypes
 import (
 	"encoding/json"
 	"encoding/xml"
+	"maps"
+	"sort"
 	"strings"
 
 	"github.com/orange-cloudavenue/common-go/urn"
@@ -199,6 +201,124 @@ type APIResponseProductProperty struct {
 	Type             string `json:"type" fake:"{word}"`
 	Value            string `json:"value" fake:"{word}"`
 	UserConfigurable bool   `json:"userConfigurable" fake:"{bool}"`
+}
+
+// productSectionInfo is the OVF Info of the guest properties section.
+const productSectionInfo = "Custom properties"
+
+// APIProductSectionList is the XML ProductSectionList of a vApp (GET and PUT
+// of /api/vApp/{id}/productSections). The JSON representation returned by the
+// API uses other key names than the SDK models, the XML one is the reference
+// (same wire contract as go-vcloud-director).
+type APIProductSectionList struct {
+	XMLName        xml.Name              `xml:"ProductSectionList"`
+	OVF            string                `xml:"xmlns:ovf,attr,omitempty"`
+	XMLNS          string                `xml:"xmlns,attr"`
+	ProductSection *APIProductSectionXML `xml:"http://schemas.dmtf.org/ovf/envelope/1 ProductSection,omitempty"`
+}
+
+// APIProductSectionXML is one OVF ProductSection.
+type APIProductSectionXML struct {
+	Class    string                  `xml:"http://schemas.dmtf.org/ovf/envelope/1 class,attr,omitempty"`
+	Instance string                  `xml:"http://schemas.dmtf.org/ovf/envelope/1 instance,attr,omitempty"`
+	Info     string                  `xml:"Info,omitempty"`
+	Property []APIProductPropertyXML `xml:"http://schemas.dmtf.org/ovf/envelope/1 Property,omitempty"`
+}
+
+// APIProductPropertyXML is one OVF Property of a ProductSection.
+type APIProductPropertyXML struct {
+	Key              string              `xml:"http://schemas.dmtf.org/ovf/envelope/1 key,attr,omitempty"`
+	Label            string              `xml:"http://schemas.dmtf.org/ovf/envelope/1 Label,omitempty"`
+	Description      string              `xml:"http://schemas.dmtf.org/ovf/envelope/1 Description,omitempty"`
+	DefaultValue     string              `xml:"http://schemas.dmtf.org/ovf/envelope/1 value,attr"`
+	Value            *APIProductValueXML `xml:"http://schemas.dmtf.org/ovf/envelope/1 Value,omitempty"`
+	Type             string              `xml:"http://schemas.dmtf.org/ovf/envelope/1 type,attr,omitempty"`
+	UserConfigurable bool                `xml:"http://schemas.dmtf.org/ovf/envelope/1 userConfigurable,attr"`
+}
+
+// APIProductValueXML is the value element of an OVF Property.
+type APIProductValueXML struct {
+	Value string `xml:"http://schemas.dmtf.org/ovf/envelope/1 value,attr,omitempty"`
+}
+
+// ToModel converts the XML ProductSectionList to the public guest property model.
+func (r *APIProductSectionList) ToModel() types.ModelVAppGuestProperties {
+	model := types.ModelVAppGuestProperties{Sections: make([]types.ModelVAppGuestPropertySection, 0, 1)}
+	if r == nil || r.ProductSection == nil {
+		return model
+	}
+
+	section := types.ModelVAppGuestPropertySection{
+		Class:      r.ProductSection.Class,
+		Instance:   r.ProductSection.Instance,
+		Properties: make(map[string]types.ModelVAppGuestProperty, len(r.ProductSection.Property)),
+	}
+	for _, property := range r.ProductSection.Property {
+		value := property.DefaultValue
+		if property.Value != nil {
+			value = property.Value.Value
+		}
+		section.Properties[property.Key] = types.ModelVAppGuestProperty{
+			Key:              property.Key,
+			Label:            property.Label,
+			Type:             property.Type,
+			Value:            value,
+			UserConfigurable: property.UserConfigurable,
+		}
+	}
+	model.Sections = append(model.Sections, section)
+
+	return model
+}
+
+// ToAPIProductSectionList converts the public guest property model to the XML
+// ProductSectionList. The properties are sorted by key (deterministic payload).
+// Only one ProductSection is sent: the vApp guest properties are one custom section.
+func ToAPIProductSectionList(model types.ModelVAppGuestProperties) APIProductSectionList {
+	result := APIProductSectionList{OVF: ovfEnvelopeXMLNS, XMLNS: vcloudXMLNS}
+
+	section := APIProductSectionXML{Info: productSectionInfo}
+	if len(model.Sections) > 0 {
+		section.Class = model.Sections[0].Class
+		section.Instance = model.Sections[0].Instance
+	}
+
+	merged := make(map[string]types.ModelVAppGuestProperty)
+	for _, s := range model.Sections {
+		maps.Copy(merged, s.Properties)
+	}
+
+	keys := make([]string, 0, len(merged))
+	for key := range merged {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	section.Property = make([]APIProductPropertyXML, 0, len(keys))
+	for _, key := range keys {
+		property := merged[key]
+		propertyType := property.Type
+		if propertyType == "" {
+			propertyType = "string"
+		}
+		section.Property = append(section.Property, APIProductPropertyXML{
+			Key:              key,
+			Label:            cmpOr(property.Label, key),
+			Type:             propertyType,
+			Value:            &APIProductValueXML{Value: property.Value},
+			UserConfigurable: property.UserConfigurable,
+		})
+	}
+
+	result.ProductSection = &section
+	return result
+}
+
+func cmpOr(value, fallback string) string {
+	if value != "" {
+		return value
+	}
+	return fallback
 }
 
 // APIResponseVAppNetworkConfigSection contains the runtime XML networkConfigSection of a vApp.
