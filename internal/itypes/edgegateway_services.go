@@ -35,7 +35,7 @@ type (
 		Properties  struct {
 			// EdgeGateway
 			RateLimit int    `json:"rateLimit,omitempty"`
-			EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"` // The UUID of the edge gateway
+			EdgeUUID  string `json:"edgeUUID,omitempty"` // The UUID of the edge gateway
 		} `json:"properties"`
 		Children  []APIResponseNetworkServicesSubChildren `json:"children,omitempty" fakesize:"6"`
 		ServiceID string                                  `json:"serviceId,omitempty"`
@@ -87,7 +87,7 @@ func (ap *APIResponseNetworkServices) ToModel(params types.ParamsEdgeGateway) *t
 				continue
 			}
 
-			data.ID = urn.Normalize(urn.EdgeGateway, child.Properties.EdgeUUID).String()
+			data.ID = child.Properties.EdgeUUID
 			data.Name = child.Name
 			populateEdgeGatewayServices(data, child.Children)
 		}

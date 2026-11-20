@@ -289,7 +289,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 							Name: validEdgeGWName,
 							Properties: struct {
 								RateLimit int    `json:"rateLimit,omitempty"`
-								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+								EdgeUUID  string `json:"edgeUUID,omitempty"`
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
@@ -331,7 +331,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 							Name: validEdgeGWName,
 							Properties: struct {
 								RateLimit int    `json:"rateLimit,omitempty"`
-								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+								EdgeUUID  string `json:"edgeUUID,omitempty"`
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
@@ -380,7 +380,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 							Name: validEdgeGWName,
 							Properties: struct {
 								RateLimit int    `json:"rateLimit,omitempty"`
-								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+								EdgeUUID  string `json:"edgeUUID,omitempty"`
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
@@ -413,7 +413,7 @@ func TestDisableCloudavenueServices(t *testing.T) {
 							Name: validEdgeGWName,
 							Properties: struct {
 								RateLimit int    `json:"rateLimit,omitempty"`
-								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+								EdgeUUID  string `json:"edgeUUID,omitempty"`
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
@@ -510,7 +510,7 @@ func TestGetCloudavenueServices(t *testing.T) {
 							Name: validEdgeGWName,
 							Properties: struct {
 								RateLimit int    `json:"rateLimit,omitempty"`
-								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+								EdgeUUID  string `json:"edgeUUID,omitempty"`
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
@@ -552,7 +552,7 @@ func TestGetCloudavenueServices(t *testing.T) {
 							Name: validEdgeGWName,
 							Properties: struct {
 								RateLimit int    `json:"rateLimit,omitempty"`
-								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+								EdgeUUID  string `json:"edgeUUID,omitempty"`
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},

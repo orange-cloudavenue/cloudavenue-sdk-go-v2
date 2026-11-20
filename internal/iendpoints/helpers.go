@@ -100,7 +100,6 @@ const (
 
 	urnApplicationPortProfile   = "urn=applicationPortProfile"
 	urnCertificateLibraryItem   = "urn=certificateLibraryItem"
-	urnEdgeGateway              = "urn=edgegateway"
 	urnFirewallGroup            = "urn=firewallGroup"
 	urnNetwork                  = "urn=network"
 	urnVDC                      = "urn=vdc"
@@ -109,9 +108,7 @@ const (
 	urnVDCStoragePolicy         = "urn=vdcstorageProfile"
 	urnVApp                     = "urn=vapp"
 	urnOrg                      = "urn=org"
-	urnEdgeGatewayID            = "urn=edgegateway"
 	urnCatalog                  = "urn=catalog"
-	ruleRequiredURNEdgeGateway  = "required," + urnEdgeGateway
 	ruleResourceNameEdgeGateway = "resource_name=edgegateway"
 
 	descCatalogURN   = "URN of the catalog"

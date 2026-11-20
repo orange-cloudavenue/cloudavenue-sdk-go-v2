@@ -14,7 +14,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/orange-cloudavenue/common-go/urn"
 	"resty.dev/v3"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
@@ -47,7 +46,7 @@ func (c *Client) GetT0(ctx context.Context, params types.ParamsGetT0) (*types.Mo
 		return nil, fmt.Errorf("edge gateway id or name is required when t0 name is not provided")
 	}
 
-	if err := validateEdgeGatewayRef(params.EdgegatewayID, params.EdgegatewayName); err != nil {
+	if err := validateEdgeGatewayRef(params.EdgegatewayName); err != nil {
 		return nil, err
 	}
 
@@ -99,7 +98,7 @@ func (c *Client) getT0ByEdgeGateway(ctx context.Context, params types.ParamsGetT
 }
 
 func findT0NameForEdgeGateway(t0s *itypes.APIResponseNetworkServices, params types.ParamsGetT0) string {
-	edgeID := urn.Normalize(urn.EdgeGateway, params.EdgegatewayID).String()
+	edgeID := params.EdgegatewayID
 
 	for _, t0 := range *t0s {
 		if t0.Name == "" {
@@ -111,7 +110,7 @@ func findT0NameForEdgeGateway(t0s *itypes.APIResponseNetworkServices, params typ
 				continue
 			}
 
-			if edgeID != "" && edgeID == urn.Normalize(urn.EdgeGateway, edgeGateway.Properties.EdgeUUID).String() {
+			if edgeID != "" && edgeID == edgeGateway.Properties.EdgeUUID {
 				return t0.Name
 			}
 

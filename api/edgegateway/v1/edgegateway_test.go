@@ -40,7 +40,7 @@ func TestGetEdgeGateway(t *testing.T) {
 		{
 			name: "Valid Edge Gateway ID",
 			params: &types.ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgegateway}"),
+				ID: generator.MustGenerate("{uuid}"),
 			},
 			expectedErr: false,
 		},
@@ -53,12 +53,12 @@ func TestGetEdgeGateway(t *testing.T) {
 			mockQueryResponseStatus: 200,
 			mockQueryResponse: &itypes.APIResponseQueryEdgeGateway{
 				Record: []itypes.APIResponseQueryEdgeGatewayRecord{{
-					ID:   generator.MustGenerate("{urn:edgegateway}"),
+					ID:   generator.MustGenerate("{uuid}"),
 					HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 				}},
 			},
 			mockResponse: &itypes.APIResponseEdgegateway{
-				ID:   generator.MustGenerate("{urn:edgegateway}"),
+				ID:   generator.MustGenerate("{uuid}"),
 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			mockResponseStatus: 200,
@@ -72,16 +72,9 @@ func TestGetEdgeGateway(t *testing.T) {
 			expectedErr:             true,
 		},
 		{
-			name: "Invalid Edge Gateway ID",
-			params: &types.ParamsEdgeGateway{
-				ID: "urn:vcloud:vm:invalid-id",
-			},
-			expectedErr: true,
-		},
-		{
 			name: "Error 500",
 			params: &types.ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgegateway}"),
+				ID: generator.MustGenerate("{uuid}"),
 			},
 			expectedErr:        true,
 			mockResponse:       nil,
@@ -142,7 +135,7 @@ func TestGetEdgeGateway_ContextDeadlineExceeded(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), 0)
 	defer cancel()
 
-	_, err = eC.GetEdgeGateway(ctx, types.ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgegateway}")})
+	_, err = eC.GetEdgeGateway(ctx, types.ParamsEdgeGateway{ID: generator.MustGenerate("{uuid}")})
 	assert.NotNil(t, err, "Expected context deadline exceeded error")
 	assert.Contains(t, err.Error(), "context deadline exceeded", "Expected error to contain 'context deadline exceeded'")
 }
@@ -208,7 +201,7 @@ func TestDeleteEdgeGateway(t *testing.T) {
 		{
 			name: "Valid Edge Gateway ID",
 			params: &types.ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgegateway}"),
+				ID: generator.MustGenerate("{uuid}"),
 			},
 			mockResponse: nil,
 			// mockResponseStatus: 202,
@@ -305,7 +298,7 @@ func TestDeleteEdgeGateway(t *testing.T) {
 		{
 			name: "Error 500",
 			params: &types.ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgegateway}"),
+				ID: generator.MustGenerate("{uuid}"),
 			},
 			mockResponse:       nil,
 			mockResponseStatus: 500,
@@ -314,7 +307,7 @@ func TestDeleteEdgeGateway(t *testing.T) {
 		{
 			name: "Error 401",
 			params: &types.ParamsEdgeGateway{
-				ID: generator.MustGenerate("{urn:edgegateway}"),
+				ID: generator.MustGenerate("{uuid}"),
 			},
 			mockResponse:       nil,
 			mockResponseStatus: 401,
@@ -351,7 +344,7 @@ func TestDeleteEdgeGateway(t *testing.T) {
 			} else if tt.params.Name != "" && !tt.expectedErr {
 				status := http.StatusOK
 				setEdgeGatewayListResponse(ms, []itypes.APIResponseEdgegateway{{
-					ID: generator.MustGenerate("{urn:edgegateway}"), Name: tt.params.Name,
+					ID: generator.MustGenerate("{uuid}"), Name: tt.params.Name,
 				}}, &status)
 			}
 
@@ -463,7 +456,7 @@ func TestDeleteEdgeGateway_ContextDeadlineExceeded(t *testing.T) {
 	ctx, cancel := context.WithTimeout(t.Context(), 0)
 	defer cancel()
 
-	err := eC.DeleteEdgeGateway(ctx, types.ParamsEdgeGateway{ID: generator.MustGenerate("{urn:edgegateway}")})
+	err := eC.DeleteEdgeGateway(ctx, types.ParamsEdgeGateway{ID: generator.MustGenerate("{uuid}")})
 	assert.NotNil(t, err, "Expected context deadline exceeded error")
 	assert.Contains(t, err.Error(), "context deadline exceeded", "Expected error to contain 'context deadline exceeded'")
 }
@@ -513,13 +506,13 @@ func TestCreateEdgeGateway(t *testing.T) {
 			}}},
 			mockListVDCResponseStatus: 200,
 			mockGetEdgeGatewayResponse: &itypes.APIResponseEdgegateway{
-				ID:   generator.MustGenerate("{urn:edgegateway}"),
+				ID:   generator.MustGenerate("{uuid}"),
 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			mockGetEdgeGatewayResponseStatus: 200,
 			mockQueryResponse: &itypes.APIResponseQueryEdgeGateway{Record: []itypes.APIResponseQueryEdgeGatewayRecord{{
 				HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
-				ID:   generator.MustGenerate("{urn:edgegateway}"),
+				ID:   generator.MustGenerate("{uuid}"),
 			}}},
 			mockQueryResponseStatus: 200,
 			mockJobResponse: &cav.CerberusJobAPIResponse{
@@ -554,14 +547,14 @@ func TestCreateEdgeGateway(t *testing.T) {
 			mockListVDCResponseStatus: 200,
 			mockListVDCResponse:       &itypes.APIResponseListVDC{},
 			mockGetEdgeGatewayResponse: &itypes.APIResponseEdgegateway{
-				ID:   generator.MustGenerate("{urn:edgegateway}"),
+				ID:   generator.MustGenerate("{uuid}"),
 				Name: "tn-edge-created-vdcgroup",
 			},
 			mockGetEdgeGatewayResponseStatus: 200,
 			mockQueryResponse: &itypes.APIResponseQueryEdgeGateway{Record: []itypes.APIResponseQueryEdgeGatewayRecord{{
 				HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 				Name: "tn-edge-created-vdcgroup",
-				ID:   generator.MustGenerate("{urn:edgegateway}"),
+				ID:   generator.MustGenerate("{uuid}"),
 			}}},
 			mockQueryResponseStatus: 200,
 			mockListVDCGroupResponse: &itypes.APIResponseListVDCGroup{Values: []itypes.APIResponseListVDCGroupDetails{{
@@ -603,14 +596,14 @@ func TestCreateEdgeGateway(t *testing.T) {
 			}}},
 			mockListVDCResponseStatus: 200,
 			mockGetEdgeGatewayResponse: &itypes.APIResponseEdgegateway{
-				ID:   generator.MustGenerate("{urn:edgegateway}"),
+				ID:   generator.MustGenerate("{uuid}"),
 				Name: "tn-edge-created-bandwidth",
 			},
 			mockGetEdgeGatewayResponseStatus: 200,
 			mockQueryResponse: &itypes.APIResponseQueryEdgeGateway{Record: []itypes.APIResponseQueryEdgeGatewayRecord{{
 				HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 				Name: "tn-edge-created-bandwidth",
-				ID:   generator.MustGenerate("{urn:edgegateway}"),
+				ID:   generator.MustGenerate("{uuid}"),
 			}}},
 			mockQueryResponseStatus: 200,
 			mockJobResponse: &cav.CerberusJobAPIResponse{
@@ -745,13 +738,13 @@ func TestCreateEdgeGateway(t *testing.T) {
 			}}},
 			mockListVDCResponseStatus: 200,
 			mockGetEdgeGatewayResponse: &itypes.APIResponseEdgegateway{
-				ID:   generator.MustGenerate("{urn:edgegateway}"),
+				ID:   generator.MustGenerate("{uuid}"),
 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			mockGetEdgeGatewayResponseStatus: 200,
 			mockQueryResponse: &itypes.APIResponseQueryEdgeGateway{Record: []itypes.APIResponseQueryEdgeGatewayRecord{{
 				HREF: "https://api.example.com/edgegateways/ed0a243a-374b-4306-ab25-9c3787cbdb4c",
-				ID:   generator.MustGenerate("{urn:edgegateway}"),
+				ID:   generator.MustGenerate("{uuid}"),
 			}}},
 			mockQueryResponseStatus: 200,
 			mockListT0Response: func() itypes.APIResponseT0Names {
@@ -867,7 +860,7 @@ func TestCreateEdgeGateway(t *testing.T) {
 			}}},
 			mockListVDCResponseStatus: 200,
 			mockGetEdgeGatewayResponse: &itypes.APIResponseEdgegateway{
-				ID:   generator.MustGenerate("{urn:edgegateway}"),
+				ID:   generator.MustGenerate("{uuid}"),
 				Name: generator.MustGenerate("{resource_name:edgegateway}"),
 			},
 			mockGetEdgeGatewayResponseStatus: 200,
@@ -1064,7 +1057,7 @@ func TestUpdateEdgeGateway(t *testing.T) {
 		{
 			name: "Valid Edge Gateway ID",
 			params: &types.ParamsUpdateEdgeGateway{
-				ID:        generator.MustGenerate("{urn:edgegateway}"),
+				ID:        generator.MustGenerate("{uuid}"),
 				Bandwidth: 25,
 			},
 
@@ -1079,12 +1072,13 @@ func TestUpdateEdgeGateway(t *testing.T) {
 			expectedErr: false,
 		},
 		{
-			name: "Invalid Edge Gateway ID",
+			name: "Edge Gateway ID not found",
 			params: &types.ParamsUpdateEdgeGateway{
-				ID:        "invalid-id",
+				ID:        generator.MustGenerate("{uuid}"),
 				Bandwidth: 25,
 			},
-			expectedErr: true,
+			mockResponseStatus: 404,
+			expectedErr:        true,
 		},
 		{
 			name: "Edge Gateway Name not found",
@@ -1103,7 +1097,7 @@ func TestUpdateEdgeGateway(t *testing.T) {
 			if tt.params.Name != "" && tt.mockQueryResponseStatus == 0 && !tt.expectedErr {
 				status := http.StatusOK
 				setEdgeGatewayListResponse(ms, []itypes.APIResponseEdgegateway{{
-					ID: generator.MustGenerate("{urn:edgegateway}"), Name: tt.params.Name,
+					ID: generator.MustGenerate("{uuid}"), Name: tt.params.Name,
 				}}, &status)
 			}
 
