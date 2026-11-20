@@ -133,6 +133,6 @@ func init() {
 		PathTemplate:     pathCerberusEdgeGateways,
 		PathParams:       nil,
 		QueryParams:      nil,
-		ResponseType:     itypes.APIResponseEdgegateways{},
+		ResponseType:     []itypes.APIResponseEdgegateway{},
 	}.Register()
 }

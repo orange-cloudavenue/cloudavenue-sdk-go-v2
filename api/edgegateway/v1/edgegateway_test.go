@@ -279,9 +279,9 @@ func TestDeleteEdgeGateway(t *testing.T) {
 				ms.SetResponse(endpoints.ListVDC(), nil, &tt.mockQueryResponseStatus)
 			} else if tt.params.Name != "" && !tt.expectedErr {
 				status := http.StatusOK
-				setEdgeGatewayListResponse(ms, &itypes.APIResponseEdgegateways{Values: []itypes.APIResponseEdgegateway{{
+				setEdgeGatewayListResponse(ms, []itypes.APIResponseEdgegateway{{
 					ID: generator.MustGenerate("{urn:edgegateway}"), Name: tt.params.Name,
-				}}}, &status)
+				}}, &status)
 			}
 
 			err := eC.DeleteEdgeGateway(t.Context(), *tt.params)
@@ -940,9 +940,9 @@ func TestUpdateEdgeGateway(t *testing.T) {
 			eC, ms := newClient(t)
 			if tt.params.Name != "" && tt.mockQueryResponseStatus == 0 && !tt.expectedErr {
 				status := http.StatusOK
-				setEdgeGatewayListResponse(ms, &itypes.APIResponseEdgegateways{Values: []itypes.APIResponseEdgegateway{{
+				setEdgeGatewayListResponse(ms, []itypes.APIResponseEdgegateway{{
 					ID: generator.MustGenerate("{urn:edgegateway}"), Name: tt.params.Name,
-				}}}, &status)
+				}}, &status)
 			}
 
 			if tt.mockResponseStatus != 0 {

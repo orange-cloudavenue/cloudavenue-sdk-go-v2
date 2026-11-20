@@ -18,6 +18,7 @@ import (
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
+	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 )
 
 func newClient(t *testing.T) (*Client, *mock.Server) {
@@ -44,7 +45,20 @@ func newClient(t *testing.T) (*Client, *mock.Server) {
 
 // setEdgeGatewayListResponse configures both the current Infrapi list endpoint
 // and its compatibility alias. They share a route in the mock server.
+// The list endpoint returns a bare JSON array, so query-style fixtures are converted.
 func setEdgeGatewayListResponse(ms *mock.Server, data any, status *int) {
+	if query, ok := data.(*itypes.APIResponseQueryEdgeGateway); ok && query != nil {
+		list := make([]itypes.APIResponseEdgegateway, 0, len(query.Record))
+		for _, r := range query.Record {
+			list = append(list, itypes.APIResponseEdgegateway{
+				ID:       r.ID,
+				Name:     r.Name,
+				OrgVDC:   &itypes.APIObjectReference{ID: r.VDCID, Name: r.VDCName},
+				OwnerRef: &itypes.APIObjectReference{ID: r.VDCID, Name: r.VDCName},
+			})
+		}
+		data = list
+	}
 	ms.CleanResponse(endpoints.ListEdgeGateway())
 	ms.SetResponse(endpoints.ListEdgeGateway(), data, status)
 	ms.CleanResponse(endpoints.QueryEdgeGateway())

@@ -530,8 +530,7 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 				listStatusCode := tt.mockListResponseStatus
 				ms.CleanResponse(epQuery)
 				ms.SetResponse(epQuery, tt.mockListResponse, &listStatusCode)
-				ms.CleanResponse(endpoints.ListEdgeGateway())
-				ms.SetResponse(endpoints.ListEdgeGateway(), tt.mockListResponse, &listStatusCode)
+				setEdgeGatewayListResponse(ms, tt.mockListResponse, &listStatusCode)
 				ms.CleanResponse(endpoints.ListVDC())
 				ms.SetResponse(endpoints.ListVDC(), tt.mockListResponse, &listStatusCode)
 			}
@@ -752,8 +751,7 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 			if tt.mockListResponse != nil || tt.mockListResponseStatus != 0 {
 				listStatusCode := tt.mockListResponseStatus
 				ms.SetResponse(epQuery, tt.mockListResponse, &listStatusCode)
-				ms.CleanResponse(endpoints.ListEdgeGateway())
-				ms.SetResponse(endpoints.ListEdgeGateway(), tt.mockListResponse, &listStatusCode)
+				setEdgeGatewayListResponse(ms, tt.mockListResponse, &listStatusCode)
 				ms.CleanResponse(endpoints.ListVDC())
 				ms.SetResponse(endpoints.ListVDC(), tt.mockListResponse, &listStatusCode)
 			}
