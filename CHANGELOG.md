@@ -1,4 +1,5 @@
-## 1.1.0 (Unreleased)
+## 1.2.0 (Unreleased)
+## 1.1.0 (November 20, 2026)
 ### :rotating_light: **Breaking Changes**
 
 * cav: replace the public polling API with `WaitJob(ctx, client, JobWaitRequest)`, requiring an explicit backend and removing the legacy await helpers. (GH-155)
