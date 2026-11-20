@@ -1,0 +1,35 @@
+```release-note:bug
+fix(vapp): read the VDC from the rel="up" link, the lease from the LeaseSettingsSectionType section (a lease of 0 is a value) and the owner as a user URN, and re-read a vApp found by name by its ID, to match the real vApp payload.
+```
+
+```release-note:bug
+fix(vdc): decode the storage profiles of a VDC when the API returns them as a plain array.
+```
+
+```release-note:bug
+fix(vapp): update the description with the recompose action and the lease with the lease settings section (the single PUT on the vApp answered 415).
+```
+
+```release-note:bug
+fix(vapp): read and write guest properties as XML (productSections+xml, task Accept on the PUT) and keep every ProductSection element the model does not carry (password, qualifiers, categories, extensions) when updating them.
+```
+
+```release-note:bug
+fix(vapp): decode the Link of the runtime network config, read IsDeployed from NetworkConfig and keep every element of the network config section in schema order, so updating one network no longer drops the others.
+```
+
+```release-note:bug
+fix(vapp): send the admin user and group media types for ACL subjects (an URN type answered 400) and read subjects from legacy and cloudapi hrefs.
+```
+
+```release-note:breaking-change
+vapp: `endpoints.UpdateVApp` and the `APIRequestUpdateVApp` type are removed, use `RecomposeVApp` and `UpdateVAppLeaseSettingsSection` (`client.UpdateVApp` is unchanged).
+```
+
+```release-note:breaking-change
+vapp: `ModelVApp.Owner` is a user URN instead of an href when the payload only carries the href.
+```
+
+```release-note:chore
+vapp: the label of a guest property defaults to its key when empty, and `UpdateVApp` fails when only one lease is requested and the current other lease is unknown.
+```
