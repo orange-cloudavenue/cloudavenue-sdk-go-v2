@@ -60,6 +60,12 @@ func TestAPIResponseGetVApp_RealPayload(t *testing.T) {
 
 	// VDC derived from the rel="up" link
 	assert.Equal(t, "urn:vcloud:vdc:cfb722cd-3a8b-4c0a-930e-8fe116d9ab5d", model.VDC)
+
+	// Lease read from the section, a 0 lease is a real value (never expires)
+	require.NotNil(t, model.DeploymentLeaseInSeconds)
+	assert.Equal(t, 0, *model.DeploymentLeaseInSeconds)
+	require.NotNil(t, model.StorageLeaseInSeconds)
+	assert.Equal(t, 3600, *model.StorageLeaseInSeconds)
 }
 
 func TestAPIResponseGetVApp_TopLevelFieldsStillWork(t *testing.T) {

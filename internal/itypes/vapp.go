@@ -19,6 +19,9 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
+// vAppLeaseSettingsSectionType is the _type of the lease section of the legacy vApp JSON.
+const vAppLeaseSettingsSectionType = "LeaseSettingsSectionType"
+
 const (
 	vcloudXMLNS      = "http://www.vmware.com/vcloud/v1.5"
 	ovfEnvelopeXMLNS = "http://schemas.dmtf.org/ovf/envelope/1"
@@ -137,9 +140,11 @@ type APIResponseGetVApp struct {
 	Owner           VAppOwnerRef               `json:"owner" fake:"{urn:user}"`
 	Metadata        []APIResponseMetadata      `json:"metadataEntry" fakesize:"1"`
 
-	// Links is only decoded from the real legacy payload: it has no top-level
-	// vdc, the VDC is the rel="up" link.
-	Links []APIResponseVAppLink `json:"link" fake:"skip"`
+	// Links and Sections are only decoded from the real legacy payload: it has
+	// no top-level vdc nor leaseSettings, the VDC is the rel="up" link and the
+	// lease lives in the LeaseSettingsSectionType section.
+	Links    []APIResponseVAppLink    `json:"link" fake:"skip"`
+	Sections []APIResponseVAppSection `json:"section" fake:"skip"`
 }
 
 // APIResponseVAppLink is one entry of the `link` array of the legacy vApp JSON.
@@ -147,6 +152,14 @@ type APIResponseVAppLink struct {
 	HREF string `json:"href"`
 	Rel  string `json:"rel"`
 	Type string `json:"type"`
+}
+
+// APIResponseVAppSection is one entry of the `section` array of the legacy vApp JSON.
+// Only the lease section fields are decoded.
+type APIResponseVAppSection struct {
+	Type                     string `json:"_type"`
+	DeploymentLeaseInSeconds *int   `json:"deploymentLeaseInSeconds"`
+	StorageLeaseInSeconds    *int   `json:"storageLeaseInSeconds"`
 }
 
 // APIResponseLeaseSettings contains VApp lease settings.
@@ -427,6 +440,23 @@ func (r *APIResponseGetVApp) ToModel() types.ModelVApp {
 	}
 	if r.LeaseSettings.StorageLeaseInSeconds > 0 {
 		m.StorageLeaseInSeconds = &r.LeaseSettings.StorageLeaseInSeconds
+	}
+
+	// The real payload carries the lease in the LeaseSettingsSectionType section.
+	// A lease of 0 means "never expires" and must not be confused with "absent".
+	for _, section := range r.Sections {
+		if section.Type != vAppLeaseSettingsSectionType {
+			continue
+		}
+		if section.DeploymentLeaseInSeconds != nil {
+			v := *section.DeploymentLeaseInSeconds
+			m.DeploymentLeaseInSeconds = &v
+		}
+		if section.StorageLeaseInSeconds != nil {
+			v := *section.StorageLeaseInSeconds
+			m.StorageLeaseInSeconds = &v
+		}
+		break
 	}
 
 	if m.VDC == "" {
