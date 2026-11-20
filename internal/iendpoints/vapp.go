@@ -361,10 +361,10 @@ func init() {
 		Description:      "Get the ProductSection guest properties of a VApp",
 		Method:           cav.MethodGET,
 		Backend:          cav.BackendVMware,
-		Headers:          map[string]string{headerAccept: headerProductSectionsJSON},
+		Headers:          map[string]string{headerAccept: headerProductSectionsXML},
 		PathTemplate:     pathVAppProductSections,
 		PathParams:       vAppActionPathParams(),
-		ResponseType:     itypes.APIResponseGuestProperties{},
+		ResponseType:     itypes.APIProductSectionList{},
 	}.Register()
 
 	// UpdateVAppProductSections
@@ -375,10 +375,10 @@ func init() {
 		Method:           cav.MethodPUT,
 		Backend:          cav.BackendVMware,
 		// The response is a task, not a productSections: the productSections Accept is rejected with HTTP 406.
-		Headers:         map[string]string{headerAccept: headerXMLAny, headerContentType: headerProductSectionsJSON},
+		Headers:         map[string]string{headerAccept: headerXMLAny, headerContentType: headerProductSectionsXML},
 		PathTemplate:    pathVAppProductSections,
 		PathParams:      vAppActionPathParams(),
-		BodyRequestType: itypes.APIResponseGuestProperties{},
+		BodyRequestType: itypes.APIProductSectionList{},
 		ResponseType:    cav.Job{},
 	}.Register()
 

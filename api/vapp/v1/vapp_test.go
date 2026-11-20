@@ -455,59 +455,80 @@ func TestVAppGuestProperties(t *testing.T) {
 	vappID := testVAppID
 	getCalls := 0
 
-	guestProperties := &itypes.APIResponseGuestProperties{ProductSectionList: []itypes.APIResponseProductSection{{Class: "vami", Instance: "default", Property: []itypes.APIResponseProductProperty{{Key: "hostname", Label: "Hostname", Type: "string", Value: "vm-01", UserConfigurable: true}, {Key: "role", Type: "string", Value: "app"}}}}}
+	stored := &itypes.APIProductSectionList{
+		XMLNS: "http://www.vmware.com/vcloud/v1.5",
+		ProductSection: &itypes.APIProductSectionXML{
+			Info: "Custom properties",
+			Property: []itypes.APIProductPropertyXML{
+				{Key: "hostname", Label: "Hostname", Type: "string", Value: &itypes.APIProductValueXML{Value: "vm-01"}, UserConfigurable: true},
+				{Key: "role", Type: "string", Value: &itypes.APIProductValueXML{Value: "app"}},
+			},
+		},
+	}
 
 	ms.CleanResponse(endpoints.GetVAppProductSections())
 	ms.SetResponseFunc(endpoints.GetVAppProductSections(), func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "application/vnd.vmware.vcloud.productSections+json;version=39.1", r.Header.Get("Accept"))
-		w.Header().Set("Content-Type", "application/json")
-		assert.NoError(t, json.NewEncoder(w).Encode(guestProperties))
+		assert.Equal(t, "application/vnd.vmware.vcloud.productSections+xml;version=39.1", r.Header.Get("Accept"))
+		w.Header().Set("Content-Type", "application/vnd.vmware.vcloud.productSections+xml")
+		assert.NoError(t, xml.NewEncoder(w).Encode(stored))
 		getCalls++
 	})
 
 	resp, err := client.GetVAppGuestProperties(t.Context(), types.ParamsGetVAppGuestProperties{ID: vappID})
 	assert.NoError(t, err)
 	if assert.NotNil(t, resp) && assert.Len(t, resp.Sections, 1) {
-		assert.Equal(t, "vami", resp.Sections[0].Class)
-		assert.Equal(t, "default", resp.Sections[0].Instance)
 		assert.Equal(t, types.ModelVAppGuestProperty{Key: "hostname", Label: "Hostname", Type: "string", Value: "vm-01", UserConfigurable: true}, resp.Sections[0].Properties["hostname"])
+		assert.Equal(t, types.ModelVAppGuestProperty{Key: "role", Type: "string", Value: "app"}, resp.Sections[0].Properties["role"])
 	}
 
 	ms.CleanResponse(endpoints.UpdateVAppProductSections())
 	ms.SetResponseFunc(endpoints.UpdateVAppProductSections(), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "application/*+xml;version=39.1", r.Header.Get("Accept"))
-		assert.Equal(t, "application/vnd.vmware.vcloud.productSections+json;version=39.1", r.Header.Get("Content-Type"))
-		var body itypes.APIResponseGuestProperties
-		assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
-		if assert.Len(t, body.ProductSectionList, 1) {
-			assert.Equal(t, "vami", body.ProductSectionList[0].Class)
-			assert.Len(t, body.ProductSectionList[0].Property, 2)
-			assert.Equal(t, []itypes.APIResponseProductProperty{{Key: "hostname", Label: "Hostname", Type: "string", Value: "vm-02", UserConfigurable: true}, {Key: "role", Type: "string", Value: "db"}}, body.ProductSectionList[0].Property)
+		assert.Equal(t, "application/vnd.vmware.vcloud.productSections+xml;version=39.1", r.Header.Get("Content-Type"))
+		var body itypes.APIProductSectionList
+		assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
+		if assert.NotNil(t, body.ProductSection) {
+			assert.Equal(t, "Custom properties", body.ProductSection.Info)
+			// Sorted by key, label defaults to the key, type defaults to string
+			assert.Equal(t, []itypes.APIProductPropertyXML{
+				{Key: "hostname", Label: "Hostname", Type: "string", Value: &itypes.APIProductValueXML{Value: "vm-02"}, UserConfigurable: true},
+				{Key: "role", Label: "role", Type: "string", Value: &itypes.APIProductValueXML{Value: "db"}},
+			}, body.ProductSection.Property)
 		}
-		guestProperties = &body
+		stored = &body
 		w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
 		w.WriteHeader(http.StatusAccepted)
 	})
 
-	updated, err := client.UpdateVAppGuestProperties(t.Context(), types.ParamsUpdateVAppGuestProperties{ID: vappID, GuestProperties: types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Class: "vami", Instance: "default", Properties: map[string]types.ModelVAppGuestProperty{"hostname": {Label: "Hostname", Type: "string", Value: "vm-02", UserConfigurable: true}, "role": {Type: "string", Value: "db"}}}}}})
+	updated, err := client.UpdateVAppGuestProperties(t.Context(), types.ParamsUpdateVAppGuestProperties{ID: vappID, GuestProperties: types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Properties: map[string]types.ModelVAppGuestProperty{"hostname": {Label: "Hostname", Type: "string", Value: "vm-02", UserConfigurable: true}, "role": {Value: "db"}}}}}})
 	assert.NoError(t, err)
 	if assert.NotNil(t, updated) && assert.Len(t, updated.Sections, 1) {
 		assert.Equal(t, types.ModelVAppGuestProperty{Key: "hostname", Label: "Hostname", Type: "string", Value: "vm-02", UserConfigurable: true}, updated.Sections[0].Properties["hostname"])
-		assert.Equal(t, types.ModelVAppGuestProperty{Key: "role", Type: "string", Value: "db"}, updated.Sections[0].Properties["role"])
+		assert.Equal(t, types.ModelVAppGuestProperty{Key: "role", Label: "role", Type: "string", Value: "db"}, updated.Sections[0].Properties["role"])
 	}
 	assert.Equal(t, 2, getCalls)
 }
 
 func TestVAppGuestPropertiesPayloadDeterministicOrder(t *testing.T) {
-	first := toAPIResponseGuestProperties(types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Class: "class", Instance: "b", Properties: map[string]types.ModelVAppGuestProperty{"gamma": {Type: "string", Value: "3"}, "beta": {Type: "string", Value: "4"}}}, {Class: "class", Instance: "a", Properties: map[string]types.ModelVAppGuestProperty{"zeta": {Type: "string", Value: "1"}, "alpha": {Type: "string", Value: "2"}}}}})
-	second := toAPIResponseGuestProperties(types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Class: "class", Instance: "a", Properties: map[string]types.ModelVAppGuestProperty{"alpha": {Type: "string", Value: "2"}, "zeta": {Type: "string", Value: "1"}}}, {Class: "class", Instance: "b", Properties: map[string]types.ModelVAppGuestProperty{"beta": {Type: "string", Value: "4"}, "gamma": {Type: "string", Value: "3"}}}}})
+	first := itypes.ToAPIProductSectionList(types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Properties: map[string]types.ModelVAppGuestProperty{"gamma": {Type: "string", Value: "3"}, "beta": {Type: "string", Value: "4"}, "zeta": {Type: "string", Value: "1"}, "alpha": {Type: "string", Value: "2"}}}}})
+	second := itypes.ToAPIProductSectionList(types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Properties: map[string]types.ModelVAppGuestProperty{"alpha": {Type: "string", Value: "2"}, "zeta": {Type: "string", Value: "1"}, "beta": {Type: "string", Value: "4"}, "gamma": {Type: "string", Value: "3"}}}}})
 
 	assert.Equal(t, second, first)
-	if assert.Len(t, first.ProductSectionList, 2) {
-		assert.Equal(t, "a", first.ProductSectionList[0].Instance)
-		assert.Equal(t, []itypes.APIResponseProductProperty{{Key: "alpha", Type: "string", Value: "2"}, {Key: "zeta", Type: "string", Value: "1"}}, first.ProductSectionList[0].Property)
-		assert.Equal(t, "b", first.ProductSectionList[1].Instance)
-		assert.Equal(t, []itypes.APIResponseProductProperty{{Key: "beta", Type: "string", Value: "4"}, {Key: "gamma", Type: "string", Value: "3"}}, first.ProductSectionList[1].Property)
+	if assert.NotNil(t, first.ProductSection) && assert.Len(t, first.ProductSection.Property, 4) {
+		keys := make([]string, 0, 4)
+		for _, property := range first.ProductSection.Property {
+			keys = append(keys, property.Key)
+		}
+		assert.Equal(t, []string{"alpha", "beta", "gamma", "zeta"}, keys)
+	}
+}
+
+func TestVAppGuestPropertiesEmptyListIsSent(t *testing.T) {
+	// An empty section removes every property: the section is still sent.
+	body := itypes.ToAPIProductSectionList(types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Properties: map[string]types.ModelVAppGuestProperty{}}}})
+	if assert.NotNil(t, body.ProductSection) {
+		assert.Equal(t, "Custom properties", body.ProductSection.Info)
+		assert.Empty(t, body.ProductSection.Property)
 	}
 }
 

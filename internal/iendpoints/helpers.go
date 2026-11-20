@@ -61,6 +61,9 @@ const (
 	// headerUndeployVAppParamsXML is the mandatory request media type of the
 	// undeploy action; the generic XML content type yields 415.
 	headerUndeployVAppParamsXML = "application/vnd.vmware.vcloud.undeployVAppParams+xml;version=39.1"
+	// headerProductSectionsXML is the productSections XML media type, the
+	// reference representation of the vApp guest properties.
+	headerProductSectionsXML = "application/vnd.vmware.vcloud.productSections+xml;version=39.1"
 	// headerProductSectionsJSON is the productSections media type: the generic
 	// JSON accept/content type yields 406 (GET) / 415 (PUT).
 	headerProductSectionsJSON = "application/vnd.vmware.vcloud.productSections+json;version=39.1"
