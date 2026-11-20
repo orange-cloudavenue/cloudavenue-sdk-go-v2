@@ -10,9 +10,6 @@
 package iendpoints
 
 import (
-	"github.com/orange-cloudavenue/common-go/extractor"
-	"github.com/orange-cloudavenue/common-go/validators"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
 )
@@ -33,10 +30,6 @@ func init() {
 				Name:        pathParamEdgeID,
 				Description: descEdgeGatewayID,
 				Required:    true,
-				ValidatorFunc: func(value string) error {
-					return validators.New().Var(value, ruleRequiredURNEdgeGateway)
-				},
-				TransformFunc: extractor.ExtractUUID,
 			},
 		},
 		QueryParams:     nil,

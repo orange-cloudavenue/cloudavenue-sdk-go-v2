@@ -10,8 +10,6 @@
 package itypes
 
 import (
-	"github.com/orange-cloudavenue/common-go/urn"
-
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
@@ -19,26 +17,17 @@ type (
 	// * APIResponse
 	APIResponseT0Names []string
 
-	APIResponseT0s []APIResponseT0
-
 	APIResponseT0 struct {
-		Type       string                  `json:"type" fake:"tier-0-vrf"`
-		Name       string                  `json:"name" fake:"{resource_name:t0}"`
-		Properties APIResponseT0Properties `json:"properties"`
-		Children   []APIResponseT0Children `json:"children,omitempty" fakesize:"1"`
+		Tier0VRF      string `json:"tier0_vrf" fake:"{resource_name:t0}"`
+		Tier0Provider string `json:"tier0_provider" fake:"pr01e02t0sp01"`
+		// One of VRF_STANDARD, VRF_PREMIUM, VRF_DEDICATED_MEDIUM, VRF_DEDICATED_LARGE.
+		ClassService string                 `json:"class_service" fake:"VRF_STANDARD"`
+		Services     []APIResponseT0Service `json:"services" fakesize:"1"`
 	}
 
-	APIResponseT0Properties struct {
-		ClassOfService string `json:"classOfService,omitempty" fake:"SHARED_STANDARD"`
-	}
-
-	APIResponseT0Children struct {
-		Type       string `json:"type" fake:"edge-gateway"`
-		Name       string `json:"name" fake:"{resource_name:edgegateway}"`
-		Properties struct {
-			RateLimit int    `json:"rateLimit,omitempty" fake:"5"`
-			EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"` // The UUID of the edge gateway
-		} `json:"properties"`
+	APIResponseT0Service struct {
+		Service string `json:"service" fake:"INTERNET"`
+		VLANID  string `json:"vlan_id,omitempty" fake:"1234"`
 	}
 )
 
@@ -51,104 +40,72 @@ func (t0Names APIResponseT0Names) ToModel() *types.ModelT0s {
 	return modelT0s
 }
 
-func (t0 APIResponseT0) ToModel() *types.ModelT0s {
-	return APIResponseT0s{t0}.ToModel()
+// edgeGateways returns the edge gateways attached to the T0 named name in the network hierarchy.
+// The Tier-0 details endpoint does not expose edge gateways, they are only available in the network hierarchy.
+func (hierarchy *APIResponseNetworkServices) edgeGateways(name string) []APIResponseNetworkServicesChildren {
+	if hierarchy == nil {
+		return nil
+	}
+
+	for _, t0 := range *hierarchy {
+		if t0.Name != name {
+			continue
+		}
+
+		var edgeGateways []APIResponseNetworkServicesChildren
+		for _, child := range t0.Children {
+			if child.Type == "edge-gateway" {
+				edgeGateways = append(edgeGateways, child)
+			}
+		}
+		return edgeGateways
+	}
+
+	return nil
 }
 
-func (t0s APIResponseT0s) ToModel() *types.ModelT0s {
-	var modelT0s types.ModelT0s
-	for _, t0 := range t0s {
-		modelT0 := types.ModelT0{
-			Name:           t0.Name,
-			ClassOfService: t0.Properties.ClassOfService,
-			Bandwidth: types.ModelT0Bandwidth{
-				Capacity: func() int {
-					if cof, ok := classOfServices[t0.Properties.ClassOfService]; ok {
-						return cof.MaxBandwidth
-					}
-					return 0
-				}(),
-				Provisioned: func() int {
-					if t0.Children == nil {
-						return 0
-					}
+// ToModel converts the Tier-0 details to a model.
+// The hierarchy is the response of the network hierarchy endpoint and is used to
+// retrieve the edge gateways attached to the T0 (nil means no edge gateway).
+func (t0 APIResponseT0) ToModel(hierarchy *APIResponseNetworkServices) *types.ModelT0 {
+	cos, hasCoS := classOfServices[t0.ClassService]
 
-					var totalProvisioned int
-					for _, child := range t0.Children {
-						if child.Properties.RateLimit > 0 {
-							totalProvisioned += child.Properties.RateLimit
-						}
-					}
-					return totalProvisioned
-				}(),
-				Remaining:              0,   // Remaining is calculated later
-				AllowedBandwidthValues: nil, // AllowedBandwidthValues is calculated later
-				AllowUnlimited: func() bool {
-					if cof, ok := classOfServices[t0.Properties.ClassOfService]; ok {
-						return cof.AllowUnlimited
-					}
-					return false
-				}(),
-			},
-			MaxEdgeGateways: func() int {
-				if cof, ok := classOfServices[t0.Properties.ClassOfService]; ok {
-					return cof.MaxEdgeGateways
-				}
-				return 0
-			}(),
-			EdgeGateways: func() []types.ModelT0EdgeGateway {
-				var edgeGateways []types.ModelT0EdgeGateway
-
-				for _, child := range t0.Children {
-					if child.Type == "edge-gateway" {
-						edgeGateway := types.ModelT0EdgeGateway{
-							ID:                     urn.Normalize(urn.EdgeGateway, child.Properties.EdgeUUID).String(),
-							Name:                   child.Name,
-							Bandwidth:              child.Properties.RateLimit,
-							AllowedBandwidthValues: nil, // This will be calculated later based on the remaining bandwidth
-						}
-						edgeGateways = append(edgeGateways, edgeGateway)
-					}
-				}
-				return edgeGateways
-			}(),
-		}
-		modelT0s.T0s = append(modelT0s.T0s, modelT0)
+	model := &types.ModelT0{
+		Name:            t0.Tier0VRF,
+		ClassOfService:  t0.ClassService,
+		MaxEdgeGateways: cos.MaxEdgeGateways,
+		Bandwidth: types.ModelT0Bandwidth{
+			Capacity:       cos.MaxBandwidth,
+			AllowUnlimited: cos.AllowUnlimited,
+		},
 	}
 
-	// Calculate the remaining bandwidth and allowed bandwidth values for each T0 router
-	for i, t0 := range modelT0s.T0s {
-		t0.Bandwidth.Remaining = t0.Bandwidth.Capacity - t0.Bandwidth.Provisioned
+	for _, child := range hierarchy.edgeGateways(t0.Tier0VRF) {
+		if child.Properties.RateLimit > 0 {
+			model.Bandwidth.Provisioned += child.Properties.RateLimit
+		}
 
-		// Calculate the allowed bandwidth values for the T0 router
-		if cof, ok := classOfServices[t0.ClassOfService]; ok {
-			// Use t0.Bandwidth.Remaining to ensure the values are within the allowed range
-			if t0.Bandwidth.Remaining > 0 {
-				for _, bw := range cof.MaxEdgeGatewayBandwidth {
-					if bw <= t0.Bandwidth.Remaining {
-						t0.Bandwidth.AllowedBandwidthValues = append(t0.Bandwidth.AllowedBandwidthValues, bw)
-					}
-				}
+		model.EdgeGateways = append(model.EdgeGateways, types.ModelT0EdgeGateway{
+			ID:        child.Properties.EdgeUUID,
+			Name:      child.Name,
+			Bandwidth: child.Properties.RateLimit,
+		})
+	}
+
+	model.Bandwidth.Remaining = model.Bandwidth.Capacity - model.Bandwidth.Provisioned
+
+	// Calculate the allowed bandwidth values, they must fit in the remaining bandwidth.
+	if hasCoS && model.Bandwidth.Remaining > 0 {
+		for _, bw := range cos.MaxEdgeGatewayBandwidth {
+			if bw <= model.Bandwidth.Remaining {
+				model.Bandwidth.AllowedBandwidthValues = append(model.Bandwidth.AllowedBandwidthValues, bw)
 			}
 		}
-		modelT0s.T0s[i] = t0
-	}
 
-	// Calculate the allowed bandwidth values for each edge gateway
-	for i, t0 := range modelT0s.T0s {
-		for j, edgeGateway := range t0.EdgeGateways {
-			// Use t0.Bandwidth.Remaining to ensure the values are within the allowed range
-			if t0.Bandwidth.Remaining > 0 {
-				for _, bw := range classOfServices[t0.ClassOfService].MaxEdgeGatewayBandwidth {
-					if bw <= t0.Bandwidth.Remaining {
-						edgeGateway.AllowedBandwidthValues = append(edgeGateway.AllowedBandwidthValues, bw)
-					}
-				}
-			}
-			modelT0s.T0s[i].EdgeGateways[j] = edgeGateway
+		for i := range model.EdgeGateways {
+			model.EdgeGateways[i].AllowedBandwidthValues = append([]int(nil), model.Bandwidth.AllowedBandwidthValues...)
 		}
 	}
 
-	modelT0s.Count = len(modelT0s.T0s)
-	return &modelT0s
+	return model
 }

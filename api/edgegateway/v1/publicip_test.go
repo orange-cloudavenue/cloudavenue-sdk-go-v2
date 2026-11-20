@@ -76,7 +76,7 @@ func newEdgeGatewayChild(name, edgeUUID string, services ...itypes.APIResponseNe
 		Name: name,
 		Properties: struct {
 			RateLimit int    `json:"rateLimit,omitempty"`
-			EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+			EdgeUUID  string `json:"edgeUUID,omitempty"`
 		}{
 			EdgeUUID: edgeUUID,
 		},
@@ -170,7 +170,7 @@ func TestListEdgegatewayPublicIP(t *testing.T) {
 							Name: validEdgeGWName,
 							Properties: struct {
 								RateLimit int    `json:"rateLimit,omitempty"`
-								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+								EdgeUUID  string `json:"edgeUUID,omitempty"`
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
@@ -215,7 +215,7 @@ func TestListEdgegatewayPublicIP(t *testing.T) {
 							Name: validEdgeGWName,
 							Properties: struct {
 								RateLimit int    `json:"rateLimit,omitempty"`
-								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+								EdgeUUID  string `json:"edgeUUID,omitempty"`
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
@@ -361,7 +361,7 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 							Name: validEdgeGWName,
 							Properties: struct {
 								RateLimit int    `json:"rateLimit,omitempty"`
-								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+								EdgeUUID  string `json:"edgeUUID,omitempty"`
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
@@ -414,7 +414,7 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 							Name: validEdgeGWName,
 							Properties: struct {
 								RateLimit int    `json:"rateLimit,omitempty"`
-								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+								EdgeUUID  string `json:"edgeUUID,omitempty"`
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
@@ -498,7 +498,7 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 							Name: "other-edge",
 							Properties: struct {
 								RateLimit int    `json:"rateLimit,omitempty"`
-								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+								EdgeUUID  string `json:"edgeUUID,omitempty"`
 							}{
 								EdgeUUID: "11111111-1111-1111-1111-111111111111",
 							},
@@ -530,8 +530,7 @@ func TestGetEdgegatewayPublicIP(t *testing.T) {
 				listStatusCode := tt.mockListResponseStatus
 				ms.CleanResponse(epQuery)
 				ms.SetResponse(epQuery, tt.mockListResponse, &listStatusCode)
-				ms.CleanResponse(endpoints.ListEdgeGateway())
-				ms.SetResponse(endpoints.ListEdgeGateway(), tt.mockListResponse, &listStatusCode)
+				setEdgeGatewayListResponse(ms, tt.mockListResponse, &listStatusCode)
 				ms.CleanResponse(endpoints.ListVDC())
 				ms.SetResponse(endpoints.ListVDC(), tt.mockListResponse, &listStatusCode)
 			}
@@ -609,7 +608,7 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 							Name: validEdgeGWName,
 							Properties: struct {
 								RateLimit int    `json:"rateLimit,omitempty"`
-								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+								EdgeUUID  string `json:"edgeUUID,omitempty"`
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
@@ -676,7 +675,7 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 							Name: validEdgeGWName,
 							Properties: struct {
 								RateLimit int    `json:"rateLimit,omitempty"`
-								EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+								EdgeUUID  string `json:"edgeUUID,omitempty"`
 							}{
 								EdgeUUID: "ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 							},
@@ -752,8 +751,7 @@ func TestCreateEdgegatewayPublicIP(t *testing.T) {
 			if tt.mockListResponse != nil || tt.mockListResponseStatus != 0 {
 				listStatusCode := tt.mockListResponseStatus
 				ms.SetResponse(epQuery, tt.mockListResponse, &listStatusCode)
-				ms.CleanResponse(endpoints.ListEdgeGateway())
-				ms.SetResponse(endpoints.ListEdgeGateway(), tt.mockListResponse, &listStatusCode)
+				setEdgeGatewayListResponse(ms, tt.mockListResponse, &listStatusCode)
 				ms.CleanResponse(endpoints.ListVDC())
 				ms.SetResponse(endpoints.ListVDC(), tt.mockListResponse, &listStatusCode)
 			}
