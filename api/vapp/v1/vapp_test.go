@@ -16,6 +16,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
@@ -1021,4 +1022,44 @@ func Test_NewClient_ClientNil(t *testing.T) {
 	c, err := New(nil)
 	assert.Nil(t, c, "Expected nil client when input is nil")
 	assert.Error(t, err, "Expected error when input is nil")
+}
+
+func TestGetVAppByNameReadsTheVAppByID(t *testing.T) {
+	tests := []struct {
+		name        string
+		recordID    string
+		expectByID  bool
+		expectedVDC string
+	}{
+		{name: "URN record ID is re-read by ID", recordID: testVAppID, expectByID: true, expectedVDC: "urn:vcloud:vdc:aaaaaaaa-1234-4b8d-89ab-123456789012"},
+		{name: "non URN record ID keeps the list record", recordID: "not-a-urn", expectByID: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
+			ms.CleanResponse(endpoints.ListVApp())
+			status := http.StatusOK
+			ms.SetResponse(endpoints.ListVApp(), &itypes.APIResponseListVApp{Records: []itypes.APIResponseListVAppRecord{{ID: tt.recordID, Name: "my-vapp"}}}, &status)
+
+			byID := 0
+			ms.CleanResponse(endpoints.GetVApp())
+			ms.SetResponseFunc(endpoints.GetVApp(), func(w http.ResponseWriter, _ *http.Request) {
+				byID++
+				w.Header().Set("Content-Type", "application/json")
+				assert.NoError(t, json.NewEncoder(w).Encode(&itypes.APIResponseGetVApp{ID: testVAppID, Name: "my-vapp", VDC: "urn:vcloud:vdc:aaaaaaaa-1234-4b8d-89ab-123456789012"}))
+			})
+
+			app, err := client.GetVApp(t.Context(), types.ParamsGetVApp{Name: "my-vapp"})
+			require.NoError(t, err)
+			assert.Equal(t, "my-vapp", app.Name)
+			assert.Equal(t, tt.expectedVDC, app.VDC)
+			if tt.expectByID {
+				assert.Equal(t, 1, byID)
+			} else {
+				assert.Zero(t, byID)
+			}
+		})
+	}
 }

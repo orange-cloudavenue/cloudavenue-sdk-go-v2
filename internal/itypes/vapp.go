@@ -14,6 +14,8 @@ import (
 	"encoding/xml"
 	"strings"
 
+	"github.com/orange-cloudavenue/common-go/urn"
+
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
@@ -134,6 +136,17 @@ type APIResponseGetVApp struct {
 	Org             string                     `json:"org" fake:"{urn:org}"`
 	Owner           VAppOwnerRef               `json:"owner" fake:"{urn:user}"`
 	Metadata        []APIResponseMetadata      `json:"metadataEntry" fakesize:"1"`
+
+	// Links is only decoded from the real legacy payload: it has no top-level
+	// vdc, the VDC is the rel="up" link.
+	Links []APIResponseVAppLink `json:"link" fake:"skip"`
+}
+
+// APIResponseVAppLink is one entry of the `link` array of the legacy vApp JSON.
+type APIResponseVAppLink struct {
+	HREF string `json:"href"`
+	Rel  string `json:"rel"`
+	Type string `json:"type"`
 }
 
 // APIResponseLeaseSettings contains VApp lease settings.
@@ -416,6 +429,10 @@ func (r *APIResponseGetVApp) ToModel() types.ModelVApp {
 		m.StorageLeaseInSeconds = &r.LeaseSettings.StorageLeaseInSeconds
 	}
 
+	if m.VDC == "" {
+		m.VDC = vdcURNFromLinks(r.Links)
+	}
+
 	for _, meta := range r.Metadata {
 		if meta.Key == "vappBillingModel" {
 			m.Properties.BillingModel = meta.Value
@@ -424,6 +441,20 @@ func (r *APIResponseGetVApp) ToModel() types.ModelVApp {
 	m.GuestProperties = r.GuestProperties.ToModel()
 
 	return m
+}
+
+// vdcURNFromLinks returns the URN of the parent VDC from the rel="up" link
+// (https://<console>/api/vdc/<uuid>), or an empty string.
+func vdcURNFromLinks(links []APIResponseVAppLink) string {
+	for _, link := range links {
+		if link.Rel != "up" || !strings.Contains(link.HREF, "/api/vdc/") {
+			continue
+		}
+		if uuid := urn.ExtractUUID(link.HREF); uuid != "" {
+			return urn.Normalize(urn.VDC, uuid).String()
+		}
+	}
+	return ""
 }
 
 // ToModel converts APIResponseGuestProperties to the public guest property model.

@@ -15,6 +15,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/orange-cloudavenue/common-go/urn"
+
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
@@ -237,6 +239,11 @@ func (c *Client) GetVApp(ctx context.Context, params types.ParamsGetVApp) (*type
 		for _, vapp := range list.Records {
 			m := vapp.ToModel()
 			if m.Name == params.Name {
+				// The list record has no VDC nor lease: read the full vApp by ID.
+				// A record ID that is not a vApp URN cannot be read: keep the partial model.
+				if urn.IsVAPP(m.ID) {
+					return c.GetVApp(ctx, types.ParamsGetVApp{ID: m.ID})
+				}
 				return &m, nil
 			}
 		}
