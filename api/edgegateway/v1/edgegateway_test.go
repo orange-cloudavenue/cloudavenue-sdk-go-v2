@@ -69,13 +69,6 @@ func TestGetEdgeGateway(t *testing.T) {
 			expectedErr:             true,
 		},
 		{
-			name: "Invalid Edge Gateway ID",
-			params: &types.ParamsEdgeGateway{
-				ID: "urn:vcloud:vm:invalid-id",
-			},
-			expectedErr: true,
-		},
-		{
 			name: "Error 500",
 			params: &types.ParamsEdgeGateway{
 				ID: generator.MustGenerate("{urn:edgegateway}"),
@@ -917,12 +910,13 @@ func TestUpdateEdgeGateway(t *testing.T) {
 			expectedErr: false,
 		},
 		{
-			name: "Invalid Edge Gateway ID",
+			name: "Edge Gateway ID not found",
 			params: &types.ParamsUpdateEdgeGateway{
-				ID:        "invalid-id",
+				ID:        generator.MustGenerate("{urn:edgegateway}"),
 				Bandwidth: 25,
 			},
-			expectedErr: true,
+			mockResponseStatus: 404,
+			expectedErr:        true,
 		},
 		{
 			name: "Edge Gateway Name not found",

@@ -139,7 +139,7 @@ func (c *Client) GetPublicIP(ctx context.Context, params types.ParamsGetEdgeGate
 		return nil, fmt.Errorf("invalid IP address: %w", err)
 	}
 
-	if err := validateEdgeGatewayRef(params.ID, params.Name); err != nil {
+	if err := validateEdgeGatewayRef(params.Name); err != nil {
 		return nil, err
 	}
 

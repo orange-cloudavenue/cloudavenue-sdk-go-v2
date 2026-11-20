@@ -159,7 +159,7 @@ func Test_GetT0(t *testing.T) {
 						Name: generator.MustGenerate("{resource_name:edgegateway}"),
 						Properties: struct {
 							RateLimit int    `json:"rateLimit,omitempty"`
-							EdgeUUID  string `json:"edgeUuid,omitempty" fake:"{urn:edgegateway}"`
+							EdgeUUID  string `json:"edgeUUID,omitempty"`
 						}{
 							EdgeUUID: "urn:vcloud:gateway:ed0a243a-374b-4306-ab25-9c3787cbdb4c",
 						},
@@ -200,12 +200,6 @@ func Test_GetT0(t *testing.T) {
 			params:        types.ParamsGetT0{},
 			expectedErr:   true,
 			errorContains: "edge gateway id or name is required",
-		},
-		{
-			name:          "Invalid edge gateway ID",
-			params:        types.ParamsGetT0{EdgegatewayID: "not-an-edge-gateway-urn"},
-			expectedErr:   true,
-			errorContains: "invalid edge gateway ID",
 		},
 		{
 			name:          "Invalid edge gateway name",
