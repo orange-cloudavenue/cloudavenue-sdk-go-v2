@@ -55,6 +55,10 @@ func (c *Client) GetT0(ctx context.Context, params types.ParamsGetT0) (*types.Mo
 }
 
 func (c *Client) getT0ByName(ctx context.Context, params types.ParamsGetT0) (*types.ModelT0, error) {
+	return c.getT0ByNameWithHierarchy(ctx, params, nil)
+}
+
+func (c *Client) getT0ByNameWithHierarchy(ctx context.Context, params types.ParamsGetT0, hierarchy *itypes.APIResponseNetworkServices) (*types.ModelT0, error) {
 	ep := cav.MustGetEndpoint("GetT0")
 
 	resp, err := c.c.Do(ctx, ep, cav.WithPathParam(ep.PathParams[0], params.T0Name))
@@ -62,12 +66,20 @@ func (c *Client) getT0ByName(ctx context.Context, params types.ParamsGetT0) (*ty
 		return nil, wrapT0APIError("GetT0", err, resp)
 	}
 
-	result := resp.Result().(*itypes.APIResponseT0).ToModel()
-	if len(result.T0s) == 0 || result.T0s[0].Name == "" {
+	details := resp.Result().(*itypes.APIResponseT0)
+	if details == nil || details.Tier0VRF == "" {
 		return nil, newT0NotFoundError(params, resp)
 	}
 
-	return &result.T0s[0], nil
+	if hierarchy == nil {
+		hierarchyResp, hErr := c.c.Do(ctx, endpoints.GetEdgeGatewayServices())
+		if hErr != nil {
+			return nil, wrapT0APIError("GetT0", hErr, hierarchyResp)
+		}
+		hierarchy = hierarchyResp.Result().(*itypes.APIResponseNetworkServices)
+	}
+
+	return details.ToModel(hierarchy), nil
 }
 
 func (c *Client) getT0ByEdgeGateway(ctx context.Context, params types.ParamsGetT0) (*types.ModelT0, error) {
@@ -76,12 +88,14 @@ func (c *Client) getT0ByEdgeGateway(ctx context.Context, params types.ParamsGetT
 		return nil, wrapT0APIError("GetT0", err, resp)
 	}
 
-	t0Name := findT0NameForEdgeGateway(resp.Result().(*itypes.APIResponseNetworkServices), params)
+	hierarchy := resp.Result().(*itypes.APIResponseNetworkServices)
+
+	t0Name := findT0NameForEdgeGateway(hierarchy, params)
 	if t0Name == "" {
 		return nil, newT0NotFoundError(params, resp)
 	}
 
-	return c.getT0ByName(ctx, types.ParamsGetT0{T0Name: t0Name})
+	return c.getT0ByNameWithHierarchy(ctx, types.ParamsGetT0{T0Name: t0Name}, hierarchy)
 }
 
 func findT0NameForEdgeGateway(t0s *itypes.APIResponseNetworkServices, params types.ParamsGetT0) string {
