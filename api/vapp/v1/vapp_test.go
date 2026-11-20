@@ -679,11 +679,16 @@ func TestDiscardSuspendedStateVAppEndpoint(t *testing.T) {
 	assert.Equal(t, "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-DiscardVAppState.html", ep.DocumentationURL)
 }
 
-func TestUpdateVAppEndpointDocumentation(t *testing.T) {
-	ep := endpoints.UpdateVApp()
-	assert.Equal(t, "/api/vApp/{vapp-id}", ep.PathTemplate)
-	assert.Equal(t, "PUT", string(ep.Method))
-	assert.Equal(t, "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-Vm.html", ep.DocumentationURL)
+func TestUpdateVAppEndpoints(t *testing.T) {
+	recompose := endpoints.RecomposeVApp()
+	assert.Equal(t, "/api/vApp/{vapp-id}/action/recomposeVApp", recompose.PathTemplate)
+	assert.Equal(t, "POST", string(recompose.Method))
+	assert.Equal(t, "application/vnd.vmware.vcloud.recomposeVAppParams+xml;version=39.1", recompose.Headers["Content-Type"])
+
+	lease := endpoints.UpdateVAppLeaseSettingsSection()
+	assert.Equal(t, "/api/vApp/{vapp-id}/leaseSettingsSection/", lease.PathTemplate)
+	assert.Equal(t, "PUT", string(lease.Method))
+	assert.Equal(t, "application/vnd.vmware.vcloud.leaseSettingsSection+xml;version=39.1", lease.Headers["Content-Type"])
 }
 
 func TestVAppLifecycleActionsRequireID(t *testing.T) {
@@ -785,18 +790,25 @@ func TestUpdateVAppPreservesExistingDescription(t *testing.T) {
 		assert.NoError(t, json.NewEncoder(w).Encode(resp))
 	})
 
-	ms.CleanResponse(endpoints.UpdateVApp())
-	ms.SetResponseFunc(endpoints.UpdateVApp(), func(w http.ResponseWriter, r *http.Request) {
-		var body itypes.APIRequestUpdateVApp
-		assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
-		if assert.NotNil(t, body.Description) {
-			assert.Equal(t, "current description", *body.Description)
+	recomposeCalled := false
+	ms.CleanResponse(endpoints.RecomposeVApp())
+	ms.SetResponseFunc(endpoints.RecomposeVApp(), func(w http.ResponseWriter, r *http.Request) {
+		recomposeCalled = true
+		w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
+		w.WriteHeader(http.StatusAccepted)
+	})
+
+	ms.CleanResponse(endpoints.UpdateVAppLeaseSettingsSection())
+	ms.SetResponseFunc(endpoints.UpdateVAppLeaseSettingsSection(), func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "application/vnd.vmware.vcloud.leaseSettingsSection+xml;version=39.1", r.Header.Get("Content-Type"))
+		var body itypes.APIRequestLeaseSettingsSection
+		assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
+		if assert.NotNil(t, body.DeploymentLeaseInSeconds) {
+			assert.Equal(t, 1800, *body.DeploymentLeaseInSeconds)
 		}
-		if assert.NotNil(t, body.LeaseSettings) && assert.NotNil(t, body.LeaseSettings.DeploymentLeaseInSeconds) {
-			assert.Equal(t, 1800, *body.LeaseSettings.DeploymentLeaseInSeconds)
-		}
-		if assert.NotNil(t, body.LeaseSettings) && assert.NotNil(t, body.LeaseSettings.StorageLeaseInSeconds) {
-			assert.Equal(t, storageLease, *body.LeaseSettings.StorageLeaseInSeconds)
+		// The lease that is not requested keeps its current value
+		if assert.NotNil(t, body.StorageLeaseInSeconds) {
+			assert.Equal(t, storageLease, *body.StorageLeaseInSeconds)
 		}
 		w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
 		w.WriteHeader(http.StatusAccepted)
@@ -808,9 +820,11 @@ func TestUpdateVAppPreservesExistingDescription(t *testing.T) {
 	assert.Equal(t, "current description", resp.Description)
 	assert.NotNil(t, resp.DeploymentLeaseInSeconds)
 	assert.Equal(t, 1800, *resp.DeploymentLeaseInSeconds)
+	assert.False(t, recomposeCalled, "the description is unchanged: no recompose")
 
 	ms.CleanResponse(endpoints.GetVApp())
-	ms.CleanResponse(endpoints.UpdateVApp())
+	ms.CleanResponse(endpoints.UpdateVAppLeaseSettingsSection())
+	ms.CleanResponse(endpoints.RecomposeVApp())
 }
 
 func TestUpdateVAppCanClearDescription(t *testing.T) {
@@ -834,13 +848,13 @@ func TestUpdateVAppCanClearDescription(t *testing.T) {
 		assert.NoError(t, json.NewEncoder(w).Encode(resp))
 	})
 
-	ms.CleanResponse(endpoints.UpdateVApp())
-	ms.SetResponseFunc(endpoints.UpdateVApp(), func(w http.ResponseWriter, r *http.Request) {
-		var body itypes.APIRequestUpdateVApp
-		assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
-		if assert.NotNil(t, body.Description) {
-			assert.Equal(t, empty, *body.Description)
-		}
+	ms.CleanResponse(endpoints.RecomposeVApp())
+	ms.SetResponseFunc(endpoints.RecomposeVApp(), func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "application/vnd.vmware.vcloud.recomposeVAppParams+xml;version=39.1", r.Header.Get("Content-Type"))
+		var body itypes.APIRequestRecomposeVApp
+		assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
+		assert.Equal(t, empty, body.Description)
+		assert.Equal(t, "test-vapp-1", body.Name)
 		w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
 		w.WriteHeader(http.StatusAccepted)
 	})
@@ -851,7 +865,7 @@ func TestUpdateVAppCanClearDescription(t *testing.T) {
 	assert.Equal(t, empty, resp.Description)
 
 	ms.CleanResponse(endpoints.GetVApp())
-	ms.CleanResponse(endpoints.UpdateVApp())
+	ms.CleanResponse(endpoints.RecomposeVApp())
 }
 
 func TestDeleteVApp(t *testing.T) {
@@ -1062,4 +1076,119 @@ func TestGetVAppByNameReadsTheVAppByID(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestMergedLease(t *testing.T) {
+	requested, current := 1800, 3600
+
+	got, err := mergedLease("deployment", &requested, &current)
+	assert.NoError(t, err)
+	assert.Equal(t, 1800, *got)
+
+	got, err = mergedLease("deployment", nil, &current)
+	assert.NoError(t, err)
+	assert.Equal(t, 3600, *got)
+
+	// an unknown current lease is not replaced by 0 ("never expires")
+	_, err = mergedLease("storage", nil, nil)
+	assert.ErrorContains(t, err, "the current storage lease is unknown")
+
+	// the returned pointer is a copy
+	*got = 1
+	assert.Equal(t, 3600, current)
+}
+
+// updateVAppCalls mocks the vApp read and the two update calls, and records the order of the calls.
+func updateVAppCalls(t *testing.T, ms interface {
+	CleanResponse(*cav.Endpoint)
+	SetResponseFunc(*cav.Endpoint, http.HandlerFunc)
+}, current *itypes.APIResponseGetVApp, leaseStatus int,
+) *[]string {
+	t.Helper()
+
+	calls := &[]string{}
+
+	ms.CleanResponse(endpoints.GetVApp())
+	ms.SetResponseFunc(endpoints.GetVApp(), func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		assert.NoError(t, json.NewEncoder(w).Encode(current))
+	})
+
+	ms.CleanResponse(endpoints.RecomposeVApp())
+	ms.SetResponseFunc(endpoints.RecomposeVApp(), func(w http.ResponseWriter, _ *http.Request) {
+		*calls = append(*calls, "recompose")
+		w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
+		w.WriteHeader(http.StatusAccepted)
+	})
+
+	ms.CleanResponse(endpoints.UpdateVAppLeaseSettingsSection())
+	ms.SetResponseFunc(endpoints.UpdateVAppLeaseSettingsSection(), func(w http.ResponseWriter, r *http.Request) {
+		*calls = append(*calls, "lease")
+		if leaseStatus != http.StatusAccepted {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(leaseStatus)
+			assert.NoError(t, json.NewEncoder(w).Encode(map[string]any{"message": "lease refused", "majorErrorCode": leaseStatus, "minorErrorCode": "BAD_REQUEST"}))
+			return
+		}
+		var body itypes.APIRequestLeaseSettingsSection
+		assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
+		if assert.NotNil(t, body.DeploymentLeaseInSeconds) {
+			assert.Equal(t, 1800, *body.DeploymentLeaseInSeconds)
+		}
+		if assert.NotNil(t, body.StorageLeaseInSeconds) {
+			assert.Equal(t, 7200, *body.StorageLeaseInSeconds)
+		}
+		w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
+		w.WriteHeader(http.StatusAccepted)
+	})
+
+	return calls
+}
+
+func TestUpdateVAppDescriptionAndLeaseAreTwoOrderedCalls(t *testing.T) {
+	client, ms := newClient(t)
+	vappID := "urn:vcloud:vapp:12345678-1234-4b8d-89ab-123456789012"
+	description := "new description"
+
+	calls := updateVAppCalls(t, ms, &itypes.APIResponseGetVApp{
+		ID: vappID, Name: "test-vapp-1", Description: "old description",
+		LeaseSettings: itypes.APIResponseLeaseSettings{DeploymentLeaseInSeconds: 3600, StorageLeaseInSeconds: 7200},
+	}, http.StatusAccepted)
+
+	_, err := client.UpdateVApp(t.Context(), types.ParamsUpdateVApp{ID: vappID, Description: &description, DeploymentLeaseInSeconds: new(1800)})
+	assert.NoError(t, err)
+	assert.Equal(t, []string{"recompose", "lease"}, *calls)
+}
+
+func TestUpdateVAppLeaseFailureSaysTheDescriptionWasUpdated(t *testing.T) {
+	client, ms := newClient(t)
+	vappID := "urn:vcloud:vapp:12345678-1234-4b8d-89ab-123456789012"
+	description := "new description"
+
+	calls := updateVAppCalls(t, ms, &itypes.APIResponseGetVApp{
+		ID: vappID, Name: "test-vapp-1", Description: "old description",
+		LeaseSettings: itypes.APIResponseLeaseSettings{DeploymentLeaseInSeconds: 3600, StorageLeaseInSeconds: 7200},
+	}, http.StatusBadRequest)
+
+	_, err := client.UpdateVApp(t.Context(), types.ParamsUpdateVApp{ID: vappID, Description: &description, DeploymentLeaseInSeconds: new(1800)})
+	assert.ErrorContains(t, err, "update lease (the description was already updated)")
+	assert.Equal(t, []string{"recompose", "lease"}, *calls)
+}
+
+func TestUpdateVAppUnknownCurrentLeaseFailsBeforeAnyCall(t *testing.T) {
+	client, ms := newClient(t)
+	vappID := "urn:vcloud:vapp:12345678-1234-4b8d-89ab-123456789012"
+	description := "new description"
+
+	// the vApp has no lease information: only the deployment lease is requested
+	calls := updateVAppCalls(t, ms, &itypes.APIResponseGetVApp{ID: vappID, Name: "test-vapp-1", Description: "old description"}, http.StatusAccepted)
+
+	_, err := client.UpdateVApp(t.Context(), types.ParamsUpdateVApp{ID: vappID, Description: &description, DeploymentLeaseInSeconds: new(1800)})
+	assert.ErrorContains(t, err, "the current storage lease is unknown")
+	assert.Empty(t, *calls, "nothing is changed when the lease cannot be resolved")
+
+	// requesting both leases is enough
+	_, err = client.UpdateVApp(t.Context(), types.ParamsUpdateVApp{ID: vappID, DeploymentLeaseInSeconds: new(1800), StorageLeaseInSeconds: new(7200)})
+	assert.NoError(t, err)
+	assert.Equal(t, []string{"lease"}, *calls)
 }

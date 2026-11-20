@@ -129,26 +129,48 @@ var (
 			return extractVMwareJob(resp, "instantiate template")
 		},
 	}
-	updateVAppByIDOp = cav.Operation[updateVAppByIDParams, cav.Job]{
+	recomposeVAppOp = cav.Operation[recomposeVAppParams, cav.Job]{
 		Name:     opUpdateVApp,
 		Backend:  cav.BackendVMware,
-		Endpoint: endpoints.UpdateVApp(),
-		Validate: func(p updateVAppByIDParams) error {
+		Endpoint: endpoints.RecomposeVApp(),
+		Validate: func(p recomposeVAppParams) error {
 			if p.ID == "" {
 				return fmt.Errorf("id is required")
 			}
 
 			return nil
 		},
-		RequestOptions: func(p updateVAppByIDParams) ([]cav.EndpointRequestOption, error) {
-			ep := endpoints.UpdateVApp()
+		RequestOptions: func(p recomposeVAppParams) ([]cav.EndpointRequestOption, error) {
+			ep := endpoints.RecomposeVApp()
 			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
 		},
-		Transform: func(p updateVAppByIDParams) (any, error) {
+		Transform: func(p recomposeVAppParams) (any, error) {
 			return p.Body, nil
 		},
-		Extract: func(resp *cav.Response, _ updateVAppByIDParams) (cav.Job, error) {
-			return extractVMwareJob(resp, "update")
+		Extract: func(resp *cav.Response, _ recomposeVAppParams) (cav.Job, error) {
+			return extractVMwareJob(resp, "recompose")
+		},
+	}
+	updateVAppLeaseSettingsSectionOp = cav.Operation[updateVAppLeaseSettingsSectionParams, cav.Job]{
+		Name:     opUpdateVApp,
+		Backend:  cav.BackendVMware,
+		Endpoint: endpoints.UpdateVAppLeaseSettingsSection(),
+		Validate: func(p updateVAppLeaseSettingsSectionParams) error {
+			if p.ID == "" {
+				return fmt.Errorf("id is required")
+			}
+
+			return nil
+		},
+		RequestOptions: func(p updateVAppLeaseSettingsSectionParams) ([]cav.EndpointRequestOption, error) {
+			ep := endpoints.UpdateVAppLeaseSettingsSection()
+			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
+		},
+		Transform: func(p updateVAppLeaseSettingsSectionParams) (any, error) {
+			return p.Body, nil
+		},
+		Extract: func(resp *cav.Response, _ updateVAppLeaseSettingsSectionParams) (cav.Job, error) {
+			return extractVMwareJob(resp, "update lease settings")
 		},
 	}
 	deleteVAppByIDOp = cav.Operation[deleteVAppByIDParams, cav.Job]{
@@ -365,35 +387,64 @@ func (c *Client) UpdateVApp(ctx context.Context, params types.ParamsUpdateVApp) 
 		current = vapp
 	}
 
-	body := itypes.APIRequestUpdateVApp{
-		Description: &current.Description,
-	}
-	if params.Description != nil {
-		body.Description = params.Description
-	}
-	if params.DeploymentLeaseInSeconds != nil || params.StorageLeaseInSeconds != nil || current.DeploymentLeaseInSeconds != nil || current.StorageLeaseInSeconds != nil {
-		body.LeaseSettings = &itypes.APIRequestLeaseSettings{}
-		if current.DeploymentLeaseInSeconds != nil {
-			body.LeaseSettings.DeploymentLeaseInSeconds = current.DeploymentLeaseInSeconds
+	// The lease body is built first: a lease that cannot be resolved must fail before anything is changed.
+	var lease *itypes.APIRequestLeaseSettingsSection
+	if leaseChanged(params, current) {
+		deployment, err := mergedLease("deployment", params.DeploymentLeaseInSeconds, current.DeploymentLeaseInSeconds)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", opUpdateVApp, err)
 		}
-		if params.DeploymentLeaseInSeconds != nil {
-			body.LeaseSettings.DeploymentLeaseInSeconds = params.DeploymentLeaseInSeconds
+		storage, err := mergedLease("storage", params.StorageLeaseInSeconds, current.StorageLeaseInSeconds)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", opUpdateVApp, err)
 		}
-		if current.StorageLeaseInSeconds != nil {
-			body.LeaseSettings.StorageLeaseInSeconds = current.StorageLeaseInSeconds
-		}
-		if params.StorageLeaseInSeconds != nil {
-			body.LeaseSettings.StorageLeaseInSeconds = params.StorageLeaseInSeconds
+
+		// Both values are sent, the one that is not requested keeps its current value.
+		lease = &itypes.APIRequestLeaseSettingsSection{
+			OVF:                      ovfEnvelopeXMLNS,
+			XMLNS:                    vcloudXMLNS,
+			Info:                     "Lease section settings",
+			DeploymentLeaseInSeconds: deployment,
+			StorageLeaseInSeconds:    storage,
 		}
 	}
 
-	job, err := cav.Execute(ctx, c.c, updateVAppByIDOp, updateVAppByIDParams{ID: params.ID, Body: body})
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", opUpdateVApp, err)
+	// The description and the lease are two calls (the API has no single call for both): when the
+	// second one fails the first one is already applied, and the error says so.
+	descriptionUpdated := false
+
+	// The description is changed with the recompose action. Deploy keeps the current deployment
+	// state: go-vcloud-director sends it the same way (UpdateNameDescription, SmallRecomposeVappParams).
+	if params.Description != nil && *params.Description != current.Description {
+		job, err := cav.Execute(ctx, c.c, recomposeVAppOp, recomposeVAppParams{ID: params.ID, Body: itypes.APIRequestRecomposeVApp{
+			OVF:         ovfEnvelopeXMLNS,
+			XSI:         xmlSchemaInstanceNS,
+			XMLNS:       vcloudXMLNS,
+			Name:        current.Name,
+			Deploy:      current.Deployed,
+			Description: *params.Description,
+		}})
+		if err != nil {
+			return nil, fmt.Errorf("%s: update description: %w", opUpdateVApp, err)
+		}
+		if job.Status != cav.JobSuccess {
+			if err := c.awaitJob(ctx, opUpdateVApp, job.ID); err != nil {
+				return nil, err
+			}
+		}
+		descriptionUpdated = true
 	}
 
-	if err := c.awaitJob(ctx, opUpdateVApp, job.ID); err != nil {
-		return nil, err
+	if lease != nil {
+		job, err := cav.Execute(ctx, c.c, updateVAppLeaseSettingsSectionOp, updateVAppLeaseSettingsSectionParams{ID: params.ID, Body: *lease})
+		if err != nil {
+			return nil, fmt.Errorf("%s: update lease%s: %w", opUpdateVApp, alreadyUpdatedNote(descriptionUpdated), err)
+		}
+		if job.Status != cav.JobSuccess {
+			if err := c.awaitJob(ctx, opUpdateVApp, job.ID); err != nil {
+				return nil, fmt.Errorf("%s: update lease%s: %w", opUpdateVApp, alreadyUpdatedNote(descriptionUpdated), err)
+			}
+		}
 	}
 
 	m, err := c.GetVApp(ctx, types.ParamsGetVApp{ID: params.ID})
@@ -511,4 +562,41 @@ func toInstantiationParams(params *types.VAppInstantiationParams) *itypes.APIReq
 		}
 	}
 	return result
+}
+
+// leaseChanged reports whether the update changes the lease of the vApp.
+func leaseChanged(params types.ParamsUpdateVApp, current *types.ModelVApp) bool {
+	return differs(params.DeploymentLeaseInSeconds, current.DeploymentLeaseInSeconds) ||
+		differs(params.StorageLeaseInSeconds, current.StorageLeaseInSeconds)
+}
+
+// differs reports whether a requested lease (nil: not requested) differs from the current one.
+// An unknown current lease (nil) is considered different.
+func differs(requested, current *int) bool {
+	if requested == nil {
+		return false
+	}
+	return current == nil || *requested != *current
+}
+
+// mergedLease returns the requested lease, or the current one when not requested.
+// A lease of 0 means "never expires": an unknown current lease is not replaced by 0, the update is refused.
+func mergedLease(kind string, requested, current *int) (*int, error) {
+	if requested != nil {
+		v := *requested
+		return &v, nil
+	}
+	if current != nil {
+		v := *current
+		return &v, nil
+	}
+	return nil, fmt.Errorf("the current %s lease is unknown: request both leases or none", kind)
+}
+
+// alreadyUpdatedNote tells that the description was changed before the failure.
+func alreadyUpdatedNote(descriptionUpdated bool) string {
+	if descriptionUpdated {
+		return " (the description was already updated)"
+	}
+	return ""
 }

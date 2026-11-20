@@ -380,18 +380,27 @@ type APIRequestInstantiateVAppTemplate struct {
 	AllEULAsAccepted    bool                               `xml:"AllEULAsAccepted,omitempty"`
 }
 
-// APIRequestUpdateVApp contains the request payload for updating a VApp.
-type APIRequestUpdateVApp struct {
-	XMLNS         string                   `json:"xmlns" fake:"http://www.vmware.com/vcloud/v1.5"`
-	Name          string                   `json:"name,omitempty" fake:"mockvapp-{word}"`
-	Description   *string                  `json:"description,omitempty" fake:"{sentence}"`
-	LeaseSettings *APIRequestLeaseSettings `json:"leaseSettings,omitempty"`
+// APIRequestRecomposeVApp is the XML body of the recomposeVApp action used to
+// update the name and the description of a vApp.
+type APIRequestRecomposeVApp struct {
+	XMLName     xml.Name `xml:"RecomposeVAppParams"`
+	OVF         string   `xml:"xmlns:ovf,attr"`
+	XSI         string   `xml:"xmlns:xsi,attr"`
+	XMLNS       string   `xml:"xmlns,attr"`
+	Name        string   `xml:"name,attr"`
+	Deploy      bool     `xml:"deploy,attr"`
+	Description string   `xml:"Description"`
 }
 
-// APIRequestLeaseSettings contains lease settings for update requests.
-type APIRequestLeaseSettings struct {
-	DeploymentLeaseInSeconds *int `json:"deploymentLeaseInSeconds,omitempty"`
-	StorageLeaseInSeconds    *int `json:"storageLeaseInSeconds,omitempty"`
+// APIRequestLeaseSettingsSection is the XML body replacing the lease settings
+// section of a vApp.
+type APIRequestLeaseSettingsSection struct {
+	XMLName                  xml.Name `xml:"LeaseSettingsSection"`
+	OVF                      string   `xml:"xmlns:ovf,attr"`
+	XMLNS                    string   `xml:"xmlns,attr"`
+	Info                     string   `xml:"ovf:Info"`
+	DeploymentLeaseInSeconds *int     `xml:"DeploymentLeaseInSeconds,omitempty"`
+	StorageLeaseInSeconds    *int     `xml:"StorageLeaseInSeconds,omitempty"`
 }
 
 // APIResponseOrgLeaseSettings contains org/VDC-level lease settings.

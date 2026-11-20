@@ -125,11 +125,18 @@ func InstantiateVAppTemplate() *cav.Endpoint {
 	return cav.MustGetEndpoint("InstantiateVAppTemplate")
 }
 
-// UpdateVApp - Update an existing VApp
+// RecomposeVApp - Update the name and the description of a VApp (recompose action)
 //
-// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-Vm.html
-func UpdateVApp() *cav.Endpoint {
-	return cav.MustGetEndpoint("UpdateVApp")
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-RecomposeVApp.html
+func RecomposeVApp() *cav.Endpoint {
+	return cav.MustGetEndpoint("RecomposeVApp")
+}
+
+// UpdateVAppLeaseSettingsSection - Replace the lease settings section of a VApp
+//
+// DocumentationURL: https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-LeaseSettingsSection.html
+func UpdateVAppLeaseSettingsSection() *cav.Endpoint {
+	return cav.MustGetEndpoint("UpdateVAppLeaseSettingsSection")
 }
 
 // DeleteVApp - Delete an existing VApp
