@@ -127,26 +127,48 @@ var (
 			return extractVMwareJob(resp, "instantiate template")
 		},
 	}
-	updateVAppByIDOp = cav.Operation[updateVAppByIDParams, cav.Job]{
+	recomposeVAppOp = cav.Operation[recomposeVAppParams, cav.Job]{
 		Name:     opUpdateVApp,
 		Backend:  cav.BackendVMware,
-		Endpoint: endpoints.UpdateVApp(),
-		Validate: func(p updateVAppByIDParams) error {
+		Endpoint: endpoints.RecomposeVApp(),
+		Validate: func(p recomposeVAppParams) error {
 			if p.ID == "" {
 				return fmt.Errorf("id is required")
 			}
 
 			return nil
 		},
-		RequestOptions: func(p updateVAppByIDParams) ([]cav.EndpointRequestOption, error) {
-			ep := endpoints.UpdateVApp()
+		RequestOptions: func(p recomposeVAppParams) ([]cav.EndpointRequestOption, error) {
+			ep := endpoints.RecomposeVApp()
 			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
 		},
-		Transform: func(p updateVAppByIDParams) (any, error) {
+		Transform: func(p recomposeVAppParams) (any, error) {
 			return p.Body, nil
 		},
-		Extract: func(resp *cav.Response, _ updateVAppByIDParams) (cav.Job, error) {
-			return extractVMwareJob(resp, "update")
+		Extract: func(resp *cav.Response, _ recomposeVAppParams) (cav.Job, error) {
+			return extractVMwareJob(resp, "recompose")
+		},
+	}
+	updateVAppLeaseSettingsSectionOp = cav.Operation[updateVAppLeaseSettingsSectionParams, cav.Job]{
+		Name:     opUpdateVApp,
+		Backend:  cav.BackendVMware,
+		Endpoint: endpoints.UpdateVAppLeaseSettingsSection(),
+		Validate: func(p updateVAppLeaseSettingsSectionParams) error {
+			if p.ID == "" {
+				return fmt.Errorf("id is required")
+			}
+
+			return nil
+		},
+		RequestOptions: func(p updateVAppLeaseSettingsSectionParams) ([]cav.EndpointRequestOption, error) {
+			ep := endpoints.UpdateVAppLeaseSettingsSection()
+			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
+		},
+		Transform: func(p updateVAppLeaseSettingsSectionParams) (any, error) {
+			return p.Body, nil
+		},
+		Extract: func(resp *cav.Response, _ updateVAppLeaseSettingsSectionParams) (cav.Job, error) {
+			return extractVMwareJob(resp, "update lease settings")
 		},
 	}
 	deleteVAppByIDOp = cav.Operation[deleteVAppByIDParams, cav.Job]{
@@ -362,35 +384,46 @@ func (c *Client) UpdateVApp(ctx context.Context, params types.ParamsUpdateVApp) 
 		current = vapp
 	}
 
-	body := itypes.APIRequestUpdateVApp{
-		Description: &current.Description,
-	}
-	if params.Description != nil {
-		body.Description = params.Description
-	}
-	if params.DeploymentLeaseInSeconds != nil || params.StorageLeaseInSeconds != nil || current.DeploymentLeaseInSeconds != nil || current.StorageLeaseInSeconds != nil {
-		body.LeaseSettings = &itypes.APIRequestLeaseSettings{}
-		if current.DeploymentLeaseInSeconds != nil {
-			body.LeaseSettings.DeploymentLeaseInSeconds = current.DeploymentLeaseInSeconds
+	// The description is changed with the recompose action.
+	if params.Description != nil && *params.Description != current.Description {
+		job, err := cav.Execute(ctx, c.c, recomposeVAppOp, recomposeVAppParams{ID: params.ID, Body: itypes.APIRequestRecomposeVApp{
+			OVF:         ovfEnvelopeXMLNS,
+			XSI:         xmlSchemaInstanceNS,
+			XMLNS:       vcloudXMLNS,
+			Name:        current.Name,
+			Deploy:      current.Deployed,
+			Description: *params.Description,
+		}})
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", opUpdateVApp, err)
 		}
-		if params.DeploymentLeaseInSeconds != nil {
-			body.LeaseSettings.DeploymentLeaseInSeconds = params.DeploymentLeaseInSeconds
-		}
-		if current.StorageLeaseInSeconds != nil {
-			body.LeaseSettings.StorageLeaseInSeconds = current.StorageLeaseInSeconds
-		}
-		if params.StorageLeaseInSeconds != nil {
-			body.LeaseSettings.StorageLeaseInSeconds = params.StorageLeaseInSeconds
+		if job.Status != cav.JobSuccess {
+			if err := c.awaitJob(ctx, opUpdateVApp, job.ID); err != nil {
+				return nil, err
+			}
 		}
 	}
 
-	job, err := cav.Execute(ctx, c.c, updateVAppByIDOp, updateVAppByIDParams{ID: params.ID, Body: body})
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", opUpdateVApp, err)
-	}
+	// The lease is changed on its own section: both values are sent, the one
+	// that is not requested keeps its current value.
+	if leaseChanged(params, current) {
+		lease := itypes.APIRequestLeaseSettingsSection{
+			OVF:                      ovfEnvelopeXMLNS,
+			XMLNS:                    vcloudXMLNS,
+			Info:                     "Lease section settings",
+			DeploymentLeaseInSeconds: mergedLease(params.DeploymentLeaseInSeconds, current.DeploymentLeaseInSeconds),
+			StorageLeaseInSeconds:    mergedLease(params.StorageLeaseInSeconds, current.StorageLeaseInSeconds),
+		}
 
-	if err := c.awaitJob(ctx, opUpdateVApp, job.ID); err != nil {
-		return nil, err
+		job, err := cav.Execute(ctx, c.c, updateVAppLeaseSettingsSectionOp, updateVAppLeaseSettingsSectionParams{ID: params.ID, Body: lease})
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", opUpdateVApp, err)
+		}
+		if job.Status != cav.JobSuccess {
+			if err := c.awaitJob(ctx, opUpdateVApp, job.ID); err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	m, err := c.GetVApp(ctx, types.ParamsGetVApp{ID: params.ID})
@@ -508,4 +541,32 @@ func toInstantiationParams(params *types.VAppInstantiationParams) *itypes.APIReq
 		}
 	}
 	return result
+}
+
+// leaseChanged reports whether the update changes the lease of the vApp.
+func leaseChanged(params types.ParamsUpdateVApp, current *types.ModelVApp) bool {
+	return differs(params.DeploymentLeaseInSeconds, current.DeploymentLeaseInSeconds) ||
+		differs(params.StorageLeaseInSeconds, current.StorageLeaseInSeconds)
+}
+
+// differs reports whether a requested lease (nil: not requested) differs from the current one.
+// An unknown current lease (nil) is considered different.
+func differs(requested, current *int) bool {
+	if requested == nil {
+		return false
+	}
+	return current == nil || *requested != *current
+}
+
+// mergedLease returns the requested lease, or the current one when not requested (0 when unknown).
+func mergedLease(requested, current *int) *int {
+	if requested != nil {
+		v := *requested
+		return &v
+	}
+	v := 0
+	if current != nil {
+		v = *current
+	}
+	return &v
 }

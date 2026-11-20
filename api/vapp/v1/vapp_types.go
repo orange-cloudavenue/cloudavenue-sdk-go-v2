@@ -27,9 +27,14 @@ type instantiateVAppTemplateParams struct {
 	Body  itypes.APIRequestInstantiateVAppTemplate
 }
 
-type updateVAppByIDParams struct {
+type recomposeVAppParams struct {
 	ID   string
-	Body itypes.APIRequestUpdateVApp
+	Body itypes.APIRequestRecomposeVApp
+}
+
+type updateVAppLeaseSettingsSectionParams struct {
+	ID   string
+	Body itypes.APIRequestLeaseSettingsSection
 }
 
 type deleteVAppByIDParams struct {
