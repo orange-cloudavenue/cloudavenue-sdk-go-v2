@@ -96,7 +96,13 @@ func (o *VAppOwnerRef) UnmarshalJSON(data []byte) error {
 	case payload.User.ID != "":
 		*o = VAppOwnerRef(payload.User.ID)
 	case payload.User.HREF != "":
-		*o = VAppOwnerRef(payload.User.HREF)
+		// The legacy payload may carry only the user href (/api/admin/user/<uuid>):
+		// return the user URN to stay consistent with the other identifiers.
+		if uuid := urn.ExtractUUID(payload.User.HREF); uuid != "" {
+			*o = VAppOwnerRef(urn.Normalize(urn.User, uuid).String())
+		} else {
+			*o = VAppOwnerRef(payload.User.HREF)
+		}
 	default:
 		*o = VAppOwnerRef(payload.HREF)
 	}
