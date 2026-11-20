@@ -78,7 +78,7 @@ var (
 			return edgeGateway.ToModel(), nil
 		},
 	}
-	deleteEdgeGatewayByIDOp = cav.Operation[deleteEdgeGatewayByIDParams, struct{}]{
+	deleteEdgeGatewayByIDOp = cav.Operation[deleteEdgeGatewayByIDParams, *cav.CerberusJobCreatedAPIResponse]{
 		Name:     opDeleteEdgeGateway,
 		Backend:  cav.BackendInfrapi,
 		Endpoint: endpoints.DeleteEdgeGateway(),
@@ -93,8 +93,17 @@ var (
 			ep := endpoints.DeleteEdgeGateway()
 			return []cav.EndpointRequestOption{cav.WithPathParam(ep.PathParams[0], p.ID)}, nil
 		},
-		Extract: func(_ *cav.Response, _ deleteEdgeGatewayByIDParams) (struct{}, error) {
-			return struct{}{}, nil
+		Extract: func(resp *cav.Response, _ deleteEdgeGatewayByIDParams) (*cav.CerberusJobCreatedAPIResponse, error) {
+			deleted, ok := resp.Result().(*cav.CerberusJobCreatedAPIResponse)
+			if !ok || deleted == nil {
+				return nil, fmt.Errorf("unexpected delete response type %T", resp.Result())
+			}
+
+			if deleted.ID == "" {
+				return nil, fmt.Errorf("job id not found in delete response")
+			}
+
+			return deleted, nil
 		},
 	}
 	updateEdgeGatewayByIDOp = cav.Operation[updateEdgeGatewayByIDParams, struct{}]{
@@ -160,8 +169,16 @@ func (c *Client) DeleteEdgeGateway(ctx context.Context, params types.ParamsEdgeG
 		}
 	}
 
-	if _, err := cav.Execute(ctx, c.c, deleteEdgeGatewayByIDOp, deleteEdgeGatewayByIDParams{ID: params.ID}); err != nil {
+	deleted, err := cav.Execute(ctx, c.c, deleteEdgeGatewayByIDOp, deleteEdgeGatewayByIDParams{ID: params.ID})
+	if err != nil {
 		return err
+	}
+
+	if _, err := cav.WaitJob(ctx, c.c, cav.JobWaitRequest{
+		Backend: cav.BackendInfrapi,
+		JobID:   deleted.ID,
+	}); err != nil {
+		return fmt.Errorf("%s: await job: %w", opDeleteEdgeGateway, err)
 	}
 
 	return nil

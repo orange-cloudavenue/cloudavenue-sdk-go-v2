@@ -11,7 +11,9 @@ package edgegateway
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
+	"sync/atomic"
 	"testing"
 
 	"github.com/orange-cloudavenue/common-go/generator"
@@ -21,6 +23,7 @@ import (
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav/mock"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/internal/itypes"
+	pkgerrors "github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/pkg/errors"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/types"
 )
 
@@ -197,6 +200,8 @@ func TestDeleteEdgeGateway(t *testing.T) {
 		params                  *types.ParamsEdgeGateway
 		mockResponse            any
 		mockResponseStatus      int
+		mockJobResponse         any
+		mockJobResponseStatus   int
 		mockQueryResponseStatus int
 		expectedErr             bool
 	}{
@@ -208,6 +213,67 @@ func TestDeleteEdgeGateway(t *testing.T) {
 			mockResponse: nil,
 			// mockResponseStatus: 202,
 			expectedErr: false,
+		},
+		{
+			name: "Valid Edge Gateway ID with job done",
+			params: &types.ParamsEdgeGateway{
+				ID: generator.MustGenerate("{uuid}"),
+			},
+			mockJobResponse:       newDeleteJobResponse("DONE"),
+			mockJobResponseStatus: http.StatusOK,
+			expectedErr:           false,
+		},
+		{
+			name: "Job failed",
+			params: &types.ParamsEdgeGateway{
+				ID: generator.MustGenerate("{uuid}"),
+			},
+			mockJobResponse:       newDeleteJobResponse("FAILED"),
+			mockJobResponseStatus: http.StatusOK,
+			expectedErr:           true,
+		},
+		{
+			name: "Job unknown status",
+			params: &types.ParamsEdgeGateway{
+				ID: generator.MustGenerate("{uuid}"),
+			},
+			mockJobResponse:       newDeleteJobResponse("UNKNOWN"),
+			mockJobResponseStatus: http.StatusOK,
+			expectedErr:           true,
+		},
+		{
+			name: "Job lookup returns empty response",
+			params: &types.ParamsEdgeGateway{
+				ID: generator.MustGenerate("{uuid}"),
+			},
+			mockJobResponse:       &cav.CerberusJobAPIResponse{},
+			mockJobResponseStatus: http.StatusOK,
+			expectedErr:           true,
+		},
+		{
+			name: "Job lookup error 404",
+			params: &types.ParamsEdgeGateway{
+				ID: generator.MustGenerate("{uuid}"),
+			},
+			mockJobResponseStatus: http.StatusNotFound,
+			expectedErr:           true,
+		},
+		{
+			name: "Job lookup error 500",
+			params: &types.ParamsEdgeGateway{
+				ID: generator.MustGenerate("{uuid}"),
+			},
+			mockJobResponseStatus: http.StatusInternalServerError,
+			expectedErr:           true,
+		},
+		{
+			name: "Delete response without job id",
+			params: &types.ParamsEdgeGateway{
+				ID: generator.MustGenerate("{uuid}"),
+			},
+			mockResponse:       &cav.CerberusJobCreatedAPIResponse{},
+			mockResponseStatus: http.StatusCreated,
+			expectedErr:        true,
 		},
 		{
 			name: "Valid Edge Gateway Name",
@@ -274,6 +340,11 @@ func TestDeleteEdgeGateway(t *testing.T) {
 				ms.SetResponse(endpoints.DeleteEdgeGateway(), tt.mockResponse, &tt.mockResponseStatus)
 			}
 
+			if tt.mockJobResponseStatus != 0 {
+				ms.CleanResponse(endpoints.GetJobCerberus())
+				ms.SetResponse(endpoints.GetJobCerberus(), tt.mockJobResponse, &tt.mockJobResponseStatus)
+			}
+
 			if tt.mockQueryResponseStatus != 0 {
 				setEdgeGatewayListResponse(ms, nil, &tt.mockQueryResponseStatus)
 				ms.SetResponse(endpoints.ListVDC(), nil, &tt.mockQueryResponseStatus)
@@ -292,6 +363,97 @@ func TestDeleteEdgeGateway(t *testing.T) {
 			}
 		})
 	}
+}
+
+// newDeleteJobResponse builds a Cerberus job lookup response for the delete edge gateway job.
+func newDeleteJobResponse(status string) *cav.CerberusJobAPIResponse {
+	return &cav.CerberusJobAPIResponse{
+		{
+			Actions: []cav.CerberusJobAPIResponseAction{
+				{
+					Details: generator.MustGenerate("{resource_name:edgegateway}"),
+					Name:    "Delete Edge Gateway",
+					Status:  status,
+				},
+			},
+			Name:        "Delete Edge Gateway Job",
+			Status:      status,
+			Description: "Edge Gateway deletion job",
+		},
+	}
+}
+
+// TestDeleteEdgeGateway_WaitsForJob verifies DeleteEdgeGateway polls the job
+// created by the delete request and only returns once it is terminal.
+func TestDeleteEdgeGateway_WaitsForJob(t *testing.T) {
+	t.Run("job lookup is called with the job id returned by delete", func(t *testing.T) {
+		eC, ms := newClient(t)
+
+		jobID := generator.MustGenerate("{uuid}")
+		deleteStatus := http.StatusCreated
+		ms.SetResponse(endpoints.DeleteEdgeGateway(), &cav.CerberusJobCreatedAPIResponse{ID: jobID, Message: "ok"}, &deleteStatus)
+
+		var (
+			calls   atomic.Int32
+			gotPath atomic.Value
+		)
+		ms.SetResponseFunc(endpoints.GetJobCerberus(), func(w http.ResponseWriter, r *http.Request) {
+			calls.Add(1)
+			gotPath.Store(r.URL.Path)
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(newDeleteJobResponse("DONE"))
+		})
+
+		err := eC.DeleteEdgeGateway(t.Context(), types.ParamsEdgeGateway{ID: generator.MustGenerate("{uuid}")})
+		assert.NoError(t, err)
+		assert.Equal(t, int32(1), calls.Load(), "job endpoint should be polled once")
+		path, _ := gotPath.Load().(string)
+		assert.Contains(t, path, jobID, "job lookup should use the job id returned by delete")
+	})
+
+	t.Run("pending job is polled until done", func(t *testing.T) {
+		eC, ms := newClient(t)
+
+		var calls atomic.Int32
+		ms.SetResponseFunc(endpoints.GetJobCerberus(), func(w http.ResponseWriter, _ *http.Request) {
+			status := "DONE"
+			if calls.Add(1) == 1 {
+				status = "IN_PROGRESS"
+			}
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(newDeleteJobResponse(status))
+		})
+
+		err := eC.DeleteEdgeGateway(t.Context(), types.ParamsEdgeGateway{ID: generator.MustGenerate("{uuid}")})
+		assert.NoError(t, err)
+		assert.Equal(t, int32(2), calls.Load(), "job endpoint should be polled until terminal status")
+	})
+
+	t.Run("failed job returns ErrJobFailed", func(t *testing.T) {
+		eC, ms := newClient(t)
+
+		status := http.StatusOK
+		ms.SetResponse(endpoints.GetJobCerberus(), newDeleteJobResponse("FAILED"), &status)
+
+		err := eC.DeleteEdgeGateway(t.Context(), types.ParamsEdgeGateway{ID: generator.MustGenerate("{uuid}")})
+		assert.ErrorIs(t, err, pkgerrors.ErrJobFailed)
+	})
+
+	t.Run("context canceled while waiting for job", func(t *testing.T) {
+		eC, ms := newClient(t)
+
+		ctx, cancel := context.WithCancel(t.Context())
+		defer cancel()
+
+		ms.SetResponseFunc(endpoints.GetJobCerberus(), func(w http.ResponseWriter, _ *http.Request) {
+			cancel()
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(newDeleteJobResponse("IN_PROGRESS"))
+		})
+
+		err := eC.DeleteEdgeGateway(ctx, types.ParamsEdgeGateway{ID: generator.MustGenerate("{uuid}")})
+		assert.Error(t, err)
+	})
 }
 
 func TestDeleteEdgeGateway_ContextDeadlineExceeded(t *testing.T) {
