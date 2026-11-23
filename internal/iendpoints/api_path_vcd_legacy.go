@@ -47,6 +47,10 @@ const (
 	pathVAppControlAccessAction = "/api/vApp/{vapp-id}/action/controlAccess"
 	// pathVAppNetworkConfigSection gets or replaces the runtime network configuration of one vApp.
 	pathVAppNetworkConfigSection = "/api/vApp/{vapp-id}/networkConfigSection/"
+	// pathVAppRecompose recomposes one vApp (rename, change the description).
+	pathVAppRecompose = "/api/vApp/{vapp-id}/action/recomposeVApp"
+	// pathVAppLeaseSettingsSection replaces the lease settings section of one vApp.
+	pathVAppLeaseSettingsSection = "/api/vApp/{vapp-id}/leaseSettingsSection/"
 	// pathVAppRemoveAllNetworks removes all networks from one vApp.
 	pathVAppRemoveAllNetworks = "/api/vApp/{vapp-id}/action/removeAllNetworks"
 	// pathVAppUndeploy undeploys one vApp.

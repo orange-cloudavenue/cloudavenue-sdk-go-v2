@@ -13,9 +13,11 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/cav"
 	"github.com/orange-cloudavenue/cloudavenue-sdk-go-v2/endpoints"
@@ -455,60 +457,77 @@ func TestVAppGuestProperties(t *testing.T) {
 	vappID := testVAppID
 	getCalls := 0
 
-	guestProperties := &itypes.APIResponseGuestProperties{ProductSectionList: []itypes.APIResponseProductSection{{Class: "vami", Instance: "default", Property: []itypes.APIResponseProductProperty{{Key: "hostname", Label: "Hostname", Type: "string", Value: "vm-01", UserConfigurable: true}, {Key: "role", Type: "string", Value: "app"}}}}}
+	stored := itypes.ToAPIProductSectionList(types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Properties: map[string]types.ModelVAppGuestProperty{
+		"hostname": {Label: "Hostname", Type: "string", Value: "vm-01", UserConfigurable: true},
+		"role":     {Type: "string", Value: "app"},
+	}}}})
 
 	ms.CleanResponse(endpoints.GetVAppProductSections())
 	ms.SetResponseFunc(endpoints.GetVAppProductSections(), func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "application/vnd.vmware.vcloud.productSections+json;version=39.1", r.Header.Get("Accept"))
-		w.Header().Set("Content-Type", "application/json")
-		assert.NoError(t, json.NewEncoder(w).Encode(guestProperties))
+		assert.Equal(t, "application/vnd.vmware.vcloud.productSections+xml;version=39.1", r.Header.Get("Accept"))
+		w.Header().Set("Content-Type", "application/vnd.vmware.vcloud.productSections+xml")
+		assert.NoError(t, xml.NewEncoder(w).Encode(stored))
 		getCalls++
 	})
 
 	resp, err := client.GetVAppGuestProperties(t.Context(), types.ParamsGetVAppGuestProperties{ID: vappID})
 	assert.NoError(t, err)
 	if assert.NotNil(t, resp) && assert.Len(t, resp.Sections, 1) {
-		assert.Equal(t, "vami", resp.Sections[0].Class)
-		assert.Equal(t, "default", resp.Sections[0].Instance)
 		assert.Equal(t, types.ModelVAppGuestProperty{Key: "hostname", Label: "Hostname", Type: "string", Value: "vm-01", UserConfigurable: true}, resp.Sections[0].Properties["hostname"])
+		assert.Equal(t, types.ModelVAppGuestProperty{Key: "role", Label: "role", Type: "string", Value: "app"}, resp.Sections[0].Properties["role"])
 	}
 
 	ms.CleanResponse(endpoints.UpdateVAppProductSections())
 	ms.SetResponseFunc(endpoints.UpdateVAppProductSections(), func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "application/vnd.vmware.vcloud.productSections+json;version=39.1", r.Header.Get("Accept"))
-		assert.Equal(t, "application/vnd.vmware.vcloud.productSections+json;version=39.1", r.Header.Get("Content-Type"))
-		var body itypes.APIResponseGuestProperties
-		assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
-		if assert.Len(t, body.ProductSectionList, 1) {
-			assert.Equal(t, "vami", body.ProductSectionList[0].Class)
-			assert.Len(t, body.ProductSectionList[0].Property, 2)
-			assert.Equal(t, []itypes.APIResponseProductProperty{{Key: "hostname", Label: "Hostname", Type: "string", Value: "vm-02", UserConfigurable: true}, {Key: "role", Type: "string", Value: "db"}}, body.ProductSectionList[0].Property)
+		assert.Equal(t, "application/*+xml;version=39.1", r.Header.Get("Accept"))
+		assert.Equal(t, "application/vnd.vmware.vcloud.productSections+xml;version=39.1", r.Header.Get("Content-Type"))
+		var body itypes.APIProductSectionList
+		assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
+		model := body.ToModel()
+		if assert.Len(t, model.Sections, 1) {
+			assert.Equal(t, map[string]types.ModelVAppGuestProperty{
+				"hostname": {Key: "hostname", Label: "Hostname", Type: "string", Value: "vm-02", UserConfigurable: true},
+				"role":     {Key: "role", Label: "role", Type: "string", Value: "db"},
+			}, model.Sections[0].Properties)
 		}
-		guestProperties = &body
+		stored = &body
 		w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
 		w.WriteHeader(http.StatusAccepted)
 	})
 
-	updated, err := client.UpdateVAppGuestProperties(t.Context(), types.ParamsUpdateVAppGuestProperties{ID: vappID, GuestProperties: types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Class: "vami", Instance: "default", Properties: map[string]types.ModelVAppGuestProperty{"hostname": {Label: "Hostname", Type: "string", Value: "vm-02", UserConfigurable: true}, "role": {Type: "string", Value: "db"}}}}}})
+	updated, err := client.UpdateVAppGuestProperties(t.Context(), types.ParamsUpdateVAppGuestProperties{ID: vappID, GuestProperties: types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Properties: map[string]types.ModelVAppGuestProperty{"hostname": {Label: "Hostname", Type: "string", Value: "vm-02", UserConfigurable: true}, "role": {Value: "db"}}}}}})
 	assert.NoError(t, err)
 	if assert.NotNil(t, updated) && assert.Len(t, updated.Sections, 1) {
 		assert.Equal(t, types.ModelVAppGuestProperty{Key: "hostname", Label: "Hostname", Type: "string", Value: "vm-02", UserConfigurable: true}, updated.Sections[0].Properties["hostname"])
-		assert.Equal(t, types.ModelVAppGuestProperty{Key: "role", Type: "string", Value: "db"}, updated.Sections[0].Properties["role"])
+		assert.Equal(t, types.ModelVAppGuestProperty{Key: "role", Label: "role", Type: "string", Value: "db"}, updated.Sections[0].Properties["role"])
 	}
-	assert.Equal(t, 2, getCalls)
+	// read, read of the current list before the update, read of the result
+	assert.Equal(t, 3, getCalls)
 }
 
 func TestVAppGuestPropertiesPayloadDeterministicOrder(t *testing.T) {
-	first := toAPIResponseGuestProperties(types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Class: "class", Instance: "b", Properties: map[string]types.ModelVAppGuestProperty{"gamma": {Type: "string", Value: "3"}, "beta": {Type: "string", Value: "4"}}}, {Class: "class", Instance: "a", Properties: map[string]types.ModelVAppGuestProperty{"zeta": {Type: "string", Value: "1"}, "alpha": {Type: "string", Value: "2"}}}}})
-	second := toAPIResponseGuestProperties(types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Class: "class", Instance: "a", Properties: map[string]types.ModelVAppGuestProperty{"alpha": {Type: "string", Value: "2"}, "zeta": {Type: "string", Value: "1"}}}, {Class: "class", Instance: "b", Properties: map[string]types.ModelVAppGuestProperty{"beta": {Type: "string", Value: "4"}, "gamma": {Type: "string", Value: "3"}}}}})
+	first, err := xml.Marshal(itypes.ToAPIProductSectionList(types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Properties: map[string]types.ModelVAppGuestProperty{"gamma": {Type: "string", Value: "3"}, "beta": {Type: "string", Value: "4"}, "zeta": {Type: "string", Value: "1"}, "alpha": {Type: "string", Value: "2"}}}}}))
+	assert.NoError(t, err)
+	second, err := xml.Marshal(itypes.ToAPIProductSectionList(types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Properties: map[string]types.ModelVAppGuestProperty{"alpha": {Type: "string", Value: "2"}, "zeta": {Type: "string", Value: "1"}, "beta": {Type: "string", Value: "4"}, "gamma": {Type: "string", Value: "3"}}}}}))
+	assert.NoError(t, err)
 
-	assert.Equal(t, second, first)
-	if assert.Len(t, first.ProductSectionList, 2) {
-		assert.Equal(t, "a", first.ProductSectionList[0].Instance)
-		assert.Equal(t, []itypes.APIResponseProductProperty{{Key: "alpha", Type: "string", Value: "2"}, {Key: "zeta", Type: "string", Value: "1"}}, first.ProductSectionList[0].Property)
-		assert.Equal(t, "b", first.ProductSectionList[1].Instance)
-		assert.Equal(t, []itypes.APIResponseProductProperty{{Key: "beta", Type: "string", Value: "4"}, {Key: "gamma", Type: "string", Value: "3"}}, first.ProductSectionList[1].Property)
+	assert.Equal(t, string(second), string(first))
+
+	last := -1
+	for _, key := range []string{"alpha", "beta", "gamma", "zeta"} {
+		idx := strings.Index(string(first), `:key="`+key+`"`)
+		assert.Greater(t, idx, last, "%s is out of order in %s", key, first)
+		last = idx
 	}
+}
+
+func TestVAppGuestPropertiesEmptyListIsSent(t *testing.T) {
+	// An empty section removes every property: the section is still sent.
+	out, err := xml.Marshal(itypes.ToAPIProductSectionList(types.ModelVAppGuestProperties{Sections: []types.ModelVAppGuestPropertySection{{Properties: map[string]types.ModelVAppGuestProperty{}}}}))
+	assert.NoError(t, err)
+	assert.Contains(t, string(out), "<ProductSection")
+	assert.Contains(t, string(out), "Custom properties")
+	assert.NotContains(t, string(out), "<Property")
 }
 
 func TestVAppGuestPropertiesAllowEmptySection(t *testing.T) {
@@ -678,11 +697,16 @@ func TestDiscardSuspendedStateVAppEndpoint(t *testing.T) {
 	assert.Equal(t, "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/POST-DiscardVAppState.html", ep.DocumentationURL)
 }
 
-func TestUpdateVAppEndpointDocumentation(t *testing.T) {
-	ep := endpoints.UpdateVApp()
-	assert.Equal(t, "/api/vApp/{vapp-id}", ep.PathTemplate)
-	assert.Equal(t, "PUT", string(ep.Method))
-	assert.Equal(t, "https://developer.broadcom.com/xapis/vmware-cloud-director-api/39.1/doc/operations/PUT-Vm.html", ep.DocumentationURL)
+func TestUpdateVAppEndpoints(t *testing.T) {
+	recompose := endpoints.RecomposeVApp()
+	assert.Equal(t, "/api/vApp/{vapp-id}/action/recomposeVApp", recompose.PathTemplate)
+	assert.Equal(t, "POST", string(recompose.Method))
+	assert.Equal(t, "application/vnd.vmware.vcloud.recomposeVAppParams+xml;version=39.1", recompose.Headers["Content-Type"])
+
+	lease := endpoints.UpdateVAppLeaseSettingsSection()
+	assert.Equal(t, "/api/vApp/{vapp-id}/leaseSettingsSection/", lease.PathTemplate)
+	assert.Equal(t, "PUT", string(lease.Method))
+	assert.Equal(t, "application/vnd.vmware.vcloud.leaseSettingsSection+xml;version=39.1", lease.Headers["Content-Type"])
 }
 
 func TestVAppLifecycleActionsRequireID(t *testing.T) {
@@ -784,18 +808,25 @@ func TestUpdateVAppPreservesExistingDescription(t *testing.T) {
 		assert.NoError(t, json.NewEncoder(w).Encode(resp))
 	})
 
-	ms.CleanResponse(endpoints.UpdateVApp())
-	ms.SetResponseFunc(endpoints.UpdateVApp(), func(w http.ResponseWriter, r *http.Request) {
-		var body itypes.APIRequestUpdateVApp
-		assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
-		if assert.NotNil(t, body.Description) {
-			assert.Equal(t, "current description", *body.Description)
+	recomposeCalled := false
+	ms.CleanResponse(endpoints.RecomposeVApp())
+	ms.SetResponseFunc(endpoints.RecomposeVApp(), func(w http.ResponseWriter, r *http.Request) {
+		recomposeCalled = true
+		w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
+		w.WriteHeader(http.StatusAccepted)
+	})
+
+	ms.CleanResponse(endpoints.UpdateVAppLeaseSettingsSection())
+	ms.SetResponseFunc(endpoints.UpdateVAppLeaseSettingsSection(), func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "application/vnd.vmware.vcloud.leaseSettingsSection+xml;version=39.1", r.Header.Get("Content-Type"))
+		var body itypes.APIRequestLeaseSettingsSection
+		assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
+		if assert.NotNil(t, body.DeploymentLeaseInSeconds) {
+			assert.Equal(t, 1800, *body.DeploymentLeaseInSeconds)
 		}
-		if assert.NotNil(t, body.LeaseSettings) && assert.NotNil(t, body.LeaseSettings.DeploymentLeaseInSeconds) {
-			assert.Equal(t, 1800, *body.LeaseSettings.DeploymentLeaseInSeconds)
-		}
-		if assert.NotNil(t, body.LeaseSettings) && assert.NotNil(t, body.LeaseSettings.StorageLeaseInSeconds) {
-			assert.Equal(t, storageLease, *body.LeaseSettings.StorageLeaseInSeconds)
+		// The lease that is not requested keeps its current value
+		if assert.NotNil(t, body.StorageLeaseInSeconds) {
+			assert.Equal(t, storageLease, *body.StorageLeaseInSeconds)
 		}
 		w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
 		w.WriteHeader(http.StatusAccepted)
@@ -807,9 +838,11 @@ func TestUpdateVAppPreservesExistingDescription(t *testing.T) {
 	assert.Equal(t, "current description", resp.Description)
 	assert.NotNil(t, resp.DeploymentLeaseInSeconds)
 	assert.Equal(t, 1800, *resp.DeploymentLeaseInSeconds)
+	assert.False(t, recomposeCalled, "the description is unchanged: no recompose")
 
 	ms.CleanResponse(endpoints.GetVApp())
-	ms.CleanResponse(endpoints.UpdateVApp())
+	ms.CleanResponse(endpoints.UpdateVAppLeaseSettingsSection())
+	ms.CleanResponse(endpoints.RecomposeVApp())
 }
 
 func TestUpdateVAppCanClearDescription(t *testing.T) {
@@ -833,13 +866,13 @@ func TestUpdateVAppCanClearDescription(t *testing.T) {
 		assert.NoError(t, json.NewEncoder(w).Encode(resp))
 	})
 
-	ms.CleanResponse(endpoints.UpdateVApp())
-	ms.SetResponseFunc(endpoints.UpdateVApp(), func(w http.ResponseWriter, r *http.Request) {
-		var body itypes.APIRequestUpdateVApp
-		assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
-		if assert.NotNil(t, body.Description) {
-			assert.Equal(t, empty, *body.Description)
-		}
+	ms.CleanResponse(endpoints.RecomposeVApp())
+	ms.SetResponseFunc(endpoints.RecomposeVApp(), func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "application/vnd.vmware.vcloud.recomposeVAppParams+xml;version=39.1", r.Header.Get("Content-Type"))
+		var body itypes.APIRequestRecomposeVApp
+		assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
+		assert.Equal(t, empty, body.Description)
+		assert.Equal(t, "test-vapp-1", body.Name)
 		w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
 		w.WriteHeader(http.StatusAccepted)
 	})
@@ -850,7 +883,7 @@ func TestUpdateVAppCanClearDescription(t *testing.T) {
 	assert.Equal(t, empty, resp.Description)
 
 	ms.CleanResponse(endpoints.GetVApp())
-	ms.CleanResponse(endpoints.UpdateVApp())
+	ms.CleanResponse(endpoints.RecomposeVApp())
 }
 
 func TestDeleteVApp(t *testing.T) {
@@ -1021,4 +1054,184 @@ func Test_NewClient_ClientNil(t *testing.T) {
 	c, err := New(nil)
 	assert.Nil(t, c, "Expected nil client when input is nil")
 	assert.Error(t, err, "Expected error when input is nil")
+}
+
+func TestGetVAppByNameReadsTheVAppByID(t *testing.T) {
+	tests := []struct {
+		name        string
+		recordID    string
+		expectByID  bool
+		expectedVDC string
+	}{
+		{name: "URN record ID is re-read by ID", recordID: testVAppID, expectByID: true, expectedVDC: "urn:vcloud:vdc:aaaaaaaa-1234-4b8d-89ab-123456789012"},
+		{name: "non URN record ID keeps the list record", recordID: "not-a-urn", expectByID: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client, ms := newClient(t)
+
+			ms.CleanResponse(endpoints.ListVApp())
+			status := http.StatusOK
+			ms.SetResponse(endpoints.ListVApp(), &itypes.APIResponseListVApp{Records: []itypes.APIResponseListVAppRecord{{ID: tt.recordID, Name: "my-vapp"}}}, &status)
+
+			byID := 0
+			ms.CleanResponse(endpoints.GetVApp())
+			ms.SetResponseFunc(endpoints.GetVApp(), func(w http.ResponseWriter, _ *http.Request) {
+				byID++
+				w.Header().Set("Content-Type", "application/json")
+				assert.NoError(t, json.NewEncoder(w).Encode(&itypes.APIResponseGetVApp{ID: testVAppID, Name: "my-vapp", VDC: "urn:vcloud:vdc:aaaaaaaa-1234-4b8d-89ab-123456789012"}))
+			})
+
+			app, err := client.GetVApp(t.Context(), types.ParamsGetVApp{Name: "my-vapp"})
+			require.NoError(t, err)
+			assert.Equal(t, "my-vapp", app.Name)
+			assert.Equal(t, tt.expectedVDC, app.VDC)
+			if tt.expectByID {
+				assert.Equal(t, 1, byID)
+			} else {
+				assert.Zero(t, byID)
+			}
+		})
+	}
+}
+
+func TestMergedLease(t *testing.T) {
+	requested, current := 1800, 3600
+
+	got, err := mergedLease("deployment", &requested, &current)
+	assert.NoError(t, err)
+	assert.Equal(t, 1800, *got)
+
+	got, err = mergedLease("deployment", nil, &current)
+	assert.NoError(t, err)
+	assert.Equal(t, 3600, *got)
+
+	// an unknown current lease is not replaced by 0 ("never expires")
+	_, err = mergedLease("storage", nil, nil)
+	assert.ErrorContains(t, err, "the current storage lease is unknown")
+
+	// the returned pointer is a copy
+	*got = 1
+	assert.Equal(t, 3600, current)
+}
+
+// updateVAppCalls mocks the vApp read and the two update calls, and records the order of the calls.
+func updateVAppCalls(t *testing.T, ms interface {
+	CleanResponse(*cav.Endpoint)
+	SetResponseFunc(*cav.Endpoint, http.HandlerFunc)
+}, current *itypes.APIResponseGetVApp, leaseStatus int,
+) *[]string {
+	t.Helper()
+
+	calls := &[]string{}
+
+	ms.CleanResponse(endpoints.GetVApp())
+	ms.SetResponseFunc(endpoints.GetVApp(), func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		assert.NoError(t, json.NewEncoder(w).Encode(current))
+	})
+
+	ms.CleanResponse(endpoints.RecomposeVApp())
+	ms.SetResponseFunc(endpoints.RecomposeVApp(), func(w http.ResponseWriter, _ *http.Request) {
+		*calls = append(*calls, "recompose")
+		w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
+		w.WriteHeader(http.StatusAccepted)
+	})
+
+	ms.CleanResponse(endpoints.UpdateVAppLeaseSettingsSection())
+	ms.SetResponseFunc(endpoints.UpdateVAppLeaseSettingsSection(), func(w http.ResponseWriter, r *http.Request) {
+		*calls = append(*calls, "lease")
+		if leaseStatus != http.StatusAccepted {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(leaseStatus)
+			assert.NoError(t, json.NewEncoder(w).Encode(map[string]any{"message": "lease refused", "majorErrorCode": leaseStatus, "minorErrorCode": "BAD_REQUEST"}))
+			return
+		}
+		var body itypes.APIRequestLeaseSettingsSection
+		assert.NoError(t, xml.NewDecoder(r.Body).Decode(&body))
+		if assert.NotNil(t, body.DeploymentLeaseInSeconds) {
+			assert.Equal(t, 1800, *body.DeploymentLeaseInSeconds)
+		}
+		if assert.NotNil(t, body.StorageLeaseInSeconds) {
+			assert.Equal(t, 7200, *body.StorageLeaseInSeconds)
+		}
+		w.Header().Set("Location", "/api/task/87ab1934-0146-4fb0-80bc-815fea03214d")
+		w.WriteHeader(http.StatusAccepted)
+	})
+
+	return calls
+}
+
+func TestUpdateVAppDescriptionAndLeaseAreTwoOrderedCalls(t *testing.T) {
+	client, ms := newClient(t)
+	vappID := "urn:vcloud:vapp:12345678-1234-4b8d-89ab-123456789012"
+	description := "new description"
+
+	calls := updateVAppCalls(t, ms, &itypes.APIResponseGetVApp{
+		ID: vappID, Name: "test-vapp-1", Description: "old description",
+		LeaseSettings: itypes.APIResponseLeaseSettings{DeploymentLeaseInSeconds: 3600, StorageLeaseInSeconds: 7200},
+	}, http.StatusAccepted)
+
+	_, err := client.UpdateVApp(t.Context(), types.ParamsUpdateVApp{ID: vappID, Description: &description, DeploymentLeaseInSeconds: new(1800)})
+	assert.NoError(t, err)
+	assert.Equal(t, []string{"recompose", "lease"}, *calls)
+}
+
+func TestUpdateVAppLeaseFailureSaysTheDescriptionWasUpdated(t *testing.T) {
+	client, ms := newClient(t)
+	vappID := "urn:vcloud:vapp:12345678-1234-4b8d-89ab-123456789012"
+	description := "new description"
+
+	calls := updateVAppCalls(t, ms, &itypes.APIResponseGetVApp{
+		ID: vappID, Name: "test-vapp-1", Description: "old description",
+		LeaseSettings: itypes.APIResponseLeaseSettings{DeploymentLeaseInSeconds: 3600, StorageLeaseInSeconds: 7200},
+	}, http.StatusBadRequest)
+
+	_, err := client.UpdateVApp(t.Context(), types.ParamsUpdateVApp{ID: vappID, Description: &description, DeploymentLeaseInSeconds: new(1800)})
+	assert.ErrorContains(t, err, "update lease (the description was already updated)")
+	assert.Equal(t, []string{"recompose", "lease"}, *calls)
+}
+
+func TestUpdateVAppUnknownCurrentLeaseFailsBeforeAnyCall(t *testing.T) {
+	client, ms := newClient(t)
+	vappID := "urn:vcloud:vapp:12345678-1234-4b8d-89ab-123456789012"
+	description := "new description"
+
+	// the vApp has no lease information: only the deployment lease is requested
+	calls := updateVAppCalls(t, ms, &itypes.APIResponseGetVApp{ID: vappID, Name: "test-vapp-1", Description: "old description"}, http.StatusAccepted)
+
+	_, err := client.UpdateVApp(t.Context(), types.ParamsUpdateVApp{ID: vappID, Description: &description, DeploymentLeaseInSeconds: new(1800)})
+	assert.ErrorContains(t, err, "the current storage lease is unknown")
+	assert.Empty(t, *calls, "nothing is changed when the lease cannot be resolved")
+
+	// requesting both leases is enough
+	_, err = client.UpdateVApp(t.Context(), types.ParamsUpdateVApp{ID: vappID, DeploymentLeaseInSeconds: new(1800), StorageLeaseInSeconds: new(7200)})
+	assert.NoError(t, err)
+	assert.Equal(t, []string{"lease"}, *calls)
+}
+
+func TestPatchRawVAppRuntimeNetworkIsDeployed(t *testing.T) {
+	deployed := true
+	tests := []struct {
+		name    string
+		current *bool
+		request *bool
+		want    *bool
+	}{
+		{name: "not requested keeps the current value", current: &deployed, request: nil, want: &deployed},
+		{name: "requested overwrites the current value", current: nil, request: &deployed, want: &deployed},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dst := &itypes.APIResponseVAppNetworkConfig{NetworkName: "net", IsDeployed: tt.current}
+			src := types.ModelVAppRuntimeNetworkConfig{NetworkName: "net"}
+			src.Configuration.IsDeployed = tt.request
+
+			patchRawVAppRuntimeNetwork(dst, src)
+
+			assert.Equal(t, tt.want, dst.IsDeployed)
+		})
+	}
 }
