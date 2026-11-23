@@ -1,4 +1,8 @@
 ## 1.2.0 (Unreleased)
+### :rotating_light: **Breaking Changes**
+
+* vapp: `ModelVApp.Owner` is a user URN instead of an href when the payload only carries the href. (GH-163)
+* vapp: `endpoints.UpdateVApp` and the `APIRequestUpdateVApp` type are removed, use `RecomposeVApp` and `UpdateVAppLeaseSettingsSection` (`client.UpdateVApp` is unchanged). (GH-163)
 
 ### :bug: **Bug Fixes**
 
@@ -6,6 +10,12 @@
 * fix(edgeGateway): remove URN edgeGateway management as only UUID are returned as ID (GH-162)
 * fix(edgeGateway): wait for Cav Job completion when deleting edge gateway (GH-162)
 * fix(tier0): incorrect API response mapping from InfrApi backend (GH-162)
+* fix(vapp): decode the Link of the runtime network config, read IsDeployed from NetworkConfig and keep every element of the network config section in schema order, so updating one network no longer drops the others. (GH-163)
+* fix(vapp): read and write guest properties as XML (productSections+xml, task Accept on the PUT) and keep every ProductSection element the model does not carry (password, qualifiers, categories, extensions) when updating them. (GH-163)
+* fix(vapp): read the VDC from the rel="up" link, the lease from the LeaseSettingsSectionType section (a lease of 0 is a value) and the owner as a user URN, and re-read a vApp found by name by its ID, to match the real vApp payload. (GH-163)
+* fix(vapp): send the admin user and group media types for ACL subjects (an URN type answered 400) and read subjects from legacy and cloudapi hrefs. (GH-163)
+* fix(vapp): update the description with the recompose action and the lease with the lease settings section (the single PUT on the vApp answered 415). (GH-163)
+* fix(vdc): decode the storage profiles of a VDC when the API returns them as a plain array. (GH-163)
 
 ## 1.1.0 (November 20, 2026)
 ### :rotating_light: **Breaking Changes**
