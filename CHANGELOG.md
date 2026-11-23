@@ -1,4 +1,12 @@
 ## 1.2.0 (Unreleased)
+
+### :bug: **Bug Fixes**
+
+* fix(edgeGateway): incorrect retrieval of list edgeGateway API response (GH-162)
+* fix(edgeGateway): remove URN edgeGateway management as only UUID are returned as ID (GH-162)
+* fix(edgeGateway): wait for Cav Job completion when deleting edge gateway (GH-162)
+* fix(tier0): incorrect API response mapping from InfrApi backend (GH-162)
+
 ## 1.1.0 (November 20, 2026)
 ### :rotating_light: **Breaking Changes**
 
