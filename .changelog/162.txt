@@ -1,0 +1,15 @@
+```release-note:bug
+fix(tier0): incorrect API response mapping from InfrApi backend
+```
+
+```release-note:bug
+fix(edgeGateway): incorrect retrieval of list edgeGateway API response
+```
+
+```release-note:bug
+fix(edgeGateway): wait for Cav Job completion when deleting edge gateway
+```
+
+```release-note:bug
+fix(edgeGateway): remove URN edgeGateway management as only UUID are returned as ID
+```

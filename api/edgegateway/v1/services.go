@@ -30,13 +30,7 @@ const cavServicesNetworkType = "cav-services"
 // validateEdgeGatewayRef checks the edge gateway reference carried by
 // params. The network hierarchy endpoint takes no query parameters, so the
 // validation previously expressed by the endpoint definition lives here.
-func validateEdgeGatewayRef(id, name string) error {
-	if id != "" {
-		if err := validators.New().Var(id, "urn=edgegateway"); err != nil {
-			return fmt.Errorf("invalid edge gateway ID: %w", err)
-		}
-	}
-
+func validateEdgeGatewayRef(name string) error {
 	if name != "" {
 		if err := validators.New().Var(name, "resource_name=edgegateway"); err != nil {
 			return fmt.Errorf("invalid edge gateway name: %w", err)
@@ -52,7 +46,7 @@ func (c *Client) GetServices(ctx context.Context, params types.ParamsEdgeGateway
 		return nil, fmt.Errorf("id or name is required")
 	}
 
-	if err := validateEdgeGatewayRef(params.ID, params.Name); err != nil {
+	if err := validateEdgeGatewayRef(params.Name); err != nil {
 		return nil, err
 	}
 
@@ -98,7 +92,7 @@ func (c *Client) EnableCloudavenueServices(ctx context.Context, params types.Par
 		return fmt.Errorf("id or name is required")
 	}
 
-	if err := validateEdgeGatewayRef(params.ID, params.Name); err != nil {
+	if err := validateEdgeGatewayRef(params.Name); err != nil {
 		return err
 	}
 
